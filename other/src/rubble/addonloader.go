@@ -59,6 +59,9 @@ func loadDir(source dcfs.DataSource, addonname, path string, addons []*Addon) []
 		path += "/"
 	}
 	
+	// Load a forced init script if any.
+	loadForcedInit(source, dirpath)
+	
 	if containsParseable(source, dirpath) {
 		addons = append(addons, loadAddon(source, addonname, dirpath))
 	}
@@ -128,8 +131,28 @@ func classifyFile(file *AddonFile, filename string) string {
 	return filename
 }
 
+func loadForcedInit(source dcfs.DataSource, path string) {
+	if path != "" {
+		path += "/"
+	}
+	
+	content, err := source.OpenAndRead(path + "forced_init.rsf")
+	if err != nil {
+		content, err = source.OpenAndRead(path + "forced_init.rbf")
+		if err != nil {
+			return // No init script this addon
+		}
+	}
+	
+	ForcedInit = append(ForcedInit, content)
+	return 
+}
+
 func containsParseable(source dcfs.DataSource, path string) bool {
 	for _, filename := range source.ListFiles(path) {
+		if filename == "forced_init.rsf" || filename == "forced_init.rbf" {
+			continue
+		}
 		if strings.HasSuffix(filename, ".rsf") {
 			// is script
 			return true

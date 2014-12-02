@@ -31,6 +31,9 @@ var Addons []*Addon
 // Files is mapped to the Raptor indexable rubble:raws.
 var Files *FileList
 
+// Force initialization scripts, there should never be very many.
+var ForcedInit = make([][]byte, 0, 5)
+
 // Parse stage constants
 const (
 	stgUseCurrent = iota // Order the parser to use the current stage

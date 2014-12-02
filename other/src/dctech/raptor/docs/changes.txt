@@ -1,4 +1,9 @@
 
+v2.1
+	The parser will no longer automatically create floats from lexer input 
+		This is to stop the string "1.0" from becoming "1" and other issues of that sort.
+	Fixed error when trying to fetch a namespace from a namespace
+
 v2.0
 	Raptor is now reentrant!
 	The State has been split into two pieces, the State and the Script

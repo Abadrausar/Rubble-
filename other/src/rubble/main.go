@@ -45,7 +45,7 @@ func main() {
 		}
 	}()
 
-	LogPrintln("Rubble v3.1")
+	LogPrintln("Rubble v3.2")
 	LogPrintln("After Blast comes Rubble.")
 	LogPrintln("=============================================")
 
@@ -174,6 +174,21 @@ func main() {
 
 	LogPrintln("Initializing Scripting Subsystem.")
 	InitScripting()
+	
+	LogPrintln("Running Forced Init Scripts.")
+	for i := range ForcedInit {
+		script := raptor.NewScript()
+		err := raptor.LoadFile(ForcedInit[i], script)
+		if err != nil {
+			panic("Script Error: " + err.Error())
+		}
+
+		_, err = GlobalRaptorState.Run(script)
+		if err != nil {
+			panic("Script Error: " + err.Error())
+		}
+	}
+	
 	LogPrintln("Adding Builtins.")
 	SetupBuiltins()
 

@@ -93,7 +93,7 @@ func ParseCommandLine() {
 	Flags.StringVar(&DFDir, "dfdir", DFDir, "The path to the DF directory. May be relative.")
 	Flags.StringVar(&OutputDir, "outputdir", OutputDir, "Where should Rubble write the generated raw files?")
 	Flags.StringVar(&AddonsDir, "addonsdir", AddonsDir, "Rubble addons directory.")
-
+	
 	Flags.StringVar(&AddonsList, "addons", "", "List of addons to load. This is optional.")
 	Flags.StringVar(&ConfigList, "config", "", "List of config overrides. This is optional.")
 
@@ -103,8 +103,4 @@ func ParseCommandLine() {
 	Flags.BoolVar(&NoRecover, "norecover", false, "Should Rubble not recover errors? Useful for debugging.")
 
 	Flags.Parse(os.Args[1:])
-	
-	LogPrintln(DFDir)
-	LogPrintln(OutputDir)
-	LogPrintln(AddonsDir)
 }

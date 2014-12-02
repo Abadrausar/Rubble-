@@ -36,6 +36,7 @@ Cons:
 
 Required Reading for Modders (in most-important-first order):
 	This readme
+	HowTo Rubble - Tutorials
 	Rubble Addons - lots of stuff about addons in general
 	Rubble Base Templates - the template documentation for the base_templates addon
 	Rubble Native Templates - the template documentation for the builtin templates
@@ -194,21 +195,28 @@ Zap Aquifers:
 BUGS:
 ==============================================
 
-No bugs are known
-
 Known Issues (non-bug):
 	You should not use the extension .txt for readme files, as this will cause Rubble to parse those files.
 		See "Rubble Addons.txt" for more details.
-	Raptor 2.0 is still quite new, so I am sure there are hordes of bugs just waiting to ambush unsuspecting users.
-		I tested everything I could think of so any major bugs should be squashed, I'm just not quite ready to declare that I have rooted all the little guys out of their dark corners yet.
-		If Rubble exits with a script error I want to know.
 
 When making an error report please post the FULL log file! Posting just a few line tells me almost nothing about the problem, after all I made Rubble write all that stuff for a reason :)
-If you really want to be helpful run "rubble -norecover" and post that log as well as the normal log.
+If you really want to be helpful run "rubble -norecover" and post that log as well as the normal log. To do this from the GUI just add "-norecover" to the "Extra options" box at the bottom.
 
 ==============================================
 Changelog:
 ==============================================
+v3.2
+	Added forced initialization scripts, special scripts named "forced_init.rsf" (or .rbf) that ALWAYS run
+		Forced init scripts will run for any addon, even addons that are not active or addons that have no parseables
+		See "Rubble Addons.txt" for more details.
+	Added rubble:requireaddon to the "Base" addon (as a forced init script),
+		checks if an addon is active and aborts (with a nice message) if not
+	Added rubble:incompatibleaddon to the "Base" addon (as a forced init script),
+		checks if an addon is active and aborts (with a nice message) if so
+	Moved the Raptor shell predefs to the new forced init script in "Base"
+	Updated to Raptor 2.1
+		Raptor 2.1 fixes a few bugs, one of which is fairly major
+
 v3.1
 	The addon loader is now recursive
 		See "Rubble Addons.txt" for the new loading rules.

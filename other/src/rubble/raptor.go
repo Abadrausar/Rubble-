@@ -109,7 +109,6 @@ func CommandPanic(script *raptor.Script, params []*raptor.Value) {
 	panic(params[0].String())
 }
 
-type abort string
 // Causes rubble to abort with an error, use for correctable errors like configuration problems.
 // 	rubble:abort msg
 // Returns unchanged.

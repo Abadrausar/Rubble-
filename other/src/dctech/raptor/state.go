@@ -231,7 +231,7 @@ func (this *State) ParseNameSpaceName(name string) *NameSpace {
 
 func (this *State) fetchNameSpaceName(names []string, namespace *NameSpace) *NameSpace {
 	if len(names) == 1 {
-		if !this.NameSpaces.Exist(names[0]) {
+		if !namespace.NameSpaces.Exist(names[0]) {
 			panic(fmt.Sprintf("Undeclared Namespace: \"%v\"", names[0]))
 		}
 		return namespace.NameSpaces.Fetch(names[0])

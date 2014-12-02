@@ -1,0 +1,58 @@
+
+# Load some helpful commands.
+
+# These are the same "shell predefs" that are loaded by the Raptor shell by default.
+
+# increment variable
+(command ++ __name__ {
+	(set [__name__] (int:add [[__name__]] 1))
+})
+
+# decrement variable
+(command -- __name__ {
+	(set [__name__] (int:sub [[__name__]] 1))
+})
+
+# for loop
+(command for __init__ __test__ __incriment__ __code__ {
+	(eval [__init__])
+	(loop {
+		(if (evalinnew [__test__]) {}{(breakloop false)})
+		(evalinnew [__code__])
+		(evalinnew [__incriment__])
+		(break true)
+	})
+})
+
+# while loop
+(command while __test__ __code__ {
+	(loop {
+		(if (evalinnew [__test__]) {}{(breakloop false)})
+		(evalinnew [__code__])
+		(break true)
+	})
+})
+
+# include a file
+# requires the file io commands to be loaded
+(command include __path__ {
+	(evalinparent (fileio:read [__path__]))
+})
+
+# Rubble specific commands
+
+# Dependency check
+(command rubble:requireaddon me addon {
+	(if (rubble:addonactive [addon]) {
+	}{
+		(rubble:abort (str:add "The \"" [me] "\" addon requires that the \"" [addon] "\" addon to be active!\n"
+		"Please activate that addon and try again."))
+	})
+})
+
+(command rubble:incompatibleaddon me addon {
+	(if (rubble:addonactive [addon]) {
+		(rubble:abort (str:add "The \"" [me] "\" addon is incompatible with the \"" [addon] "\" addon!\n"
+		"Please deactivate that addon and try again."))
+	})
+})

@@ -17,9 +17,9 @@ User Templates defined in the base/templates addon.
 	Returns <PRERAWS>. Used to strip leading and trailing whitespace for better formatting of output and to delay variable expansion.
 
 ==============================================
-{!PANIC;<MESSAGE>}
-{PANIC;<MESSAGE>}
-{#PANIC;<MESSAGE>}
+{!ABORT;<MESSAGE>}
+{ABORT;<MESSAGE>}
+{#ABORT;<MESSAGE>}
 	Forces Rubble to exit, <MESSAGE> is displayed.
 
 ==============================================

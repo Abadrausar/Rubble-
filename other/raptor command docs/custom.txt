@@ -5,6 +5,12 @@ Causes a panic.
 
 	Returns unchanged.
 
+Causes rubble to abort with an error, use for correctable errors like configuration problems.
+	
+	rubble:abort msg
+	
+	Returns unchanged.
+
 Makes Rubble skip a file.
 	
 	rubble:skipfile name
@@ -42,6 +48,14 @@ Defines a Rubble script template.
 	rubble:template name [params...] code
 	
 	Returns unchanged.
+
+Checks if a named addon is active.
+	
+	rubble:addonactive name
+	
+	name needs to be the FULL name of the addon! (for example "Base/Files")
+	The name check is case-sensitive!
+	Returns true or false.
 
 Variables
 	rubble:dfdir		The Dwarf Fortress directory

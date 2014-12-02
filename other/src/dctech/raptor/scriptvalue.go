@@ -136,12 +136,12 @@ func TokenToValue(tok *Token) *Value {
 		return this
 	}
 
-	fltval, err := strconv.ParseFloat(tok.Lexeme, 64)
-	if err == nil {
-		this.Type = TypFloat
-		this.Data = fltval
-		return this
-	}
+	//fltval, err := strconv.ParseFloat(tok.Lexeme, 64)
+	//if err == nil {
+	//	this.Type = TypFloat
+	//	this.Data = fltval
+	//	return this
+	//}
 
 	this.Type = TypString
 	this.Data = tok.Lexeme

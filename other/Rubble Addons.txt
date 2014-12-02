@@ -3,8 +3,7 @@
 How to Write a Rubble Addon
 ==============================================
 
-There used to be a tutorial here, but it got badly obsolete.
-For now I have just removed it.
+There are some tutorials in the file "How To Rubble.txt", I suggest you read them as they explain the basics in some detail.
 
 ==============================================
 Template Prefixes Explained:
@@ -88,6 +87,28 @@ Pitfalls to keep in mind:
 		To put it simply, you can't. Or rather you can, but Rubble will crash with an error on the next iteration. Remember to declare your variables ahead of time and if you REALLY don't want them around after the loop exits just delvar them away or surround the whole mess in a call to evalinnew.
 
 ==============================================
+Forced Initialization Scripts:
+==============================================
+
+Forced init scripts are very limited, but also very useful. Basically they are Raptor scripts that ALWAYS run, even when their containing addon is not active.
+Forced init scripts are always named "forced_init.rsf" (or .rbf, .rsf takes precedence).
+Use forced init scripts to do setup that may be shared by multiple addons and HAS to be done. For example an excellent use for a forced init script is adding namespaces and global variables shared by a bunch of addons in an addon pack.
+
+Forced init scripts have a very narrow use-case and should be used with care.
+
+Forced init scripts are still loaded as "user data" if their containing addon contains any parseables! Due to the way files override each other it is unlikely that this could be useful, but it is more work than it is worth to override the default behavior.
+
+==============================================
+.rbf:
+==============================================
+
+"So what's up with this '.rbf' extension that is listed as being parseable?" you ask. 
+It stands for "Raptor Binary File" and is used for "compiled" raptor scripts. If for some odd reason you want to make your scripts smaller (why not just make your addon a zip file?) and harder to edit (note that it is really easy to decompile a .rbf file.) you can compile your scripts and use the binary instead of the source.
+Why you would want to do this I have no idea, but it didn't take any extra work to allow you to load them, so why not?
+
+In most languages compiling a script would be something you would do to help find errors and/or to reduce file size, in Raptor finding errors is better done with validate and Rubble loads addons from zip files, therefor making binaries redundant.
+
+==============================================
 The Addon Loader:
 ==============================================
 
@@ -101,6 +122,7 @@ The following rules determine how addons are loaded:
 	Zip files and directories are identical as far as the loader is concerned except as otherwise specified.
 	If an addon contains one or more directories, the directories are loaded as child addons.
 	An addon without parseable files (.txt, .rbl, .rsf, .rbf) is not loaded (but any child addons are).
+		A forced init script is not considered a paresable file. (but such a script will still run)
 
 The following rules determine how addon files override each other (if there is a name collision):
 	Addons in zip files will always override addons in directories.
@@ -127,7 +149,7 @@ For example Better Dorfs, a mod of mine, groups all of its addons into the "Bett
 Other Random Information:
 ==============================================
 
-If you want to allow an item, reaction, or building with a minimum of fuss register it as class "ADDON_HOOK_MOUNTAIN" or "ADDON_HOOK_PLAYABLE". Addon hooks also exist for the other entities.
+If you want to allow an item, reaction, or building with a minimum of fuss, register it as class "ADDON_HOOK_MOUNTAIN" or "ADDON_HOOK_PLAYABLE". Specific addon hooks also exist for the other entities as well as an ADDON_HOOK_GENERIC that every entity has.
 
 If you are making a template that takes a variable number of params and you want to implement it via a different template you may need the ... param.
 Example:
