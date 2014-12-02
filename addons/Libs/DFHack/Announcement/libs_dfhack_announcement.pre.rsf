@@ -1,0 +1,28 @@
+
+# Announcement Template and Script Install
+
+# Example:
+# As a reaction product line:
+# {DFHACK_ANNOUNCEMENT;You have unleashed a dragon!;COLOR_LIGHTRED}
+# (the color defaults to white)
+#
+
+(rubble:requireaddon "Libs/DFHack/Announcement" "Libs/DFHack/Command")
+(namespace rubble:libs_dfhack_announcement)
+
+# Gets a material to show the specified announcement.
+(command rubble:libs_dfhack_announcement:getmat text color {
+	(var in <array libs_dfhack_announcement [text] [color]>)
+	(rubble:libs_dfhack_command:getmat [in])
+})
+
+# Use this template as a replacement for a reaction product line.
+(rubble:template "DFHACK_ANNOUNCEMENT" text color=COLOR_WHITE {
+	(var in <array libs_dfhack_announcement [text] [color]>)
+	(str:add "[PRODUCT:100:1:BOULDER:NONE:" (rubble:libs_dfhack_command:getmat [in]) "]")
+})
+
+# Install the script.
+(fileio:write (str:add [rubble:dfdir] "/hack/scripts/libs_dfhack_announcement.lua") [rubble:raws "libs_dfhack_announcement.lua"])
+
+(ret "")

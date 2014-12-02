@@ -32,6 +32,9 @@ func LoadAddons(path string) []*Addon {
 	LogPrintln(path)
 	source, err := dcfs.NewDirReader(path)
 	if err != nil {
+		if ShellMode {
+			return addonlist
+		}
 		panic(err)
 	}
 

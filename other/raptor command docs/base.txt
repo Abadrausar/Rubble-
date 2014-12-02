@@ -87,8 +87,7 @@ func CommandEvalInParent(script *raptor.Script, params []*raptor.Value)
     Returns the return value of the last command in the code it runs.
 
 func CommandExists(script *raptor.Script, params []*raptor.Value)
-    Returns true (-1) if variable exists or if a index exists in a map or
-    array.
+    Returns true if variable exists or if a index exists in a map or array.
 
 	exists name
 	exists value index
@@ -196,6 +195,17 @@ func CommandThis(script *raptor.Script, params []*raptor.Value)
 
     Returns the value of the This register.
 
+func CommandTrap(script *raptor.Script, params []*raptor.Value)
+    Evaluates code in the current environment and halts any unrecoverable
+    errors. WARNING!! This command may result in a messed up state/script if
+    you are not careful! There is a reason "unrecoverable errors" are called
+    that! In most cases you should be OK, but be careful.
+
+	trap code
+
+    Returns the return value of the last command in the code it runs or sets
+    the error flag and returns a string describing the error..
+
 func CommandVar(script *raptor.Script, params []*raptor.Value)
     Creates a new variable setting the value to value if present.
 
@@ -237,6 +247,7 @@ func Setup(state *raptor.State)
 	eval
 	evalinparent
 	evalinnew
+	trap
 	if
 	loop
 	foreach

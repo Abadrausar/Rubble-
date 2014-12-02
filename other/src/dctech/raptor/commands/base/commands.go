@@ -48,6 +48,7 @@ import "dctech/raptor"
 //	eval
 //	evalinparent
 //	evalinnew
+//	trap
 //	if
 //	loop
 //	foreach
@@ -77,6 +78,7 @@ func Setup(state *raptor.State) {
 	state.NewNativeCommand("eval", CommandEval)
 	state.NewNativeCommand("evalinparent", CommandEvalInParent)
 	state.NewNativeCommand("evalinnew", CommandEvalInNew)
+	state.NewNativeCommand("trap", CommandTrap)
 	state.NewNativeCommand("if", CommandIf)
 	state.NewNativeCommand("loop", CommandLoop)
 	state.NewNativeCommand("foreach", CommandForEach)
@@ -295,7 +297,7 @@ func CommandSet(script *raptor.Script, params []*raptor.Value) {
 	script.RetVal = params[2]
 }
 
-// Returns true (-1) if variable exists or if a index exists in a map or array.
+// Returns true if variable exists or if a index exists in a map or array.
 // 	exists name
 //	exists value index
 // Returns true or false.
@@ -400,6 +402,25 @@ func CommandEvalInNew(script *raptor.Script, params []*raptor.Value) {
 	script.Envs.Add(raptor.NewEnvironment())
 	script.Exec()
 	script.Envs.Remove()
+}
+
+// Evaluates code in the current environment and halts any unrecoverable errors.
+// WARNING!! This command may result in a messed up state/script if you are not careful!
+// There is a reason "unrecoverable errors" are called that! In most cases you should be OK, but be careful.
+// 	trap code
+// Returns the return value of the last command in the code it runs or sets the error 
+// flag and returns a string describing the error..
+func CommandTrap(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to trap.")
+	}
+
+	script.Code.AddCodeSource(params[0].CodeSource())
+	err := script.SafeExec()
+	if err != nil {
+		script.Error = true
+		script.RetVal = raptor.NewValueString(err.Error())
+	}
 }
 
 // If the condition is true run true code else if false code exists call false code.

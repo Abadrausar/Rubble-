@@ -1,0 +1,7 @@
+{#SCRIPT;
+	(var out "[OBJECT:INORGANIC]")
+	(foreach [rubble:libs_dfhack_command:mats] {
+		(set out (str:add [out] "\n\n" [params 1]))
+	})
+	[out]
+}

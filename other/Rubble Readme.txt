@@ -171,6 +171,22 @@ Generic Animal Mats:
 	As a special bonus :p this addon should work with most any mod, even total conversions.
 	This addon is packed as a zip to demo how that is done.
 
+Libs/DFHack/Announcement:
+	This addon is a modders resource for displaying announcements to the player.
+	Requires "Libs/DFHack/Command".
+	This addon also provides a Raptor command for advanced usage.
+
+Libs/DFHack/Command:
+	This addon is a modders resource for running DFHack commands from reactions.
+	Activating this addon adds a template that generates reaction product lines for autosyndrome boiling rocks (the boiling rocks in question are automatically defined).
+	This addon also provides a Raptor command for advanced usage.
+
+Libs/DFHack/Spawn:
+	"Libs/DFHack/Spawn" is a modders resource for spawning creatures via DFHack.
+	Activating this addon installs a creature spawner script into the DFHack scripts directory.
+	Requires "Libs/DFHack/Command".
+	This addon also provides a Raptor command for advanced usage.
+
 Nerf/Ranged:
 	A simple addon that nerfs bows and crossbows, uses the stats from the popular Broken Arrow mod.
 
@@ -205,6 +221,25 @@ If you really want to be helpful run "rubble -norecover" and post that log as we
 ==============================================
 Changelog:
 ==============================================
+v3.5
+	Updated to Raptor 2.1.2
+		2.1.2 adds two new commands, sort:new and sort:map as well as fixing an issue in the shell.
+	Rubble is more flexible about it's environment when running in shell mode.
+	Added "Libs/DFHack/Announcement", a library addon for displaying announcements to the player.
+	Added "Libs/DFHack/Command" (from BD), a library addon for running DFHack commands.
+	Added "Libs/DFHack/Spawn" (from BD), a library addon for spawning creatures.
+
+v3.4
+	Updated to Raptor 2.1.1
+		2.1.1 adds a new command, trap.
+	Removed ITEM template (use SHARED_ITEM)
+	Added rubble:activeaddons, a params array indexable with a list of all active addon names
+	Added rubble:grouprequires script command to the "Base" addon forced init script
+		Allows for specifying a dependency for a group of addons.
+	Added rubble:groupincompatible script command to the "Base" addon forced init script
+		Allows for specifying an incompatibility for a group of addons.
+	Rewrote addon hooks to make output format better (still a little ugly)
+
 v3.3
 	Added the following templates to help streamline tileset support:
 		INSTALL_TILESHEET

@@ -309,6 +309,7 @@ func (this *Script) Exec() {
 // SafeExec traps panics and turns them into errors, use when you want to emulate the behavior 
 // of State.Run without doing the other stuff Run does.
 // Respects this.Host.NoRecover.
+// Halts all exit states, but does none of the other cleanup (aside from what Exec already does).
 func (this *Script) SafeExec() (err error) {
 	err = nil
 

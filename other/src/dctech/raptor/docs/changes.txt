@@ -1,4 +1,14 @@
 
+v2.1.2
+	Added new version of the Run function to the state: RunShell.
+		Used for cases where you would expect "global" variables to be preserved.
+	The shell program now uses RunShell
+	Added new commands: sort:new and sort:map
+
+v2.1.1
+	Added the trap command to the base commands package
+		trap can be used to handle some expected unrecoverable errors. Possibly dangerous, use with care.
+
 v2.1
 	The parser will no longer automatically create floats from lexer input 
 		This is to stop the string "1.0" from becoming "1" and other issues of that sort.

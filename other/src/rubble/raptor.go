@@ -38,6 +38,7 @@ import "dctech/raptor/commands/ini"
 import "dctech/raptor/commands/integer"
 import "dctech/raptor/commands/raw"
 import "dctech/raptor/commands/regex"
+import "dctech/raptor/commands/sort"
 import "dctech/raptor/commands/str"
 
 import "regexp"
@@ -67,6 +68,7 @@ func InitScripting() {
 	integer.Setup(state)
 	raw.Setup(state)
 	regex.Setup(state)
+	sort.Setup(state)
 	str.Setup(state)
 	
 	state.NewNameSpace("rubble")
@@ -74,6 +76,14 @@ func InitScripting() {
 	state.NewNamespacedVar("rubble:outputdir", raptor.NewValueString(OutputDir))
 	state.NewNamespacedVar("rubble:addonsdir", raptor.NewValueString(AddonsDir))
 	state.NewNamespacedVar("rubble:raws", raptor.NewValueObject(NewIndexableRaws()))
+	
+	array := make([]*raptor.Value, 0, 20)
+	for i := range Addons {
+		if Addons[i].Active == true {
+			array = append(array, raptor.NewValueString(Addons[i].Name))
+		}
+	}
+	state.NewNamespacedVar("rubble:activeaddons", raptor.NewValueObject(raptor.NewParamsArray(array)))
 	
 	state.NewNativeCommand("panic", CommandPanic)
 	

@@ -89,7 +89,7 @@ func ShellModeRun() {
 	if !NoPredefs {
 		LogPrintln("Loading Predefined User Commands...")
 		script.Code.AddCodeSource(raptor.NewLexer(preDefs, 64, 1))
-		rtn, err := GlobalRaptorState.Run(script)
+		rtn, err := GlobalRaptorState.RunShell(script)
 		if err != nil {
 			LogPrintln("Predefine Error:", err)
 			LogPrintln("Predefine Ret:", rtn)
@@ -181,7 +181,7 @@ func ShellModeRun() {
 			return
 		}
 
-		rtn, err := GlobalRaptorState.Run(script)
+		rtn, err := GlobalRaptorState.RunShell(script)
 		if err != nil {
 			LogPrintln("Error:", err)
 		}
@@ -220,7 +220,7 @@ func ShellModeRun() {
 
 		if curchar[0] == byte('\n') && !escape {
 			script.Code.Add(string(line))
-			rtn, err := GlobalRaptorState.Run(script)
+			rtn, err := GlobalRaptorState.RunShell(script)
 			if err != nil {
 				LogPrintln("Error:", err)
 			}

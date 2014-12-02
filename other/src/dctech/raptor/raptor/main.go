@@ -42,6 +42,7 @@ import "dctech/raptor/commands/ini"
 import "dctech/raptor/commands/integer"
 import "dctech/raptor/commands/raw"
 import "dctech/raptor/commands/regex"
+import "dctech/raptor/commands/sort"
 import "dctech/raptor/commands/str"
 import "io/ioutil"
 import "flag"
@@ -185,6 +186,7 @@ func main() {
 	integer.Setup(state)
 	raw.Setup(state)
 	regex.Setup(state)
+	sort.Setup(state)
 	str.Setup(state)
 
 	// Add any command line params to the state.
@@ -194,7 +196,7 @@ func main() {
 	if !NoPredefs {
 		fmt.Println("Loading Predefined User Commands...")
 		script.Code.AddCodeSource(raptor.NewLexer(preDefs, 64, 1))
-		rtn, err := state.Run(script)
+		rtn, err := state.RunShell(script)
 		if err != nil {
 			fmt.Println("Predefine Error:", err)
 			fmt.Println("Predefine Ret:", rtn)
@@ -286,7 +288,7 @@ func main() {
 			return
 		}
 
-		rtn, err := state.Run(script)
+		rtn, err := state.RunShell(script)
 		if err != nil {
 			fmt.Println("Error:", err)
 		}
@@ -325,7 +327,7 @@ func main() {
 
 		if curchar[0] == byte('\n') && !escape {
 			script.Code.Add(string(line))
-			rtn, err := state.Run(script)
+			rtn, err := state.RunShell(script)
 			if err != nil {
 				fmt.Println("Error:", err)
 			}

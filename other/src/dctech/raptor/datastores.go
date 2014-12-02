@@ -92,6 +92,10 @@ func (this *EnvStore) Clear() {
 	this.Add(NewEnvironment())
 }
 
+func (this *EnvStore) ClearAllButRoot() {
+	*this = (*this)[0:1]
+}
+
 func (this *EnvStore) Last() *Environment {
 	return (*this)[len(*this)-1]
 }

@@ -17,4 +17,5 @@ call export ini
 call export integer
 call export raw
 call export regex
+call export sort
 call export str

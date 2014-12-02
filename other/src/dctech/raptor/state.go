@@ -365,3 +365,44 @@ func (this *State) Run(script *Script) (ret *Value, err error) {
 	return // Required :(
 }
 
+// RunShell executes a Raptor script, but does not completely clear the environment.
+// You must NEVER, NEVER, NEVER nest calls to Run unless you make the nested calls with a new Script.
+func (this *State) RunShell(script *Script) (ret *Value, err error) {
+	// Most of this function is identical to RunCommand
+	// It's just easier to copy than refactor
+	
+	script.Host = this
+	
+	err = nil
+
+	defer func() {
+		ret = script.RetVal
+		
+		if !this.NoRecover {
+			if x := recover(); x != nil {
+				switch i := x.(type) {
+				case error:
+					err = i
+				case string:
+					err = fmt.Errorf("%v Near %v", i, script.Code.Last().Position())
+				default:
+					err = errors.New(fmt.Sprint(i))
+				}
+			}
+		}
+		
+		// Normal Cleanup
+		script.Code.Clear()
+		script.Envs.ClearAllButRoot()
+		script.Host = nil
+		//script.RetVal = nil
+		script.This = nil
+		script.Exit = false
+		script.Return = false
+		script.Break = false
+		script.BreakLoop = false
+	}()
+
+	script.Exec()
+	return // Required :(
+}

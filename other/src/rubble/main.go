@@ -45,7 +45,7 @@ func main() {
 		}
 	}()
 
-	LogPrintln("Rubble v3.3")
+	LogPrintln("Rubble v3.5")
 	LogPrintln("After Blast comes Rubble.")
 	LogPrintln("=============================================")
 
@@ -67,11 +67,15 @@ func main() {
 		LogPrintln("Addons Not Specified via Command line.")
 		LogPrintln("Loading " + AddonsDir + "/addonlist.ini...")
 		file, err := ioutil.ReadFile(AddonsDir + "/addonlist.ini")
-		if err != nil {
+		if err != nil && !ShellMode {
 			LogPrintln("Read failed (this is bad if unexpected)\n  Error:", err)
 			UpdateAddonList(AddonsDir, Addons)
 			LogPrintln("Rubble has no files to parse, aborting.")
 			return
+		} else if ShellMode {
+			LogPrintln("Read failed (this is bad if unexpected)\n  Error:", err)
+			UpdateAddonList(AddonsDir, Addons)
+			LogPrintln("Rubble has no files to parse but shell mode is active, continuing.")
 		}
 
 		lines := strings.Split(string(file), "\n")
@@ -99,7 +103,7 @@ func main() {
 		}
 	}
 
-	if len(addonNames) == 0 {
+	if len(addonNames) == 0 && !ShellMode {
 		LogPrintln("No Addons Marked Active")
 		LogPrintln("Rubble has no files to parse, aborting.")
 		return
@@ -127,7 +131,7 @@ func main() {
 	// Convert Addons to File List
 	Files = NewFileList(Addons)
 
-	if len(Files.Order) == 0 {
+	if len(Files.Order) == 0 && !ShellMode {
 		LogPrintln("Files list is empty. (no active addons have parseable files)")
 		LogPrintln("Rubble has no files to parse, aborting.")
 		return

@@ -490,11 +490,6 @@
 	
 	(rubble:stageparse (str:add "{SHARED_OBJECT;" [id] ";\n[ITEM_" [type] ":" [id] "]\n\t" [def] "\n}"))
 })
-(rubble:template "ITEM" type id def {
-	(console:print "    WARNING template ITEM is depreciated and will be removed soon.\n"
-	"      Replace with SHARED_ITEM.")
-	(rubble:calltemplate "SHARED_ITEM" [type] [id] [def])
-})
 (rubble:template "ITEM_CLASS" ... {
 	(var type [rubble:item_current_type])
 	(var id [rubble:item_current_id])
@@ -572,12 +567,71 @@
 	(str:trimspace [out])
 })
 
+# combination of #USES_TECH and #USES_ITEMS, for internal use.
+(rubble:template "#_ADDON_HOOK" class {
+	(var out (str:add "# Hook: " [class]))
+	
+	# Items
+	(if (exists [rubble:item_data] [class]){
+		(foreach [rubble:item_data [class]] {
+			(var type [rubble:item_data [class] [params 0] type])
+			(var rarity [rubble:item_data [class] [params 0] rarity])
+			(if [rubble:item_types [type]] {
+				# Has rarity
+				(set out (str:add [out] "\n\t[" [type] ":" [params 0] ":" [rarity] "]"))
+			}{
+				# Does not have rarity
+				(set out (str:add [out] "\n\t[" [type] ":" [params 0] "]"))
+			})
+			(break true)
+		})
+	})
+	
+	(var buildings <map>)
+	(var buildingnames <array>)
+	(var reactions <map>)
+	(var reactionnames <array>)
+	
+	(if (exists [rubble:building_data] [class]){
+		(foreach [rubble:building_data [class]] {
+			(if (exists [buildings] [params 1]){
+				# nop
+			}{
+				(set [buildings] [params 1] true)
+				(set [buildingnames] (len [buildingnames]) [params 1])
+			})
+			(break true)
+		})
+	})
+	(if (exists [rubble:reaction_data] [class]){
+		(foreach [rubble:reaction_data [class]] {
+			(if (exists [reactions] [params 1]){
+				# nop
+			}{
+				(set [reactions] [params 1] true)
+				(set [reactionnames] (len [reactionnames]) [params 1])
+			})
+			(break true)
+		})
+	})
+	
+	(foreach [buildingnames] {
+		(set out (str:add [out] "\n\t[PERMITTED_BUILDING:" [params 1] "]"))
+		(break true)
+	})
+	(foreach [reactionnames] {
+		(set out (str:add [out] "\n\t[PERMITTED_REACTION:" [params 1] "]"))
+		(break true)
+	})
+	
+	(str:trimspace [out])
+})
+
 (rubble:template "ADDON_HOOKS" id "playable=false" {
-	(str:add
-		"{#USES_ITEMS;ADDON_HOOK_" [id] "}"
-		"{#USES_TECH;ADDON_HOOK_" [id] "}"
-		"{#USES_ITEMS;ADDON_HOOK_GENERIC}"
-		"{#USES_TECH;ADDON_HOOK_GENERIC}"
-		(if [playable] {"{#USES_ITEMS;ADDON_HOOK_PLAYABLE}{#USES_TECH;ADDON_HOOK_PLAYABLE}"} {""})
-	)
+
+	(var out (str:add
+		"{#_ADDON_HOOK;ADDON_HOOK_" [id] "}\n"
+		"\t{#_ADDON_HOOK;ADDON_HOOK_GENERIC}"
+		(if [playable] {"\n\t{#_ADDON_HOOK;ADDON_HOOK_PLAYABLE}"}{""})
+	))
 })
