@@ -1,0 +1,148 @@
+	
+Rubble Template Documentation
+
+Template are about to go through a major rewrite, the stuff here is mostly leftovers from GoBlast.
+
+==============================================
+{!TEMPLATE;<NAME>;<CODE>}
+{!TEMPLATE;<NAME>;<PARAM_1>;<PARAM_2>;...;<CODE>}
+{!TEMPLATE;<NAME>;<PARAM_1>=<DEFAULT_VALUE_1>;<PARAM_2>=<DEFAULT_VALUE_2>;...;<CODE>}
+	Creates a new template definition with name <NAME>, subsequently calling {<NAME>} will return a new parse of <CODE>.
+
+	Calling {<NAME>;<ARGUMENT_1>;<ARGUMENT_2>} will replace instances of %<PARAM_1>, %{<PARAM_1>}, or %1 with <ARGUMENT_1>, instances of %<PARAM_2>, %{<PARAM_2>}, or %2 with <ARGUMENT_2>, etcetera. Default values may be specified for parameters.
+	
+	If a parameters value has the form $<VALUE> or ${<VALUE>} <VALUE> will be treated as a variable name and replaced with the variables value, the same also holds for any such string found in <CODE>
+	
+	Note that <NAME> may not be a global identifier.
+	
+	Example:
+		{!TEMPLATE;FOO;bar}
+		{FOO}
+		{FOO}
+		{!TEMPLATE;GREET;thing;Hello %{thing}!}
+		{GREET;World}
+		{!TEMPLATE;GREET_DWARF;dwarf=Urist;Hello %{dwarf}!}
+		{GREET_DWARF}
+		{GREET_DWARF;Led}
+		{SET;TEST;‼Fun‼}
+		{GREET;$TEST}
+	
+	evaluates to
+		bar
+		bar
+		Hello World!
+		Hello Urist!
+		Hello Led!
+		Hello ‼Fun‼!
+
+==============================================
+{ONCE;<KEY>;<PRERAWS>}
+	Parses and returns <PRERAWS> unless a ONCE block with the same <KEY> has been parsed earlier.
+
+==============================================
+{STATIC;<KEY>;<PRERAWS>}
+	If this template is the first to be evaluated with key <KEY>, then <PRERAWS> are parsed and returned. Subsequent STATIC calls with the same <KEY> will return the result of the first parse instead without parsing anything else before that.
+
+==============================================
+{COMMENT;<STUFF>...}
+{C;<STUFF>...}
+	Doesn't parse or return anything.
+
+==============================================
+{VOID;<PRERAWS>...}
+	Parses <PRERAWS>, but doesn't return anything.
+
+==============================================
+{SET;<NAME>;<VALUE>}
+	Sets a variable of name <NAME> to value <VALUE>. Returns nothing.
+
+==============================================
+{IF;<STRING1>;<STRING2>;<THEN_PRERAWS>}
+{IF;<STRING1>;<STRING2>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
+	If <STRING1> and <STRING2> are equal, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned. This is very useful with variables.
+	
+	Example:
+		{IF;$TEST_VAR;YES;[FOO];[BAR]}
+
+
+==============================================
+{!SCRIPT;<NCACODE>} or {!SCRIPT;<NCACODE>;<PARAMS>...}
+{SCRIPT;<NCACODE>} or {SCRIPT;<NCACODE>;<PARAMS>...}
+{#SCRIPT;<NCACODE>} or {#SCRIPT;<NCACODE>;<PARAMS>...}
+	Run a NCA4 script and returns whatever the script returns. This is not very useful yet because there are no custom NCA commands for Rubble yet. When this is finished you will be able to script most Rubble actions as well as do all sorts of other things.
+
+==============================================
+{#ADVENTURE_TIER}
+	Returns a new unique [ADVENTURE_TIER:X] tag every time it is processed.
+	
+	Example (assuming {#ADVENTURE_TIER} wasn't previously called):
+		{#ADVENTURE_TIER} -> [ADVENTURE_TIER:1]
+		{#ADVENTURE_TIER} -> [ADVENTURE_TIER:2]
+
+==============================================
+{ITEM_CLASS;<TYPE>;<ITEM>;<RARITY>;<CLASS>} or {ITEM_CLASS;<TYPE>;<ITEM>;<RARITY>;<CLASS>;<TAGS>...}
+	Registers an item <ITEM> of type <TYPE> to item class <CLASS> with rarity <RARITY>, optionally assigning specific <TAGS>. Used later with #USES_ITEM_CLASSES.
+	
+	<TYPE> must be one of AMMO, ARMOR, DIGGER, GLOVES, HELM, INSTRUMENT, PANTS, SHIELD, SHOES, SIEGEAMMO, TOOL, TOY, TRAPCOMP or WEAPON.
+	<RARITY> can be RARE, UNCOMMON, COMMON and FORCED.
+
+==============================================
+{#USES_ITEM_CLASSES;<CLASSES>...;<TAGS>...}
+	Usable in entity definitions. Expands to a list of item permissions of all the <CLASSES> combined. If tags were specified in a {ITEM_CLASS} call, all of those tags need to be in the tag list for this item permission to be returned. When two item classes contain the same item, but with different rarities, they will result in one item permission tag with the more common of the two rarities. Be careful when using multiple #USES_ITEM_CLASSES calls, and make sure every item is returned by at most one #USES_ITEM_CLASSES call.
+
+==============================================
+{TECH_CLASS;<TYPE>;<TECH>;<CLASS>}
+	Similar to ITEM_CLASS, this registers a technology of type <TYPE> to class <CLASS>. Used with #USES_TECH_CLASSES.
+
+	<TYPE> may be either BUILDING or REACTION.
+
+==============================================
+{#USES_TECH_CLASSES;<CLASSES>...}
+	Usable in entity definitions. Expands to a list of tech permissions of all <CLASS>es combined.
+
+==============================================
+{#ADV_TIME;<AMOUNT>;<UNIT>}
+	Time unit to adventure mode ticks conversion template. Returns a number of ticks that corresponds to <AMOUNT> <UNIT>s in adventure mode. The allowed units are SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR and their respective plurals.
+	
+	Examples:
+		{#ADV_TIME;1;SECOND} -> 1
+		{#ADV_TIME;2;MINUTES} -> 120
+		{#ADV_TIME;24;HOURS} -> 86400
+		{#ADV_TIME;1;DAY} -> 86400
+		{#ADV_TIME;1;YEAR} -> 29030400
+
+==============================================
+{#FORT_TIME;<AMOUNT>;<UNIT>}
+	Time unit to fortress mode ticks conversion template. Returns a number of ticks that corresponds to <AMOUNT> <UNIT>s in fortress mode. The allowed units are SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR and their respective plurals.
+
+	Examples:
+		{#FORT_TIME;1;SECOND} -> 0
+		{#FORT_TIME;2;MINUTES} -> 1
+		{#FORT_TIME;24;HOURS} -> 1200
+		{#FORT_TIME;1;DAY} -> 1200
+		{#FORT_TIME;1;YEAR} -> 403200
+
+==============================================
+{SHARED_INORGANIC;<NAME>;<DEFINITION>}
+{SHARED_MATERIAL_TEMPLATE;<NAME>;<DEFINITION>}
+	Adds a common inorganic or material template to the dictionary. <DEFINITION> should be a complete inorganic stone entry, including the [INORGANIC:<NAME>] tag. If this template call is the first to define this type of stone, then the given <DEFINITION> will be used in the finished raws. 
+	
+	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_ORE, REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
+
+==============================================
+{REGISTER_ORE;<ORE>;<METAL>;<AMOUNT>}
+	Adds a [METAL_ORE:<METAL>:<AMOUNT>] tag to the definition of <ORE>. For this to work, <ORE> must be registered as a SHARED_INORGANIC. If this is called multiple times with the same <ORE> and <METAL>, the highest <AMOUNT> is used.
+
+==============================================
+{REGISTER_REACTION_CLASS;<INORGANIC>;<CLASS>}
+	Adds a [REACTION_CLASS:<CLASS>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC.
+
+==============================================
+{REGISTER_REACTION_PRODUCT;<INORGANIC>;<CLASS>;<PRODUCT>}
+	Adds a [MATERIAL_REACTION_PRODUCT:<CLASS>:<PRODUCT>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC.
+
+==============================================
+{SHARED_ITEM;<NAME>;<DEFINITION>}
+	Adds a common item of name <NAME> to the item dictionary. <DEFINITION> should be a complete item entry, including the [ITEM_<TYPE>:<NAME>] tag. If this template call is the first to define this item, then the given <DEFINITION> will be used in the finished raws.
+	
+	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws.
