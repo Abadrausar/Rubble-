@@ -89,13 +89,6 @@ func InitScripting() {
 	}
 	rbl.RegisterVar("versions", rex.NewValueIndex(rex.NewStaticMap(versions)))
 
-	addons := make([]*rex.Value, 0, 20)
-	for i := range Addons {
-		if Addons[i].Active == true {
-			addons = append(addons, rex.NewValueString(Addons[i].Name))
-		}
-	}
-	rbl.RegisterVar("activeaddons", rex.NewValueIndex(rex.NewStaticArray(addons)))
 	rbl.RegisterVar("addons", genii.New(Addons))
 	rbl.RegisterVar("files", genii.New(Files))
 
@@ -117,6 +110,7 @@ func InitScripting() {
 	rbl.RegisterCommand("template", Command_Template)
 	
 	rbl.RegisterCommand("activate_addon", Command_ActivateAddon)
+	rbl.RegisterCommand("add_file", Command_AddFile)
 
 	// Redirect output to logger
 	state.Output = logFile
@@ -255,6 +249,7 @@ func Command_Template(script *rex.Script, params []*rex.Value) {
 // The addon is not really activated, but it's files are added to the file list,
 // this makes this command exceptionally dangerous and not to be used except for
 // special cases by users who know what they are doing.
+// It is best to only use this command from an init script (or maybe a pre script).
 // Does nothing if the addon is already active.
 // Returns unchanged.
 func Command_ActivateAddon(script *rex.Script, params []*rex.Value) {
@@ -279,4 +274,38 @@ func Command_ActivateAddon(script *rex.Script, params []*rex.Value) {
 	}
 
 	gosort.Strings(Files.Order)
+}
+
+// Adds a file.
+// 	rubble:add_file name contents
+// THIS COMMAND IS EXTREMELY DANGEROUS!
+// Depending on when the file is added parsing could end up in a broken state!
+// I have no idea what kind of bugs could be created by using this command,
+// but I am sure they are legion.
+// It is best to only use this command from an init script (or maybe a pre script).
+// If the file already exists it's contents are replaced, just like an normal override. 
+// Returns unchanged.
+func Command_AddFile(script *rex.Script, params []*rex.Value) {
+	if len(params) != 2 {
+		panic("Wrong number of params to rubble:add_file.")
+	}
+
+	name := params[0].String()
+	contents := []byte(params[0].String())
+	
+	if _, ok := Files.Files[name]; !ok {
+		file := new(AddonFile)
+		file.Path = name
+		file.Source = "rubble:add_file"
+		file.Content = contents
+		Files.Files[name] = file
+		Files.Order = append(Files.Order, name)
+		gosort.Strings(Files.Order)
+		return
+	}
+	file := new(AddonFile)
+	file.Path = name
+	file.Source = "rubble:add_file"
+	file.Content = contents
+	Files.Files[name] = file
 }

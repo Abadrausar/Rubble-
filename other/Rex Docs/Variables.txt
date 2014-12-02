@@ -2,7 +2,6 @@
 Built-in Variables:
 	rubble:version		The Rubble version string.
 	rubble:versions		A map of all the versions in this series.
-	rubble:activeaddons	An array of all the active addon names.
 	rubble:addons		An indexable version of ALL loaded addons, active or not. 
 							A direct interface to the underlying data, this sucker can be dangerous!
 							With great power comes great responsibility.

@@ -193,39 +193,80 @@ User Templates defined in the "Libs/Base" addon.
 {EDIT_D_INIT;<SETTING>;<VALUE>}
 	Edit a setting in "d_init.txt".
 	<SETTING> must be one of:
-		SKY
-		CHASM
-		PILLAR_TILE
-		TRACK_N
-		TRACK_S
-		TRACK_E
-		TRACK_W
-		TRACK_NS
-		TRACK_NE
-		TRACK_NW
-		TRACK_SE
-		TRACK_SW
-		TRACK_EW
-		TRACK_NSE
-		TRACK_NSW
-		TRACK_NEW
-		TRACK_SEW
-		TRACK_NSEW
-		TRACK_RAMP_N
-		TRACK_RAMP_S
-		TRACK_RAMP_E
-		TRACK_RAMP_W
-		TRACK_RAMP_NS
-		TRACK_RAMP_NE
-		TRACK_RAMP_NW
-		TRACK_RAMP_SE
-		TRACK_RAMP_SW
-		TRACK_RAMP_EW
-		TRACK_RAMP_NSE
-		TRACK_RAMP_NSW
-		TRACK_RAMP_NEW
-		TRACK_RAMP_SEW
-		TRACK_RAMP_NSEW
+		SKY							TREE_CAP_WALL_NW
+		CHASM						TREE_TRUNK_NW_DEAD
+		PILLAR_TILE					TREE_CAP_WALL_NW_DEAD
+		TRACK_N						TREE_TRUNK_NE
+		TRACK_S						TREE_CAP_WALL_NE
+		TRACK_E						TREE_TRUNK_NE_DEAD
+		TRACK_W						TREE_CAP_WALL_NE_DEAD
+		TRACK_NS					TREE_TRUNK_SW
+		TRACK_NE					TREE_CAP_WALL_SW
+		TRACK_NW					TREE_TRUNK_SW_DEAD
+		TRACK_SE					TREE_CAP_WALL_SW_DEAD
+		TRACK_SW					TREE_TRUNK_SE
+		TRACK_EW					TREE_CAP_WALL_SE
+		TRACK_NSE					TREE_TRUNK_SE_DEAD
+		TRACK_NSW					TREE_CAP_WALL_SE_DEAD
+		TRACK_NEW					TREE_TRUNK_NSE
+		TRACK_SEW					TREE_TRUNK_NSE_DEAD
+		TRACK_NSEW					TREE_TRUNK_NSW
+		TRACK_RAMP_N				TREE_TRUNK_NSW_DEAD
+		TRACK_RAMP_S				TREE_TRUNK_NEW
+		TRACK_RAMP_E				TREE_TRUNK_NEW_DEAD
+		TRACK_RAMP_W				TREE_TRUNK_SEW
+		TRACK_RAMP_NS				TREE_TRUNK_SEW_DEAD
+		TRACK_RAMP_NE				TREE_TRUNK_NSEW
+		TRACK_RAMP_NW				TREE_TRUNK_NSEW_DEAD
+		TRACK_RAMP_SE				TREE_TRUNK_BRANCH_N
+		TRACK_RAMP_SW				TREE_TRUNK_BRANCH_N_DEAD
+		TRACK_RAMP_EW				TREE_TRUNK_BRANCH_S
+		TRACK_RAMP_NSE				TREE_TRUNK_BRANCH_S_DEAD
+		TRACK_RAMP_NSW				TREE_TRUNK_BRANCH_E
+		TRACK_RAMP_NEW				TREE_TRUNK_BRANCH_E_DEAD
+		TRACK_RAMP_SEW				TREE_TRUNK_BRANCH_W
+		TRACK_RAMP_NSEW				TREE_TRUNK_BRANCH_W_DEAD
+									TREE_BRANCH_NS
+		TREE_ROOT_SLOPING			TREE_BRANCH_NS_DEAD
+		TREE_TRUNK_SLOPING			TREE_BRANCH_EW
+		TREE_ROOT_SLOPING_DEAD		TREE_BRANCH_EW_DEAD
+		TREE_TRUNK_SLOPING_DEAD		TREE_BRANCH_NW
+		TREE_ROOTS					TREE_BRANCH_NW_DEAD
+		TREE_ROOTS_DEAD				TREE_BRANCH_NE
+		TREE_BRANCHES				TREE_BRANCH_NE_DEAD
+		TREE_BRANCHES_DEAD			TREE_BRANCH_SW
+		TREE_SMOOTH_BRANCHES		TREE_BRANCH_SW_DEAD
+		TREE_SMOOTH_BRANCHES_DEAD	TREE_BRANCH_SE
+		TREE_TRUNK_PILLAR			TREE_BRANCH_SE_DEAD
+		TREE_TRUNK_PILLAR_DEAD		TREE_BRANCH_NSE
+		TREE_CAP_PILLAR				TREE_BRANCH_NSE_DEAD
+		TREE_CAP_PILLAR_DEAD		TREE_BRANCH_NSW
+		TREE_TRUNK_N				TREE_BRANCH_NSW_DEAD
+		TREE_TRUNK_S				TREE_BRANCH_NEW
+		TREE_TRUNK_N_DEAD			TREE_BRANCH_NEW_DEAD
+		TREE_TRUNK_S_DEAD			TREE_BRANCH_SEW
+		TREE_TRUNK_EW				TREE_BRANCH_SEW_DEAD
+		TREE_TRUNK_EW_DEAD			TREE_BRANCH_NSEW
+		TREE_CAP_WALL_N				TREE_BRANCH_NSEW_DEAD
+		TREE_CAP_WALL_S				TREE_TWIGS
+		TREE_CAP_WALL_N_DEAD		TREE_TWIGS_DEAD
+		TREE_CAP_WALL_S_DEAD		TREE_CAP_RAMP
+		TREE_TRUNK_E				TREE_CAP_RAMP_DEAD
+		TREE_TRUNK_W				TREE_CAP_FLOOR1
+		TREE_TRUNK_E_DEAD			TREE_CAP_FLOOR2
+		TREE_TRUNK_W_DEAD			TREE_CAP_FLOOR1_DEAD
+		TREE_TRUNK_NS				TREE_CAP_FLOOR2_DEAD
+		TREE_TRUNK_NS_DEAD			TREE_CAP_FLOOR3
+		TREE_CAP_WALL_E				TREE_CAP_FLOOR4
+		TREE_CAP_WALL_W				TREE_CAP_FLOOR3_DEAD
+		TREE_CAP_WALL_E_DEAD		TREE_CAP_FLOOR4_DEAD
+		TREE_CAP_WALL_W_DEAD		TREE_TRUNK_INTERIOR
+		TREE_TRUNK_NW				TREE_TRUNK_INTERIOR_DEAD
+
+==============================================
+{D_INIT_TO_DEFAULTS}
+	Sets all settings that may be handled by EDIT_D_INIT to their default values.
+	(you do not need to OPEN_D_INIT or CLOSE_D_INIT when using this template)
 
 ==============================================
 {CLOSE_D_INIT}
@@ -240,23 +281,34 @@ User Templates defined in the "Libs/Base" addon.
 	Changes the type of the current file to a graphics file.
 
 ==============================================
-{BUILDING_WORKSHOP;<TECH>;<CLASS>}
+{BUILDING_WORKSHOP;<ID>;<CLASS>}
 	Similar to ITEM_CLASS, this registers a workshop to class <CLASS>. Used with #USES_TECH or #USES_BUILDINGS.
-	Returns [BUILDING_WORKSHOP:<TECH>]
+	Returns [BUILDING_WORKSHOP:<ID>]
 
 ==============================================
-{BUILDING_FURNACE;<TECH>;<CLASS>}
+{BUILDING_FURNACE;<ID>;<CLASS>}
 	Similar to ITEM_CLASS, this registers a furnace to class <CLASS>. Used with #USES_TECH or #USES_BUILDINGS.
-	Returns [BUILDING_FURNACE:<TECH>]
+	Returns [BUILDING_FURNACE:<ID>]
 
 ==============================================
 {#USES_BUILDINGS;<CLASSES>...}
 	Usable in entity definitions. Expands to a list of building permissions of all <CLASS>es combined.
 
 ==============================================
-{REACTION;<TECH>;<CLASS>}
+{REACTION;<ID>;<CLASS>}
 	Similar to ITEM_CLASS, this registers a reaction to class <CLASS>. Used with #USES_TECH or #USES_REACTIONS.
-	Returns [REACTION:<TECH>]
+	Returns [REACTION:<ID>]
+
+==============================================
+{DFHACK_REACTION;<ID>;<COMMAND>;<CLASS>}
+	Exactly like REACTION, except that <COMMAND> is run whenever the reaction is completed (provided that DFHack is installed of course).
+
+==============================================
+{DFHACK_REACTION_BIND;<COMMAND>;[<ID>=""]}
+	Binds a command to a reaction, like DFHACK_REACTION except for an already existing reaction.
+	
+	If <ID> is "" the name of the last reaction defined by a REACTION template is used.
+	(Specialized variants of REACTION, such as DFHACK_REACTION, work as well)
 
 ==============================================
 {#USES_REACTIONS;<CLASSES>...}
@@ -316,11 +368,11 @@ User Templates defined in the "Libs/Base" addon.
 	This only works for scripts added by an addon, already installed scripts should use DFHACK_RUNCOMMAND.
 
 ==============================================
-{DFHACK_RUNCOMMAND;<COMMAND>;[<PARAMS>...]}
+{DFHACK_RUNCOMMAND;<COMMAND>}
 	Sets a DFHack command up to run when the world is loaded.
 	
 	Example:
-		{DFHACK_RUNCOMMAND;workflow;enable;drybuckets;auto-melt}
+		{DFHACK_RUNCOMMAND;workflow enable drybuckets auto-melt}
 
 ==============================================
 {@ADV_TIME;<COUNT>;<UNIT>}

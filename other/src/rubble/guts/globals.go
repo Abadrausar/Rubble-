@@ -29,6 +29,7 @@ import "dctech/axis"
 // (all the listed versions are assumed to be backwards compatible)
 // Index 0 MUST be the current version!
 var RubbleVersions = []string{
+	"4.1",
 	"4.0",
 	"pre4",
 }

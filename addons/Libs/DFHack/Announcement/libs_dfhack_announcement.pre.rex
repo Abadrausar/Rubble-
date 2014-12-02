@@ -7,17 +7,23 @@
 # (the color defaults to white)
 #
 
-(rubble:requireaddon "Libs/DFHack/Announcement" "Libs/DFHack/Command")
-module rubble:libs_dfhack_announcement
+# Use this template as a replacement for the REACTION template
+(rubble:template "DFHACK_REACTION_ANNOUNCE" block id class text color="COLOR_WHITE" {
+	[rubble:dfhack_reactions [id] = (str:add 'rubble_announce "' [text] '" ' [color])]
+	(rubble:reaction [id] [class])
+})
 
-# Gets a material to show the specified announcement.
-command rubble:libs_dfhack_announcement:getmat text color {
-	(rubble:libs_dfhack_command:getmat <array "rubble_announce" [text] [color]>)
-}
-
-# Use this template as a replacement for a reaction product line.
-(rubble:template "DFHACK_ANNOUNCEMENT" block text color="COLOR_WHITE" {
-	(str:add "[PRODUCT:100:1:BOULDER:NONE:" (rubble:libs_dfhack_announcement:getmat [text] [color]) "]")
+(rubble:template "DFHACK_ANNOUNCE" block text color="COLOR_WHITE" id="" {
+	(if (str:cmp [id] "") {
+		(if (isnil [rubble:reaction_data [rubble:reaction_last]]) {
+			(rubble:abort "Error: rubble:reaction_last is invalid in call to DFHACK_ANNOUNCE.")
+		})
+		
+		[rubble:dfhack_reactions [rubble:reaction_last] = (str:add 'rubble_announce "' [text] '" ' [color])]
+	}{
+		[rubble:dfhack_reactions [id] = (str:add 'rubble_announce "' [text] '" ' [color])]
+	})
+	(ret "")
 })
 
 # Install the script.

@@ -18,6 +18,24 @@ none	Parse, a template with no prefix will run in the parse stage.
 The template prefix is part of the template's name, you cannot change a template's parse stage by calling it with a different prefix (unless you rename the template)
 
 ==============================================
+The Configuration File:
+==============================================
+
+Rubble allows you to change its settings via command line options or a config file. To see these options and their defaults run "rubble -h".
+
+ALL command line options may also be specified in the config file.
+
+Rubble tries to read the file "./rubble.ini", if this does not fail Rubble will load settings from here before processing command line options (command line options always take precedence).
+Example "rubble.ini" (using some of the defaults):
+	[rubble]
+	dfdir = ..
+	outputdir = df:raw
+	addonsdir = rubble:addons
+Duplicate keys are just fine, they will act pretty much exactly like duplicate options on the command line.
+
+Most users will never need the configuration file.
+
+==============================================
 Tileset Addons:
 ==============================================
 

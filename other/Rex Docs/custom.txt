@@ -23,8 +23,21 @@ func Command_ActivateAddon(script *rex.Script, params []*rex.Value)
     THIS COMMAND IS EXTREMELY DANGEROUS! The addon is not really activated,
     but it's files are added to the file list, this makes this command
     exceptionally dangerous and not to be used except for special cases by
-    users who know what they are doing. Does nothing if the addon is already
-    active. Returns unchanged.
+    users who know what they are doing. It is best to only use this command
+    from an init script (or maybe a pre script). Does nothing if the addon
+    is already active. Returns unchanged.
+
+func Command_AddFile(script *rex.Script, params []*rex.Value)
+    Adds a file.
+
+	rubble:add_file name contents
+
+    THIS COMMAND IS EXTREMELY DANGEROUS! Depending on when the file is added
+    parsing could end up in a broken state! I have no idea what kind of bugs
+    could be created by using this command, but I am sure they are legion.
+    It is best to only use this command from an init script (or maybe a pre
+    script). If the file already exists it's contents are replaced, just
+    like an normal override. Returns unchanged.
 
 func Command_CallTemplate(script *rex.Script, params []*rex.Value)
     Calls a Rubble template.

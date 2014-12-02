@@ -72,15 +72,18 @@ command rubble:ingroup addon group {
 
 command rubble:groupactive group {
 	var found = false
-	(foreach [rubble:activeaddons] block _ addon {
-		(if (rubble:ingroup [addon] [group]) {
-			[found = true]
-			(break false)
+	(foreach [rubble:addons] block _ addon {
+		(if [addon Active] {
+			(if (rubble:ingroup [addon] [group]) {
+				[found = true]
+				(break false)
+			}{
+				(break true)
+			})
 		}{
 			(break true)
 		})
 	})
-	
 	(ret [found])
 }
 
