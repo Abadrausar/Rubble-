@@ -56,6 +56,47 @@ Really advanced users may want to look at the tweak script that drives "Dev/Tile
 It is easy to forget that Rubble can be used for far more than just generating raws, it also works well for processing them.
 
 ==============================================
+The Rubble DFHack Lua Startup Script System:
+==============================================
+
+I have noticed that many mods that require a DFHack script use the script in one of two ways: either it is run once when the save is loaded or it is run when a reaction is completed. Reaction scripts are already handled by the DFHACK_REACTION and DFHACK_REACTION_BIND templates, but there was no good way to handle startup scripts.
+
+Rubble's solution to the startup script problem is simple: it loads and evaluates scripts from raw/dfhack, once, when the save is loaded. These scripts are not commands (they cannot take parameters), and they do not clutter up the command list with things that will only be run once. Each of these startup scripts is isolated, if one misbehaves and dies the loader just goes on to the next with no interruption.
+
+To load a script with this system simple put any .lua file into out:dfhack, it's that simple. To make it even easier you can just use the rubble:dfhack_loadscript script command, it installs a script by name automatically.
+
+==============================================
+The Rubble DFHack Lua Pseudo Module System:
+==============================================
+
+DFHack can now load commands from the save directory, but if you need to load a module you still need to install it globally, "pseudo modules" are my solution for this issue.
+
+Pseudo modules consist of three parts:
+	The module file
+	The loader
+	Client scripts
+
+The module file is almost exactly like a standard Lua module, the only difference is the prefix and suffix
+At the top of the script where you would have some thing like this:
+	local _ENV = mkmodule("example")
+You have this instead:
+	local _ENV = rubble.mkmodule("example")
+And at the end where you would have:
+	return _ENV
+Use:
+	rubble.example = _ENV
+
+The loader is simple and automatic, just put any .mod.lua file into out:dfhack. This works exactly like startup scripts (just with a different file extension) so you can even use rubble:dfhack_loadscript if you are feeling lazy.
+
+Clients are mostly the same as with normal modules, the only difference is instead of:
+	local example = require "example"
+You use:
+	local example = rubble.example
+Or, of course, you could just use the full name everywhere :)
+
+Obviously, due to the way they are loaded pseudo modules will only work when a save is loaded, but since they are only for use with region-local scripts this is not an issue.
+
+==============================================
 Patches:
 ==============================================
 

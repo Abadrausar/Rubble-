@@ -35,7 +35,7 @@ Installation:
 Installation for Rubble users:
 	Install Text Will Be Text (you will obviously need to install DFHack as well)
 	Install Rubble.
-	Activate the "Tilesets/MLC/DFHack/TWBT" addon (included with Rubble)
+	Activate the "User/Tilesets/MLC/DFHack/TWBT" addon (included with Rubble)
 	Activate any other addons you want.
 	Generate the raws (by running Rubble)
 	Play DF!

@@ -8,7 +8,7 @@
 	[USE_MATERIAL_TEMPLATE:MUSCLE:MUSCLE_TEMPLATE]
 		[PREFIX:NONE]
 		[STATE_COLOR:ALL_SOLID:MAUVE]
-		[STATE_NAME_ADJ:ALL_SOLID:smoked meat]
+		[STATE_NAME_ADJ:ALL_SOLID:smoked]
 		[STATE_COLOR:LIQUID:MAUVE]
 		[STATE_NAME:LIQUID:n/a]
 		[STATE_ADJ:LIQUID:n/a]
@@ -50,6 +50,6 @@
 		[IMPLIES_ANIMAL_KILL]
 		[MEAT]
 		[BUTCHER_SPECIAL:MEAT:NONE]
-		[MEAT_NAME:NONE:smoked meat:smoked meat]
+		[MEAT_NAME:NONE:meat:meat]
 		[EDIBLE_RAW] Smoking cooks the meat, so "raw" consumption is fine.
 		[EDIBLE_COOKED]

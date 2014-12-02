@@ -1,6 +1,6 @@
 
 local buildings = require 'plugins.building-hacks'
-local fluids = require "rubble_fluids"
+local fluids = rubble.fluids
 
 function makeCastObsidian()
 	return function(wshop)

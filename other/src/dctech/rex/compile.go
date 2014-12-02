@@ -69,8 +69,11 @@ func (state *State) compileCommand(lex *Lexer, code *Code) {
 	lex.getcurrent(tknCmdBegin)
 	code.addOp(lex.current.opCode())
 
-	// Compile the command's name
-	state.compileName(lex, code, tknCmdBegin)
+	if lex.checkLook(tknRawString) {
+		state.compileName(lex, code, tknCmdBegin)
+	} else {
+		state.compileValue(lex, code)
+	}
 
 	// Compile the commands parameters if any
 	for !lex.checkLook(tknCmdEnd) {

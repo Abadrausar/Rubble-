@@ -18,7 +18,7 @@
 	{
 		BLOCK "04090025"
 		{
-			VALUE "CompanyName", "Double Click Technologies"
+			VALUE "CompanyName", "Binary Blade"
 			VALUE "FileDescription", "Rex Shell"
 			VALUE "FileVersion", "1.0"
 			VALUE "InternalName", "Rex"

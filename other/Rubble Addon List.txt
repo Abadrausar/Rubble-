@@ -23,9 +23,10 @@ Base:
 		Specialized SHARED_OBJECT templates have been inserted where appropriate.
 		REACTION and BUILDING_WORKSHOP templates have been inserted where appropriate.
 		@BUILD_KEY templates have been inserted where appropriate.
-		#ADDON_HOOKS have been added to all entities.
-		!ENTITY_PLAYABLE tags have been added to all entities.
+		ADDON_HOOKS have been added to all entities.
+		!ENTITY_PLAYABLE templates have been added to all entities.
 		The dwarven outpost liaison has been modded to works as a trade rep if the dwarves are unplayable.
+		Dwarves have the alchemist labor permitted in their entity.
 		Vermin creatures have #TILE and #COLOR templates inserted.
 		All file IDs have been stripped.
 
@@ -45,7 +46,7 @@ Dev:
 	Dev/Tileset/Export:
 		This addon is a helper for extracting tileset information from raws that have the Rubble tileset templates added. See "Dev/Tileset/Insert".
 		The extracted tile numbers will be written to "./dev_export_tileset.tile_info.rbl".
-		Basically an automatic replacement for "#WRITE_TILESET".
+		Basically an automatic replacement for the old #WRITE_TILESET template.
 	
 	Dev/Tileset/Insert:
 		This addon adds the SHARED_OBJECT templates to all the tileset sensitive objects.
@@ -67,7 +68,9 @@ Libs:
 		This addon is a "critical addon" meaning that it is needed by the base for normal operation.
 	
 	Libs/Castes/DFHack/Transform:
-		Adds support for transforming castes via autoSyndrome and syndromeTrigger.
+		Adds support for transforming castes.
+		Basically just a gender aware and pared down version of "modtools/transform-unit" (with specialized versions of DFHACK_REACTION and DFHACK_REACTION_BIND for easy use).
+		Does not require "Libs/Castes", but it is designed to work with it.
 	
 	Libs/Crates:
 		Adds infrastructure for "crates", eg bars that can be bought from caravans and then "unpacked" via special reactions into items.
@@ -82,8 +85,16 @@ Libs:
 		The announcements work via specialized variants of the DFHACK_REACTION and DFHACK_REACTION_BIND templates.
 		The templates added by this addon are always available (even when the addon is not active).
 	
+	Libs/DFHack/Fix Handedness:
+		Automatically installs and activates a fix for making gloves in reactions.
+	
 	Libs/DFHack/Fluids:
-		Installs the extremely useful rubble_fluids DFHack Lua library and command.
+		Installs the extremely useful rubble.fluids Lua pseudo module and it's companion command rubble_fluids.
+		(adds no templates)
+	
+	Libs/DFHack/Timeout:
+		Adds a Lua pseudo module (rubble.timeout) that adds support for persistent time delays (eg they survive a save/load).
+		Includes a simple command for use with reaction trigger.
 		(adds no templates)
 	
 	Libs/Macro:
@@ -107,6 +118,11 @@ User:
 		Adds some basic adventure mode crafting reactions, mostly useful to help jump-start use of advfort.
 		Allows you to make crude picks and axes from knapped stone, anvils from boulders, backpacks from bags (that you can find in any human hamlet), and "emergency" crutches from bone.
 		All adventure mode reactions use the knapping skill.
+	
+	User/Archery:
+		Adds the archers workshop, a building where you can make all types of ranged weapons and their ammo.
+		The only thing you cannot do (yet) is make ranged weapons from metal, you will have to use bone or wood for now.
+		To keep the ammo reaction count under control ammo creation is done in two steps, first you make "shafts" out of the desired material, then you turn the shafts into ammo of the desired type.
 	
 	User/Block:
 		This addon provides materials used by the other addons in this group, you do not need to worry about it, if it is needed it will be activated automatically.
@@ -222,8 +238,10 @@ User:
 		Adds more dwarf castes.
 		See the entry in "Rubble Addon Extras.txt" for more details, including descriptions and detailed population ratios.
 	
-	User/Dwarf/Ranged Weapons:
-		Allows dwarves to use bows and blowguns (and make ammo for them), very simple.
+	User/Dwarf/Castes/DFHack/Transform:
+		Allows you to change the caste of your dwarves at the guild hall for a nominal fee.
+		Most caste changes cost 500 gold, but warriors and priests cost more.
+		Requires the "User/Dwarf/Castes" addon.
 	
 	User/Edible Vermin:
 		Allows you to cook vermin at the kitchen to get cheap meat, a good emergency food source.
@@ -328,8 +346,8 @@ User:
 		Removes all the vanilla alloy reactions, it is not a good idea to use this without "User/Metallurgy"!
 	
 	User/Pottery:
-		Replace the vanilla pottery system with a MUCH expanded version. 
-		Glazing is done via powders ground at a millstone or quern from ash. For more glaze types see the "User/Pottery/Glaze" addon.
+		Replace the vanilla pottery system with a much expanded version. 
+		Glazing is still done the same basic way as vanilla (unless "User/Pottery/Glaze" is installed, then it is MUCH better). Unlike vanilla there is not a glazing reaction for each item type, use stockpiles to restrict item usage.
 	
 	User/Pottery/Batch:
 		Adds a batch kiln that can make 5x the stuff with 4x the material and 1x the fuel.
@@ -337,9 +355,35 @@ User:
 		Glazing and collecting clay can only be done at the normal kiln.
 	
 	User/Pottery/Glaze:
-		Adds the glaze compounder, a workshop for mixing glazes from other color glazes.
-		Also allows you to grind some minerals into glaze powder.
-		Requires the "Pottery" addon.
+		Allows you to grind minerals and ores into glaze powders of various colors and then use these powders to glaze various items. Unlike vanilla there is not a glazing reaction for each item type, use stockpiles to restrict item usage.
+		Each mineral or ore boulder is ground into 10 units of glaze powder, ash bars only produce 3 units.
+		There are four different kinds of glazing you may do:
+			Ash glazing uses one unit of ash to glaze an item, simple and cheap.
+			Monochrome glazing uses two units of any color glaze to glaze an item.
+			Dichrome glazing uses one unit of white glaze and one unit of any other color to glaze an item, this is more valuable than monochrome and has an additional chance of having bands on the item for even more value.
+			Polychrome glazing uses one unit of white and one unit each of blue, red, and yellow glaze to glaze an item, like dichrome this adds lots of value and each non-white color has a chance of adding bands. If you get lucky your simple pot could become very valuable!
+		Glaze List:
+			Name									Color Class		Value
+			olive ash glaze							ash				3
+			cream white tin glaze					white			10
+			pearl white zinc glaze					white			10
+			silver glaze							white			15
+			gold glaze								yellow			20
+			turquoise green copper glaze			blue			10
+			rust red iron glaze						red				15
+			chartreuse green nickel glaze			blue			10
+			scarlet red lead glaze					red				10
+			vermilion cinnabar glaze				red				6
+			cobalt blue glaze						blue			6
+			saffron yellow orpiment glaze			yellow			6
+			lemon yellow antimony glaze				yellow			6
+			dark indigo manganese glaze				blue			6
+			orange radiant pitchblende glaze		red				6
+		This addon is a polished and Rubblized port of the old "Expanded Glazes" mod by "NW_Kohaku". This version has had the reactions completely reworked as well as a few other balancing changes.
+	
+	User/Pottery/Porcelain:
+		Allows you to use orthoclase and microcline to make porcelain (in addition to kaolinite).
+		I am not sure how realistic this is, orthoclase and microcline are used to make porcelain, but it may only be as an additive, not the main ingredient.
 	
 	User/Quarry:
 		Dig for some basic raw materials without needing to actually dig.
@@ -367,13 +411,13 @@ User:
 		If this addon is activated dwarves are unplayable and the dwarven outpost liaison becomes a trade rep (unless you activate "Saurian/Unplayable").
 		Requires the "Glass Forge" addon.
 	
-	User/Saurian/Basic Castes:
+	User/Saurian/Castes:
 		Adds some basic castes to the saurians.
 		See the saurian guide for details.
 		Requires the "User/Saurian" addon.
 	
-	User/Saurian/Basic Castes/DFHack/Transform:
-		Allows you to change the cast of your saurians at the new meditation circle workshop.
+	User/Saurian/Castes/DFHack/Transform:
+		Allows you to change the caste of your saurians at the new meditation circle workshop.
 		Meditating takes from 1/2 to 3 seasons (depending on what the result caste is).
 		Requires the "User/Saurian" and "User/Saurian/Basic Castes" addons.
 	

@@ -1,6 +1,6 @@
 
 local event = require "plugins.eventful"
-local fluids = require "rubble_fluids"
+local fluids = rubble.fluids
 
 function castObsidian(reaction, unit, in_items, in_reag, out_items, call_native)
 	call_native.value=false

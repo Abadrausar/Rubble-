@@ -40,7 +40,7 @@ import "dctech/rex/commands/regex"
 import "dctech/rex/commands/sort"
 import "dctech/rex/commands/str"
 
-import "dctech/dfrex/dfraw"
+import "dctech/rexdfraw"
 
 import "dctech/axis/axisrex"
 
@@ -75,7 +75,7 @@ func InitScriptingEarly() {
 
 	genii.Setup(state)
 
-	dfraw.Setup(state)
+	rexdfraw.Setup(state)
 
 	axisrex.Setup(state)
 

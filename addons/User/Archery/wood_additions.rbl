@@ -1,0 +1,10 @@
+
+# This file is shared by many addons, do not modify it unless you modify every copy at once!
+
+# Wood Additions adds several small tweaks to wood materials, namely a better block name and
+# a reaction class for more precise reaction targeting.
+
+{SHARED_OBJECT_ADD;WOOD_TEMPLATE;
+	[BLOCK_NAME:plank:planks]
+	[REACTION_CLASS:WOOD_MAT]
+}

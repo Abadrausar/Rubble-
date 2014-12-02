@@ -2,6 +2,32 @@
 ==============================================
 Changelog:
 ==============================================
+v4.7 (for DF 40.11)
+	This is the first version of Rubble for DF 40.x that has all the DFHack stuff working!
+		Or at least everything *should* work, some stuff has less testing than I would like...
+	Updated the "Base" addon to DF 40.11
+	Fixed a major Rex bug with by-value command calls, this should have only effected "Libs/Macro".
+	Rewrote the "User/Pottery/Glaze" addon and made it no longer dependent on "User/Pottery".
+	Vastly simplified glazing in "User/Pottery", the reaction is now more-or-less like vanilla.
+	Added "Libs/DFHack/Timeout", adds support for persistent time delays.
+	Rewrote "Libs/Castes/DFHack/Transform" so it no longer requires autoSyndrome (so it should work with the new DFHack).
+		The API has changed significantly! Luckily the new system is vastly simpler than the old.
+	Renamed "User/Saurian/Basic Castes/DFHack/Transform" and "User/Saurian/Basic Castes" (removed the "Basic" part).
+	Rewrote "User/Saurian/Castes/DFHack/Transform" to use the new system.
+	Added "User/Dwarf/Castes/DFHack/Transform", change your dwarves castes for a nominal fee.
+	Added "Libs/DFHack/Fix Handedness", automatic fix for making gloves in reactions.
+	Added "User/Archery", a workshop that allows you to make all types of ranged weapons and ammo.
+	Removed "User/Dwarf/Ranged Weapons", made obsolete by "User/Archery".
+	Fixed bad craft reaction in "User/Bonecarver".
+	Permitted the ALCHEMIST labor for the dwarven entity in the "Base" addon.
+		This fixes an issue with DFHack's manipulator plugin, namely that you can only toggle labors that are permitted.
+	Added a new system for loading DFHack Lua libraries from the region raw directory (I call it "pseudo modules").
+		See "Rubble Basics" for details about the new system.
+	DFHack scripts and pseudo modules are now loaded dynamically in alphabetical order.
+	Changed "Libs/DFHack/Fluids" to use the new pseudo module system.
+	Changed all clients of "Libs/DFHack/Fluids" to work with the new system.
+	Fixed meat names for "User/Smoked Meats".
+
 v4.6 (for DF 40.10)
 	Updated the "Base" addon to DF 40.10
 	Changed the way the encoder is handled internally, this should not effect the user in any way.

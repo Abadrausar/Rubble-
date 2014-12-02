@@ -1,2 +1,2 @@
 
-(rubble:activateaddon "Libs/Castes/DFHack/Transform" "Libs/Castes")
+(rubble:activateaddon "Libs/Castes/DFHack/Transform" "Libs/DFHack/Timeout")

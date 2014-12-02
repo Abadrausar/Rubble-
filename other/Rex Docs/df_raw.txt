@@ -1,7 +1,7 @@
 PACKAGE DOCUMENTATION
 
-package dfraw
-    import "dctech/dfrex/dfraw"
+package rexdfraw
+    import "dctech/rexdfraw"
 
 
 

@@ -259,29 +259,33 @@ func (script *Script) execCommand() {
 	// Read the command's name
 	var module *Module = nil
 	var command *Value = nil
-	for {
-		script.code.last().getOpCode(opName)
-
-		if script.code.last().checkLookAhead(opNameSplit) {
-			// It's a module name.
-			if module == nil {
-				module = script.Host.modules.get(script.code.last().current().Index)
-			} else {
-				module = module.modules.get(script.code.last().current().Index)
+	if script.code.last().checkLookAhead(opName) {
+		for {
+			script.code.last().getOpCode(opName)
+	
+			if script.code.last().checkLookAhead(opNameSplit) {
+				// It's a module name.
+				if module == nil {
+					module = script.Host.modules.get(script.code.last().current().Index)
+				} else {
+					module = module.modules.get(script.code.last().current().Index)
+				}
+	
+				script.code.last().getOpCode(opNameSplit)
+				continue
 			}
-
-			script.code.last().getOpCode(opNameSplit)
-			continue
-		}
-
-		if module == nil {
-			// Global
-			command = script.Host.global.vars.get(script.code.last().current().Index)
+	
+			if module == nil {
+				// Global
+				command = script.Host.global.vars.get(script.code.last().current().Index)
+				break
+			}
+			// Module
+			command = module.vars.get(script.code.last().current().Index)
 			break
 		}
-		// Module
-		command = module.vars.get(script.code.last().current().Index)
-		break
+	} else {
+		command = script.execValue()
 	}
 
 	// Read the command's parameters if any

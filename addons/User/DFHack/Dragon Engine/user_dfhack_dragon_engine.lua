@@ -60,7 +60,7 @@ function registerDragonEngine(dir,data)
             }
         }
         }
-    print("Registered mechanical workshop:".."DRAGON_ENGINE_"..dir)
+    print("    Registered mechanical workshop:".."DRAGON_ENGINE_"..dir)
 end
 for k,v in pairs(dragon_engine_dirs) do
     registerDragonEngine(k,v)

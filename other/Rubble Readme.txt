@@ -95,8 +95,6 @@ Known Issues (non-bug):
 	You should not use the extension .txt for readme files, as this will cause Rubble to parse those files.
 		See "Rubble Basics.txt" for more details.
 	
-	It may be possible (depending on your addons) to see FBs made from "caste transformation", there is nothing I can do about this as autoSyndrome requires the use of inorganic materials.
-	
 	The scalemail armor from the "User/Warcrafter" addon is always marked "Foreign" in the equipment screen, you will have to explicitly assign it.
 		IMHO this is better than sometimes not having all the armor pieces (which is what happened before).
 
@@ -107,7 +105,7 @@ Bugs:
 			"User/Warcrafter/Adventure" does not work quite right with "User/Tanning" because the adventure mode tanning reaction uses too much skin. This cannot be fixed by me.
 		
 		Reactions produce unusable gloves:
-			The glove reactions are left in only because DFHack can be used to fix this bug, users that lack DFHack (or who have not run the proper script) should not make any gloves at custom workshops.
+			The glove reactions are left in only because DFHack can be used to fix this bug, if DFHack is available then Rubble will automatically load a fix.
 
 	There are no known (non-vanilla) bugs.
 

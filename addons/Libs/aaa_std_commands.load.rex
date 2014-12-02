@@ -12,16 +12,12 @@ command rubble:fetchaddon name {
 }
 
 command rubble:addonactive name {
-	(foreach [rubble:addons] block _ addon {
-		(if (str:cmp [addon Name] [name]) {
-			(if [addon Active] {
-				(ret true)
-			}{
-				(ret false)
-			})
-		})
+	var addonref = (rubble:fetchaddon [name])
+	(if (isnil [addonref]) {
+		(ret false)
+	}{
+		(ret [addonref Active])
 	})
-	(ret false)
 }
 
 command rubble:activateaddon me addon {
