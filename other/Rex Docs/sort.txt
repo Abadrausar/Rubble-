@@ -1,0 +1,25 @@
+PACKAGE DOCUMENTATION
+
+package sort
+    import "dctech/rex/commands/sort"
+
+
+
+FUNCTIONS
+
+func Command_Map(script *rex.Script, params []*rex.Value)
+    Sorts a map alphabetically.
+
+	sort:map map
+
+    Returns a new ordered map with the same keys/values as the old
+    indexable.
+
+func Command_New(script *rex.Script, params []*rex.Value)
+    Creates a new ordered map.
+
+	sort:new
+
+    Returns a new (empty) ordered map.
+
+

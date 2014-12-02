@@ -4,12 +4,11 @@ Built-in Native Templates
 
 ==============================================
 {!TEMPLATE;<NAME>;[<PARAM>[=<DEFAULT_VALUE>]...];<CODE>}
-{!TEMPLATE;<NAME>;...;<CODE>}
 	Creates a new template definition with name <NAME>, subsequently calling {<NAME>} will return a new parse of <CODE>.
 
-	Calling {<NAME>;<ARGUMENT_1>;<ARGUMENT_2>} will replace instances of %<PARAM_1>, %{<PARAM_1>}, or %1 with <ARGUMENT_1>, instances of %<PARAM_2>, %{<PARAM_2>}, or %2 with <ARGUMENT_2>, etcetera. Default values may be specified for parameters.
+	Calling {<NAME>;<ARGUMENT_1>;<ARGUMENT_2>} will replace instances of %<PARAM_1> or %{<PARAM_1>} with <ARGUMENT_1>, instances of %<PARAM_2> or %{<PARAM_2>} with <ARGUMENT_2>, etcetera. Default values may be specified for parameters.
 	
-	If a parameters value has the form $<VALUE> or ${<VALUE>} <VALUE> will be treated as a variable name and replaced with the variables value, the same also holds for any such string found in <CODE>
+	Variables ($<VAR_NAME> or ${<VAR_NAME>}) will be expanded in both the parameters and the <CODE>.
 	
 	Example:
 		{!TEMPLATE;FOO;bar}
@@ -20,7 +19,7 @@ Built-in Native Templates
 		{!TEMPLATE;GREET_DWARF;dwarf=Urist;Hello %{dwarf}!}
 		{GREET_DWARF}
 		{GREET_DWARF;Led}
-		{SET;TEST;‼Fun‼}
+		{@SET;TEST;‼Fun‼}
 		{GREET;$TEST}
 	
 	evaluates to
@@ -30,34 +29,3 @@ Built-in Native Templates
 		Hello Urist!
 		Hello Led!
 		Hello ‼Fun‼!
-
-==============================================
-{!SCRIPT_TEMPLATE;<NAME>;[<PARAM>[=<DEFAULT_VALUE>]...];<CODE>}
-{!SCRIPT_TEMPLATE;<NAME>;...;<CODE>}
-	Exactly like !TEMPLATE except <CODE> should be a Raptor script and any params are declared as Raptor variables.
-	
-	Example:
-		{!SCRIPT_TEMPLATE;FOO;(ret "bar")}
-		{!SCRIPT_TEMPLATE;GREET;thing;(str:add Hello [thing] !)}
-		{!SCRIPT_TEMPLATE;LIST;...;
-			(var tmp)
-			(foreach params {
-				(set tmp (str:add [tmp] ", " [params 1]))
-				(break true)
-			})
-			(str:trimleft [tmp] 2) # strip the leading ", "
-		}
-		{FOO}
-		{GREET;World}
-		Dwarves: {LIST;Urist;Led}
-	
-	evaluates to
-		bar
-		Hello World!
-		Dwarves: Urist, Led
-
-==============================================
-{!SCRIPT;<CODE>;[<PARAMS>...]}
-{SCRIPT;<CODE>;[<PARAMS>...]}
-{#SCRIPT;<CODE>;[<PARAMS>...]}
-	Runs a Raptor script as a command and returns whatever the script returns.

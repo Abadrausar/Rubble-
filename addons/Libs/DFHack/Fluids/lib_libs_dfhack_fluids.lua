@@ -50,12 +50,40 @@ function eatFluid(x, y, z, magma, amount, minimum)
 	return true
 end
 
--- Eat from below a specified area, there needs to be access to the fluid via a downward passable tile
+-- Eat from below a specified area, there needs to be access to the fluid via a downward passable tile.
 function eatFromArea(x1, y1, x2, y2, z, magma, amount, minimum)
 	for cx = x1, x2, 1 do
 		for cy = y1, y2, 1 do
 			if passableDown(cx, cy, z) then
 				if eatFluid(cx, cy, z-1, magma, amount, minimum) then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
+-- Check if there is enough fluid of the correct type in the specified tile.
+function checkFluid(x, y, z, magma, amount, minimum)
+	local block = dfhack.maps.ensureTileBlock(x,y,z)
+	
+	if block.designation[x%16][y%16].flow_size >= minimum then
+		if block.designation[x%16][y%16].liquid_type == magma then
+			return true
+		else
+			return false
+		end
+	end
+	return false
+end
+
+-- Check if there is enough fluids of the correct type below a specified area.
+function checkInArea(x1, y1, x2, y2, z, magma, amount, minimum)
+	for cx = x1, x2, 1 do
+		for cy = y1, y2, 1 do
+			if passableDown(cx, cy, z) then
+				if checkFluid(cx, cy, z-1, magma, amount, minimum) then
 					return true
 				end
 			end

@@ -1,3 +1,0 @@
-
-# Install the spawn script.
-(fileio:write (str:add [rubble:dfdir] "/hack/scripts/rubble_spawn.lua") [rubble:raws "libs_dfhack_spawn.lua"])

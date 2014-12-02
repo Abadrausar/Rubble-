@@ -1,3 +1,0 @@
-
-(fileio:write (str:add [rubble:dfdir] "/hack/scripts/rubble_fluids.lua") [rubble:raws "com_libs_dfhack_fluids.lua"])
-(fileio:write (str:add [rubble:dfdir] "/hack/lua/rubble_fluids.lua") [rubble:raws "lib_libs_dfhack_fluids.lua"])

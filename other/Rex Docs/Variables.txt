@@ -1,0 +1,14 @@
+
+Built-in Variables:
+	rubble:version		The Rubble version string.
+	rubble:versions		A map of all the versions in this series.
+	rubble:activeaddons	An array of all the active addon names.
+	rubble:addons		An indexable version of ALL loaded addons, active or not. 
+							A direct interface to the underlying data, this sucker can be dangerous!
+							With great power comes great responsibility.
+	rubble:files		An indexable version of all the files in the active addons. 
+							A direct interface to the underlying data, this sucker can be dangerous!
+							With great power comes great responsibility.
+	rubble:raws			This is an EditIndexable that stores string versions of all active addon files.
+	
+	rubble:fs			A reference to the Rubble AXIS VFS file system, use with the axis commands.

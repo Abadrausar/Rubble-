@@ -23,7 +23,7 @@ Let's start with the building. Create a new file in your addon directory and nam
 	[NAME:Bonfire]
 	[NAME_COLOR:6:0:1]
 	[DIM:1:1]
-	[BUILD_KEY:CUSTOM_SHIFT_F]
+	{@BUILD_KEY;SHIFT_F;true}
 	[WORK_LOCATION:1:1]
 	[BLOCK:1:O]
 	[TILE:0:1:240]
@@ -35,8 +35,11 @@ Let's start with the building. Create a new file in your addon directory and nam
 	[TILE:3:1:30]
 	[COLOR:3:1:6:0:0]
 [/code]
-There are two things of note in this file. First there is no file header, Rubble adds this automatically, so renaming a file goes from an error-prone two step process to just a simple file rename. Second you will note that the building tag is replaced by some weird thing that uses curly-brackets and has an extra parameter, this is a Rubble template. This particular template is a direct replacement for the raw tag of the same name, but it also has one other very important function. This template (as well as lots of other related Rubble templates) registers a building with an object class. A Rubble object class is a list of items/buildings/reactions/whatever listed under a name. By using other templates you can extract a list of a specified type of items from a class and do things with them, in this case automatically add building permissions to entities.
-ADDON_HOOK_PLAYABLE is a special class that can be used for items, reactions, and buildings, it is part of a special group of object classes created by the #ADDON_HOOKS template (which I will explain in more detail later).
+There are three things of note in this file.
+First there is no file header, Rubble adds this automatically, so renaming a file goes from an error-prone two step process to just a simple file rename.
+Second you will note that the building tag is replaced by some weird thing that uses curly-brackets and has an extra parameter, this is a Rubble template. This particular template is a direct replacement for the raw tag of the same name, but it also has one other very important function. This template (as well as lots of other related Rubble templates) registers a building with an object class. A Rubble object class is a list of items/buildings/reactions/whatever listed under a name. By using other templates you can extract a list of a specified type of items from a class and do things with them, in this case automatically add building permissions to entities.
+ADDON_HOOK_PLAYABLE is a special class that can be used for items, reactions, and buildings, it is part of a special group of object classes created by the ADDON_HOOKS template (which I will explain in more detail later).
+Third the BUILD_KEY tag has also been replaced with a template, this template will automatically resolve key conflicts, so it another building already uses SHIFT_F it will choose the next open key (ALT_F in this case, unless it is in use as well). The second parameter specifies whether the key is for a furnace, so in this case it should be true (this parameter defaults to false, so it can be left off for workshops).
 
 Now that we have a building we need some reactions. Create a new file and name it "reaction_bonfire_tutorial.txt", then paste the following code into that file.
 [code]
@@ -97,15 +100,15 @@ Create a new file (name it "inorganic_bonfire_tutorial.txt") and paste the follo
 	[NO_STONE_STOCKPILE]
 }
 [/code]
-Wow, what's this SHARED_INORGANIC thing? That is one of the SHARED_OBJECT templates. SHARED_OBJECT (and the templates based off of it, like SHARED_INORGANIC) provides a mechanism for replacing or modifying objects from other addons. In this case it's not terribly useful, but using it every time you can is a good habit to get into. I will not go into detail about exactly what SHARED_OBJECT (or it's children) does as that would take far too much time, I suggest you go read the documentation for the "Base Templates" for the whole story.
+Wow, what's this SHARED_INORGANIC thing? That is one of the SHARED_OBJECT templates. SHARED_OBJECT (and the templates based off of it, like SHARED_INORGANIC) provides a mechanism for replacing or modifying objects from other addons. In this case it's not terribly useful, but using it every time you can is a good habit to get into. I will not go into detail about exactly what SHARED_OBJECT (or it's children) does, as that would take far too much time. I suggest you go read the documentation for the "Base Templates" for the whole story.
 
 Now there is one last detail, "How exactly do I make my building/reactions usable?". To put it simply, you already have.
-Earlier I mentioned the #ADDON_HOOKS template, this very useful template is already in every entity in the Base/Files addon. Basically #ADDON_HOOKS adds calls to all the required templates to insert entity permissions for items, reactions, and buildings for the following classes:
+Earlier I mentioned the ADDON_HOOKS template, this very useful template is already in every entity in the Base/Files addon. Basically ADDON_HOOKS adds calls to all the required templates to insert entity permissions for items, reactions, and buildings for the following classes:
 ADDON_HOOK_GENERIC
 ADDON_HOOK_<entity name> (For example ADDON_HOOK_MOUNTAIN or ADDON_HOOK_PLAINS)
 and if the entity is playable (dwarves only by default) ADDON_HOOK_PLAYABLE
 This means that your new addon should be immediately usable by the dwarves and any other playable races that may be added by other addons.
-Of course for #ADDON_HOOKS to work you need to have declared the item/building/reaction with the proper Rubble template, but as you have seen that is a simple matter for buildings and reactions. For items it is a little more complicated, but that is for a later tutorial.
+Of course for ADDON_HOOKS to work you need to have declared the item/building/reaction with the proper Rubble template, but as you have seen that is a simple matter for buildings and reactions. For items it is a little more complicated, but that is for a later tutorial.
 
 ========================================================
 
@@ -147,69 +150,127 @@ That call will expand into the following:
 	[SKILL:METALCRAFT]
 [/code]
 As you can see it is just a straight forward variable expansion. 
-One thing sharp-eyed readers may have noticed is that there was never a value defined for "count", if you will look up to the template definition you will see that count is followed by an equals sign (=). If a parameter name is followed by an equals sign whatever is after the equals sign is used as the default value for that parameter if that parameter is not given a value, so in this case count defaults to "1".
+One thing sharp-eyed readers may have noticed is that there was never a value defined for "count", if you will look up to the template definition you will see that count is followed by an equals sign (=). If a parameter name is followed by an equals sign whatever is after the equals sign is used as the default value for that parameter, so in this case count defaults to "1".
 
-There are a few more interesting things that standard templates like this can do, but most of them have been replaced by the much more flexible !SCRIPT_TEMPLATE (which is too advanced to detail here). For more on how templates work, and how they interact with other parts of Rubble, see "Rubble Addons.txt" and the last section of "Rubble Process.txt".
+There are a few more interesting things that standard templates like this can do, but most of them have been replaced by the much more flexible rubble:template script command (which is too advanced to detail here). For more on how templates work, and how they interact with other parts of Rubble, see "Rubble Addons.txt" and the last section of "Rubble Process.txt".
 
-(The templates/items/materials used in this tutorial come from the "Better Dorfs/Saurian/Warcrafter" addon)
+(The templates/items/materials used in this tutorial come from the (no longer available) "Better Dorfs/Saurian/Warcrafter" addon)
 
 ========================================================
 
-Tutorial 3: Raptor Script, Some Basic Commands
+Tutorial 3: Some Basic Script Commands and Concepts
 
-This tutorial introduces some basic Raptor scripting commands.
-WARNING! This tutorial assumes you have read the "Raptor Basics" document that comes with Rubble!
-WARNING! The following information is very spotty, hey it's a lot of stuff to cover, let's see you do better ;)
+Rubble includes powerful scripting support, almost everything can be controlled via scripting at some level.
+The only "issue" is that rather than a popular scripting language like Lua or Python, Rubble uses a custom language named Rex.
 
-Raptor is a custom scripting language I use for various projects, but the only thing that matters is that if you really want to get the most out of Rubble you need Raptor. Raptor scripts are used to make advanced templates and tweak scripts as well as a few other small things.
+There are three main reasons I use Rex:
+	It is really easy to embed with the language I wrote Rubble in.
+	I know it very well (after all I wrote it :p).
+	Most of the integration work was already done as part of other projects.
 
-This tutorial will not try to teach you to program (that would take far too much time), nor will it try to teach you the Raptor syntax (that's what "Raptor Basics" is for), I will merely try to present some important commands that everyone should know.
+The only real drawback to using Rex is that I am the only person who really knows how to use it, this tutorial should help fix that.
 
-Types:
-There are three main "kinds" of types in Raptor, built-in types, indexable types, and user data. 
-The built-in types are integer, string, float, bool, command, and code. All built-in types can be converted to any other built-in type seamlessly, these types are purely internal.
-Indexable types are defined by the same external packages as commands, there is only one indexable type built into Raptor (the type used by the "params" array). The version of Raptor used by Rubble has several indexable types, but they all act like map or array. map and array are the only two types that can be created by the user (outside of some commands), map is an associative array (you can use any string as the key) and array is a traditional linear array (you can only use integers as keys). I will talk more about indexables later.
-User data is a catch-all term for anything a command wants to stuff into a value that is not an indexable or built-in type. Most of the time user data is only useful to commands from the same package as the one that created it in the first place.
+It is a very good idea to read "Rex Docs/Rex Basics.txt" along side this file, as that file has all the basic documentation for the Rex language, this tutorial is only to help fill in holes and expand upon the things in that document.
 
-len
-len is very simple, just pass it an indexable value and it returns how many keys it has.
+The first thing you have to understand is that Rex is what is know as a "command based" language, this means that most of the language revolves around "commands". Commands are basically what most languages would call functions, but they do things that most languages would use keywords for.
+A good example is if. In Rex if is a command like any other, it even returns a value (which can be very useful).
+At first using commands for almost everything seems a little odd, but it allows you to do some very weird and wonderful things :)
 
-set and var
-var is used to create new variables, very simple.
-set allows you to change the value of a variable, also very simple, at least until you get to indexables... 
-set is used to add new keys to an indexable, for map all you need to do is set a non-existent key, for array the only key you can add is the one just passed the end, eg if len returns "10" for an array indexable that means that the existing keys are 0-9 and if you set key 10 you will be appending to the array.
+Return Values:
+	In Rex all return values are stored in a single "register" (it isn't actually a hardware register) that is shared with things like variable dereferences and object literals, basically every time a value is retrieved it is stuck in the the return register. This means that every command "returns a value" whether it wants to or not. If it doesn't return something explicitly it is said to return "unchanged", eg. whatever was in the register before. If you want to insert the last retrieved value into a command call or the like you can use the nop command. nop (no operation) is a simple command that does nothing, and so it obviously returns unchanged, perfect for getting the current value of the return register. 
 
-exists
-exists checks if a key exists in an indexable, invaluable.
+Exit States:
+	Rex has several "exit states" that are used to control program flow. Whenever an exit state is active the runtime halts execution and starts dropping blocks from the chain until a specific condition is met (or a native command clears the exit state). Several exit states may be active at once (but in practice this never happens)
+	
+	Return:
+		When this exit state is active blocks are dropped until a user command is exited, at which point it is halted by the command call handler.
+	Break:
+		This exit state is halted by the parser after exactly one block is dropped.
+	BreakLoop:
+		This exit state is special in that it is not normally halted by the runtime, it is halted by some native commands (mainly loop and foreach, but most other loops handle it as well)
+		BreakLoop is started by the command breakloop and is halted by being explicitly cleared by a native command.
+	Exit:
+		When this state is active blocks are dropped until there are none left (which exits the script)
+		Exit is started by the exit command and is never halted.
+	
+	Most (if not all) of the commands that start an exit state take a parameter, this parameter is put in the return register. This is a convenience as `true (break)` is functionally identical to `(break true)`.
+	
+	All exit states are cleared when the script exits.
 
-foreach
-foreach is the first of the two native loop commands provided by Raptor (Rubble comes with some user command loops as well). foreach will iterate over all key/value pairs in an indexable until it gets to the end or you tell it to stop (by using breakloop or returning false)
+Some Important Commands:
 
-loop and if
-Raptor, unlike most programming languages, has no key words, so if and loop are commands like any other. This can lead to some odd issues for those used to the usual way of doing things. 
-if is simple, except for one thing: it returns a value just like every other command. if will return unchanged so whatever the last command is in the block if runs is what if returns.
-loop is more complicated. loop will continuously run a block of code until the return value is "false" (for strings: "", for integers: 0, for booleans: false, for the other types: it's complicated, don't ask) or the BreakLoop, Exit, or Return exit state is set (eg you call exit, ret, or breakloop) This property is why most calls to loop either contain nothing but a call to if that wraps the whole loop body or the loop body ends in "(break true)" ("(break true)" is the Raptor equivalent of most language's "continue" keyword, sort-of, its complicated).
-Most of the time you do not need to use the raw loop commands as Rubble comes with some predefined user commands that wrap loop into more familiar for and while commands.
-[code]
-# prints the numbers 0-9
-(var count 0)
-(loop {
-	(if (int:lt [count] 10) {
-		(console:print [count] "\n")
-		(break true)
-	}{
-		(break false)
-	})
-})
-[/code]
+	if condition then [else]
+		(if true {(ret a)}{(ret b)})
+		(if true {(ret a)})
+		
+		if is the main conditional command in Rex. It is very simple and used all over, just like the if statements in most languages.
+		
+		One important thing to keep in mind is that, like all commands, if returns a value! This means that cool things like the following can be done:
+		(str:add "[NAME:Make Something" (if (int:eq [count] 0){""}{(str:add " (" [count] ")")}) "]")
+		
+		Which will return the following:
+		(if count == 0) "[NAME:Make Something]"
+		(if count == 5) "[NAME:Make Something (5)]"
+		
+	loop code
+		(loop {
+			false
+		})
+		
+		loop is the basic looping command, it will run it's code block until it returns false. This means that loop and if are close companions, the vast majority of loop commands will consists of a single if command that surrounds the actual loop body.
+	
+	foreach indexable code
+		(foreach <array a b c> block key value {
+			(console:print [key] " = " [value] "\n")
+			(break true)
+		})
+		
+		This example is much more complicated the the previous ones. 
+		First of all right after the command name you will see a "object literal", I will not try to explain them here, see the "Rex Docs/Rex Basics.txt" file that comes with Rubble.
+		After that comes a block declaration, this is basically a way to add variables to a block before it is created, in this case the variables "key" and "value", which are then filled in by the foreach command. These variables are filled in by position, not name, so you could name them anything you want.
+		The body uses the console:print command to write the values of key and value to the console, nothing too fancy. The important bit is the `(break true)` command at the bottom, this ensures that the block returns true, as if the block returns false the foreach loop will abort early.
 
-breakloop
-breakloop is a relatively new command that make loop and foreach interaction MUCH easier than it used to be. To put it simply (breakloop false) is like most languages "break" keyword and (breakloop true) is like "continue".
-
-console:print
-console:print will write data to the Rubble log and to the screen, good for status messages in tweak scripts.
-
-I have only skimmed over the top of the most important commands, to find out more read the Raptor command documentation (in the "other/raptor command docs" directory in the Rubble download). How and where you can use Raptor scripts will be covered in later tutorials (there is also some information on the subject in the "Rubble Addons" document)
+	console:print items...
+		(console:print "Hello!\n")
+		
+		Write stuff to the log, this command is really nice for printing status in long tweak scripts and/or helping with debugging.
+	
+	str:add strings...
+		(str:add "s1" "s2") # s1s2
+		
+		Add two or more strings together, this command is probably the most common one after if and foreach, after all Rubble is all about string processing.
+	
+	int:add a b, int:sub a b
+		(int:add 2 2) # 4
+		(int:sub 5 4) # 1
+		
+		These two commands (and their brothers int:mul, int:div, and int:mod) make up the basic math commands. int:add adds two numbers and int:sub subtracts them, simple.
+		There also exist counterparts in the float module for working with floating point numbers (there is obviously no float:mod :p).
+	
+	bool:and a b, bool:or a b, bool:not a
+		(bool:and true false) # false
+		(bool:or false true) # true
+		(bool:not false) # true
+		
+		The basic boolean operations, I don't use these much, but when you need them you need them.
+		In any case not much to say, if you don't know what these are then you need to go read a beginners programming book (any will do).
+	
+	expr expression values...
+		(expr "a+b" 1 3) # 4
+		
+		expr (short for "expression") provides a basic mathematical and logical expression parser.
+		The supported operators are: (in precedence order)
+			( )
+			/ * %
+			+ -
+			== != > < >= <=
+			!
+			&& ||
+		The types int, float, and bool are supported, any other type is converted to int or bool depending on context.
+		Any non-operator character in the expression string is treated as a placeholder for one of the values, syntax errors will cause a crash (which will cause Rubble to abort, so don't do that!)
+		If you only need to do something simple like add two numbers it is a far better idea to use the normal commands in the int, float, and bool modules, as expr has a relatively large amount of overhead compared to doing it by hand.
+	
+Rubble comes with basic documentation for each command, and it is a very good idea to read some (or all!) of the scripts in the default addons.
 
 ========================================================
 
@@ -230,42 +291,28 @@ There are 4 core templates that provide support for tilesets:
 (The SET_XXX templates insert a entry in the tile or color dictionary that is later retrieved by the #TILE or #COLOR template with the same <ID>, if no entry for <ID> is present in the dictionary <DEFAULT> is used.)
 
 These templates are a little cumbersome to use but you don't have to. All the specialized SHARED_OBJECT templates will detect tile and color information in their contents and automatically inserts calls to #TILE and #COLOR.
-This means that you do not need explicit calls to #TILE or #COLOR as plants, inorganics, tools, and material definitions are handled automatically (while creatures have some tile information included, no tileset that I know of modifies this data).
+This means that you do not need explicit calls to #TILE or #COLOR as plants, inorganics, tools, and material definitions are handled automatically. Vermin creatures also have some tile information included, but as there is no SHARED_OBJECT template for creatures you will have to insert the tileset templates by hand if you need to edit vermin tile numbers, lucky you there is an addon that mostly automates this.
 
-With #TILE and #COLOR handled, all you really need to worry about is SET_TILE and SET_COLOR. If you are adding support for a brand new tileset, the easiest way is to use #WRITE_TILESET. #WRITE_TILESET is a developer template that makes a list of all calls to #TILE and #COLOR and generates a file containing the corresponding calls to SET_TILE and SET_COLOR.
-You would then edit the file generated by #WRITE_TILESET to change the tile numbers and colors to match what your tileset needs.
+With #TILE and #COLOR handled, all you really need to worry about is SET_TILE and SET_COLOR. If you are adding support for a brand new tileset, the easiest way is to use the "Dev/Tileset/Export" addon. "Dev/Tileset/Export" is a developer addon that makes a list of all calls to #TILE and #COLOR and generates a file containing the corresponding calls to SET_TILE and SET_COLOR.
+You would then edit the generated file to change the tile numbers and colors to match what your tileset needs.
 
-If you already have raws there is a shortcut you can use that will cut the time needed by a considerable amount. To put it simply you do a quick hack job of inserting the SHARED_OBJECT templates, then generate a temporary addon consisting of the edited raws with the last file containing a call to our friend #WRITE_TILESET.
+If you already have the tileset raws you can use "Dev/Tileset/Insert" to add the templates automatically (and then use "Dev/Tileset/Export" to extract the gathered information).
 THIS PROCEDURE IS ONLY FOR CASES WHERE YOU ALREADY HAVE A FULL SET OF RAWS FOR YOUR TILESET! It is, IMHO, much easier to generate a default tileset addon and then edit that than it is to edit the full raws.
-
-These instructions are written with the assumption that you are using Notepad++, if you are using another editor you will have to make sure it is capable of regular expression search and replace operations.
 
 First make a new folder in you addons directory, this will be temporary, so name it anything you want.
 Now copy all the raw files that your tileset modified to your new temporary addon, you want only the changed files.
-Next add a file named something like "zzz_write_tileset.rbl" and add this line to that file: {#WRITE_TILESET;./tileset.rbl}
-Now open all the inorganic material files, to speed things up it's best to have them all open at once.
-Open the search/replace dialog and make sure the "Regular expression" radio button is checked.
-Then enter the following search text: "\[INORGANIC:([^:\]]+)\]"
-And this a the replacement: "}{SHARED_INORGANIC;$1;"
-Now go ahead and hit "Replace All in All Opened Documents".
-One last step: go through each file and remove the first '}' and add a '}' to the end of the file.
 
-Now follow the above steps for plant, item, and material template files using the following search/replace pairs:
-	"\[PLANT:([^:\]]+)\]" -> "}{SHARED_PLANT;$1;"
-	"\[ITEM_([^:\]]+):([^:\]]+)\]" -> "}{SHARED_ITEM;$1;$2;"
-	"\[MATERIAL_TEMPLATE:([^:\]]+)\]" -> "}{SHARED_MATERIAL_TEMPLATE;$1;"
+Now generate the raws, activating ONLY your temporary addon, "Base/Templates", "Base/Clear", "Dev/Tileset/Insert", and "Dev/Tileset/Export", the generated raws are useless, what you want is the file "dev_export_tileset.tile_info.rbl" that should be in your current working directory (generally the directory containing "rubble.exe").
 
-Now generate the raws, activating ONLY your temporary addon, "Base/Templates", and "Base/Clear", the generated raws are useless, what you want is the file "tileset.rbl" that should be in your current working directory (generally the directory containing "rubble.exe").
+Once you have your tileset file ready to go (however you got it) create a new addon and add the tileset file as well as your tileset's font image.
 
-Once you have your tileset.rbl file ready to go (however you got it) create a new addon and add the tileset.rbl file as well as your tileset's font image.
-
-To install you tileset image all you need to do is add a call to INSTALL_TILESHEET to the top of you tileset.rbl file, for example:
+To install you tileset image all you need to do is add a call to INSTALL_TILESHEET to the top of you tileset file, for example:
 [code]
 {INSTALL_TILESHEET;test_16x16.png}
 [/code]
 
-Now for editing the init files. Rubble provides a set of templates specifically for editing the tileset related init settings found in "d_init.txt". 
-To set the "font" (eg the tilesheet) you use the SET_FULLSCREEN_TILESHEET and SET_WINDOWED_TILESHEET templates. (Both templates also set the font to be used in graphical mode)
+Now for editing the init files. Rubble provides a set of templates specifically for editing the tileset related init settings found in "init.txt" and "d_init.txt". 
+To set the "font" (eg the tilesheet) you use the SET_FULLSCREEN_TILESHEET and SET_WINDOWED_TILESHEET templates. Both templates also set the font to be used in graphical mode, if you need to set these separately (if you are using Text Will Be Text for example), then use SET_FULLSCREEN_FONT, SET_FULLSCREEN_FONT_GRAPHICS, SET_WINDOWED_FONT, and SET_WINDOWED_FONT_GRAPHICS.
 To set things like track tiles you use OPEN_D_INIT, EDIT_D_INIT, CLOSE_D_INIT, and D_INIT_TO_DEFAULTS. The following example makes pillars look like smooth floors ;)
 [code]
 {OPEN_D_INIT}
@@ -281,39 +328,31 @@ Tutorial 5: Basic Tweak Scripts
 
 This tutorial will introduce tweak scripts and attempt to show some uses for them.
 
-I personally use tweak scripts all over the place in my Rubble addons, as (by design) tweak scripts are incredibly flexible.
+I personally use tweak scripts all over the place in my addons, as (by design) tweak scripts are incredibly flexible.
 
 The original use I had in mind for tweak scripts was allowing you to "tweak" the raws after generation in ways that are hard for templates to do.
-For example, the Rubble addon "Zap Aquifers", this addon consists of a single "post script" (a tweak script that runs after generation) that disables all AQUIFER tags in inorganic materials.
+For example, the addon "Zap Aquifers", this addon consists of a single "post script" (a tweak script that runs after generation) that disables all AQUIFER tags in inorganic materials.
 Here is the whole script that I will be dissecting:
 [code]
-(var aquifercount 0)
-(var aquifercounttotal 0)
 
-(foreach [rubble:raws] {
-	(if (str:cmp "inorganic_" (str:left [params 0] 10)) {
-		(var file (raw:init [params 1]))
-		(var tag (raw:current))
+var aquifercount = 0
+var aquifercounttotal = 0
+
+(foreach [rubble:raws] block name content {
+	(if (str:cmp "inorganic_" (str:left [name] 10)) {
+		(console:print "    " [name] "\n")
 		
-		(console:print "    " [params 0] "\n")
-		
-		(loop {
-			(raw:advance [file])
-			
-			(if (raw:valid [file]){}{(breakloop false)})
-			
+		[rubble:raws [name] = (df:raw:walk [content] block tag {
 			(if (str:cmp [tag id] "AQUIFER") {
-				(raw:disable [file])
-				(++ aquifercount)
+				[tag disable = true]
+				[aquifercount = (int:add [aquifercount] 1)]
 			})
 			
 			(break true)
-		})
+		})]
 		(console:print "      Found Aquifers : " [aquifercount] "\n")
-		(set aquifercounttotal (int:add [aquifercounttotal] [aquifercount]))
-		(set aquifercount 0)
-		
-		(set [rubble:raws] [params 0] (raw:dump [file]))
+		[aquifercounttotal = (int:add [aquifercounttotal] [aquifercount])]
+		[aquifercount = 0]
 	})
 	(break true)
 })
@@ -322,82 +361,66 @@ Here is the whole script that I will be dissecting:
 
 First we will start with the top:
 [code]
-(var aquifercount 0)
-(var aquifercounttotal 0)
+var aquifercount = 0
+var aquifercounttotal = 0
 
-(foreach [rubble:raws] {
+(foreach [rubble:raws] block name content {
 	...
-})
+};)
 [/code]
 The two variables are for logging, they keep track of how many aquifer tags we found in the current file and in all the files together.
-rubble:raws is an indexable that contains all the files in all the addons indexable by name.
+rubble:raws is an indexable that contains all the files in all the (active) addons indexable by name.
+The block declaration is needed so foreach has some variables to populate, two of them to be exact (a block declaration is basically a anonymous command, they are used where you need variables with having formal variable declarations).
 
 Now for the body of the foreach loop:
 [code]
 ...
 
-(foreach [rubble:raws] {
-	(if (str:cmp "inorganic_" (str:left [params 0] 10)) {
-		(var file (raw:init [params 1]))
-		(var tag (raw:current [file]))
+(foreach [rubble:raws] block name content {
+	(if (str:cmp "inorganic_" (str:left [name] 10)) {
+		(console:print "    " [name] "\n")
 		
-		(console:print "    " [params 0] "\n")
-		
-		(loop {
-			(raw:advance [file])
-			
-			(if (raw:valid [file]){}{(breakloop false)})
-			
+		[rubble:raws [name] = (df:raw:walk [content] block tag {
 			...
 			
 			(break true)
-		})
+		})]
 		(console:print "      Found Aquifers : " [aquifercount] "\n")
-		(set aquifercounttotal (int:add [aquifercounttotal] [aquifercount]))
-		(set aquifercount 0)
-		
-		(set [rubble:raws] [params 0] (raw:dump [file]))
+		[aquifercounttotal = (int:add [aquifercounttotal] [aquifercount])]
+		[aquifercount = 0]
 	})
 	(break true)
 })
 ...
 [/code]
 First we have an if command to check if the file contains inorganics, if not we just go on to the next file, simple.
-If the file does contain inorganics we setup a few temporary variables, initalize raw parsing for the file, and print the file name (in params 0). Raw parsing is provided by commands in the "raw" namespace, and is rather simple as all you can do is step through the file one tag at a time modifying the current tag if you wish.
-The loop command steps through the file one tag at a time checking if the tag is "valid" (eg EOF has not been reached) and breaking out of the loop if it is not.
+If the file does contain inorganics we setup a few temporary variables, print the file name, and start parsing. Raw parsing is provided by commands in the "df:raw" module, and is rather simple, as all you can do is step through the file one tag at a time modifying the current tag if you wish (unless you use the slower advanced parser, which we are not doing here). The raw walker automatically returns a string version of the file as modified, so we assign that to the correct entry in the rubble:raws indexable.
 After all tags have been processed it prints a message to say how many aquifers it has found, adds the current count to the total, and resets the current count.
-Finally the modified raws are dumped to a string and that string is used to replace the old file contents.
 
 Now for the meat of the script, the few lines that actually DO something.
 [code]
 ...
 
-(foreach [rubble:raws] {
-	(if (str:cmp "inorganic_" (str:left [params 0] 10)) {
+(foreach [rubble:raws] block name content {
+	(if (str:cmp "inorganic_" (str:left [name] 10)) {
 		...
 		
-		(loop {
-			(raw:advance)
-			
-			(if (raw:valid){}{(breakloop false)})
-			
+		[rubble:raws [name] = (df:raw:walk [content] block tag {
 			(if (str:cmp [tag id] "AQUIFER") {
-				(raw:disable)
-				(++ aquifercount)
+				[tag disable = true]
+				[aquifercount = (int:add [aquifercount] 1)]
 			})
 			
 			(break true)
-		})
+		})]
 		...
 	})
 	(break true)
 })
 (console:print "    Found Aquifers Total : " [aquifercounttotal] "\n")
 [/code]
-Right after we check for EOF we check if the tag id equals "AQUIFER" and call raw:disable if so (raw:disable just removes the square brackets around the tag). Also we increment the current aquifer count.
+First we check if the tag id equals "AQUIFER" and disable the tag if so (disabling a tag just replaces it's square brackets with dashes). Also we increment the current aquifer count.
 Finally at the end, after all files are processed we print a message saying how many aquifers we found total in all files.
-
-As you can see there is a lot of stuff in a script of this type that will change but little for other scripts that walk the raws like this, unfortunately most of these scripts differ just enough to make some kind of universal raw walker command impractical :(
 
 One of the other big uses for tweak scripts is checking dependencies, for example:
 [code]
@@ -411,12 +434,187 @@ Please activate that addon and try again.
 (There is also a command for specifying incompatible addons)
 Most of the time you would want your dependency checks to be in prescripts, so as to abort as soon as possible.
 
-"So how does Rubble know what is a postscript and what is a prescript?" you ask. Simple, the file extension. Rubble "knows" a file ending in .pre.rsf is a prescript and a file ending in .post.rsf is a post script.
+"So how does Rubble know what is a postscript and what is a prescript?" you ask. Simple, the file extension. Rubble "knows" a file ending in .pre.rex is a prescript and a file ending in .post.rex is a post script.
 
 There are many, many things that you can do with tweak scripts, for more examples see the addons that come with Rubble.
 
 ========================================================
 
-Tutorial 6: Not Sure Yet
+Tutorial 6: The Rubble GUI
 
-This tutorial will provide useful instruction, I am just not sure what kind as of yet :)
+This tutorial introduces the Rubble GUI and explains all of it's functions.
+
+The Rubble GUI automates all the common Rubble tasks, but you still need to know what these tasks are and when to use them to make full use of it.
+Unfortunately the GUI is Windows only.
+
+The first and simplest thing you can do is a normal generation cycle. This is done from the "Addons" tab, simply select the addons you want in the list then click "Generate Raws with Selected Addons", quick and easy.
+
+The second major task is running prep cycles. 
+Prep is Rubble's answer to the problem of sharing worlds with radically different settings. For example you download a succession world that has a different tileset from the one you normally use, without Rubble you would have to replace the raws with the ones for a tileset you prefer (hard to do if the raws are modded), install the same tile set on your copy of DF, or just deal with "funny" looking walls and such. With Rubble there are two, much easier, ways to deal with this problem, the first and easiest way being prep. To put it simply prep will update your DF install to roughly match the one used to generate the world. Only things changed/controlled by addons are handled, so, for example, a custom DFHack plugin that is not controlled by a Rubble addon would not be included.
+In most cases prep handles everything need to run a world without issues, including installing the same tileset the world was generated with and installing the necessary DFhack scripts.
+To run a prep cycle simply open the "Prep" tab, select the region you want to prep and click "Run Prep for Selected Region".
+
+Third is regenerating a world.
+Regeneration is a slightly dangerous, but very useful action that is mostly used to change tilesets. Regen is, along with prep, the primary method for dealing with shared worlds. While prep makes your install mirror the one used when the world was generated, regen make the world mirror your install.
+Regen can totally ruin your world if it is misused! As long as you regenerate with the same exact addons used to create the world in the first place nothing bad should happen (but regenerating with the same addons is pointless).
+Generally regen should only be used for changing tilesets, as most if not all tileset addons are safe to switch on worlds in progress. Note that this in not the case with the vast majority of other addons!
+Before using regen make a backup of your world!
+To regen a world open the "Regen" tab, select the region to regenerate, then change the addon list below. Once you have the addons setup the way you want them simply click "Regen Selected Region with Selected Addons".
+
+The last tab is the "Other" tab, which at the time I am writing this only allows you to set extra command line switches to pass to Rubble (advanced users only!).
+
+The only things you cannot do from the GUI (without manually specifying extra flags) are:
+	Update the addon list (the GUI does this automatically)
+	Print debug and performance information (why would you want to?)
+	Manage config variables
+	Change the default paths
+
+========================================================
+
+Tutorial 7: The raw Parsers
+
+This tutorial will teach you how to use the script raw parsers.
+
+Rubble comes with two, slightly different, raw parsers that are made available to tweak scripts to use for whatever strikes your fancy.
+
+The first parser is provided by the df:raw:walk command. This is the parser that is generally used, as it is much faster and a little easier to use at the cost of being slightly less flexible.
+The primary issue with using this parser is the fact that you can only look at one tag at a time, and you can only move forward from the first tag to the last (it is possible to abort early if you wish), still this is just fine for the vast majority of tasks.
+
+To use this raw parser you pass in a string containing the raws you wish to parse as well as a block of code to run for each tag, the command the returns a string with the raws plus any changes you may have made.
+
+Example:
+[code]
+(console:print "Raws: " (df:raw:walk "[FOO][BAR][BAZ]" block tag {
+	(console:print "The tag ID is: " [tag id] "\n")
+	(break true)
+}) "\n")
+[/code]
+
+Result:
+[code]
+The tag ID is: FOO
+The tag ID is: BAR
+The tag ID is: BAZ
+Raws: [FOO][BAR][BAZ]
+[/code]
+
+Internally df:raw:walk is a lot like foreach, so like foreach you have to remember to "break true" unless you want to abort early (breakloop also works as expected).
+
+The other parser is much more flexible, but it can also be much slower. Rather than running code for each tag this parser converts the raws to an indexable that you can use however you wish. This means that you can store single tags and iterate over the raws in any order that you wish, but converting the indexable back to a string is rather slow.
+Another cool thing you can do with this parser is reorder the tags, or even construct new raw files, as the file is just a standard array indexable filled with a custom tag indexables.
+
+As this parser just generates a standard array (of special tag values) you just use the normal methods you would use with any indexable when working with it.
+
+Example:
+[code]
+var raws = (df:raw:parse "[FOO][BAR][BAZ]")
+(foreach [raws] block i tag {
+	(console:print "The tag ID is: " [tag id] "\n")
+	(break true)
+})
+(console:print "Raws: " (df:raw:dump [raws]) "\n")
+[/code]
+
+Result:
+[code]
+The tag ID is: FOO
+The tag ID is: BAR
+The tag ID is: BAZ
+Raws: [FOO][BAR][BAZ]
+[/code]
+
+Although in most cases the tag values generated by the two parser look and act much the same they are very different!
+
+The "fast" parser (df:raw:walk) supports the following fields:
+	Write-Only:
+		replace			Replace the entire tag with the given text.
+		append			Add text after the tag.
+		prepend			Add text before the tag.
+		disable			Replace the tag's square brackets with dashes.
+	Read-Only:
+		id				The tag "ID", eg the first (or only) item.
+		<an integer>	A tag's "parameters", eg every item after the first, the len command returns how many of these there is.
+
+The "slow" parser (df:raw:parse) supports the following fields:
+	replace			Replace the entire tag with the given text, if this is set id and params is ignored.
+	append			Add text after the tag.
+	prepend			Add text before the tag.
+	disable			Replace the tag's square brackets with dashes.
+	comments		Any non-raw text that existed between this tag and the next (or the end of the file). Includes whitespace!
+	id				The tag's "ID", eg the first (or only) item.
+	params			An indexable (by default a standard array) containing the tag parameters, eg every item after the first.
+
+All of the slow parser fields can be both read and written, so changing the value of the second parameter of a tag with the slow parser is just a matter of "[tag params 1 = value]" where as with the fast parser you have to replace the whole tag (with preformatted text!).
+
+The slow parser does support the "replace" index, but it is a better idea to use the df:raw:tag command if you want to replace a tag with another (better yet modify the existing tag). The replace index is for when you want to replace a tag with arbitrary text, for example if you are inserting a Rubble template.
+
+Example (df:raw:tag):
+[code]
+var raws = (df:raw:parse "[FOO][BAR][BAZ]")
+[raws 1 = (df:raw:tag "NEW" "TAG")]
+(console:print "Raws: " (df:raw:dump [raws]) "\n")
+[/code]
+
+Example (modify old tag):
+[code]
+var raws = (df:raw:parse "[FOO][BAR][BAZ]")
+[raws 1 id = "NEW"]
+[raws 1 params = <array "TAG">]
+(console:print "Raws: " (df:raw:dump [raws]) "\n")
+[/code]
+
+Result (both):
+[code]
+Raws: [FOO][NEW:TAG][BAZ]
+[/code]
+
+While I have been calling them the "fast" and "slow" parsers, this is not necessarily true, most of what makes the "slow" parser slow lies in df:raw:dump, so if you are not going to modify the raws and then write them out it may actually be faster, testing is needed.
+
+========================================================
+
+Tutorial 8: Setting up a Development Rubble Install
+
+Rubble is a great tool for transforming raws and doing other repetitive development tasks of that sort, this tutorial aims to show you how to setup a minimal environment for when you don't need to have DF available.
+
+Why should you use Rubble instead of writing a script in your favorite scripting language?
+Here are a few reasons:
+	Rubble already "knows" how to load files and run scripts, saving a lot of overhead
+	Rubble comes with not one but TWO raw parsers, no need to roll your own
+	Rubble comes with an extensive library of ready to go addons that can, when properly used, save you a lot of time
+
+In any case this tutorial is not here to teach you how to write a script to do what you need, this is just here to tell you how to setup Rubble as a standalone tool for working with raws without needing DF.
+
+Basically you need a separate Rubble installation that lacks the "user" addons and is not affiliated with a copy of DF. This is simple to setup, just unpack Rubble somewhere and create a directory beside the addons directory (I'll assume you named it "out"). 
+
+Now start the GUI, it will complain about not finding the "saves" directory and quit, this is normal. Open the "gui.ini" that was created, it should look like this:
+[code]
+[general]
+otheroptions=
+rubble_bin=rubble.exe
+rubble_cwd=.
+addonsdir=.\addons
+dfdir=..
+addonlist=
+[/code]
+Add "minimal=true" at the bottom of the file.
+
+Now create a file named "rubble.ini" and add these contents:
+[code]
+[rubble]
+dfdir=rubble:out
+outputdir=rubble:out
+[/code]
+Feel free to add any other options you like, for a full list run "rubble -h".
+
+Now run the GUI again, it should start properly this time, just without the "Prep" and "Regen" tabs.
+
+Go ahead and delete any addons you don't need (which should be most of them) this will shorten the list and make it easier to find stuff. DO NOT DELETE "Base/Templates" or the "base.init.rex" file! They contain valuable commands you will need, if not now then later.
+Most of contents of the "other" directory can be deleted as well, the only things I would suggest you keep are the documents.
+
+Now you should have a copy of Rubble ready to use for various development tasks.
+
+Most of the time when using Rubble this way you will be working with temporary addons that contain only a few files and only activating 3-4 addons when generating. A common task will go like this: First you create a temporary addon with your working files (the ones containing the data you need to manipulate), then you create a new addon that contains the script(s) you will be using (this makes it easier to reuse them later) once you are finished writing the script(s) activate the needed addons and generate. Most of the time when I do this I am not after the generated files, instead the files I want are written out by the scripts as a side effect of generation, but this depends on how your scripts are written.
+
+An excellent example of an addon meant to be used with a setup like this is "Dev/Tileset/Insert", it is less than useful for end users, but invaluable for developers. For example when using "Dev/Tileset/Insert" with the "DEV_TILESET_INSERT_EXPORT" config variable set it works best on a minimal setup like this, otherwise you trash your default settings and/or send too much time wading around other things you may have installed.
+
+If you really want to get fancy you can install go (golang.org) and build "rexsh" as directed in "src/Building.txt", this is an invaluable tool when trying to learn how to script with Rubble, and makes testing small code snippets a breeze. Unfortunately while building a go program is absurdly easy compared to building programs written in most languages it is still something best left to advanced users.

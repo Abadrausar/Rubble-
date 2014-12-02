@@ -52,9 +52,22 @@ func New() *Info {
 	return this
 }
 
-// Ways to exit with an io.EOF error:
-//	Ctrl+Z			Sends char 26... but later versions of go no longer treat this like EOF
+// Run prints a prompt and then reads input one byte at a time until EOF or newline.
+// If EOF is is found an error is returned, in any case the line read up to the end condition
+// is returned, if Run exits with an error there may be data returned as well.
+// 
+// To workaround a go bug Run will simulate EOF if it finds char 26 (the Windows/DOS EOF char).
+// 
+// I have no idea how well (or if) this works with Unicode.
+// 
+// If newline is prefixed by the defined escape char then it is added to the output buffer, and
+// Run continues to look for input, in all other cases the escape char is not given special treatment
+// (eg you do not need to double it up)
+//
+// Ways to generate EOF (on windows):
+//	Ctrl+Z			Sends char 26
 //	Ctrl+Break		Seems to work like a combo of Alt+26 followed by Enter
+//	Ctrl+C			Same as Ctrl+Break?
 //	Alt+26			Generates an EOF condition
 //	Alt+026			Same as Ctrl+Z
 //	Alt+27			Same as Alt+26?
@@ -63,6 +76,7 @@ func (this *Info) Run() ([]byte, error) {
 	escape := false
 
 	out := make([]byte, 0, 100)
+	eatEOF := false // state var for eating the newline after an EOF char.
 
 	fmt.Fprint(this.Out, this.Prompt)
 	for {
@@ -72,13 +86,22 @@ func (this *Info) Run() ([]byte, error) {
 		}
 
 		// The DOS EOF char.
-		// This causes Ctrl+Z and Alt+026 to work for later go versions.
+		// This causes Ctrl+Z and Alt+026 to work for later go versions (1.2).
 		if this.char[0] == 26 {
-			return out, io.EOF
+			eatEOF = true
+			continue
 		}
 		
 		if this.char[0] == byte('\r') {
 			continue
+		}
+		
+		if eatEOF && (this.char[0] != byte('\n')) {
+			eatEOF = false
+		}
+
+		if eatEOF && (this.char[0] == byte('\n')) {
+			return out, io.EOF
 		}
 
 		if this.char[0] == this.Escape && !escape {

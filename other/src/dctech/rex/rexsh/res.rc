@@ -1,0 +1,35 @@
+#include <windows.h>
+
+// no icon yet
+//IDI_ICON1	ICON		DISCARDABLE	"../res/raptor.shell.ico"
+//IDI_ICON2	ICON		DISCARDABLE	"../res/raptor.rsf.ico"
+//IDI_ICON3	ICON		DISCARDABLE	"../res/raptor.rbf.ico"
+
+1 VERSIONINFO
+	FILEVERSION		1,0,0,0
+	PRODUCTVERSION	1,0,0,0
+	FILEOS			VOS_NT
+	FILETYPE		VFT_APP
+	FILESUBTYPE		VFT2_UNKNOWN
+	FILEFLAGSMASK	0x00000000
+	FILEFLAGS		0x00000000
+{
+	BLOCK "StringFileInfo"
+	{
+		BLOCK "04090025"
+		{
+			VALUE "CompanyName", "Double Click Technologies"
+			VALUE "FileDescription", "Rex Shell"
+			VALUE "FileVersion", "1.0"
+			VALUE "InternalName", "Rex"
+			VALUE "LegalCopyright", "2014 Milo Christiansen"
+			VALUE "OriginalFilename", "rexsh.exe"
+			VALUE "ProductName", "Rex Shell"
+			VALUE "ProductVersion", "1.0"
+		}
+	}
+	BLOCK "VarFileInfo"
+	{
+		VALUE "Translation", 0x0409, 0x0025
+	}
+}

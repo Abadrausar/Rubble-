@@ -1,17 +1,2 @@
-[OBJECT:REACTION]
 
-{!SCRIPT;
-	(var howmany (rubble:getvar "DEV_DUMMY_REACTION_COUNT"))
-	(if (str:cmp [howmany] "") {
-		(set howmany 15)
-	})
-	
-	(var out "The following are \"dummy\" reactions used to add content after worldgen.\n")
-	(for {(var count 0)}{(int:lt [count] [howmany])}{(++ count)}{
-		(set out (rubble:stageparse (str:add [out] 
-		"\n{REACTION;DUMMY_REACTION_" [count] ";ADDON_HOOK_PLAYABLE}\n"
-		"\tAdd your reaction body here\n"
-		)))
-	})
-	(ret [out])
-}
+This is filled in via tweak script.

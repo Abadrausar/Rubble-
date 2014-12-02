@@ -1,0 +1,15 @@
+
+{@SCRIPT;
+	(rubble:prepfile "MLC 16x16.png")
+	(rubble:prepfile "MLC 10x10.png")
+}
+
+{D_INIT_TO_DEFAULTS}
+
+{INSTALL_TILESHEET;MLC 16x16.png}
+{INSTALL_TILESHEET;MLC 10x10.png}
+
+{SET_FULLSCREEN_TILESHEET;MLC 16x16.png}
+{SET_WINDOWED_TILESHEET;MLC 10x10.png}
+
+# In a non-ASCII tileset there would be a long list of calls to SET_TILE and SET_COLOR here.

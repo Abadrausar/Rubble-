@@ -3,13 +3,10 @@
 LICENSE:
 ==============================================
 
-Raptor, "dctech/ini", "dctech/dcfs", "dctech/iconsole", and Rubble are released under the following license:
+Rex, AXIS VFS, "dctech/dfrex/dfraw", "dctech/iconsole", and Rubble are released under the following license:
 
-Raptor is Copyright 2012-2014 by Milo Christiansen
-"dctech/ini" is Copyright 2013 by Milo Christiansen
-"dctech/dcfs" is Copyright 2013 by Milo Christiansen
-"dctech/iconsole" is Copyright 2014 by Milo Christiansen
-Rubble is Copyright 2013-2014 by Milo Christiansen
+Rex, "dctech/dfrex/dfraw", and "dctech/iconsole" are Copyright 2014 by Milo Christiansen
+AXIS VFS and Rubble are Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of

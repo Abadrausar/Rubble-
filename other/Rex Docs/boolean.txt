@@ -1,0 +1,31 @@
+PACKAGE DOCUMENTATION
+
+package boolean
+    import "dctech/rex/commands/boolean"
+
+
+
+FUNCTIONS
+
+func Command_And(script *rex.Script, params []*rex.Value)
+    Ands two values.
+
+	bool:and a b
+
+    Returns a && b
+
+func Command_Not(script *rex.Script, params []*rex.Value)
+    Inverts a value.
+
+	bool:not a
+
+    Returns !a
+
+func Command_Or(script *rex.Script, params []*rex.Value)
+    Ors two values.
+
+	bool:or a b
+
+    Returns a || b
+
+

@@ -1,0 +1,198 @@
+
+There are some tutorials in the file "How To Rubble.txt", I suggest you read them as they explain the basics in some detail.
+
+==============================================
+Template Prefixes Explained:
+==============================================
+
+When a template is run is determined by a one character prefix (or lack of a prefix).
+There are three parse stages and four prefixes.
+Prefix	Meaning
+!		Preparse, a template with this prefix will run in the preparse stage.
+none	Parse, a template with no prefix will run in the parse stage.
+#		Postparse, a template with this prefix will run in the postparse stage.
+@		ASAP, a template with this prefix will run in the earliest possible parse stage.
+
+@ templates are usually run in preparse but could be run in any stage depending on when it is parsed (parsing can be delayed by nesting in a later parse stage template for example).
+
+The template prefix is part of the template's name, you cannot change a template's parse stage by calling it with a different prefix (unless you rename the template)
+
+==============================================
+Tileset Addons:
+==============================================
+
+There is a rather good (IMHO) tutorial on tileset addon in the "HowTo Rubble" file, see tutorial #4.
+
+==============================================
+Porting an existing mod to Rubble with "Dev/Tileset/Insert":
+==============================================
+
+The "Dev/Tileset/Insert" addon is primarily for porting tilesets from existing raws, but it can also be used to insert some important templates into your raw set to help jump-start your porting effort.
+
+The only templates that are handled are the specialized "SHARED_OBJECT" templates as well as #TILE and #COLOR in vermin creatures, but as adding the SHARED_OBJECT templates is usually either the largest or second largest job in porting any mod it really helps.
+
+Most of the time the files processed by "Dev/Tileset/Insert" are not available to the modder, but if you set the config var "DEV_TILESET_INSERT_EXPORT" to "true" then every file it changes will be written to the current working directory. Just copy the files it writes to your addon and save yourself hours of work!
+
+Really advanced users may want to look at the tweak script that drives "Dev/Tileset/Insert" so that they can use it's example to write temporary addons/scripts to help with other, more specific, porting tasks. For example if you have lots of reactions it may be worth while to write a script to add the REACTION template to them all (using the reaction name to decide what class to register them as perhaps).
+
+It is easy to forget that Rubble can be used for far more than just generating raws, it also works well for processing them.
+
+==============================================
+Tweak Scripts:
+==============================================
+
+Tweak scripts are the most important thing to happen to Rubble since version 1. They allow you to run arbitrary scripts before or after generation. These scripts can change the raws, allowing you to "tweak" the generated output.
+
+Pre tweak scripts have the extension ".pre.rex".
+Post tweak scripts have the extension ".post.rex".
+
+Tweak scripts are written in Rex not Rubble code, so Rubble templates are not available except through rubble:calltemplate or rubble:stageparse.
+
+Most tweak scripts will make use of the commands in the df:raw namespace to walk the raw files and make changes as needed.
+
+As for writing your own tweak scripts... It would be a very good idea to read the tweak scripts included with Rubble, if you do not understand those scripts then you will have trouble writing your own.
+
+==============================================
+Initialization Scripts:
+==============================================
+
+Init scripts are very limited, but also very useful. Basically they are Rex scripts that ALWAYS run, even when their containing addon is not active.
+Init scripts have the extension ".init.rex".
+Use init scripts to do setup that may be shared by multiple addons and HAS to be done. For example an excellent use for a init script is adding namespaces and global variables shared by a bunch of addons in an addon pack.
+
+Another fine use of init scripts is "always active" templates, basically you add a template stub in an init script an the override it with a full version in a pre tweak script. This way clients of your addon can just assume that your addon's template are present allowing you to skip checking to see if it is active. 
+(please note that you really only want to do this within an addon pack so that you can be sure the other addon is installed)
+
+Init scripts have a very narrow use-case and should be used with care.
+
+Init scripts are still loaded as "user data" if their containing addon contains any parseables!
+
+==============================================
+The prep "addon":
+==============================================
+
+prep is a special "addon" that is created automatically during generation and is written to the raw folder. This "addon" contains all the scripts and files needed to make DF ready to load a world generated from that set of raws. Basically it allows you to easily run multiple, very different, worlds without too much trouble. 
+
+Running "rubble -prep=<region name>" should make sure all init setting, tilesets, DFHack scripts, ect. are installed just as they were when the raws for that world were originally generated.
+(It is the responsibility of each addon to provide any prep support it may need)
+
+Scripts with the extension ".prep.rex" are automatically added to the prep "addon" to be run when a region is prepped, any data files you need will have to be added manually via the "rubble:prepfile" script command.
+
+If you want to revert to the setting used by the main raw folder (if you want to generate a new world or something) just run "rubble -prep=raw".
+
+Most addons do not need to worry about supporting prep, it is only needed for addons that make changes to files outside the raw folder.
+
+==============================================
+Install Mode:
+==============================================
+
+Install mode is a simple operating mode in which files are loaded from a single zip and any ".inst.rex" scripts are run. This mode is intended for installing non-raw mods (for example DFHack plugins or utilities).
+
+To use install mode just create a zip containing the files you want to install and a script that has the commands required to install them.
+
+Install scripts can do anything that any other script can do.
+
+To install a package:
+	rubble -install=<package>
+
+<package> should be a (non-DCFS!) path to a zip file.
+
+Windows users can simply drag and drop an installer package onto the Rubble GUI icon, this will automatically launch Rubble to install the package.
+
+==============================================
+AXIS VFS:
+==============================================
+
+For a variety of reasons newer versions of Rubble use AXIS VFS (Absurdly eXtremely Incredibly Simple Virtual File System, the lengths I go to for cool acronyms :p) for (almost) all file access.
+For most users this will make absolutely no difference, but if you need to pass a path to Rubble for some reason you will need to know at least a little.
+
+AXIS uses special (OS-independent) multi-part paths. The first part is the colon separated location ID(s). You can think of location IDs as drive letters, they each specify a different location on the file system. The second part is the traditional slash separated path.
+
+Examples:
+	df:data/init/d_init.txt
+	out:objects/entity_default.txt
+
+In some cases it may be possible to specify multiple location IDs on a path, in that case just put them one right after another.
+
+Example:
+	addons:dir:addonlist.ini
+
+One thing to keep in mind: Relative paths (paths containing "." or ".." elements) are utterly illegal in AXIS, so don't do that.
+
+The only paths that are not handled by AXIS are:
+	dfdir command-line/config option
+	outputdir command-line/config option
+	addonsdir command-line/config option
+
+And even these paths may use the AXIS syntax (with a reduced set of location IDs):
+	dfdir may use the "rubble" location
+	outputdir may use the "df" and "rubble" locations
+	addonsdir may use the "out", "df", and "rubble" locations
+
+You may still use OS paths (which may be relative) for these three settings, but you do not have to if using the AXIS syntax would be easier.
+
+Location IDs:
+rubble				The current working directory, most of the time this is where the Rubble binary is.
+df					The dwarf fortress directory, defaults to ".."
+out					The output directory, by default "df:raw"
+addons:dir			The addons directory, by default "rubble:addons"
+addons:zip			A composite, read-only, directory made up of the contents of all the zip files in the addons directory
+prep				The prep directory, only valid when a prep cycle is running.
+install:raw			The install package file, only valid when an install cycle is running.
+install:files		The install package file contents, only valid when an install cycle is running.
+
+==============================================
+The Addon Loader:
+==============================================
+
+Rubble has a recursive addon loader that can read addons from zip files or directories.
+What this means is that you can group addons in directories to have something like an addon tree.
+
+The following rules determine how addons are loaded:
+	Zip files may only be used in the root addon folder.
+	Addons in a zip always override addons in a directory.
+	Addons are loaded in alphabetical order except as otherwise specified.
+	Zip files and directories are identical as far as the loader is concerned except as otherwise specified.
+	If an addon contains one or more directories, the directories are loaded as child addons.
+	An addon without parseable files (.txt, .rbl, .rex) is not loaded (but any child addons are).
+		An init script (.init.rex) is not considered a paresable file. (but such a script will still run)
+
+The following rules determine how addon files override each other (if there is a name collision):
+	Addons in zip files will always override addons in directories.
+	Addons are loaded in alphabetical order, addon "aaa/zzz" will override "aaa/hhh" but not "bbb/aaa"
+
+If you have readmes or the like in an otherwise empty addon it is recommended that you do not give them a file extension. In any case you do not want such an addon appearing in addonlist.ini, so do not use any of the "parseable" extensions (.txt, .rbl, .rex).
+A good alternative extension is .text or maybe .me (as in "read.me"), but I prefer no extension at all.
+
+All addons are loaded into memory, but only the active addons are processed.
+An addon is active if:
+	It's name is listed on the command line in the -addons option
+	If it's entry in addonlist.ini equals "true"
+
+If any addon names are specified via the -addons option then addonlist.ini is never read (but it is updated)
+
+So why do you (the modder) need to know all this? To put it simply you need to know what is permissible for structuring your addon(s) so that you can choose an optimal method that makes it easy on both you and your users. 
+
+Do you want to use multiple small addons or just one large one? Do you want all of your mod's addons in one large directory, or do you want to group related things together? These decisions are important part of deciding how you want to package your mod and how you want the addon list presented to users.
+
+For example Better Dorfs, a mod of mine, groups all of its addons into the "Better Dorfs" addon. This means that users see, for example the Saurians addon, as "Better Dorfs/Saurians". When I add a saurian specific addon I put the new addon in "Better Dorfs/Saurians/<new addon name>". This grouping helps make it obvious what goes with what, making the lives of your users a little more pleasant.
+
+==============================================
+Other Random Information:
+==============================================
+
+If you want to allow an item, reaction, or building with a minimum of fuss, register it as class "ADDON_HOOK_MOUNTAIN" or "ADDON_HOOK_PLAYABLE". Specific addon hooks also exist for the other entities as well as an ADDON_HOOK_GENERIC that every entity has.
+
+If you are making a template that takes a variable number of params and you want to implement it via a different template you may need the ... param.
+Example:
+	{!TEMPLATE;E;
+		{ECHO;...}
+	}
+If Rubble finds a template call where the last param is ... it appends the params from the previous template call to the current template's params. This trick is good for aliases and the like.
+
+There is no check for infinite recursion, so make sure you never recurse without breaking out at some point (unless you want to cause an infinite loop and eat all your memory until Rubble crashes). 
+The reason there is no recursion check is that there are valid reasons to have deep recursion, and any infinite loops created by recursion like this are errors that should caught in testing. If you are too lazy to do proper testing it is not my job to hold your hand, plus just how many programming languages have you used that had such a check? 
+
+The Rex command documentation is automatically generated every time I build Rubble, this make it easy for me to keep everything up to date, but the formatting leaves much to be desired.
+The problem is that the app that generates the docs is made for go programmers, not Rex programmers, so a lot of information that has nothing to do with the commands makes it's way to these docs.
+Sometime when I'm really bored I need to write a program to automatically reformat these files ;)

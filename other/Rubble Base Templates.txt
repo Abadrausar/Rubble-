@@ -1,6 +1,6 @@
 	
 Rubble Template Documentation
-User Templates defined in the "Base/Templates" addon.
+User Templates defined in the "Libs/Base" addon.
 
 ==============================================
 {COMMENT;<STUFF>...}
@@ -26,6 +26,10 @@ User Templates defined in the "Base/Templates" addon.
 {ABORT;<MESSAGE>}
 {#ABORT;<MESSAGE>}
 	Forces Rubble to exit, <MESSAGE> is displayed.
+
+==============================================
+{@SCRIPT;<CODE>}
+	Runs script code and returns the result (as a string).
 
 ==============================================
 {SHARED_OBJECT;<ID>;<DEFINITION>}
@@ -67,12 +71,28 @@ User Templates defined in the "Base/Templates" addon.
 	Appends the result of parsing <PRERAWS> to the end of SHARED_OBJECT <ID>. If that shared object does not exist it saves the result to append to any definition that may come later.
 
 ==============================================
-{REGISTER_REACTION_CLASS;<INORGANIC>;<CLASS>}
+{SHARED_OBJECT_KILL_TAG;<ID>;<TAG>}
+	Disable all occurrences of <TAG> in shared object <ID>.
+	<TAG> is the ID of the tag you wish to disable, do not add square brackets or specify it's parameters.
+	
+	Example:
+		{SHARED_OBJECT_KILL_TAG;SLADE;UNDIGGABLE}
+
+==============================================
+{SHARED_OBJECT_REPLACE_TAG;<ID>;<TAG>;<REPLACEMENT>}
+	Replace all occurrences of <TAG> in shared object <ID> with <REPLACEMENT>.
+	<TAG> is the ID of the tag you wish to replace, do not add square brackets or specify it's parameters.
+	
+	Example:
+		{SHARED_OBJECT_REPLACE_TAG;SLADE;UNDIGGABLE;[AQUIFER]}
+
+==============================================
+{REGISTER_REACTION_CLASS;<ID>;<CLASS>}
 	Adds a [REACTION_CLASS:<CLASS>] tag to a SHARED_OBJECT.
 	Just a specialized version of SHARED_OBJECT_ADD.
 
 ==============================================
-{REGISTER_REACTION_PRODUCT;<INORGANIC>;<CLASS>;<PRODUCT>}
+{REGISTER_REACTION_PRODUCT;<ID>;<CLASS>;<PRODUCT>}
 	Adds a [MATERIAL_REACTION_PRODUCT:<CLASS>:<PRODUCT>] tag to a SHARED_OBJECT.
 	Just a specialized version of SHARED_OBJECT_ADD.
 
@@ -91,7 +111,11 @@ User Templates defined in the "Base/Templates" addon.
 ==============================================
 {@IF_CODE;<CODE>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
 	If <CODE> returns true, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
-	(<CODE> may be any valid Raptor code)
+	(<CODE> may be any valid script code)
+	
+==============================================
+{@IF_SKIP;<STRING1>;<STRING2>}
+	If <STRING1> and <STRING2> are equal then skip the current file.
 
 ==============================================
 {@SET;<NAME>;<VALUE>}
@@ -118,9 +142,9 @@ User Templates defined in the "Base/Templates" addon.
 
 ==============================================
 {#TILE;<ID>;<DEFAULT>}
-	If a tile entry for <ID> exists return it else return <DEFAULT>.
+	If a tile entry for <ID> exists return it, else return <DEFAULT>.
 	Use everywhere a tile number is required.
-	In most cases you will not need to use this template as the SHARED_OBJECT templates handles insertion of this template automatically.
+	In most cases you will not need to use this template as the specialized SHARED_OBJECT templates handle insertion of this template automatically.
 
 ==============================================
 {SET_COLOR;<ID>;<COLOR>}
@@ -129,16 +153,9 @@ User Templates defined in the "Base/Templates" addon.
 
 ==============================================
 {#COLOR;<ID>;<DEFAULT>}
-	If a color entry for <ID> exists return it else return <DEFAULT>.
+	If a color entry for <ID> exists return it, else return <DEFAULT>.
 	Use everywhere a color is required.
-	In most cases you will not need to use this template as the SHARED_OBJECT templates handles insertion of this template automatically.
-
-==============================================
-{#WRITE_TILESET;<PATH>}
-	Writes calls to SET_TILE and SET_COLOR for all calls to #TILE and #COLOR to file <PATH>.
-	This should only be used once to get a template for making a tileset addon, it has no other use. The average user should never need this template, it is strictly for porting tilesets!
-	Note that for this to work #WRITE_TILESET MUST be called AFTER every call to #TILE or #COLOR!
-	(Not after each one, but after they have all run, eg #WRITE_TILESET should be near the end of the last file processed.)
+	In most cases you will not need to use this template as the specialized SHARED_OBJECT templates handle insertion of this template automatically.
 
 ==============================================
 {INSTALL_TILESHEET;<TILESHEET>}
@@ -151,6 +168,22 @@ User Templates defined in the "Base/Templates" addon.
 ==============================================
 {SET_WINDOWED_TILESHEET;<TILESHEET>}
 	Sets the tilesheet used in windowed mode, both with graphics enabled and with them disabled.
+
+==============================================
+{SET_FULLSCREEN_FONT_GRAPHICS;<TILESHEET>}
+	Sets the tilesheet used in fullscreen graphical mode.
+
+==============================================
+{SET_WINDOWED_FONT_GRAPHICS;<TILESHEET>}
+	Sets the tilesheet used in windowed graphical mode.
+
+==============================================
+{SET_FULLSCREEN_FONT;<TILESHEET>}
+	Sets the tilesheet used in fullscreen non-graphical mode.
+
+==============================================
+{SET_WINDOWED_FONT;<TILESHEET>}
+	Sets the tilesheet used in windowed non-graphical mode.
 
 ==============================================
 {OPEN_D_INIT}
@@ -278,9 +311,16 @@ User Templates defined in the "Base/Templates" addon.
 		ADDON_HOOK_PLAYABLE
 
 ==============================================
-{DFHACKINIT_ADD;<ID>;<CONTENT>}
-	Adds <CONTENT> to the rubble dfhack init script. <ID> is strictly to allow overriding.
-	(This requires "script rubble.dfhack" to be added to your dfhack.init file)
+{DFHACK_LOADSCRIPT;<SCRIPTNAME>}
+	Installs and adds for automatic loading the script <SCRIPTNAME>.
+	This only works for scripts added by an addon, already installed scripts should use DFHACK_RUNCOMMAND.
+
+==============================================
+{DFHACK_RUNCOMMAND;<COMMAND>;[<PARAMS>...]}
+	Sets a DFHack command up to run when the world is loaded.
+	
+	Example:
+		{DFHACK_RUNCOMMAND;workflow;enable;drybuckets;auto-melt}
 
 ==============================================
 {@ADV_TIME;<COUNT>;<UNIT>}
@@ -313,7 +353,7 @@ User Templates defined in the "Base/Templates" addon.
 ==============================================
 {@FORT_TIME;<COUNT>;<UNIT>}
 	Generates a time value for use in interactions and the like.
-	Exactly like #ADV_TIME except for fortress mode.
+	Exactly like @ADV_TIME except for fortress mode.
 	
 	Units below MINUTE may be less than useful, as fortress mode time units lack precision.
 	

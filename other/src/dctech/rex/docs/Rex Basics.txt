@@ -1,0 +1,240 @@
+
+Rex Basics
+
+==============================================
+Overview:
+==============================================
+
+Rex is a custom scripting language I wrote that is designed to be easy to use, embed, and extend.
+
+Rex is not an acronym, it's just a name.
+
+This file mentions a few commands and other items that are not part of the base language (but are part of the standard library). Such items are generally pointed out, it would be a very good idea to read the command and package documentation in addition to this document.
+
+This file is not here to teach you how to program, this is strictly to help you understand the basics of how Rex works.
+
+==============================================
+Comments
+==============================================
+
+Rex only supports one kind of comment: a simple line comment marked by a # symbol.
+Example: # comment
+
+==============================================
+String Syntax
+==============================================
+
+Rex supports four kinds of strings: double quote strings, single quote strings, back quote strings, and raw strings.
+
+"a double quote string \"  '  ` "
+'a single quote string  " \'  ` '
+`a back quote string    "  ' \` `
+a_raw_string
+
+The first three string types are identical (aside from their delimiters).
+
+The delimited string types may contain newlines and other special characters as well as escape sequences.
+Supported escape sequences: \n \r \t \" \' \` \\ \xFF (where FF is any hex number)
+
+A raw string can contain any sequence of characters aside from the delimiter characters: \n\r \t#(){}[]<>=:"'`
+If a raw string can be converted to an integer or float and it is not being used as an identifier then it is a number, not a raw string.
+
+Some raw strings are reserved key words:
+	true
+	false
+	nil
+	module
+	command
+	block
+	var
+
+==============================================
+Compile-time declarations
+==============================================
+
+Rex is "compiled" into a byte code before execution and sometimes the compiler needs a little help to get things right, this is where compile-time declarations come in.
+
+There are four kinds of declaration:
+	Module declarations
+	Command declarations
+	Block declarations
+	Variable declarations
+
+==============================================
+Modules
+==============================================
+
+Modules are special named storage for variables, commands, types, and other modules.
+
+To create a module:
+	module name
+
+To add items to a module just prefix the name with the module name like so:
+	var test:a # declares a variable named "a" in module "test", test needs to be previously defined.
+
+Once a module is created it may be added to freely and accessed globally, this is the only way to create global variables.
+
+Modules are the only global declaration that may be repeated, if a module of that name already exists any redeclaration silently does nothing.
+
+==============================================
+Commands
+==============================================
+
+A command is Rex's version of a function, except in Rex commands also do stuff that is handled by keywords in most languages. To call a command you surround its name in parentheses, along with any parameter you wish to pass in. 
+Example:
+	(test_command 123 "a string")
+
+To declare a user command:
+	command name [params[=<const value>]...|...] {code}
+
+Example command declarations:
+	command test1 {true}
+	command test2 a=5 {[a]}
+	command test3 ... {[params 0]}
+
+Commands are always globally available, even outside the defining script.
+
+==============================================
+Blocks
+==============================================
+
+Block declarations are used when interacting with some native commands, basically they provide a way to reserve some variable names for those commands to fill in later.
+
+Variables defined by a block declaration are filled in by position, the names can be whatever you want, as long as you have enough of them. If you wish you can actually declare more than you need, this can be used instead of variable declarations (but it is generally not a good idea).
+
+Block declaration syntax:
+	block [params[=<const value>]...|...] {code}
+
+For example the "foreach" base command needs to pass in two variables, generally called "key" and "value" (you can actually name them anything you want, and naming them something else can be valuable for nesting foreach commands).
+
+Example call to "foreach":
+(foreach <array "a" "b" "c"> block key value {
+	(console:print [key] " = " [value] "\n")
+})
+
+foreach is just an example, there are several other commands that need blocks prepared this way, all such cases mention their requirements in their documentation.
+
+==============================================
+Variables
+==============================================
+
+To declare a variable:
+	var name [= value]
+
+Example variable declarations:
+	var a
+	var b = 5
+
+To read a variable you surround its name in square brackets like so: 
+	[example_variable]
+
+Some values may be "indexable", to read a value from a key in an indexable value put the key(s) after the variable name like so:
+	[variable "key"]
+
+For nested indexables you may either nest the dereferences:
+	[[[[test_var] 1] 2] 3]
+Or just pass them in as a list like so: 
+	[test_var 1 2 3]
+(needless to say the second way is easier in most cases)
+
+To set a variables value:
+	[name [keys...] = value]
+
+Example set statements:
+	[a = 5]
+	[b "c" = 100]
+
+One thing that may cause BIG issues if you are not careful: when a variable is "dereferenced" the value you get is a REFERENCE to the variables contents, so if you assign the value to a different variable they will both point to the same script value object.
+
+In practice this is not a problem as for most types modifying the value results in a new value being created, this is only really evident with types index and user.
+
+If you do run into a case where this causes problems, most of the basic types may be copied via the "copy" base command. Type index cannot usually be copied effectively (as values of that type are a reference to a reference), and the whether or not type user can be copied depends on the actual data (most of the time the answer is no).
+
+==============================================
+Values
+==============================================
+
+Script values are stored internally as several types: nil, string, int, float, bool, code, index, and user.
+
+The run-time knows how to convert between types automatically, though some types will not yield useful data if converted.
+
+There are some special values that can be used:
+	true and false are type bool
+	nil is the only value for type nil, this is the value used for undefined values
+
+Additionally there is a special syntax for "object literals". Object literals are used to create values for index types.
+
+Object literal syntax:
+	<type [key=value...]> or <type [value...]>
+	
+Example object literals:
+	<map "a"=100 "b"=200>
+	<array "a" "b" "c">
+
+Type index is used for "indexables", things like maps and arrays, generally these values are created via an object literal.	
+
+Type user is special in that it may contain literally anything that a command wants to stuff into a value. Most of the time a user value is only understood by commands from the same package as the command that generated it.
+
+Type code is used internally for code blocks (sections of code contained in curly brackets).
+
+If you need a value to be a specific type or you want to see what type a value has, there are some commands in the "convert" module that may prove useful.
+
+For example '1.0' will have type float, but if you need an int you can use '(convert:int 1.0)' and get the int value '1'.
+'(convert:type value)' will return a string describing a value's type. Please note that some types lack conversion commands, as those types cannot be converted to. For example it would be pretty silly to try to convert most of the types to an indexable, so there is no "convert to index" command.
+
+==============================================
+More Indexables
+==============================================
+
+There are many kinds of indexables but only two are common, the map and the array.
+
+Please note that while array and map are built into the language their availability is controlled by the client, not all users of Rex will have access to them (just like the library commands).
+
+Map indexables are simple, just an associative array with string keys, to add a new key just set a nonexistent key.
+Trying to read a nonexistent key will return nil.
+Map object literals need to have keys specified:
+	<map "a"=1 "b"=2 "c"=3>
+
+Array indexables are a little more complicated, only integer numbers can be used as keys, and the keys are always consecutive starting from 0.
+To add a new key you use the special key "append", reading nonexistent keys is an error.
+Array object literals must NOT have keys specified:
+	<array "a" "b" "c">
+
+There are also special "static" versions of map and array that are read only. Static indexables (named "smap" and "sarray" by default) can be created via object literals, but cannot be modified after creation.
+
+To get the key count for any indexable use the base command len:
+	(len <array "a" "b" "c">) # returns 3
+
+To check for key existence in any indexable use the base command exists:
+	(exists <map "a"=1 "b"=2 "c"=3> "a") # returns true
+
+Add key examples:
+	[<map "a"=1 "b"=2 "c"=3> "d" = 4]
+	[<array "a" "b" "c"> append = "d"]
+
+Read key examples:
+	[<map "a"=1 "b"=2 "c"=3> "b"] # returns 2
+	[<map "a"=1 "b"=2 "c"=3> "z"] # returns nil
+	[<array "a" "b" "c"> 1] # returns "b"
+
+A very important command for dealing with indexables is foreach. foreach allows you to iterate over all (or only some) keys in an indexable.
+Keep in mind that how long foreach loops is controlled by the return value of it's code block, if you want to iterate over all keys you must make sure to return true at the end of every iteration (but don't use ret or exit! use break or breakloop).
+Iteration order in foreach is controlled by the indexable, array indexables are traversed from low to high, and map indexables are traversed in random order. Other indexable types may have their own order, for example a sort:map is traversed in alphabetical order by keys.
+
+foreach example:
+	(foreach <map "a"=1 "b"=2 "c"=3> block key value {
+		(console:print [key] " = " [value] "\n")
+		(break true)
+	})
+
+==============================================
+GenII
+==============================================
+
+GenII (Generic Indexable Interface, but I usually just call it "Gen 2") is a special API provided to clients by Rex that allows scripts to read (and modify!) arbitrary (exported) data in the client. Data structures have to be exposed to GenII on an individual basis, but once a value is exported scripts have full access.
+
+If a client provides GenII values they act like indexables, but they have their own rules as to how they can be used. Most of the time common sense is all you need, after all if a GenII field is mapped to a bool type variable in the client then assigning a block of code make little sense, you still can do that, but don't expect your code block to be there when you come back for it!
+
+How exactly you use a GenII value depends very much on how the underlying data is structured. Generally GenII values are for advanced use only! Careful reading of the GenII documentation and the documentation for the exported data is required to make good use of GenII values.
+
+Depending on the client, GenII can be a major source of race conditions unless special precautions are taken. See the GenII documentation for more details.

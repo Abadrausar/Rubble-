@@ -15,13 +15,12 @@ For non-modders Rubble makes it easy to install mini-mods so you can create your
 Required Reading for Modders (in most-important-first order):
 	This readme
 	HowTo Rubble - Tutorials
-	Rubble Addons - Lots of stuff about addons in general
+	Rubble Basics - Lots of stuff about addons and Rubble in general
 	Rubble Base Templates - The template documentation for the "Base/Templates" addon
 	Rubble Native Templates - The template documentation for the built-in templates
 	Rubble Libs Templates - The template documentation for the library templates
 	The included addons - A little short on comments but still a great resource
-	Raptor Basics - Raptor overview
-	Everything in "raptor command docs" - the Raptor command documentation, NEEDED if you plan to do anything with Raptor
+	Everything in "Rex Docs" - the Rex documentation, NEEDED if you plan to do anything with Rex
 
 If you do not plan on doing any modding the only thing you need to read is this readme.
 
@@ -32,7 +31,6 @@ Install:
 Backup your "raw/objects" folder! Rubble will delete all your existing raw files!
 Extract Rubble to "<DF Directory>/rubble".
 Install your addons to "<DF Directory>/rubble/addons"
-(If you use DFHack) add "script rubble.dfhack" to your dfhack.init file, this step is VERY IMPORTANT for DFHack users!
 Run "rubble -addonlist" OR run "Rubble GUI.exe"
 
 Now you are good to go! Documentation is in the "rubble/other" folder as is source code and OSX/Linux binaries.
@@ -42,7 +40,7 @@ If you want to run Rubble without generating anything so as to update the addon 
 
 If you can (eg. you are running on windows) it is HIGHLY recommended to use the GUI. The GUI automates the process of updating and editing addonlist.ini and is generally much faster then doing everything by hand (plus you don't have to mess around with the command prompt, if you dislike that kind of thing)
 
-If you want to run multiple worlds with radically different addon sets it is HIGHLY recomended to run "rubble -prep=<region name>" before switching worlds!
+If you want to run multiple worlds with radically different addon sets it is a good idea to run "rubble -prep=<region name>" before switching worlds (this is mostly only for tilesets, other addons should be good to go unless they do something weird and non-standard).
 
 If you use OSX or Linux, 32 bit binaries for these OSes can be found in the "rubble/other" directory. If you want 64 bit binaries you can compile them yourself, source code is in other/src (along with basic build instructions).
 
@@ -58,16 +56,15 @@ Rubble tries to read the file "./rubble.ini", if this does not fail Rubble will 
 Example "rubble.ini" (using some of the defaults):
 	[rubble]
 	dfdir = ..
-	outputdir = ../raw/objects
-	addonsdir = ./addons
+	outputdir = df:raw
+	addonsdir = rubble:addons
+Duplicate keys are just fine, they will act pretty much exactly like duplicate options on the command line.
 
 Rubble supports external launchers via the -config and -addons command line options
 -config allows you to set/create rubble variables.
-	Usage: -config="key1=value1;key2=value2;keyN=valueN" 
-		(Note that the ';' may need to be a ':' on non-windows systems)
+	Usage: -config="key1=value1;key2=value2;keyN=valueN"
 -addons allows you to override the default rules for loading addons by explicitly listing which ones you want to load.
 	Usage: -addons="addon1;addon2;addon3;ect"
-		(the same note about ';' applies here as well)
 These two options are mostly for use by external launchers.
 
 If you want to regenerate the raws for a save just run 'rubble -outputdir="../data/save/<savename>/raw/objects"'
@@ -79,45 +76,52 @@ Included Addons:
 ==============================================
 
 I include addons in the base Rubble install that fix bugs, demo something useful, or are just too useful to leave out. 
-Needless to say these addons make a good place to look for info on how to do something.
+Needless to say these addons make a good place to look for examples.
 
 If you want to generate the Rubble version of "vanilla DF" you will need to activate the "Base/Files", "Base/Templates", and "Base/Clear" addons, these addons are already active in the default addonlist.ini.
 
 Add CHILD Tags:
-	Adds a CHILD tag to every creature that does not already have one.
-	DOES_NOT_EXIST, NOT_LIVING, and EQUIPMENT_WAGON count as CHILD tags for the purpose of this script, 
-	vermin are also skipped.
-	This is an advanced tweak script that processes files in multiple passes.
+	Adds a CHILD tag to every creature that does not already have one, thereby allowing them to breed in fortress mode.
+	(Note that sexless creatures will still not breed)
+	DOES_NOT_EXIST, NOT_LIVING, and EQUIPMENT_WAGON count as CHILD tags for the purpose of this script, vermin are also skipped.
 	This addon is stand-alone, as it uses no outside templates.
-
-Base/Clear:
-	This must-have addon clears the raw, graphics, and prep folder before generation.
-	This addon is completely stand-alone.
-	You should never disable this addon without a good reason!
-	If these folders are not cleared then old junk may interfere with the generated raws,
-	possibly causing DF and/or Rubble to crash!
 
 Base/Files:
 	The standard base addon. Contains Rubblized versions of the vanilla raw files. 
 	Do not disable unless you have a replacement.
 
-Base/Templates:
-	This contains all kinds of useful templates.
-	Required by most of the other addons.
-	Do not disable unless you like error messages :)
+Building Dimensions:
+	Append all building names with their dimensions, really simple.
 
 Dev/Cheat:
 	A bunch of cheat reactions to allow for fast setup of testing forts.
 	Build a "Heavy Supply Wagon" workshop, both the building and all reactions are free.
-	Uses animal caretaker skill (the most useless skill I could think of :) )
+	Uses animal caretaker skill (the most useless skill I could think of :p)
+	This addon includes basic support for use with the BD3 addon pack.
 
 Dev/Dummy Reactions:
 	This addon adds "dummy reactions" eg. empty reactions registered to "ADDON_HOOK_PLAYABLE".
 	By default 15 reactions are created, if you want a different number of reactions to be generated pass '-config="DEV_DUMMY_REACTION_COUNT=count"' to Rubble when generating.
 	These reactions are empty by default, use if you want to add new content after worldgen.
 
+Dev/Tileset/Export:
+	This addon is a helper for extracting tileset information from raws that have the Rubble tileset templates added. See "Dev/Tileset/Insert".
+	The extracted tile numbers will be written to "./dev_export_tileset.tile_info.rbl".
+	Basically an automatic replacement for "#WRITE_TILESET".
+
+Dev/Tileset/Insert:
+	This addon adds the SHARED_OBJECT templates to all the tileset sensitive objects.
+	Advanced users may want to set the config var "DEV_TILESET_INSERT_EXPORT=true" in order to get the resulting files output to the current working directory, this is a great help when porting a mod to Rubble.
+	Use with "Dev/Tileset/Export" to export tile/color info from non-Rubble raws.
+	This addon also handles vermin creature tile numbers and colors.
+
 Fix/Butcher Inorganic:
 	Allows you to butcher creatures made from (some) inorganics, FB stone walls anyone?
+	(Not 100% sure this works, copied from Modest Mod)
+
+Fix/Fish Pops:
+	Raises fish vermin populations to the max.
+	This should stop you from fishing out a lake or ocean ever again! (unless you catch ~30,000 fish...)
 
 Fix/Undead Melt:
 	Fixes bad temperature values in material_template_default.
@@ -131,17 +135,18 @@ Fix/Usable Feathers:
 	Allows you to use feathers as "soft" pearls (you can use them to make crafts).
 
 Fix/Usable Scale:
-	Allows you to use scales like leather.
+	Allows you to use scale like leather.
 
 Fix/Vermin Variations:
 	This adds two fixes:
-		It forces all giant animals to have a life span of at least 10 years and
-		It replaces all pool biome tags in giant and animal-man creatures with the correct lake biome.
+		Forces all giant animals to have a life span of at least 10 years and
+		Replaces all pool biome tags in giant and animal-man creatures with the correct lake biome.
 	This is useful to make variations on vermin appear in game and to help them live long enough to be interesting.
-	
-Generic Animal Mats:
-	Make animal mats such as meat and leather generic. This is mostly for those who have FPS issues.
-	This addon is packed as a zip to demo how that is done.
+
+Libs/Base:
+	All the base templates and other such stuff, critical to normal operation.
+	If you do not activate this addon it will be automatically activated for you during normal generation cycles.
+	(in other words: ignore this addon in most cases)
 
 Libs/Castes:
 	Adds support for dynamically adding castes to a creature.
@@ -157,22 +162,23 @@ Libs/Crates:
 
 Libs/DFHack/Add Reaction:
 	Allows you to add reactions to buildings that are normally not possible to add reactions to, also allows you to remove all hardcoded reactions from a building.
+	This addon uses an automatically generated DFHack script that is unique to each set of raws, to ensure proper operation of this addon use "rubble -prep=<region>" before loading a region that uses this addon! If you do not prep between switching regions this addon may fail to work!
 	Requires the "Base/Templates" addon.
 	WARNING! Largely untested!
 
 Libs/DFHack/Announcement:
 	This addon is a modders resource for displaying announcements to the player.
 	Requires "Libs/DFHack/Command".
-	This addon also provides a Raptor command for advanced usage.
-	This templates added by this addon are always available (even when the addon is not active). If the addon is not active then the templates will not actually do anything.
+	This addon also provides a script command for advanced usage.
+	The templates added by this addon are always available (even when the addon is not active). If the addon is not active then the templates will not actually do anything.
 
 Libs/DFHack/Command:
 	This addon is a modders resource for running DFHack commands from reactions.
 	Activating this addon adds a template that generates reaction product lines for autosyndrome boiling rocks (the boiling rocks in question are automatically defined).
-	This addon also provides a Raptor command for advanced usage.
+	This addon also provides a script command for advanced usage.
 
 Libs/DFHack/Fluids:
-	Adds the extremely useful fluids DFHack Lua library and command.
+	Adds the extremely useful rubble_fluids DFHack Lua library and command.
 	Also adds three convenience templates for filling minecarts with fluids, eating fluids, and spawning fluids.
 	Requires "Libs/DFHack/Command" (for the templates).
 
@@ -180,7 +186,15 @@ Libs/DFHack/Spawn:
 	"Libs/DFHack/Spawn" is a modders resource for spawning creatures via DFHack.
 	Activating this addon installs a creature spawner script into the DFHack scripts directory.
 	Requires "Libs/DFHack/Command".
-	This addon also provides a Raptor command for advanced usage.
+	This addon also provides a script command for advanced usage.
+
+Libs/Macro:
+	A modders resource for generating macros from scripts.
+	Adds no templates, only script commands.
+
+Libs/Macro/Example:
+	A simple addon that generates a large complicated macro from images, makes a good demo/test of "Libs/Macro".
+	This addon takes ~7-8 seconds to generate (the cursor movement generation command is kinda slow, it's a work in progress), in any case activating this addon more than triples normal run time.
 
 Nerf/Ranged:
 	A simple addon that nerfs bows and crossbows, uses the stats from the popular Broken Arrow mod.
@@ -188,14 +202,29 @@ Nerf/Ranged:
 Nerf/Whips:
 	Nerfs whips and scourges so they are not deadly anti-armor weapons.
 
-Tileset/MLC:
+Tileset/MLC/Normal:
 	A simple addon that installs my custom ASCII-like tileset.
+	This version is very close to default ASCII.
 	This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
-	Demos tileset addons.
+
+Tileset/MLC/Tracks:
+	A simple addon that installs my custom ASCII-like tileset.
+	This version has really nice track graphics. The only side effect should be "railroad rivers" on the world map.
+	This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
+
+Tileset/MLC/DFHack/TWBT:
+	A simple addon that installs my custom ASCII-like tileset.
+	This version uses the "Text Will Be Text" DFHack plugin (you will need to install that plugin separately).
+	Unlike most ASCII tilesets this one has special tiles for most buildings and items, making it (almost) fully graphical.
+	This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
 
 Tileset/Vanilla:
 	Restores the vanilla tileset related init options.
+	It is a very good idea to use this addon whenever you are using the vanilla tileset, as otherwise prepping worlds generated from those raws may not work quite right.
 	This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
+
+Tileset/Vanilla/Graphics:
+	The vanilla creature graphics, mostly just a demo.
 
 Zap Aquifers:
 	Disables all AQUIFER tags.
@@ -222,447 +251,86 @@ I know everything there is to know about how Rubble works and so I tend to forge
 ==============================================
 Changelog:
 ==============================================
-v3.13
-	The resource file is no longer linked into the OSX and Linux binaries.
-		AFAIK it is useless with them anyway...
-	The Raptor command docs have less unrelated content.
-		Unfortunately there is still much room for improvement...
-	Fixed the time templates (@ADV_TIME. @FORT_TIME, and @GROWDUR) so that floating point amounts actually work.
-	Added a simple timing mode for benchmarking, activate via "-bench" (this prints the run time just before exit).
-
-v3.12
-	Revised/extended/bugfixed "Libs/DFHack/Fluids".
-		I added the ability to spawn fluids in an area and fixed a bug that got in by accident 
-		(forgot to sync my working copy with Rubble's copy, oops)
-	The "addonlist.ini" file is now copied to the raw directory.
-	The "addonlist.ini" file now has the Rubble version that generated it written as a comment in the header.
-		These changes make it MUCH easier to tell what addons were used to generate a specific world.
-		This makes duplicating a world (or changing tilesets, ect.) MUCH easier.
-	Hopefully command stones generated by "Libs/DFHack/Command" should no longer damage items when they boil.
-	Revised the internals of a few templates to make them work as expected in some rare cases.
-		This is a very important fix, sometimes SHARED_OBJECT_ADD, REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT
-		would fail. These templates are used all over, so this was a major problem.
-		Luckily no addons (before BD 2.11 at least) triggered this bug.
-	Fixed some spots where the template docs were incorrect,
-		mostly where they mention things that have been removed a long time ago.
-	Added template @BUILD_KEY to "Base/Templates".
-	Added basic "documentation" (I use the term loosely) for all the library addon templates.
-		Most entries consist of a simple one line description following a usage statement, 
-		but I plan to flesh this out over time.
-	Added support for a new special "addon", prep.
-		prep is created automatically during generation and is written to the raw folder. 
-		This "addon" contains all the scripts and files needed to make DF ready to load a world generated 
-		from that set of raws. Basically it allows you to easily run multiple, very different, worlds without too 
-		much trouble. Running "rubble -prep=region" should make sure all init setting, tilesets, DFHack scripts, 
-		ect. are installed just as they were when the raws for that world were originally generated.
-		(It is the responsibility of each addon to provide any prep support it may need)
-	Added prep support for all addons that needed it.
-
-v3.11
-	Fix a minor script error that made "Dev/Dummy Reactions" completely useless.
-	Fixed rubble:ingroup (so it actually works now).
-	Extended "Libs/Crates" to solve the metal bar problem (eg entities having access to metals they shouldn't).
-	Added "Libs/DFHack/Fluids", all sorts of wonderful fluid interactions via some DFHack scripts.
-	The naming convention for written out DFHack command and library scripts has changed.
-		Scripts are now named "rubble_<original command name>", so "announce" becomes 
-		"rubble_announce" instead of "libs_dfhack_announcement".
-	GUI: Changed the section name used when reading "rubble.ini" to "rubble" (from "path")
-
-v3.10
-	Updated to Raptor 3.2
-		A (very) slight performance boost, a minor bug fix, a possible string corruption fix,
-		and some other minor changes that don't effect Rubble.
-	Added profiling (writes data in the format expected by pprof), not that you care.
-	Added rubble:ingroup, check if an addon is part of a specified group.
-	Added rubble:groupactive, check if any addon in a specified group is active.
-	Added native script commands rubble:nowritefile, rubble:graphicsfile, and rubble:currentfile.
-	rubble:getvar now returns "" for non-existent variables.
-	The behavior of some of the dependency check commands has changed (to make them more accurate)
-	The behavior of "Dev/Dummy Reactions" has changed slightly (should not effect users).
-	Added some caste related library addons.
-	Added the time templates (@ADV_TIME and @FORT_TIME) back to Rubble, this time they are in the "Base/Templates" addon.
-		(These templates were removed in 3.0 in order to remove all non-essential native templates)
-	Added @GROWDUR, a replacement for the vanilla GROWDUR tag that uses the same mechanism as the other time templates.
-	Execution of init scripts moved one step later (to just after built-ins are loaded)
-		This should make it so that init scripts can do literally everything that a pre tweak script can.
-	Added #INSTALL_GRAPHICS_FILE and @GRAPHICS_FILE, support for creature graphics.
-	Updated the Notepad++ UDL (lots of changes from previous versions never got added, now they are).
-
-v3.9
-	Fixed lots of cases where Raptor error handlers still used panic, oops.
-	Updated some of the docs.
-	Moved "Libs/Crates" from BD2 to Rubble.
-	Changed "Libs/Crates" to use "always active" templates.
-	Changed "Libs/DFHack/Announcement" to use "always active" templates.
-		"always active" templates are always available, they just return a placeholder string when the addon is not active.
-	"Libs/DFHack/Command" now adds [SPECIAL] to it's generated inorganics.
-		This should stop command stone FBs from generating.
-	Added rubble:placeholder to help with creating always active templates.
-	Updated to Raptor 3.1, this includes only minor changes and bug fixes.
-
-v3.8
-	Updated to Raptor 3.0
-		This update is strictly an internal refactoring, no commands have changed.
-		The internal API is much better now.
-		Error messages (on the Raptor side of things) should be much better.
-	Changed LOTS of stuff internally to get better error messages.
-		(I REALLY need to refactor the Rubble internals sometime...)
-	Fixed Rubble reporting that reading addonlist.ini failed when in shell mode even if the read succeeded.
-		(it would also update the addon list twice when this happened)
-	Init scripts may now override each other.
-		The only reason they couldn't before was oversight, init scripts are handled separate from 
-		other addon files, and I forgot to allow overriding.
-	Added rubble:compat, an indexable of version compatibility information.
-		Index with a version string, returns true if the current version is backwards compatible with the requested version.
-		If a version is not listed it will return nil (which will act like false in most cases).
-		Obviously always reports nil for versions newer than the current version.
-		Versions start with "3.8" (so [rubble:compat "3.7"] will return nil)
-	Removed command "panic", use rubble:abort.
-	Added template DFHACKINIT_ADD to "Base/Templates", allows automatic customization of dfhack.init by addons.
-		To activate this feature you need to add "script rubble.dfhack" to your dfhack.init file.
-	Added experimental "Libs/DFHack/Add Reaction" addon, manipulate hardcoded buildings/reactions.
-
-v3.7
-	Made some template changes to "Base/Templates":
-		Added @IF_ACTIVE
-		Added @IF_CODE
-		Changed IF to @IF
-		Changed SET to @SET
-		(use the various versions of ECHO and VOID to force a parse stage with @ templates)
-	There is now a builtin version variable exposed to scripts: rubble:version
-		(type string, set to "3.7" this version)
-	ALL command line parameters may now be listed in the config file.
-	The way variables in template parameters are handled has changed a little:
-		All variables in parameters are now expanded before the template is called.
-	Fixed lots of little errors in the docs.
-	Some very minor bugfixes.
-	Updated the Notepad++ UDL
-
-v3.6
-	Updated to Raptor 2.2
-		Changes:
-			Added a new type (nil)
-			Added a new mode for the syntax checker
-			Removed obsolete command: debug:clrret, use nil.
-			Added new command: copy, allows you to copy a value.
-			Added a simple threading library (threading is not useful in Rubble by default).
-			Raw lexer commands now require/return a lexer handle.
-		This update (particularly the raw parser changes) will break most post (and a few pre) tweak scripts!
-	To go with the Raptor threading library you can now run Rubble in "threaded" mode via "-threads".
-		This is only useful for multi-threaded tweak scripts, default off.
-	Fixed bug in "Libs/DFHack/Announcement", message is now written to gamelog as expected.
-	The filename key for rubble:raws no longer has it's extension stripped
-		This should resolve issues with files overriding each other when they shouldn't.
-		WARNING! This change will break some tweak scripts! (it's an easy fix)
-	Updated the tweak scripts to handle the changes to rubble:raws and the raw parser.
-	Forced init scripts are now called "init scripts" and no longer need to be named "forced_init".
-		Now they use the extension ".init.rsf", functionality is unchanged.
-	Renamed the Base init script to "base.init.rsf"
-	The "Add CHILD Tags" addon is a little more discriminating.
-
-v3.5
-	Updated to Raptor 2.1.2
-		2.1.2 adds two new commands, sort:new and sort:map as well as fixing an issue in the shell.
-	Rubble is more flexible about it's environment when running in shell mode.
-	Added "Libs/DFHack/Announcement", a library addon for displaying announcements to the player.
-	Added "Libs/DFHack/Command" (from BD), a library addon for running DFHack commands.
-	Added "Libs/DFHack/Spawn" (from BD), a library addon for spawning creatures.
-
-v3.4
-	Updated to Raptor 2.1.1
-		2.1.1 adds a new command, trap.
-	Removed ITEM template (use SHARED_ITEM)
-	Added rubble:activeaddons, a params array indexable with a list of all active addon names
-	Added rubble:grouprequires script command to the "Base" addon forced init script
-		Allows for specifying a dependency for a group of addons.
-	Added rubble:groupincompatible script command to the "Base" addon forced init script
-		Allows for specifying an incompatibility for a group of addons.
-	Rewrote addon hooks to make output format better (still a little ugly)
-
-v3.3
-	Added the following templates to help streamline tileset support:
-		INSTALL_TILESHEET
-		SET_FULLSCREEN_TILESHEET
-		SET_WINDOWED_TILESHEET
-		OPEN_D_INIT
-		EDIT_D_INIT
-		CLOSE_D_INIT
-	Changed the default tileset addons to use the new templates.
-	Renamed ITEM to SHARED_ITEM (to be consistent with the other SHARED_OBJECT templates)
-	Added ITEM as an alias for SHARED_ITEM, this will be removed in a future version
-	The SHARED_ITEM template is now tileset aware (for tools)
-	SHARED_ITEM now properly handles type DIGGER
-	Updated SHARED_ITEM to handle type FOOD
-	Updated the "Base/Files" addon to reflect the changes to SHARED_ITEM
-	Removed REGISTER_ORE, I never used it and you can just use SHARED_OBJECT_ADD instead
-	Made SHARED_OBJECT_ADD able to add to shared objects that are not yet defined as well as those already defined
-		Code added by SHARED_OBJECT_ADD will always come at the end of the definition
-	Removed ONCE and STATIC, as they were just Blast holdovers that have no real use as far as I could see
-	Added !ECHO, #ECHO, !VOID, #VOID, and V (all are aliases of existing templates)
-	Rubble now includes an embedded copy of the full-up Raptor shell!
-		Use "-shell" to enter shell mode, all normal Raptor shell command-line arguments work :)
-		The shell is entered just before generation would have started.
-		See "Rubble Addons.txt" for details.
-	Fixed bug in script command rubble:calltemplate.
-	Updated the Notepad++ UDL
-
-v3.2
-	Added forced initialization scripts, special scripts named "forced_init.rsf" (or .rbf) that ALWAYS run
-		Forced init scripts will run for any addon, even addons that are not active or addons that have no parseables
-		See "Rubble Addons.txt" for more details.
-	Added rubble:requireaddon to the "Base" addon (as a forced init script),
-		checks if an addon is active and aborts (with a nice message) if not
-	Added rubble:incompatibleaddon to the "Base" addon (as a forced init script),
-		checks if an addon is active and aborts (with a nice message) if so
-	Moved the Raptor shell predefs to the new forced init script in "Base"
-	Updated to Raptor 2.1
-		Raptor 2.1 fixes a few bugs, one of which is fairly major
-
-v3.1
-	The addon loader is now recursive
-		See "Rubble Addons.txt" for the new loading rules.
-	Grouped a bunch of addons
-		base -> Base/Files
-		base_templates -> Base/Templates
-		clear_raws -> Base/Clear
-		broken_arrow -> Nerf/Ranged
-		nerf_whips -> Nerf/Whips
-		fix_vermin_variations -> Fix/Vermin Variations
-		mlc_tileset -> Tileset/MLC
-	Updated the "Add CHILD Tags" addon to handle DOES_NOT_EXIST and EQUIPMENT_WAGON creatures
-	Added "Fix/Undead Melt", "Fix/Usable Chitin", "Fix/Usable Feathers", and "Fix/Usable Scale" addons
-	Added "Dev/Dummy Reactions" addon
-	Added "Tileset/Vanilla" addon
-	Added SHARED_OBJECT_ADD template to "Base/Templates" addon.
-		SHARED_OBJECT_ADD allows you to append tags to an existing SHARED_OBJECT, very useful.
-	Added new script command rubble:template, works just like !SCRIPT_TEMPLATE
-	Added new script command rubble:addonactive, returns true if the named addon is active
-	Added new script command rubble:abort, prints a message and quits, use instead of panic for most errors
-	Replaced !PANIC, PANIC, and #PANIC with !ABORT, ABORT, and #ABORT
-	Converted "Base/Templates" into a pre script
-		This ensures that all base templates are defined before raw parsing starts 
-		(This also improves error messages tremendously)
-	Added new template prefix character, @, means "run in first possible stage"
-		See "Rubble Addons.txt" for more details
-	Script templates are now stored as pre-lexed code, this provides a minor performance boost
-	I forgot to update the version number in the header (again), fixed
-	Updated to Raptor 2.0, this should make absolutely no difference, if any behavior has changed it's a bug
-		The only reason I updated is so that I would not have to maintain two versions of Raptor
-	Squashed some stupid script bugs
-		Looks like the new Raptor script validation tool was worth it :) too bad it only catches syntax errors...
-	Rubble now reports errors encountered when writing files out
-	Fixed "Zap Aquifers", I broke it when updating from NCA to Raptor
-	The GUI is now resizeable and allows more configuration
-		If you have a rubble.ini the GUI will now read the addons directory path from it
-		You can set the path to the directory containing rubble.exe in gui.ini
-	Updated the Notepad++ UDL
-	
-v3.0
-	Added ability to load an addon from a zip file
-	Added ability to make addon "packs", eg. multiple addons grouped in one zip file
-		Use the extension .pack.zip, one addon per subdirectory, no nesting
-	The generic animal mats addon is now packed as a zip to demo how that is done
-	Replaced addon enabling mechanism with an automatically updated ini file, addonlist.ini
-	Updated the Rubble GUI to read addon names and active status from addonlist.ini
-	Rewrote the lexer and parser from scratch
-		The new versions are much better, certainly easier for me to work with (and possibly a little faster)
-	All addon files (not just parseable files!) are now available in rubble:raws
-	Added an addon to add a CHILD tag to all creatures that do not already have one
-	Added an addon that forces all giant animals to have a life span of at least 10 years and 
-		replaces all pool biome tags in giant and animal-man creatures with the correct lake biome
-	Added an addon to nerf whips (just like broken arrow, but for whips)
-	Removed the #AQUIFER template from the base_templates addon
-		It was simple to replace this with a tweak script, and not having to use a template results in 
-		less work for modders (and me) in the long run.
-	Added an addon to strip AQUIFER tags
-	Rubble now duplicates it's output to the file rubble.log
-	Removed the #ADV_TIME and #FORT_TIME native templates
-		I never used them and having non-critical native templates rubs me the wrong way.
-		As Raptor has floating point commands it should be possible to reimplement these, so if anyone 
-		actually used them please tell me.
-	Updated from NCA7 to Raptor v1.0
-		Raptor is based on NCA, but there are (a lot of) differences, see Porting.txt for details.
-	Pre and Post tweak script extensions have changed from .nca to .rsf (Raptor Script File) or .rbf (Raptor Binary File)
-	Fixed some script errors that I discovered as I was porting everything
-	Removed support for the base
-		The old base is now just another addon (named "base").
-	The base templates are now in their own addon named "base_templates"
-	Stripped support for addon config files completely
-		If you really need a config file it is easy to use a pre script to load one.
-	Removed the rubble:basedir script variable as it is obsolete
-	Added an optional parameter to rubble:stageparse to allow specifying the parse stage to use
-	Fixed some minor mistakes in the docs
-	Rewrote the Notepad++ UDL
-	
-v2.0
-	Added pre and post tweak scripts
-		Pre tweak scripts have the file extension ".pre.nca" and post scripts have the extension ".post.nca"
-	Added external launcher support via -config and -addons
-	Added a simple GUI launcher, sorry it's windows only :(
-	Fixed incorrect version info in header
-	Rubble will now only parse files with the extensions .txt or .rbl 
-		.rbl files will not be written out. Saves on calls to rubble:skipfile!
-	Default directory settings changed, Rubble no longer bloats your save by ~10MB! (unless you want it to)
-	Changed the way addon and base config files are handled
-		Config files are now in the same directory as the base or addon and are named "config.ini"
-	I think I fixed all the documents I broke... If you see something wrong tell me
-	Fixed #ADVENTURE_TIER
-	The raw files are now available as unparsed strings to NCA scripts via the indexable rubble:raws
-		Skipped files are not available
-		This is mostly useful only for pre and post tweak scripts
-	Added simple NCA raw parser, currently you can disable, replace or append tags, see command docs for "raw"
-	Fixed fire clay giving earthenware items, not sure how this came to be
-	Changed the generic_animal_mats addon to use tweak scripts, it should be much more compatible now
-	Fixed the generic_animal_mats addon clobbering animal venom, webs, and the like
-	The usual little bits added to NCA, just some new commands this time
-		See the command docs for base, str, bool and raw for details.
-	Updated the Notepad++ UDL
-	Stopped ITEM_CLASS from writing junk to the raws, another case of forgetting to clear the return register
-	Added template SHARED_OBJECT_EXISTS to base
-
-v1.9
-	Fixed ITEM_CLASS, this template is (AFAIK) not used in the base, but it is used in the Broken Arrow addon.
-		On line 652 of file "base_templates.txt" there was an extra ')', Oops.
-	Rubble now has an icon on windows!
-	There may be some small bug fixes to the script engine, I worked on it some and I don't remember if I fixed anything other than adding hooks for (very, very) low level debugging.
-	Made a few small fixes to the docs, nothing to worry about.
-	
-v1.8
-	Updated to NCA7, this includes many small (and a few large) script changes
-		If you wrote any script code check the command docs, 
-		a bunch of commands are now namespaced and/or have had their name changed.
-		For example add is now int:add and append is now str:add.
-	Notepad++ UDF updated
-	Added ADDON_HOOKS template to the base
-	Added optional config file, not sure why I didn't do it earlier after all GoBlast had one...
-	
-v1.7
-	Slight changes to NCA Indexables, nothing that effects user script code
-	The (much expanded) mess of debugging commands have all been moved to the debug namespace, some have new names
-		Old commands with new names are:
-			valueinspect	->	debug:value
-			ncash			->	debug:shell
-		New commands are:
-			debug:list		->	Lists all global data, including variables in the root environment
-			debug:namespace	->	Lists all variables, commands, and namespaces in a namespace
-			debug:env		->	Lists all variables in all environments, sorted by environment
-			debug:clrret	->	Clears the return value, useful for cleaning up after playing around in the shell
-	Notepad++ UDL updated
-	Error reporting now should display a line number for Rubble errors
-		Script error line numbers are still an offset from the start of the script
-		Errors in templates will refer to the place where the template was called
-
-v1.6
-	Updated script runtime to NCA6, this brings major improvements to the way script values are handled
-	Added new NCA command len, the old pre-v6 way of fetching an Indexable's element count will no longer work
-	Removed source for NCASH, this is now replaced with the ncash NCA command
-	Re-exported all of the NCA command documents
-	Fixed all the templates to work with NCA6
-	Removed the old item templates (the native ones from 1.1), this was supposed to happen in 1.5 but I forgot
-	Changed ITEM_CLASS to be more flexible
-	Changed SHARED_INORGANIC and SHARED_MATERIAL_TEMPLATE to automatically support tilesets
-	Added template SHARED_PLANT, just like SHARED_INORGANIC but for plants
-	Added template #WRITE_TILESET to help modders make tileset addons
-
-v1.5
-	NCA variable dereference syntax now allows index dereferencing a value (eg. [value index])
-	NCA base commands map and array changed, they no longer create a variable, they only return the new map or array
-	NCA base commands exists and set now have multiple meanings, check NCA base docs for details
-	NCA base command foreach now takes a map or array VALUE instead of a NAME
-	Added the "NCASH predefs" to the base
-	Added valueinspect NCA command, very useful for debugging
-	Added new NCA base command evalinnew, works like run but without param support
-	Added new NCA string command trimspace, trims leading and trailing whitespace
-	Fixed major bug with NCA arrays, appending to an array did not work
-	Ported the following templates to Rubble+NCA:
-		BUILDING_WORKSHOP
-		BUILDING_FURNACE
-		#USES_BUILDINGS
-		REACTION
-		#USES_REACTIONS
-		#USES_TECH
-		REGISTER_ORE
-		#_REGISTERED_ORES
-		REGISTER_REACTION_CLASS
-		#_REGISTERED_REACTION_CLASSES
-		REGISTER_REACTION_PRODUCT
-		#_REGISTERED_REACTION_PRODUCTS
-	Rewrote all the item templates
-		ITEM no longer takes a class and rarity
-		ITEM_CLASS takes the place of ITEM's removed params and ITEM_RARITY
-		#USES_ITEMS now only takes one class
-	Added Notepad++ user defined language file for NCA5 and Rubble code
-	Added source code for NCASH5, a useful debugging tool for scripts
-	Added documentation for the NCA base language
-
-v1.4
-	Updated script runtime to NCA5, this may break some code as the way maps are handled is changed
-	Updated all NCA docs to describe NCA5
-	Changed the way the lexer handles the char literals (';', '{', and '}') to remove possible infinite recursion
-	Fixed bug in some of the base templates, the return value should have been run through the stage parser
-	Fixed #AQUIFER not working at all
-	Fixed SET returning whatever junk was in the NCA return register when it was called
-	Fixed some variables expanding too early, variables in nested template calls are not expanded until the nested template runs
-	Removed SHARED_ITEM (alias for SHARED_OBJECT)
-	Added native template !SCRIPT_TEMPLATE for declaring templates consisting of NCA code
-	Added base templates SET_TILE and #TILE for tileset support
-	Wrapped every (non-creature) tile number with a call to #TILE
-	Added rubble:dfdir variable
-	Added regex:replace NCA command
-	Added an example tileset addon mlc_tileset based on an ASCII-like tileset I made
-	Split generic animal mats out of the base and into an addon
-	Removed ANIMAL_MAT template from base
-	Made clear_raws addon active by default
-
-v1.3
-	Added rubble:stageparse NCA command
-	Added rubble:calltemplate NCA command
-	Added rubble:expandvars NCA command
-	Removed some templates that were easy to convert to Rubble+NCA code
-		Removed templates are:
-			COMMENT
-			C
-			VOID
-			PANIC
-			IF
-			ONCE
-			STATIC
-			SET
-			#ADVENTURE_TIER
-			SHARED_INORGANIC
-			SHARED_MATERIAL_TEMPLATE
-		The above templates are now in the base template file ("raw/source/base/base_templates.txt")
-	Added template ECHO (alias E) to the base
-	Added templates !PRINT, PRINT and #PRINT to the base
-	Added templates !PANIC and #PANIC to the base
-	Replaced SHARED_ITEM with SHARED_OBJECT, moved SHARED_OBJECT to the base
-	Added the ability for a template to take the params from the previous template call via a special ... param
-	Added more info to the NCA docs (still very spotty)
-	Fixed up formatting for SHARED_INORGANIC and SHARED_MATERIAL_TEMPLATE a little
-	Made Rubble expand vars in all files as a final (additional) step after postparsing
-	Fixed some more NCA bugs, as much as I use NCA you would think they would all be squashed by now.
-
-v1.2
-	Added rubble:skipfile NCA command
-	Added rubble:getvar NCA command
-	Added rubble:setvar NCA command
-	Made REGISTER_REACTION_PRODUCT parse it's material
-	Added addon tech and item hooks to entities
-	Made the lexer handle some char literals (';', '{', and '}')
-	Updated the base and addons to use the new abilities
-	Fixed some minor bugs in NCA4 and updated docs to match
-	Fixed bug that made files process in the wrong order
-	Stopped Rubble from mangling special chars
-
-v1.1
-	Added the NCA4 file system commands
-	Wrote a huge amount of docs
-	Added PANIC template to allow aborting
-	Added panic NCA command
-	Added NCA variables for each directory setting
-	Configuration files are now optional
-	Rewrote item and tech class templates, things should be much cleaner than before
-	Added a base and two example addons
-
-v1.0
-	First version
+v4pre (for DF 34.11, changes from Rubble 3.13)
+	Changed scripting subsystems from Raptor to Rex.
+		Rex is a little less flexible but ultimately faster and more powerful scripting language loosely based on Raptor.
+		Many, many things have changed, but only a few of them really make a big difference:
+			Some commands like set, var, command, and namespace are replaced by new syntax constructs.
+			Code is "compiled" to a much lower form, allowing for faster execution.
+			A lot of the more "dynamic" stuff from Raptor is gone:
+				It is not possible to use a string as code (directly, eval still works).
+				Some commands require code blocks to have variables "predeclared" via a special block declaration syntax.
+					This replaces many uses of the old params array with a much clearer, less error-prone syntax.
+				The various advanced eval commands are gone.
+			You may now use single quotes (') and back quotes (`) as string delimiters.
+		See the files in the "Rex Docs" folder for more info
+	As a direct result of the change in scripting subsystems Rubble is now MUCH faster.
+	More internal data is exported to scripts (via GenII, so be careful!).
+	Some native commands have been ported to init scripts.
+	Fixed lots of little scripting bugs that were discovered when porting.
+	Removed the builtin templates !SCRIPT, SCRIPT, and #SCRIPT.
+	Added a new base template: @SCRIPT.
+	The !SCRIPT_TEMPLATE builtin template was removed, use the rubble:template script command.
+	The syntax of the rubble:template command has changed significantly (it's simpler in some ways).
+	Removed shell mode, it was useful, but ultimately added much complexity for small gain.
+	Removed the lexer test. This was an internal debugging utility that has outlived it's usefulness.
+	Removed the "Shared Animal Mats" addon, as it is too fragile for inclusion with Rubble.
+	Added "Fix/Fish Pops", raises all fish population to the max, never fish out an area again.
+	Fixed rare case where the addon list would not update.
+	The script raw parser has moved from the "raw" module to the "df:raw" module.
+		The parser has been simplified and is joined by a slow, but more flexible cousin.
+	Added "Dev/Tileset/Export", automatically extract tile info from raws that have the Rubble tileset templates.
+	Added "Dev/Tileset/Insert", automatically inserts Rubble tileset templates into untemplated raws.
+	Removed the #WRITE_TILESET template, it is now obsolete.
+	Removed support for anonymous template parameters (eg %1) as this was never useful, and has become less so over time.
+	The "outputdir" setting has changed, it is now the path to the "raw" directory, not "raw/objects".
+	Renamed "Tilesets/MLC" to "Tilesets/MLC/Normal".
+	Added "Tilesets/MLC/Tracks", A version of the MLC tileset that has graphical tracks.
+	Added "Tilesets/MLC/DFHack/TWBT", A version of the MLC tileset for use with Text Will Be Text.
+	The addon loader no longer writes every addon and file name to the log, all this did was bloat the log for no good reason.
+	It is now possible to specify -config or -addons more than once, this applies to rubble.ini as well.
+		Each occurrence is parsed separately, but the results are added together.
+	Added the ability to pass a file name to -config, in that case the config variables will be read from the file.
+	Added the ability to pass a file name to -addons, in that case the file is treated as an addon list file.
+	Removed live profiling, it is normally really nice to have, but Rubble completes too fast for it to be usable.
+	Made sure Rubble always exits with code 1 when it does not complete properly.
+	Made sure Rubble prints "Done." as the last thing when it succeeds.
+	Finally got it so that ALL native script command documentation is automatically generated.
+		The script documents should never go out of sync now (user command docs are still done by hand though).
+	Rubble now prefixes all parsed files with a short message stating that the file was automatically generated.
+		This message also includes the source path (uses the AXIS syntax).
+	Added new addon, "Building Dimensions": Append all building names with their dimensions.
+	Lists are now always split at ';' characters instead of using the OS-specific path list separator char.
+		This change should make things more consistent across OSes.
+	rubble.ini now uses the same rules as the command line flag handler for parsing boolean values.
+	Added an "installer" mode, it simply loads files from a single zip and then runs any ".inst.rex" scripts,
+		use to install non-raw mods and addons automatically.
+	Created a new GUI with support for prepping or regenerating a region (still windows only).
+	The GUI now launches Rubble in installer mode when it is started with a command line argument.
+		(this makes it support drag and drop installing)
+	The GUI now supports a "minimal=true" option in it's INI that makes it not create the "Prep" and "Regen" tabs.
+	Made all addons deterministic, this should make region regeneration possible.
+		(in this case deterministic means that generated raw objects will always be in the same order for a given input)
+		Changed addons:
+			"Libs/Castes"
+			"Libs/Castes/DFHack/Transform"
+			"Libs/Crates"
+			"Libs/DFHack/Command"
+	Added two new templates: SHARED_OBJECT_KILL_TAG and SHARED_OBJECT_REPLACE_TAG, modify shared objects with minimum fuss.
+	Rewrote "Fix/Undead Melt" to use SHARED_OBJECT_REPLACE_TAG, it is now much less brittle.
+	All file access is now negotiated through AXIS VFS, this makes Rubble's directory structure MUCH more flexible.
+		It should no longer be possible to write to arbitrary locations on the file system, so security should be much improved.
+	The "file" and "fileio" script modules are no longer loaded, use the commands in the "axis" module instead.
+	The various script directory variables have been removed as they are not needed with AXIS VFS.
+	Added new base template: @IF_SKIP, conditionally skip a file with minimal fuss.
+	Added addon "Tileset/Vanilla/Graphics": mostly just a demo of how to make creature graphic addons.
+	Added four new tileset templates to "Base/Templates", these templates are for finer grain control of font settings.
+	Added new addons, "Libs/Macro" and "Libs/Macro/Example": Generate macros from scripts.
+	Added native script command rubble:activate_addon, force an addon active at any point.
+	Renamed "Base/Templates" to "Libs/Base".
+	"Libs/Base" is now forced active by init script during normal generation cycles.
+	Removed "Base/Clear", replaced with an init script.
+	Replaced the "Libs/Base" DFHack support with a much more flexible and less error prone system, no more extra install steps!
+	Updated "Libs/DFHack/Add Reaction" to use the new DFHack support.
+		There is no longer a need to prep between regions when using this addon.
+	Updated a LOT of documentation, and still more needs to be written...

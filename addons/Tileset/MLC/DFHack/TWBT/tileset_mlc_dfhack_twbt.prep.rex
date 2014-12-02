@@ -1,0 +1,31 @@
+
+(rubble:open_d_init)
+(rubble:edit_d_init "PILLAR_TILE" "141")
+(rubble:edit_d_init "TRACK_N" "129")
+(rubble:edit_d_init "TRACK_S" "130")
+(rubble:edit_d_init "TRACK_E" "131")
+(rubble:edit_d_init "TRACK_W" "132")
+(rubble:edit_d_init "TRACK_NS" "133")
+(rubble:edit_d_init "TRACK_NE" "138")
+(rubble:edit_d_init "TRACK_NW" "139")
+(rubble:edit_d_init "TRACK_SE" "135")
+(rubble:edit_d_init "TRACK_SW" "136")
+(rubble:edit_d_init "TRACK_EW" "134")
+(rubble:edit_d_init "TRACK_NSE" "170")
+(rubble:edit_d_init "TRACK_NSW" "171")
+(rubble:edit_d_init "TRACK_NEW" "161")
+(rubble:edit_d_init "TRACK_SEW" "160")
+(rubble:edit_d_init "TRACK_NSEW" "144")
+(rubble:close_d_init)
+
+(axis:write [rubble:fs] "df:data/init/overrides.txt" [rubble:raws "tileset_mlc_dfhack_twbt_overrides.txt"])
+
+(rubble:install_tilesheet "MLC 16x16 - Font.png")
+(rubble:install_tilesheet "MLC 16x16 - Graphics.png")
+(rubble:install_tilesheet "MLC 16x16 - Overrides.png")
+
+(rubble:set_fullscreen_font "MLC 16x16 - Font.png")
+(rubble:set_windowed_font "MLC 16x16 - Font.png")
+
+(rubble:set_fullscreen_font_graphics "MLC 16x16 - Graphics.png")
+(rubble:set_windowed_font_graphics "MLC 16x16 - Graphics.png")

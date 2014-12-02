@@ -1,0 +1,12 @@
+Rubble pre4
+After Blast comes Rubble.
+=============================================
+Attempting to Read Config File: ./rubble.ini
+  Read failed (this is most likely ok)
+  Error: open ./rubble.ini: The system cannot find the file specified.
+    Using hardcoded defaults.
+=============================================
+Loading Addons...
+./addons
+Error: GetFileAttributesEx ./addons: The system cannot find the file specified.
+  Near bad_position|L:-1

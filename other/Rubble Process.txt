@@ -14,31 +14,38 @@ Detailed Order of Execution
 	Config file is loaded (if present)
 	Commandline options are processed
 	
+	AXIS VFS is setup.
+	
 	If -profile is set:
 		Profiling is started
 	
-	If -netprofile is set:
-		the live profiling server is started
-	
-	If -prep is not set:
+	If -prep or -install are not set:
 		All addons are loaded
 		
-		If -addons is set:
-			value from -addons is split and result is used as active addon list
+		For each occurrence of -addons (including from the config file)
+			
+			If value is a file:
+				Split file into lines
+				Feed lines to ini parser
+				For each key/value:
+				
+					If value == true:
+						Add key to active addon list
+						
+			If value is not a file:
+				Value is split and result is added to active addon list
 		
 		If -addons is not set:
 			If <addondir>/addonlist.ini is present:
 				<addondir>/addonlist.ini is parsed and result is used as active addon list
 			If <addondir>/addonlist.ini is not present:
 				Current addon list is written to <addondir>/addonlist.ini
-				If -shell is not set:
-					Rubble Exits
+				Rubble Exits
 		
 		Addons are activated based on info from the active addons list
 		
 		If no addons are active:
-			If -shell is not set:
-				Rubble Exits
+			Rubble Exits
 		
 		If -addonlist is set:
 			Rubble Exits
@@ -48,18 +55,34 @@ Detailed Order of Execution
 		Current addon list is written to <addondir>/addonlist.ini
 		
 		If there are no files in file list:
-			If -shell is not set:
-				Rubble Exits
-		
-		If -lextest is set:
-			If -shell is not set:
-				The lexer test is run
-				Rubble exits
+			Rubble Exits
 	
 	Any Rubble variables specified via -config are set
-	Raptor is initialized
+	
+	For each occurrence of -config (including from the config file)
+		
+		If value is a file:
+			Split file into lines
+		
+		If value is not a file:
+			Value is split
+		
+		Feed split config values to ini parser
+		
+		For each key/value:
+			Set config variable "key" to "value"
+	
+	Scripting is initialized
+	
+	If -install is set:
+		The AXIS "install" location is initialized
+		All install scripts in the specified package are run
+		
+		Rubble Exits
 	
 	If -prep is set:
+		The AXIS "prep" location is initialized
+		
 		If -prep is set to "raw":
 			All prep scripts for the main raw folder are run.
 		
@@ -70,13 +93,7 @@ Detailed Order of Execution
 	
 	Builtin templates are loaded
 	
-	If -shell is not set or -init is set:
-		All init scripts are run
-	
-	If -shell is set:
-		Enter shell mode
-			(many, many, options here, I will not list them)
-		Rubble Exits
+	All init scripts for all addons (including the inactive ones) are run
 	
 	All pre tweak scripts are run
 	All .txt and .rbl files are preparsed
@@ -85,12 +102,17 @@ Detailed Order of Execution
 	All .txt and .rbl files have any variables outside of templates expanded
 	All post tweak scripts are run
 	All .txt files are prepended with file ids and written to disk
+	All graphics raws are prepended with file ids and written to disk
+	All prep files are written to disk
+	A copy of the addon list is written to the raw folder.
+	All the config variables are dumped to an ini file and written to the raw folder.
 	Rubble exits
 
 ==============================================
 Anatomy of a Template Call
 ==============================================
 
+	If the last param is "..." then append the params of the last template call to this call
 	All leading and trailing whitespace is striped from the params
 	All variables are expanded in the params
 	If the template is a native template then it's handler is called and the handler's return value is returned
@@ -98,5 +120,4 @@ Anatomy of a Template Call
 	Else the template's body is loaded and these transforms are run on it:
 		Text of the forms $<NAME> or ${<NAME>} that is not in a child template is replaced with the value of the variable <NAME>
 		Text of the forms %<NAME> or %{<NAME>} is replaced with the value of the param named <NAME> or the default value specified for that param
-		Text of the forms %N or %{N} (where N is an integer) is replaced with the value of the Nth param or the default value specified for that position if there is no Nth param
 	The template body is passed to the parser for that stage and the result is returned
