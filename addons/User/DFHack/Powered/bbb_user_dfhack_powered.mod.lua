@@ -1,10 +1,12 @@
 
 _ENV = rubble.mkmodule("powered_items")
+local powered = rubble.require "powered"
 
--- The Lua half of this addon takes three parts:
+-- The Lua half of this addon takes several parts:
 --	Part A: Dealing directly with workshops, finding input and output locations, etc.
 --	Part B: Finding, creating, and outputting items.
 --	Part C: Handling persistent output type data for workshops with many possible types.
+--	Part D: Finding and changing the state of "switchable" buildings.
 -- This is part B.
 
 -- Find either adjacent magma or a bar of fuel on an input tile.
@@ -22,7 +24,7 @@ function FindFuel(wshop)
 		return false
 	end
 	
-	local pos = rubble.powered.Area(wshop)
+	local pos = powered.Area(wshop)
 	if rubble.fluids.checkInArea(pos.x1, pos.y1, pos.x2, pos.y2, pos.z, true, 4, 4) then
 		return true, nil
 	end
@@ -30,12 +32,12 @@ function FindFuel(wshop)
 	return false, FindItemAtInput(wshop, check)
 end
 
+-- Finds an item adjacent to or on top of the workshop.
 -- Returns an item or nil.
--- Searches adjacent to and on top of the workshop.
--- check should be a function that take an item and returns true if it
+-- check should be a function that takes an item and returns true if it
 -- is like the one you are looking for.
 function FindItemArea(wshop, check)
-	local apos = rubble.powered.Area(wshop)
+	local apos = powered.Area(wshop)
 	local find = function(x, y, z)
 		local itemblock = dfhack.maps.ensureTileBlock(x, y, z)
 		if itemblock.occupancy[x%16][y%16].item == true then
@@ -62,13 +64,37 @@ function FindItemArea(wshop, check)
 	return nil
 end
 
+-- Finds a certain number of items adjacent to or on top of the workshop.
+-- Returns a table containing the items or nil.
+-- check should be a function that takes an item and returns true if it
+-- is like the one you are looking for.
+function FindXItemsArea(wshop, x, check)
+	local items = {}
+	local found = {}
+	for i = 1, x, 1 do
+		local item = FindItemArea(wshop, function(item)
+			if found[item.id] == true then
+				return false
+			end
+			
+			return check(item)
+		end)
+		if item == nil then
+			return nil
+		end
+		found[item.id] = true
+		items[i] = item
+	end
+	return items
+end
+
 -- Find an item on an adjacent input tile.
 -- Checks all input tiles, not just the first one it finds.
 -- Returns an item or nil
--- check should be a function that take an item and returns true if it
+-- check should be a function that takes an item and returns true if it
 -- is like the one you are looking for.
 function FindItemAtInput(wshop, check)
-	local inputs = rubble.powered.Inputs(wshop)
+	local inputs = powered.Inputs(wshop)
 	local find = function(x, y, z)
 		local itemblock = dfhack.maps.ensureTileBlock(x, y, z)
 		if itemblock.occupancy[x%16][y%16].item == true then
@@ -91,6 +117,31 @@ function FindItemAtInput(wshop, check)
 		end
 	end
 	return nil
+end
+
+-- Finds a certain number of items on adjacent input tiles.
+-- Checks all input tiles, not just the first one it finds.
+-- Returns a table containing the items or nil.
+-- check should be a function that takes an item and returns true if it
+-- is like the one you are looking for.
+function FindXItemsAtInput(wshop, x, check)
+	local items = {}
+	local found = {}
+	for i = 1, x, 1 do
+		local item = FindItemAtInput(wshop, function(item)
+			if found[item.id] == true then
+				return false
+			end
+			
+			return check(item)
+		end)
+		if item == nil then
+			return nil
+		end
+		found[item.id] = true
+		items[i] = item
+	end
+	return items
 end
 
 -- Create a basic item, you will have to set dimensions, subtype or stack size if needed.
@@ -141,15 +192,15 @@ end
 -- If the item is to be placed on an input tile it will be forbidden.
 -- If there is more than one output tile one will be chosen at random.
 function Eject(wshop, item)
-	local outputs = rubble.powered.Outputs(wshop)
+	local outputs = powered.Outputs(wshop)
 	if #outputs == 0 then
-		opos = rubble.powered.Center(wshop)
+		opos = powered.Center(wshop)
 		dfhack.items.moveToGround(item, opos)
 		return
 	end
 	
 	dfhack.items.moveToGround(item, outputs[math.random(#outputs)])
-	rubble.powered.ForbidIfNeeded(item)
+	powered.ForbidIfNeeded(item)
 end
 
 -- Set an item's quality based on a workshops "skill", aka the quality of it's components.

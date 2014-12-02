@@ -5,6 +5,11 @@
 The item sorter is very simple, you choose what kind of item it should sort and
 it retrieves any of that item it finds in its inputs and moves them to it's outputs.
 
+Sorters may sort by item type (and optionally subtype) and/or material, plus you may set
+a "output item limit". If there are more items on the output tile(s) than the limit no
+more items will be sorted until some of the items on the output are removed. This is good
+to keep too many items piling up at workshop inputs (which can starve other workshops).
+
 To sort items simply make several sorters share an input.
 
 Due to the way sorters work you may sort at most eight types of items from a single tile.
@@ -17,7 +22,7 @@ can be VERY useful with sorters.
 If a sorter has no input block it will take from any adjacent tile, this is useful for
 linking stockpiles to your productions lines.
 
-If you say no to both options when setting the sorter it will take any item!
+If you say no to all options when setting the sorter it will take any item!
 
 Sorters are designed to do simple tasks, like separating glass from empty bags at the
 powered glass forge outputs and other tasks of that "sort".
@@ -27,16 +32,14 @@ route and then splitting them at the destination. Sorters may also be used to cr
 "conveyor belts" for when powered workshops are just a little too far apart (use
 minecarts for longer routes).
 
-The sorter uses a slightly different API for managing it's settings. This API is a
-little less reliable, but the "normal" way would require almost 90 different workshops
-and well over 8000 reactions! (and with much reduced functionality at that!) This slowed
-Rubble to a crawl and I don't even want to think about what it would do to DF.
-Anyway, if a sorter gets "stuck" or forgets what it is supposed to be sorting designating
-a new workshop to be built should fix it, if not run the setting adjust reaction again.
-
 Despite it's grouping this workshop does not require power (it would be too hard
-to connect up most of the time).
+to connect up most of the time). If you wish to have sorters require power there
+is a configuration variable that may be set.
 `
+	vars=<map
+		POWERED_SORTER_HARD_MODE=<rubble:addonmetavar
+			name='Make sorters require power?' val="NO" choices="YES" choices="NO">
+	>
 	
 	activates="Libs/Base;User/DFHack/Powered"
 >

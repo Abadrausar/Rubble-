@@ -3,10 +3,11 @@ _ENV = rubble.mkmodule("powered")
 
 local buildings = require 'plugins.building-hacks'
 
--- The Lua half of this addon takes three parts:
+-- The Lua half of this addon takes several parts:
 --	Part A: Dealing directly with workshops, finding input and output locations, etc.
 --	Part B: Finding, creating, and outputting items.
 --	Part C: Handling persistent output type data for workshops with many possible types.
+--	Part D: Finding and changing the state of "switchable" buildings.
 -- This is part A.
 
 -- This is a convenience function for registering powered workshops that use the Rex API

@@ -19,6 +19,7 @@ Pros:
 	Addons can be grouped into directories to make relations clear (and to make addon packs easy to distribute)
 	Support for loading addons (and groups of addons) directly from zip files
 	Has an extra template prefix for greater flexibility
+	It is possible to automatically load addons from the internet
 	Faster (not that it really matters)
 
 Cons:

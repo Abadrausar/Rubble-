@@ -1,12 +1,6 @@
 
-function table_contains(t, el)
-	for _, v in pairs(t) do
-		if v == el then
-			return true
-		end
-	end
-	return false
-end
+local powered = rubble.require "powered"
+local pitems = rubble.require "powered_items"
 
 function isOre(mat)
 	local products = {}
@@ -62,11 +56,11 @@ end
 function makeSmeltBoulder(output)
 	return function(wshop)
 		if not wshop:isUnpowered() then
-			if not rubble.powered.HasOutput(wshop) then
+			if not powered.HasOutput(wshop) then
 				return
 			end
 			
-			local boulder = rubble.powered_items.FindItemAtInput(wshop, function(item)
+			local boulder = pitems.FindItemAtInput(wshop, function(item)
 				if df.item_type[item:getType()] == "BOULDER" then
 					local a = isOre(dfhack.matinfo.decode(item))
 					if a ~= nil then
@@ -79,7 +73,7 @@ function makeSmeltBoulder(output)
 				return
 			end
 			
-			magma, bar = rubble.powered_items.FindFuel(wshop)
+			local magma, bar = pitems.FindFuel(wshop)
 			if not magma then
 				if bar == nil then
 					return
@@ -92,13 +86,13 @@ function makeSmeltBoulder(output)
 			dfhack.items.remove(boulder)
 			
 			for _, metal in ipairs(products) do
-				item = rubble.powered_items.CreateItem(metal, 'item_barst', nil, 0)
+				item = pitems.CreateItem(metal, 'item_barst', nil, 0)
 				item:setDimension(150)
-				rubble.powered_items.Eject(wshop, item)
+				pitems.Eject(wshop, item)
 			end
 			
 		end
 	end
 end
 
-rubble.powered.Register("SMELTER_POWERED", nil, 10, 300, makeSmeltBoulder)
+powered.Register("SMELTER_POWERED", nil, 20, 500, makeSmeltBoulder)

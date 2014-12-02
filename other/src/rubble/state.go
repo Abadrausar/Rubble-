@@ -30,6 +30,7 @@ import "io/ioutil"
 import "fmt"
 
 import "net/http"
+import "html"
 
 import "dctech/rex"
 import "dctech/rex/genii"
@@ -66,6 +67,7 @@ import "rubble/rblutil"
 // (all the listed versions are assumed to be backwards compatible)
 // Index 0 MUST be the current version!
 var Versions = []string{
+	"5.5",
 	"5.4",
 	"5.3",
 	"5.2",
@@ -321,6 +323,11 @@ func (state *State) Run(addons, config []string) (err error) {
 		return err
 	}
 
+	err = state.WriteReport()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -338,6 +345,11 @@ func (state *State) RunPreLoaded(addons, config []string) (err error) {
 	}
 
 	err = state.Write()
+	if err != nil {
+		return err
+	}
+
+	err = state.WriteReport()
 	if err != nil {
 		return err
 	}
@@ -539,18 +551,23 @@ func (state *State) Activate(addons, config []string) (err error) {
 			state.Addons[i].Active = false
 		}
 	}
-
+	
 	state.Log.Println("  Activating Required Addons from Meta Data...")
-	for i := range state.Addons {
-		if state.Addons[i].Active {
-			for j := range state.Addons[i].Meta.Activates {
-				name := state.Addons[i].Meta.Activates[j]
-				if _, ok := state.AddonsTbl[name]; !ok {
-					RaiseAbort("The \"" + state.Addons[i].Name + "\" addon requires the \"" + name + "\" addon!\n" +
-						"The required addon is not currently installed, please install the required addon and try again.")
-				}
-				state.AddonsTbl[name].Active = true
+	var activate func(string)
+	activate = func(me string) {
+		for j := range state.AddonsTbl[me].Meta.Activates {
+			it := state.AddonsTbl[me].Meta.Activates[j]
+			if _, ok := state.AddonsTbl[it]; !ok {
+				RaiseAbort("The \"" + state.AddonsTbl[me].Name + "\" addon requires the \"" + it + "\" addon!\n" +
+					"The required addon is not currently installed, please install the required addon and try again.")
 			}
+			state.AddonsTbl[it].Active = true
+			activate(it)
+		}
+	}
+	for i := range state.AddonsTbl {
+		if state.AddonsTbl[i].Active {
+			activate(i)
 		}
 	}
 
@@ -569,7 +586,7 @@ func (state *State) Activate(addons, config []string) (err error) {
 			return err
 		}
 	}
-
+	
 	state.Log.Println("  Active Addons:")
 	for i := range state.Addons {
 		if state.Addons[i].Active {
@@ -762,6 +779,140 @@ func (state *State) Write() error {
 	state.Log.Println("  Writing Config Variables to Raw Directory...")
 	state.Log.Println("    genconfig.ini")
 	return state.DumpConfig("out:genconfig.ini")
+}
+
+// Used by WriteReport
+type addonheader struct {
+	Name string
+	Meta *Meta
+}
+type varheader struct {
+	Name string
+	Value string
+	Meta *MetaVar
+}
+
+// WriteReport adds a "generation report" to the output directory.
+// This report includes HTML documentation for the addons used as well as
+// information about the configuration variables and their settings.
+func (state *State) WriteReport() error {
+	state.Log.Separator()
+	state.Log.Println("Writing Generation Report...")
+	
+	state.Log.Println("  Loading Templates...")
+	tmpl, err := rblutil.LoadHTMLTemplatesStatic(state.FS)
+	if err != nil {
+		return err
+	}
+	
+	state.Log.Println("  Generating Addon Pages...")
+	headers := make([]addonheader, 0, len(state.Addons))
+	for _, addon := range state.Addons {
+		if !addon.Active {
+			continue
+		}
+		state.Log.Println("    " + addon.Name)
+		
+		header := addonheader{addon.Name, addon.Meta}
+		headers = append(headers, header)
+		
+		path := "out:Docs/Addons/" + addon.Name + ".html"
+		err := axis.Create(state.FS, path)
+		if err != nil {
+			return err
+		}
+		w, err := axis.Write(state.FS, path)
+		if err != nil {
+			return err
+		}
+		err = tmpl.ExecuteTemplate(w, "addondata", header)
+		w.Close()
+		if err != nil {
+			return err
+		}
+	}
+	
+	state.Log.Println("  Generating Active Addon List Page...")
+	err = axis.Create(state.FS, "out:Docs/Addon List.html")
+	if err != nil {
+		return err
+	}
+	w, err := axis.Write(state.FS, "out:Docs/Addon List.html")
+	if err != nil {
+		return err
+	}
+	err = tmpl.ExecuteTemplate(w, "addonlist", headers)
+	w.Close()
+	if err != nil {
+		return err
+	}
+	
+	state.Log.Println("  Generating Configuration Variable List Page...")
+	vars := make([]varheader, 0)
+	// We only generate documentation for variables that are documented in the addon.meta file.
+	for _, addon := range state.Addons {
+		if !addon.Active {
+			continue
+		}
+		
+		for i := range addon.Meta.Vars {
+			data, ok := state.VariableData[i]
+			if !ok {
+				// This should never happen!
+				continue
+			}
+			vars = append(vars, varheader{
+				i,
+				html.EscapeString(data),
+				addon.Meta.Vars[i],
+			})
+		}
+	}
+	
+	err = axis.Create(state.FS, "out:Docs/Configuration.html")
+	if err != nil {
+		return err
+	}
+	w, err = axis.Write(state.FS, "out:Docs/Configuration.html")
+	if err != nil {
+		return err
+	}
+	err = tmpl.ExecuteTemplate(w, "config", vars)
+	w.Close()
+	if err != nil {
+		return err
+	}
+	
+	state.Log.Println("  Generating Other Pages...")
+	err = axis.Create(state.FS, "out:Docs/About.html")
+	if err != nil {
+		return err
+	}
+	w, err = axis.Write(state.FS, "out:Docs/About.html")
+	if err != nil {
+		return err
+	}
+	err = tmpl.ExecuteTemplate(w, "about", nil)
+	w.Close()
+	if err != nil {
+		return err
+	}
+	
+	state.Log.Println("  Generating Menu...")
+	err = axis.Create(state.FS, "out:Menu.html")
+	if err != nil {
+		return err
+	}
+	w, err = axis.Write(state.FS, "out:Menu.html")
+	if err != nil {
+		return err
+	}
+	err = tmpl.ExecuteTemplate(w, "mainpage", nil)
+	w.Close()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (state *State) writeFile(path string, content []byte) error {

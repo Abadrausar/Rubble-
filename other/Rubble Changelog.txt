@@ -2,6 +2,44 @@
 ==============================================
 Changelog:
 ==============================================
+v5.5 (for DF 40.15)
+	Updated to 40.15 (no actual changes needed).
+	Changed the "User/DFHack/Powered/Kiln" addon to work like the other powered production buildings.
+		You can now fire clay directly to items (this change *just* missed the last version).
+	Added the following new powered workshops (each in it's own addon):
+		Spinner, process plants to thread (outputs seeds if needed).
+		Loom, weave thread to cloth.
+		Mill, grind plants to dye powder or flour (outputs seeds if needed).
+	Added "User/DFHack/Powered/Logic Gates", an experimental powered logic gate addon (untested!).
+		Once this is perfected I plan to add many gates and sensors to make complex (automatic!) world interaction possible.
+	Fixed an issue with glass item production in "User/DFHack/Powered/Factory".
+		If you ran out of raw glass you could end up with a bunch of unusable raw glass items piling up at the input, ouch.
+	Fixed an issue with powered sorters sorting by material (like an idiot I had only tested sorting by item).
+	The powered sorter now allows you to set an "output item limit".
+		If there are more items on the sorter's output tile(s) than the limit, no more will be output until some are used.
+		This should help stop "bag starvation" and other problems caused by over-eager sorters.
+	Added an option to make powered sorters require power.
+		Making them require power by default was deemed to be too annoying, but if you want things to be a little harder...
+	Fixed several other small issues in various powered workshops (none that could cause real problems).
+	Rebalanced all powered workshop time and power requirements, in general they are slower and take more power.
+	Extended the powered workshop support API a little ("User/DFHack/Powered").
+	Finally gave up and based my persistent data APIs on the default "dfhack.persistent", things should stay in sync now.
+	Fixed a major bug with automatic addon activation, this is now carried out recursively.
+		If an addon activated an addon that was supposed to activate a third addon, the third addon was never activated, oops.
+	Fixed "User/Metallurgy/Bloomery", I had forgotten to register the buildings with an addon hook.
+	Extended "Dev/Cheat" (again), more stuff to test, more raw materials required.
+		I also reordered the reactions to make them "flow" better.
+	"addon.meta" files are now treated as being "parseable" for the purpose of determining if a directory is an addon.
+	A "generation report" is now written to the output directory when generation is finished.
+		This report is basically a static version of the web UI documentation, but only for addons, etc, that were active.
+	The "clear script" now removes old generation reports.
+	Fixed some more file permission errors, stupid Linux.
+	There are two erroneous entries in the previous version's changelog.
+		I listed two changes to "User/DFHack/Powered/Cart Loader" and "User/DFHack/Powered/Cart Launcher" that were incorrect.
+			Neither of these addons used "Libs/DFHack/Upgrade Building" (directly, it was a dependency of a dependency).
+			The cart launcher supports a lot more than just four launch thresholds.
+		(These addons were rewritten two or three times over the course of getting 5.4 ready, and I forgot to fix the changelog)
+
 v5.4 (for DF 40.14)
 	Updated "Base" to DF 40.14.
 	Added stepladders and removed LIKES_FIGHTING from "User/Saurian".

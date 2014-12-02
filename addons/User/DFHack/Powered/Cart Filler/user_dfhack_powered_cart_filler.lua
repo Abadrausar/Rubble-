@@ -1,6 +1,7 @@
 
 local buildings = require 'plugins.building-hacks'
 local fluids = rubble.require "fluids"
+local pitems = rubble.require "powered_items"
 
 function makeFillCart()
 	return function(wshop)
@@ -31,13 +32,10 @@ function makeFillCart()
 			elseif water and cart then
 				fluid = false
 			elseif magma and cart then
-				--dfhack.gui.showAnnouncement("Your Powered Cart Filler cannot find an empty magma-safe minecart!", COLOR_LIGHTRED)
 				return
 			elseif cart then
-				--dfhack.gui.showAnnouncement("Your Powered Cart Filler has no nearby fluids!", COLOR_LIGHTRED)
 				return
 			else
-				-- No minecart, just do nothing to stop message spam
 				return
 			end
 			
@@ -57,9 +55,9 @@ end
 
 buildings.registerBuilding{
 	name="CART_FILLER_POWERED",
-	consume=25,
+	consume=20,
 	gears={{x=0,y=1},{x=1,y=0},{x=2,y=1},{x=1,y=2}},
-	action={5, makeFillCart()},
+	action={50, makeFillCart()},
 	animate={
 		isMechanical=true,
 		frames={

@@ -9,7 +9,7 @@ production buildings do a pretty good job, but nothing beats a skilled craftsman
 normal workshop for quality.
 
 Second: I tested everything at least once, but there may still be bugs, so be careful.
-That said most "bugs" turned out to be goofed setups, so make sure your inputs/outputs
+That said many "bugs" turned out to be goofed setups, so make sure your inputs/outputs
 are correct before complaining (for example one weird issue turned out to be a misplaced
 output tile).
 
@@ -110,13 +110,17 @@ without an input tile will take any adjacent items, just use a setup like this:
 	s: sorter
 	a: workshop
 	
-	 =
-	 s
-	 o
+	===
+	=s=
+	=o=
 	 i
 	aaa
 	aaa
 	aaa
+
+If you do not want the above system to pile all the items of the correct type in your fortress
+on the input tile it would probably be a good idea to set an output limit on the sorter!
+Be aware that sorter output limits count ALL items on ALL of the sorter's output tiles!
 
 Make sure you read and understand the addon description for the sorter! This building plays
 a critical role in any advanced factory!
@@ -127,12 +131,12 @@ It uses the same kind of input/output system as the other workshops with the exc
 an output is not required (with no output the items are dumped in the middle of the factory).
 
 If you just want items in a hurry the powered mason and carpenter may be more your speed.
-They both produce items with the need for a dwarf (keep coffins coming during a tantrum spiral!)
-but the items are a little more expensive and will be lower quality than can be made by a
-skilled dwarf.
+They both produce items without the need for a dwarf (keep coffins coming during a tantrum
+spiral!) but the items are a little more expensive and will be lower quality than can be made
+by a skilled dwarf.
 
-The glass furnace may operate either as a raw material generator for the factory or on it's
-own like the powered mason and carpenter, which way to run it is up to you.
+The glass furnace and kiln may operate either as a raw material generator for the factory or on
+their own like the powered mason and carpenter, which way to run them is up to you.
 
 Many of the powered workshops are made to fill a specific slot in a production line, but
 they work just as well by themselves. For example a powered wood furnace is mostly designed

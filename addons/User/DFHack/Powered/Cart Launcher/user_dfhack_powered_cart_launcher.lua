@@ -2,6 +2,9 @@
 local eventful = require "plugins.eventful"
 local buildings = require 'plugins.building-hacks'
 local script = require 'gui.script'
+local powered = rubble.require "powered"
+local pitems = rubble.require "powered_items"
+local ppersist = rubble.require "powered_persist"
 
 alreadyAdjusting = false
 function launcherAdjust(reaction, unit, in_items, in_reag, out_items, call_native)
@@ -32,8 +35,8 @@ function launcherAdjust(reaction, unit, in_items, in_reag, out_items, call_nativ
 				"vx = -20000, vy = 0", -- W
 			}
 			
-			local wshop = rubble.powered.MakeFake(unit.pos.x, unit.pos.y, unit.pos.z, 1)
-			rubble.powered_persist.SetOutputType(wshop, "return {"..launcher_dirs[dir]..", threshold = "..thold.."}")
+			local wshop = powered.MakeFake(unit.pos.x, unit.pos.y, unit.pos.z, 1)
+			ppersist.SetOutputType(wshop, "return {"..launcher_dirs[dir]..", threshold = "..thold.."}")
 			
 			alreadyAdjusting = false
 		end)
@@ -44,20 +47,13 @@ function makeLaunchCart()
 	return function(wshop)
 		if not wshop:isUnpowered() then
 			-- Read settings
-			local outputraw = rubble.powered_persist.GetOutputType(wshop)
-			if outputraw == "NONE" then
+			local output = ppersist.GetOutputTypeAsCode(wshop)
+			if output == nil then
 				return
 			end
-			
-			local f, err = load(outputraw)
-			if f == nil then
-				error(err)
-				return
-			end
-			local output = f()
 			
 			-- find cart
-			local cart = rubble.powered_items.FindItemArea(wshop, function(item)
+			local cart = pitems.FindItemArea(wshop, function(item)
 				if item:isTrackCart() then
 					local cart_capacity = item.subtype.container_capacity
 					local totalvolume = 0

@@ -22,7 +22,7 @@ The default browser startup script should start IE, if you don't like IE (like 9
 ----------------------------------------------
 On Linux:
 
-I recently setup a a Linux VM, did some Rubble testing, and found the following issues *sigh*.
+I recently setup a a Linux VM, did some Rubble testing, and found a bunch of issues *sigh*.
 
 To get anything working at all you need to:
 	All the binaries needed to be marked "executable" (chmod +x) and moved to the same directory as the Windows binaries.
@@ -113,7 +113,7 @@ HTML Template Customization:
 
 When the web UI server is run it tries to load HTML templates and CSS files from "./other/webUI/", if it does not find the file it is looking for it tries to write the default version of the file out to that directory.
 
-If you want to customize the look of the UI create the "./other/webUI" directory then run the server once to create these files. You can then modify them, and from then on the server will use your files.
+If you want to customize the look of the UI create the "./other/webUI" directory then run the server once to create these files. You can then modify them, and from then on the server will use your files. (templates for the generation report are also here, you can tell which are which because the report templates end in "_static")
 
 Each page template receives raw data about whatever it is supposed to do, in the default templates this data is formatted as JSON and most of the page content is generated client-side by JavaScript, but it is possible to generate the page directly on the server by using the template system for everything. In some cases doing so will cut the page size considerably as some pages receive the parsed version of the entire addons directory! (that's over 7mb of data as encoded!)
 

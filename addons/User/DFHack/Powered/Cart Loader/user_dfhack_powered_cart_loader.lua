@@ -1,12 +1,13 @@
 
 local buildings = require 'plugins.building-hacks'
+local pitems = rubble.require "powered_items"
 
 function makeLoadCart()
 	return function(wshop)
 		if not wshop:isUnpowered() then
 			local size = 1
 			
-			local cart = rubble.powered_items.FindItemArea(wshop, function(item)
+			local cart = pitems.FindItemArea(wshop, function(item)
 				return item:isTrackCart()
 			end)
 			if cart == nil then
@@ -22,7 +23,7 @@ function makeLoadCart()
 				end
 			end
 			
-			local item = rubble.powered_items.FindItemAtInput(wshop, function(item)
+			local item = pitems.FindItemAtInput(wshop, function(item)
 				if totalvolume + item:getVolume() <= cart.subtype.container_capacity then
 					return true
 				end
@@ -39,7 +40,7 @@ end
 
 buildings.registerBuilding{
 	name="CART_LOADER_POWERED",
-	consume=10,
+	consume=5,
 	gears={{x=0,y=0}},
 	action={10, makeLoadCart()},
 	animate={

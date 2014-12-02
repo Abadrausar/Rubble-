@@ -1,8 +1,11 @@
 
 local eventful = require "plugins.eventful"
 local buildings = require 'plugins.building-hacks'
-local script = require('gui.script')
-		
+local script = require 'gui.script'
+local powered = rubble.require "powered"
+local pitems = rubble.require "powered_items"
+local ppersist = rubble.require "powered_persist"
+
 function getItemCaption(type, subtype)
     local attrs = df.item_type.attrs[type]
     if subtype == -1 or subtype == nil then
@@ -25,7 +28,7 @@ function furnaceAdjust(reaction, unit, in_items, in_reag, out_items, call_native
 		for i = 0, #reaction.products-1, 1 do
 			option = reaction.products[i]
 			table.insert(opt_types, "itype = "..option.item_type..", isubtype = "..option.item_subtype)
-			table.insert(opt_names, getItemCaption(option.item_type,option.item_subtype))
+			table.insert(opt_names, getItemCaption(option.item_type, option.item_subtype))
 		end
 		
 		script.start(function()
@@ -34,15 +37,14 @@ function furnaceAdjust(reaction, unit, in_items, in_reag, out_items, call_native
 			local matok, mat = script.showListPrompt('Glass Furnace', 'Select material:', COLOR_LIGHTGREEN, mats)
 			local choiceok, choice = script.showListPrompt('Glass Furnace', 'Select item to produce:', COLOR_LIGHTGREEN, opt_names)
 			
-			local product = ""
+			local product = "NONE"
 			if choiceok and matok then
-				product = opt_types[choice]..", mat = "..mats[mat]
-			else
-				product = "NONE"
+				-- Some a**hole messes with the table passed into script.showListPrompt
+				product = opt_types[choice]..", mat = \""..mats[mat].text.."\""
 			end
 			
-			local wshop = rubble.powered.MakeFake(unit.pos.x, unit.pos.y, unit.pos.z, 1)
-			rubble.powered_persist.SetOutputType(wshop, "return {"..product.."}")
+			local wshop = powered.MakeFake(unit.pos.x, unit.pos.y, unit.pos.z, 3)
+			ppersist.SetOutputType(wshop, "return {"..product.."}")
 			
 			alreadyAdjusting = false
 		end)
@@ -52,23 +54,16 @@ end
 function makeGlass()
 	return function(wshop)
 		if not wshop:isUnpowered() then
-			if not rubble.powered.HasOutput(wshop) then
+			if not powered.HasOutput(wshop) then
 				return
 			end
 			
-			local outputraw = rubble.powered_persist.GetOutputType(wshop)
-			if outputraw == "NONE" then
+			local output = ppersist.GetOutputTypeAsCode(wshop)
+			if output == nil then
 				return
 			end
 			
-			local f, err = load(outputraw)
-			if f == nil then
-				error(err)
-				return
-			end
-			local output = f()
-			
-			local sand = rubble.powered_items.FindItemAtInput(wshop, function(item)
+			local sand = pitems.FindItemAtInput(wshop, function(item)
 				if item:isBag() then
 					local contents = dfhack.items.getContainedItems(item)
 					if #contents == 1 and contents[1]:isSand() then
@@ -83,7 +78,7 @@ function makeGlass()
 			
 			local pearlash = nil
 			if output.mat == "CLEAR" then
-				pearlash = rubble.powered_items.FindItemAtInput(wshop, function(item)
+				pearlash = pitems.FindItemAtInput(wshop, function(item)
 					if df.item_type[item:getType()] == "BAR" then
 						local mat = dfhack.matinfo.decode(item)
 						local ashmat = dfhack.matinfo.find("PEARLASH:NONE")
@@ -98,7 +93,7 @@ function makeGlass()
 				end
 			end
 			
-			magma, bar = rubble.powered_items.FindFuel(wshop)
+			magma, bar = pitems.FindFuel(wshop)
 			if not magma then
 				if bar == nil then
 					return
@@ -125,21 +120,21 @@ function makeGlass()
 					dfhack.items.remove(contained_item)
 				end
 			end
-			rubble.powered_items.Eject(wshop, sand)
+			pitems.Eject(wshop, sand)
 			
 			local glass = dfhack.matinfo.find("GLASS_"..output.mat..":NONE")
-			item = rubble.powered_items.CreateItemNumeric(glass, output.itype, output.isubtype, nil, 0)
-			rubble.powered_items.SetAutoItemQuality(wshop, item)
-			rubble.powered_items.Eject(wshop, item)
+			item = pitems.CreateItemNumeric(glass, output.itype, output.isubtype, nil, 0)
+			pitems.SetAutoItemQuality(wshop, item)
+			pitems.Eject(wshop, item)
 		end
 	end
 end
 
 buildings.registerBuilding{
 	name="DFHACK_RUBBLE_POWERED_GLASS_FURNACE",
-	consume=10,
+	consume=20,
 	gears={{x=0,y=2},{x=2,y=0},{x=2,y=2},{x=0,y=0}},
-	action={300, makeGlass()},
+	action={500, makeGlass()},
 	animate={
 		isMechanical=true,
 		frames={

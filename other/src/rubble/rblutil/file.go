@@ -22,6 +22,8 @@ misrepresented as being the original software.
 
 package rblutil
 
+import "dctech/axis"
+
 // Strip the extension from a file name.
 // If a file has multiple extensions strip only the last.
 func StripExt(name string) string {
@@ -33,4 +35,15 @@ func StripExt(name string) string {
 		i--
 	}
 	return name
+}
+
+// LoadOr is used for loading HTML templates and the like for the web UI or the documentation generator.
+// It attempts to load the file from "rubble:other/webUI/", if this fails "file" is written out and then used.
+func LoadOr(fs axis.DataSource, name, file string) string {
+	content, err := axis.ReadAll(fs, "rubble:other/webUI/" + name)
+	if err != nil {
+		axis.WriteAll(fs, "rubble:other/webUI/" + name, []byte(file))
+		return file
+	}
+	return string(content)
 }

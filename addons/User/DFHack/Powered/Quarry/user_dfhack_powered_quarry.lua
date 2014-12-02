@@ -1,4 +1,7 @@
 
+local powered = rubble.require "powered"
+local pitems = rubble.require "powered_items"
+
 function findClay(x, y, z)
 	block = dfhack.maps.ensureTileBlock(x, y, z)
 	
@@ -35,10 +38,10 @@ end
 function makeDigQuarry(output)
 	return function(wshop)
 		if not wshop:isUnpowered() then
-			if not rubble.powered.HasOutput(wshop) then
+			if not powered.HasOutput(wshop) then
 				return
 			end
-			local apos = rubble.powered.Area(wshop)
+			local apos = powered.Area(wshop)
 			
 			if output == "SAND" then
 				local mat = findSandArea(apos.x1, apos.y1, apos.x2, apos.y2, apos.z)
@@ -46,7 +49,7 @@ function makeDigQuarry(output)
 					return
 				end
 				
-				local bag = rubble.powered_items.FindItemAtInput(wshop, function(item)
+				local bag = pitems.FindItemAtInput(wshop, function(item)
 					if item:isBag() and #dfhack.items.getContainedItems(item) == 0 then
 						return true
 					end
@@ -56,17 +59,17 @@ function makeDigQuarry(output)
 					return
 				end
 				
-				local item = rubble.powered_items.CreateItem(mat, 'item_powder_miscst', nil, 0)
+				local item = pitems.CreateItem(mat, 'item_powder_miscst', nil, 0)
 				dfhack.items.moveToContainer(item, bag)
-				rubble.powered_items.Eject(wshop, bag)
+				pitems.Eject(wshop, bag)
 			else
 				local mat = findClayArea(apos.x1, apos.y1, apos.x2, apos.y2, apos.z)
 				if mat == nil then
 					return
 				end
 				
-				item = rubble.powered_items.CreateItem(mat, 'item_boulderst', nil, 0)
-				rubble.powered_items.Eject(wshop, item)
+				local item = pitems.CreateItem(mat, 'item_boulderst', nil, 0)
+				pitems.Eject(wshop, item)
 			end
 		end
 	end
@@ -77,4 +80,4 @@ local outputs = {
 	"SAND"
 }
 
-rubble.powered.Register("QUARRY_POWERED", outputs, 10, 500, makeDigQuarry)
+powered.Register("QUARRY_POWERED", outputs, 30, 800, makeDigQuarry)

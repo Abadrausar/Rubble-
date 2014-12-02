@@ -26,11 +26,11 @@ Connecting machines must be built AFTER any mechanical workshop!
 	
 	vars=<map
 		DFHACK_FACTORY_NO_STONE=<rubble:addonmetavar
-			name='Remove "User/DFHack/Factory" stone reactions?' val="NO" choices="YES" choices="NO">
+			name='Remove "User/DFHack/Powered/Factory" stone reactions?' val="NO" choices="YES" choices="NO">
 		DFHACK_FACTORY_NO_WOOD=<rubble:addonmetavar
-			name='Remove "User/DFHack/Factory" wood reactions?' val="NO" choices="YES" choices="NO">
+			name='Remove "User/DFHack/Powered/Factory" wood reactions?' val="NO" choices="YES" choices="NO">
 		DFHACK_FACTORY_NO_GLASS=<rubble:addonmetavar
-			name='Remove "User/DFHack/Factory" glass reactions?' val="NO" choices="YES" choices="NO">
+			name='Remove "User/DFHack/Powered/Factory" glass reactions?' val="NO" choices="YES" choices="NO">
 	>
 	
 	activates="Libs/Base;User/DFHack/Powered;Libs/Wood Additions"

@@ -1,8 +1,11 @@
 
 local eventful = require "plugins.eventful"
 local buildings = require 'plugins.building-hacks'
-local script = require('gui.script')
-		
+local script = require 'gui.script'
+local powered = rubble.require "powered"
+local pitems = rubble.require "powered_items"
+local ppersist = rubble.require "powered_persist"
+
 function getItemCaption(type, subtype)
     local attrs = df.item_type.attrs[type]
     if subtype == -1 or subtype == nil then
@@ -38,8 +41,8 @@ function masonAdjust(reaction, unit, in_items, in_reag, out_items, call_native)
 				product = "NONE"
 			end
 			
-			local wshop = rubble.powered.MakeFake(unit.pos.x, unit.pos.y, unit.pos.z, 1)
-			rubble.powered_persist.SetOutputType(wshop, "return {"..product.."}")
+			local wshop = powered.MakeFake(unit.pos.x, unit.pos.y, unit.pos.z, 1)
+			ppersist.SetOutputType(wshop, "return {"..product.."}")
 			
 			alreadyAdjusting = false
 		end)
@@ -49,54 +52,41 @@ end
 function makeStone()
 	return function(wshop)
 		if not wshop:isUnpowered() then
-			if not rubble.powered.HasOutput(wshop) then
+			if not powered.HasOutput(wshop) then
 				return
 			end
 			
-			local outputraw = rubble.powered_persist.GetOutputType(wshop)
-			if outputraw == "NONE" then
+			local output = ppersist.GetOutputTypeAsCode(wshop)
+			if output == nil then
 				return
 			end
 			
-			local f, err = load(outputraw)
-			if f == nil then
-				error(err)
-				return
-			end
-			local output = f()
-			
-			local items = {}
-			local found = {}
-			for i = 0, 2, 1 do
-				block = rubble.powered_items.FindItemAtInput(wshop, function(item)
-					if df.item_type[item:getType()] == "BLOCKS" then
-						if found[item.id] == true then
-							return false
-						end
-						
-						local mat = dfhack.matinfo.decode(item)
-						if mat.mode == "inorganic" then
-							return true
-						end
+			local blocks = pitems.FindXItemsAtInput(wshop, 3, function(item)
+				if df.item_type[item:getType()] == "BLOCKS" then
+					if found[item.id] == true then
+						return false
 					end
-					return false
-				end)
-				if block == nil then
-					return
+					
+					local mat = dfhack.matinfo.decode(item)
+					if mat.mode == "inorganic" then
+						return true
+					end
 				end
-				found[block.id] = true
-				items[i] = block
+				return false
+			end)
+			if blocks == nil then
+				return
 			end
 			
 			local mat = nil
-			for _, block in ipairs(items) do
+			for _, block in ipairs(blocks) do
 				mat = dfhack.matinfo.decode(block)
 				dfhack.items.remove(block)
 			end
 			
-			item = rubble.powered_items.CreateItemNumeric(mat, output.itype, output.isubtype, nil, 0)
-			rubble.powered_items.SetAutoItemQuality(wshop, item)
-			rubble.powered_items.Eject(wshop, item)
+			local item = pitems.CreateItemNumeric(mat, output.itype, output.isubtype, nil, 0)
+			pitems.SetAutoItemQuality(wshop, item)
+			pitems.Eject(wshop, item)
 		end
 	end
 end
@@ -105,7 +95,7 @@ buildings.registerBuilding{
 	name="DFHACK_RUBBLE_POWERED_MASON",
 	consume=30,
 	gears={{x=0,y=2},{x=2,y=0},{x=2,y=2},{x=0,y=0}},
-	action={300, makeStone()},
+	action={500, makeStone()},
 	animate={
 		isMechanical=true,
 		frames={

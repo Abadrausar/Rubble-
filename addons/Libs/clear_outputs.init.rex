@@ -31,6 +31,22 @@
 	})
 })
 
+(axis:walkfiles [rubble:fs] "out:Docs" block path {
+	(axis:del [rubble:fs] (str:add "out:Docs/" [path]))
+	(if (error) {
+		(console:print "Error deleting: " [path] "\n")
+		(error false)
+	})
+})
+
+(axis:walkdirs [rubble:fs] "out:Docs" block path {
+	(axis:del [rubble:fs] (str:add "out:Docs/" [path]))
+	(if (error) {
+		(console:print "Error deleting: " [path] "\n")
+		(error false)
+	})
+})
+
 (axis:walkfiles [rubble:fs] "out:" block path {
 	(axis:del [rubble:fs] (str:add "out:" [path]))
 	(if (error) {

@@ -1,0 +1,34 @@
+<rubble:addonmeta
+	header=`Single tile powered boolean logic gates! (experimental)`
+	
+	description=`
+If you do not know why boolean logic is useful keep your hands off!
+
+This addon is experimental and utterly untested, the final version will
+likely be quite different!
+
+The gates that are currently available are strictly to allow me to test the
+basic concept and make sure it will work. Before I make the full version I
+will make a generic API to encapsulate the functionality I pioneer here.
+
+Eventually building type will be selected by reaction and this system will
+include programmable sensors (item counters, cart detectors, and anything
+else I can think of that can have a meaningful boolean output) and the like.
+
+Currently logic gates only receive input from axles and output by setting
+the state of a variety of buildings:
+	gear assemblies (engaged/disengaged)
+	doors (open/closed)
+	hatch covers (open/closed)
+	wall and floor grates (open/closed)
+	vertical and floor bars (open/closed)
+	floodgates (open/closed)
+	upright spike traps (extended/retracted)
+	bridges (extended/retracted)
+	levers (and anything connected to the lever! on/off)
+
+Connecting machines must be built AFTER any mechanical workshop!
+`
+	
+	activates="Libs/Base;User/DFHack/Powered"
+>

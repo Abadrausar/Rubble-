@@ -28,7 +28,7 @@ import "io/ioutil"
 func loadOr(name, file string) string {
 	content, err := ioutil.ReadFile("./other/webUI/" + name)
 	if err != nil {
-		ioutil.WriteFile("./other/webUI/"+name, []byte(file), 0666)
+		ioutil.WriteFile("./other/webUI/"+name, []byte(file), 04755)
 		return file
 	}
 	return string(content)

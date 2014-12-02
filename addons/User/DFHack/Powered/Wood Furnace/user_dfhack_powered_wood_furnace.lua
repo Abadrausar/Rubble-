@@ -1,12 +1,15 @@
 
+local powered = rubble.require "powered"
+local pitems = rubble.require "powered_items"
+
 function makeBurnWood(output)
 	return function(wshop)
 		if not wshop:isUnpowered() then
-			if not rubble.powered.HasOutput(wshop) then
+			if not powered.HasOutput(wshop) then
 				return
 			end
 			
-			plank = rubble.powered_items.FindItemAtInput(wshop, function(block)
+			local plank = pitems.FindItemAtInput(wshop, function(block)
 				if df.item_type[block:getType()] == "BLOCKS" then
 					local mat = dfhack.matinfo.decode(block)
 					if mat.mode == "plant" then
@@ -26,9 +29,9 @@ function makeBurnWood(output)
 			else
 				mat = dfhack.matinfo.find("COAL:CHARCOAL")
 			end
-			item = rubble.powered_items.CreateItem(mat, 'item_barst', nil, 0)
+			local item = pitems.CreateItem(mat, 'item_barst', nil, 0)
 			item:setDimension(150)
-			rubble.powered_items.Eject(wshop, item)
+			pitems.Eject(wshop, item)
 		end
 	end
 end
@@ -38,4 +41,4 @@ local outputs = {
 	"CHARCOAL"
 }
 
-rubble.powered.Register("WOOD_FURNACE_POWERED", outputs, 10, 200, makeBurnWood)
+powered.Register("WOOD_FURNACE_POWERED", outputs, 20, 500, makeBurnWood)

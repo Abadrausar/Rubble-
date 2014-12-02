@@ -1,7 +1,10 @@
 
 local eventful = require "plugins.eventful"
 local buildings = require 'plugins.building-hacks'
-local script = require('gui.script')
+local script = require 'gui.script'
+local powered = rubble.require "powered"
+local pitems = rubble.require "powered_items"
+local ppersist = rubble.require "powered_persist"
 
 alreadyAdjusting = false
 function sorterAdjust(reaction, unit, in_items, in_reag, out_items, call_native)
@@ -13,8 +16,6 @@ function sorterAdjust(reaction, unit, in_items, in_reag, out_items, call_native)
 		script.start(function()
 			local itemok = false
 			local itemtype, itemsubtype
-			local matok = false
-			local mattype, matindex
 			
 			local adjust = script.showYesNoPrompt('Sorter Adjust', 'Sort by specific item type?', COLOR_LIGHTGREEN)
 			if adjust == true then
@@ -29,10 +30,21 @@ function sorterAdjust(reaction, unit, in_items, in_reag, out_items, call_native)
 				
 				itemok, itemtype, itemsubtype = script.wait()
 			end
-				
+			
+			local matok = false
+			local mattype, matindex
 			adjust = script.showYesNoPrompt('Sorter Adjust', 'Sort by specific material?', COLOR_LIGHTGREEN)
 			if adjust == true then
 				matok, mattype, matindex = script.showMaterialPrompt('Sort','Sort what material?')
+			end
+			
+			local ilimit = "0"
+			adjust = script.showYesNoPrompt('Sorter Adjust', 'Set an output item limit?', COLOR_LIGHTGREEN)
+			if adjust == true then
+				_, ilimit = script.showInputPrompt('Sorter Ajust', 'How many items should be output before stopping (0 means no limit)?', COLOR_LIGHTGREEN, ilimit)
+			end
+			if tonumber(ilimit) == nil then
+				ilimit = "0"
 			end
 			
 			local ipart = ""
@@ -43,13 +55,13 @@ function sorterAdjust(reaction, unit, in_items, in_reag, out_items, call_native)
 				ipart = "itype = nil, isubtype = -1"
 			end
 			if matok then
-				mpart = "mtype = "..mattyp..", mindex = "..matindex
+				mpart = "mtype = "..mattype..", mindex = "..matindex
 			else
 				mpart = "mtype = nil, mindex = -1"
 			end
 			
-			local wshop = rubble.powered.MakeFake(unit.pos.x, unit.pos.y, unit.pos.z, 1)
-			rubble.powered_persist.SetOutputType(wshop, "return {"..ipart..", "..mpart.."}")
+			local wshop = powered.MakeFake(unit.pos.x, unit.pos.y, unit.pos.z, 1)
+			ppersist.SetOutputType(wshop, "return {"..ipart..", "..mpart..", limit = "..ilimit.."}")
 			
 			alreadyAdjusting = false
 		end)
@@ -58,20 +70,34 @@ end
 
 function makeSortItem()
 	return function(wshop)
-		local outputraw = rubble.powered_persist.GetOutputType(wshop)
-		if outputraw == "NONE" then
+		local output = ppersist.GetOutputTypeAsCode(wshop)
+		if output == nil then
 			return
 		end
 		
-		local f, err = load(outputraw)
-		if f == nil then
-			error(err)
+		if not powered.HasOutput(wshop) then
 			return
 		end
-		local output = f()
 		
-		if not rubble.powered.HasOutput(wshop) then
-			return
+		if output.limit > 0 then
+			-- count items at outputs
+			local icount = 0
+			local outputs = powered.Outputs(wshop)
+			for _, pos in pairs(outputs) do
+				local itemblock = dfhack.maps.ensureTileBlock(pos.x, pos.y, pos.z)
+				if itemblock.occupancy[pos.x%16][pos.y%16].item == true then
+					for c = #itemblock.items - 1, 0, -1 do
+						local item = df.item.find(itemblock.items[c])
+						if item.pos.x == pos.x and item.pos.y == pos.y and item.pos.z == pos.z then
+							icount = icount + 1
+						end
+					end
+				end
+			end
+			
+			if icount >= output.limit then
+				return
+			end
 		end
 		
 		local matchitem = function(item)
@@ -90,7 +116,7 @@ function makeSortItem()
 			if output.mtype ~= nil then
 				local mat = dfhack.matinfo.decode(item)
 				
-				if mat.type ~= output.mtype or mat.index ~= mindex then
+				if mat.type ~= output.mtype or mat.index ~= output.mindex then
 					match = false
 				end
 			end
@@ -99,24 +125,25 @@ function makeSortItem()
 		end
 		
 		local item = nil
-		if rubble.powered.HasInput(wshop) then
-			item = rubble.powered_items.FindItemAtInput(wshop, matchitem)
+		if powered.HasInput(wshop) then
+			item = pitems.FindItemAtInput(wshop, matchitem)
 			if item == nil then
 				return
 			end
 		else
-			item = rubble.powered_items.FindItemArea(wshop, matchitem)
+			item = pitems.FindItemArea(wshop, matchitem)
 			if item == nil then
 				return
 			end
 		end
 		
-		rubble.powered_items.Eject(wshop, item)
+		pitems.Eject(wshop, item)
 	end
 end
 
 buildings.registerBuilding{
 	name="DFHACK_RUBBLE_POWERED_SORTER",
+	--SORTER_MODE
 	action={10, makeSortItem()},
 }
 eventful.registerReaction("LUA_HOOK_ADJUST_SORTER", sorterAdjust)

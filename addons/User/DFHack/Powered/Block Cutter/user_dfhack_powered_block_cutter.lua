@@ -1,12 +1,15 @@
 
+local powered = rubble.require "powered"
+local pitems = rubble.require "powered_items"
+
 function makeCutBlock(output)
 	return function(wshop)
 		if not wshop:isUnpowered() then
-			if not rubble.powered.HasOutput(wshop) then
+			if not powered.HasOutput(wshop) then
 				return
 			end
 			
-			local boulder = rubble.powered_items.FindItemAtInput(wshop, function(item)
+			local boulder = pitems.FindItemAtInput(wshop, function(item)
 				if df.item_type[item:getType()] == "BOULDER" then
 					local mat = dfhack.matinfo.decode(item)
 					if mat.material.flags.ITEMS_HARD and mat.material.flags.IS_STONE then
@@ -35,17 +38,10 @@ function makeCutBlock(output)
 			dfhack.items.remove(boulder)
 			
 			-- create 4 blocks
-			item = rubble.powered_items.CreateItem(mat, 'item_blocksst', nil, 0)
-			rubble.powered_items.Eject(wshop, item)
-			
-			item = rubble.powered_items.CreateItem(mat, 'item_blocksst', nil, 0)
-			rubble.powered_items.Eject(wshop, item)
-			
-			item = rubble.powered_items.CreateItem(mat, 'item_blocksst', nil, 0)
-			rubble.powered_items.Eject(wshop, item)
-			
-			item = rubble.powered_items.CreateItem(mat, 'item_blocksst', nil, 0)
-			rubble.powered_items.Eject(wshop, item)
+			pitems.Eject(wshop, pitems.CreateItem(mat, 'item_blocksst', nil, 0))
+			pitems.Eject(wshop, pitems.CreateItem(mat, 'item_blocksst', nil, 0))
+			pitems.Eject(wshop, pitems.CreateItem(mat, 'item_blocksst', nil, 0))
+			pitems.Eject(wshop, pitems.CreateItem(mat, 'item_blocksst', nil, 0))
 		end
 	end
 end
@@ -70,4 +66,4 @@ local outputs = {
 	"INPUT_MAT"
 }
 
-rubble.powered.Register("BLOCK_CUTTER_POWERED", outputs, 20, 300, makeCutBlock)
+powered.Register("BLOCK_CUTTER_POWERED", outputs, 30, 1000, makeCutBlock)

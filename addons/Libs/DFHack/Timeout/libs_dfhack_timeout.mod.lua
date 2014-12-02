@@ -25,33 +25,41 @@ misrepresented as being the original software.
 
 local _ENV = rubble.mkmodule("timeout")
 
-data = {}
-
-function savePersist()
-	print("rubble.timeout: Saving persistence data.")
-	local dat = io.open(rubble.savedir..'/raw/rubble_libs_dfhack_timeout.persist.lua', 'w')
-	dat:write("\n")
-	dat:write("rubble.timeout.data = {\n")
-	for k, v in pairs(data) do
-		if v ~= nil then
-			dat:write('\t["'..k..'"] = { delay = '..v.delay..', command = [['..v.command..']] },\n')
-		end
+local data = {}
+local rawdata = dfhack.persistent.get("rubble_libs_dfhack_timeout")
+if rawdata == nil then
+	rawdata, _ = dfhack.persistent.save({key = "rubble_libs_dfhack_timeout"})
+else
+	local f, err = load(rawdata.value)
+	if f == nil then
+		error(err)
 	end
-	dat:write("}\n")
-	dat:close()
+	f()
 end
 
-print("rubble.timeout: Loading persistence data.")
-rubble.load_script(rubble.savedir.."/raw/rubble_libs_dfhack_timeout.persist.lua")
+function savepersist()
+	local out = "rubble.timeout.data = {\n"
+	for k, v in pairs(data) do
+		if v ~= nil then
+			out = out..'\t["'..k..'"] = {'
+			out = out..' delay = '..v.delay..','
+			out = out..' command = [[ '..v.command..' ]]'
+			out = out..' },\n'
+		end
+	end
+	out = out.."}"
+	rawdata.value = out
+	rawdata:save()
+end
 
 function add(id, delay, command)
 	data[id] = {delay = delay, command = command}
-	savePersist()
+	savepersist()
 end
 
 function del(id)
 	data[id] = nil
-	savePersist()
+	savepersist()
 end
 
 function tick()

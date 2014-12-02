@@ -1,13 +1,16 @@
 
+local powered = rubble.require "powered"
+local pitems = rubble.require "powered_items"
+
 function makeCutWood(output)
 	return function(wshop)
 		if not wshop:isUnpowered() then
-			if not rubble.powered.HasOutput(wshop) then
+			if not powered.HasOutput(wshop) then
 				return
 			end
 			
 			-- find a log
-			local wood = rubble.powered_items.FindItemAtInput(wshop, function(item)
+			local wood = pitems.FindItemAtInput(wshop, function(item)
 				if df.item_type[item:getType()] == "WOOD" then
 					return true
 				end
@@ -23,19 +26,12 @@ function makeCutWood(output)
 			dfhack.items.remove(wood)
 			
 			-- create 4 blocks
-			item = rubble.powered_items.CreateItem(mat, 'item_blocksst', nil, 0)
-			rubble.powered_items.Eject(wshop, item)
-			
-			item = rubble.powered_items.CreateItem(mat, 'item_blocksst', nil, 0)
-			rubble.powered_items.Eject(wshop, item)
-			
-			item = rubble.powered_items.CreateItem(mat, 'item_blocksst', nil, 0)
-			rubble.powered_items.Eject(wshop, item)
-			
-			item = rubble.powered_items.CreateItem(mat, 'item_blocksst', nil, 0)
-			rubble.powered_items.Eject(wshop, item)
+			pitems.Eject(wshop, pitems.CreateItem(mat, 'item_blocksst', nil, 0))
+			pitems.Eject(wshop, pitems.CreateItem(mat, 'item_blocksst', nil, 0))
+			pitems.Eject(wshop, pitems.CreateItem(mat, 'item_blocksst', nil, 0))
+			pitems.Eject(wshop, pitems.CreateItem(mat, 'item_blocksst', nil, 0))
 		end
 	end
 end
 
-rubble.powered.Register("SAWMILL_POWERED", nil, 20, 300, makeCutWood)
+powered.Register("SAWMILL_POWERED", nil, 30, 1000, makeCutWood)

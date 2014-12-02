@@ -2,6 +2,7 @@
 (rubble:dfhack_loadscript "aaa_user_dfhack_powered.mod.lua")
 (rubble:dfhack_loadscript "bbb_user_dfhack_powered.mod.lua")
 (rubble:dfhack_loadscript "ccc_user_dfhack_powered.mod.lua")
+(rubble:dfhack_loadscript "ddd_user_dfhack_powered.mod.lua")
 
 module rubble:dfhack_powered
 

@@ -1,0 +1,19 @@
+<rubble:addonmeta
+	header=`A powered mill, grind plants to flour or dye powder.`
+	
+	description=`
+The powered mill takes any millable plant and turns it into powder of the correct type.
+
+Bags ARE required, place them on an input like any other input item.
+
+Seeds are produced (if possible, they will not be created for seedless plants).
+
+Input items MUST be on an input tile (a special one tile workshop), output is placed
+beyond an output tile (which is also required). If multiple output tiles are provided
+one is chosen at random each time (so output may be split).
+
+Connecting machines must be built AFTER any mechanical workshop!
+`
+	
+	activates="Libs/Base;User/DFHack/Powered"
+>

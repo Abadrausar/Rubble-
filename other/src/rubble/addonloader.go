@@ -207,6 +207,9 @@ func containsParseable(source axis.DataSource, path string) bool {
 		if strings.HasSuffix(filename, ".txt") {
 			return true
 		}
+		if filename == "addon.meta" {
+			return true
+		}
 	}
 	return false
 }

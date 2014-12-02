@@ -3,27 +3,28 @@ _ENV = rubble.mkmodule("powered_persist")
 
 local eventful = require "plugins.eventful"
 
--- The Lua half of this addon takes three parts:
+-- The Lua half of this addon takes several parts:
 --	Part A: Dealing directly with workshops, finding input and output locations, etc.
 --	Part B: Finding, creating, and outputting items.
 --	Part C: Handling persistent output type data for workshops with many possible types.
+--	Part D: Finding and changing the state of "switchable" buildings.
 -- This is part C.
 
 -- Persistent Output API
 -- Use for case where the list of possibilities is WAY to large for the normal way.
--- Use the normal (multiple workshops) way for most cases, as it is more reliable.
+-- Use the normal (multiple workshops) way for most cases, as it is easier to provide
+-- nice readouts and simpler setting change mechanics.
 -- For a workshop to use this API it's ID MUST start with "DFHACK_RUBBLE_POWERED_".
 
--- Set this workshops output string.
+-- Set this workshop's output string.
 -- The output string defaults to "NONE" for new buildings.
 function SetOutputType(wshop, output)
 	local i = "X:"..wshop.centerx.."|Y:"..wshop.centery.."|Z:"..wshop.z
 	machines[i] = output
-	
-	savePersist()
+	savepersist()
 end
 
--- Get this workshops output string.
+-- Get this workshop's output string.
 -- The output string defaults to "NONE" for new buildings.
 function GetOutputType(wshop)
 	local i = "X:"..wshop.centerx.."|Y:"..wshop.centery.."|Z:"..wshop.z
@@ -33,27 +34,36 @@ function GetOutputType(wshop)
 	return machines[i]
 end
 
--- Internal stuff, subject to change without notice!
-
--- ["X:"..x.."|Y:"..y.."|Z:"..z] = "<output id>"
-machines = {}
-
-eventful.onBuildingCreatedDestroyed.rubble_powered=function(building_id)
-	refreshMachineList()
+-- Get this workshop's output string and run it as code.
+-- Returns nil if the output is "NONE" or there is an error when loading the code.
+-- If there is an error it is logged to the DFHack console.
+function GetOutputTypeAsCode(wshop)
+	local outputraw = GetOutputType(wshop)
+	if outputraw == "NONE" then
+		return nil
+	end
+	
+	local f, err = load(outputraw)
+	if f == nil then
+		dfhack.printerr(err)
+		return nil
+	end
+	return f()
 end
 
-function savePersist()
-	print("rubble.powered_persist: Saving persistence data.")
-	local dat = io.open(rubble.savedir..'/raw/rubble_user_dfhack_powered.persist.lua', 'w')
-	dat:write("\n")
-	dat:write("rubble.powered_persist.machines = {\n")
+-- Internal stuff, subject to change without notice!
+
+function savepersist()
+	local out = "rubble.powered_persist.machines = {\n"
 	for k, v in pairs(machines) do
 		if v ~= nil then
-			dat:write('\t["'..k..'"] = "'..v..'",\n')
+			out = out..'\t["'..k..'"] = [['..v..']],\n'
 		end
 	end
-	dat:write("}\n")
-	dat:close()
+	out = out.."}"
+	
+	rawmachines.value = out
+	rawmachines:save()
 end
 
 function refreshMachineList()
@@ -75,13 +85,25 @@ function refreshMachineList()
 		end
 	end
 	machines = newmachines
-	
-	savePersist()
+	savepersist()
 end
 
-print("rubble.powered: Loading persistence data.")
-rubble.load_script(rubble.savedir.."/raw/rubble_user_dfhack_powered.persist.lua")
+eventful.onBuildingCreatedDestroyed.rubble_powered=function(building_id)
+	refreshMachineList()
+end
 
+-- ["X:"..x.."|Y:"..y.."|Z:"..z] = "<output id>"
+machines = {}
+rawmachines = dfhack.persistent.get("rubble_user_dfhack_powered")
+if rawmachines == nil then
+	rawmachines, _ = dfhack.persistent.save({key = "rubble_user_dfhack_powered"})
+else
+	local f, err = load(rawmachines.value)
+	if f == nil then
+		error(err)
+	end
+	f()
+end
 refreshMachineList()
 
 return _ENV
