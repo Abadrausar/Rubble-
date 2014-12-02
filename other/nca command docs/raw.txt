@@ -1,0 +1,79 @@
+PACKAGE
+
+package raw
+    import "dctech/nca7/commands/raw"
+
+
+FUNCTIONS
+
+func CommandRaw_Advance(state *nca7.State, params []*nca7.Value)
+    Advances the parser to the next raw tag.
+
+	raw:advance
+
+    Returns unchanged.
+
+func CommandRaw_Append(state *nca7.State, params []*nca7.Value)
+    Adds text after the current tag.
+
+	raw:append text
+
+    Returns unchanged.
+
+func CommandRaw_Current(state *nca7.State, params []*nca7.Value)
+    Returns an indexable that always points to the current tag. You only
+    need to call this once.
+
+	raw:current
+
+    Returns the current raw tag.
+
+func CommandRaw_Disable(state *nca7.State, params []*nca7.Value)
+    Disables the current tag.
+
+	raw:disable
+
+    Returns unchanged.
+
+func CommandRaw_Dump(state *nca7.State, params []*nca7.Value)
+    Dumps the raw file being opperated on as a string. Use this to write out
+    your edits.
+
+	raw:dump
+
+    Returns the raw text.
+
+func CommandRaw_Init(state *nca7.State, params []*nca7.Value)
+    Initalizes the raw parser.
+
+	raw:init text
+
+    Returns unchanged.
+
+func CommandRaw_Replace(state *nca7.State, params []*nca7.Value)
+    Replaces the current tag.
+
+	raw:replace replacement
+
+    Returns unchanged.
+
+func CommandRaw_Valid(state *nca7.State, params []*nca7.Value)
+    Returns true if there is a valid tag.
+
+	raw:valid
+
+    Returns true or false.
+
+func Setup(state *nca7.State)
+    Adds the raw commands to the state. The raw commands are:
+
+	raw:init
+	raw:advance
+	raw:valid
+	raw:current
+	raw:disable
+	raw:replace
+	raw:append
+	raw:dump
+
+

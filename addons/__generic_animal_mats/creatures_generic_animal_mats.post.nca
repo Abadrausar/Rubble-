@@ -1,0 +1,78 @@
+
+'This script is really SLOW, if I ever get profiling working this would be a good one to test.'
+(foreach [rubble:raws] {
+	(if (str:cmp "creature_" (str:left [params 0] 9)) {
+		(var file (raw:init [params 1]))
+		(var tag (raw:current))
+		
+		(console:print "  " [params 0] "\n")
+		
+		(loop {
+			(raw:advance)
+			
+			(if (raw:valid) {
+				
+				(if (str:cmp [tag id] "BLOOD") {
+					(if (int:eq (len [tag]) 3) {
+						(raw:replace (str:add "[BLOOD:CREATURE_MAT:ANIMAL:" [tag 2] ":LIQUID]"))
+					}{
+						(console:print "  BLOOD tag in creature has non-standered arg count\n")
+						(console:print "    This is probably OK so ignoring.\n")
+					})
+				})
+				
+				(if (str:cmp [tag id] "PUS") {
+					(if (int:eq (len [tag]) 3) {
+						(raw:replace (str:add "[PUS:CREATURE_MAT:ANIMAL:" [tag 2] ":LIQUID]"))
+					}{
+						(console:print "  PUS tag in creature has non-standered arg count\n")
+						(console:print "    This is probably OK so ignoring.\n")
+					})
+				})
+				
+				(if (str:cmp [tag id] "TENDONS") {
+					(if (int:eq (len [tag]) 3) {
+						(raw:replace (str:add "[TENDONS:CREATURE_MAT:ANIMAL:SINEW" [tag 2] "]"))
+					}{
+						(console:print "  TENDONS tag in creature has non-standered arg count\n")
+						(console:print "    This is probably OK so ignoring.\n")
+					})
+				})
+				
+				(if (str:cmp [tag id] "LIGAMENTS") {
+					(if (int:eq (len [tag]) 3) {
+						(raw:replace (str:add "[LIGAMENTS:CREATURE_MAT:ANIMAL:SINEW" [tag 2] "]"))
+					}{
+						(console:print "  LIGAMENTS tag in creature has non-standered arg count\n")
+						(console:print "    This is probably OK so ignoring.\n")
+					})
+				})
+				
+				(if (str:cmp [tag id] "MILKABLE") {
+					(if (int:eq (len [tag]) 3) {
+						(raw:replace (str:add "[MILKABLE:CREATURE_MAT:ANIMAL:MILK" [tag 2] "]"))
+					}{
+						(console:print "  MILKABLE tag in creature has non-standered arg count\n")
+						(console:print "    This is probably OK so ignoring.\n")
+					})
+				})
+				
+				(if (str:cmp [tag id] "EGG_MATERIAL") {
+					(if (int:eq (len [tag]) 3) {
+						(raw:replace (str:add "[EGG_MATERIAL:CREATURE_MAT:ANIMAL:" [tag 1] ":" [tag 2] "]"))
+					}{
+						(console:print "  EGG_MATERIAL tag in creature has non-standered arg count\n")
+						(console:print "    This is probably OK so ignoring.\n")
+					})
+				})
+				
+				(break true)
+			}{
+				(break false)
+			})
+		})
+		
+		(set [rubble:raws] [params 0] (raw:dump))
+	})
+	(break true)
+})

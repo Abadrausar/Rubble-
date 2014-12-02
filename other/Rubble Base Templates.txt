@@ -1,0 +1,210 @@
+	
+Rubble Template Documentation
+User Templates in Standared Base
+
+==============================================
+{COMMENT;<STUFF>...}
+{C;<STUFF>...}
+	Doesn't parse or return anything.
+
+==============================================
+{VOID;<PRERAWS>...}
+	Parses <PRERAWS>, but doesn't return anything.
+
+==============================================
+{ECHO;<PRERAWS>...}
+{E;<PRERAWS>...}
+	Returns <PRERAWS>. Used to strip leading and trailing whitespace for better formatting of output and to delay variable expansion.
+
+==============================================
+{!PANIC;<MESSAGE>}
+{PANIC;<MESSAGE>}
+{#PANIC;<MESSAGE>}
+	Forces Rubble to exit, <MESSAGE> is displayed.
+
+==============================================
+{SHARED_OBJECT;<ID>;<DEFINITION>}
+	Adds a common object with the id <ID> to the dictionary. <DEFINITION> may be any raws. If this template call is the first with this <ID>, then the given <DEFINITION> will be used in the finished raws.
+	
+	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws.
+
+==============================================
+{SHARED_OBJECT_EXISTS;<ID>;<THEN_PRERAWS>}
+{SHARED_OBJECT_EXISTS;<ID>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
+	If a SHARED_OBJECT with the id <ID> exists then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
+	This is very useful for making addons with additional behavior that depends on things (items, materials, ect) from other addons.
+
+==============================================
+{IF;<STRING1>;<STRING2>;<THEN_PRERAWS>}
+{IF;<STRING1>;<STRING2>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
+	If <STRING1> and <STRING2> are equal, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned. This is very useful with variables.
+	
+	Example:
+		{IF;$TEST_VAR;YES;[FOO];[BAR]}
+
+==============================================
+{ONCE;<KEY>;<PRERAWS>}
+	Parses and returns <PRERAWS> unless a ONCE block with the same <KEY> has been parsed earlier.
+
+==============================================
+{STATIC;<KEY>;<PRERAWS>}
+	If this template is the first to be evaluated with key <KEY>, then <PRERAWS> are parsed and returned. Subsequent STATIC calls with the same <KEY> will return the result of the first parse instead without parsing anything else before that.
+
+==============================================
+{SET;<NAME>;<VALUE>}
+	Sets a variable of name <NAME> to value <VALUE>. Returns nothing.
+
+==============================================
+{#ADVENTURE_TIER}
+	Returns a new unique [ADVENTURE_TIER:X] tag every time it is processed.
+	
+	Example (assuming {#ADVENTURE_TIER} wasn't previously called):
+		{#ADVENTURE_TIER} -> [ADVENTURE_TIER:1]
+		{#ADVENTURE_TIER} -> [ADVENTURE_TIER:2]
+
+==============================================
+{#AQUIFER}
+	Returns [AQUIFER] if the USE_AQUIFERS config option is YES.
+
+==============================================
+{!PRINT;<MSG>...}
+{PRINT;<MSG>...}
+{#PRINT;<MSG>...}
+	Writes <MSG> to the console. Each param gets it's own line.
+
+==============================================
+{SHARED_PLANT;<ID>;<DEFINITION>}
+	Adds a common plant to the dictionary. <DEFINITION> should be a complete plant entry, EXCLUDING the [PLANT:<ID>] tag. If this template call is the first to define this plant, then the given <DEFINITION> will be used in the finished raws. 
+	
+	SHARED_PLANT, like the other shared definition templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR. Use #WRITE_TILESET to write a file with all the generated (and user placed) calls.
+	
+	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws.
+	
+	SHARED_PLANT is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS as an id.
+
+==============================================
+{SHARED_INORGANIC;<ID>;<DEFINITION>}
+	Adds a common inorganic to the dictionary. <DEFINITION> should be a complete inorganic stone entry, EXCLUDING the [INORGANIC:<ID>] tag. If this template call is the first to define this inorganic, then the given <DEFINITION> will be used in the finished raws. 
+	
+	SHARED_INORGANIC, like the other shared definition templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR. Use #WRITE_TILESET to write a file with all the generated (and user placed) calls.
+	
+	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_ORE, REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
+	
+	SHARED_INORGANIC is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS as an id.
+
+==============================================
+{SHARED_MATERIAL_TEMPLATE;<ID>;<DEFINITION>}
+	Adds a common material template to the dictionary. <DEFINITION> should be a complete template entry, EXCLUDING the [MATERIAL_TEMPLATE:<ID>] tag. If this template call is the first to define this material template, then the given <DEFINITION> will be used in the finished raws. 
+	
+	SHARED_MATERIAL_TEMPLATE, like the other shared definition templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR. Use #WRITE_TILESET to write a file with all the generated (and user placed) calls.
+	
+	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
+	Uses SHARED_OBJECT, make sure <ID> is unique.
+	
+	SHARED_MATERIAL_TEMPLATE is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS as an id.
+
+==============================================
+{REGISTER_ORE;<ORE>;<METAL>;<AMOUNT>}
+	Adds a [METAL_ORE:<METAL>:<AMOUNT>] tag to the definition of <ORE>. For this to work, <ORE> must be registered as a SHARED_INORGANIC. If this is called multiple times with the same <ORE> and <METAL>, the highest <AMOUNT> is used.
+
+==============================================
+{REGISTER_REACTION_CLASS;<INORGANIC>;<CLASS>}
+	Adds a [REACTION_CLASS:<CLASS>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC.
+
+==============================================
+{REGISTER_REACTION_PRODUCT;<INORGANIC>;<CLASS>;<PRODUCT>}
+	Adds a [MATERIAL_REACTION_PRODUCT:<CLASS>:<PRODUCT>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC.
+
+==============================================
+{SET_TILE;<ID>;<TILE>}
+	Sets tile entry <ID> to <TILE>.
+	Used to add support for tilesets, first entry "wins".
+
+==============================================
+{#TILE;<ID>;<DEFAULT>}
+	If a tile entry for <ID> exists return it else return <DEFAULT>.
+	Use everywhere a tile number is required.
+
+==============================================
+{SET_COLOR;<ID>;<COLOR>}
+	Sets color entry <ID> to <COLOR>.
+	Used to add support for tilesets, first entry "wins".
+
+==============================================
+{#COLOR;<ID>;<DEFAULT>}
+	If a color entry for <ID> exists return it else return <DEFAULT>.
+	Use everywhere a color is required.
+
+==============================================
+{#WRITE_TILESET;<PATH>}
+	Writes calls to SET_TILE and SET_COLOR for all calls to #TILE and #COLOR to file <PATH>.
+	This should only be used once to get a template for making a tileset addon, it has no other use.
+	Note that for this to work #WRITE_TILESET MUST be called AFTER every call to #TILE or #COLOR!
+
+==============================================
+{BUILDING_WORKSHOP;<TECH>;<CLASS>}
+	Similar to ITEM_CLASS, this registers a workshop to class <CLASS>. Used with #USES_TECH or #USES_BUILDINGS.
+	Returns [BUILDING_WORKSHOP:<TECH>]
+
+==============================================
+{BUILDING_FURNACE;<TECH>;<CLASS>}
+	Similar to ITEM_CLASS, this registers a furnace to class <CLASS>. Used with #USES_TECH or #USES_BUILDINGS.
+	Returns [BUILDING_FURNACE:<TECH>]
+
+==============================================
+{#USES_BUILDINGS;<CLASSES>...}
+	Usable in entity definitions. Expands to a list of building permissions of all <CLASS>es combined.
+
+==============================================
+{REACTION;<TECH>;<CLASS>}
+	Similar to ITEM_CLASS, this registers a reaction to class <CLASS>. Used with #USES_TECH or #USES_REACTIONS.
+	Returns [REACTION:<TECH>]
+
+==============================================
+{#USES_REACTIONS;<CLASSES>...}
+	Usable in entity definitions. Expands to a list of reaction permissions of all <CLASS>es combined.
+
+==============================================
+{#USES_TECH;<CLASSES>...}
+	Combo of #USES_BUILDINGS and #USES_REACTIONS
+
+==============================================
+{ITEM;<TYPE>;<ITEM>;<DEFINITION>}
+	Registers an item <ITEM> of type <TYPE>. Used later with #USES_ITEMS and ITEM_CLASS. 
+	Returns [ITEM_<TYPE>:<ITEM>]
+	
+	<TYPE> must be one of AMMO, ARMOR, DIGGER, GLOVES, HELM, INSTRUMENT, PANTS, SHIELD, SHOES, SIEGEAMMO, TOOL, TOY, TRAPCOMP or WEAPON.
+	
+	ITEM is based on SHARED_OBJECT, so <ITEM> can be passed to SHARED_OBJECT_EXISTS as an id.
+
+==============================================
+{ITEM_CLASS;<CLASS>;<RARITY>=COMMON}
+{ITEM_CLASS;<TYPE>;<ITEM>;<CLASS>;<RARITY>=COMMON}
+	
+	Sets an items class and rarity. Items may have many classes and each class may have a different rarity per item. 
+	
+	The first form of an ITEM_CLASS template always refers to the last ITEM template before it.
+	The second form is for use in addons or other places where the call cannot follow the item definition.
+	
+	<RARITY> can be RARE, UNCOMMON, COMMON and FORCED.
+	
+	Example:
+	
+	{ITEM:WEAPON;ITEM_WEAPON_TEST;
+		The weapon definition...
+	}{ITEM_CLASS;TEST_WEAPONS}
+	
+	{#USES_ITEMS;TEST_WEAPONS} -> [WEAPON:ITEM_WEAPON_TEST]
+
+==============================================
+{#USES_ITEMS;<CLASS>}
+	Usable in entity definitions. Expands to a list of item permissions of the <CLASS>. When using multiple #USES_ITEMS calls make sure every item is returned by at most one #USES_ITEMS call.
+
+==============================================
+{ADDON_HOOKS;<ID>;[<PLAYABLE>=false]}
+	Usable in entity definitions, ADDON_HOOKS expands to a list of addon hooks for the entity (Addon hooks are tech/item classes). 
+	By default the hooks installed are:
+		ADDON_HOOK_GENERIC
+		ADDON_HOOK_<ID>
+	If <PLAYABLE> is true then the following hooks are also installed:
+		ADDON_HOOK_PLAYABLE

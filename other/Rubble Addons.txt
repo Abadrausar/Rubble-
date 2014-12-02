@@ -1,0 +1,164 @@
+
+==============================================
+How to Write a Rubble Addon
+==============================================
+
+A Rubble addon is like a Blast addon except for 4 things:
+	1) All files use Rubble syntax and templates
+	2) There is no objects directory, all files are in the addon root directory (eg. "addons/test" instead of Blast's "addons/test/objects")
+	3) There is no addon.pm or config.txt. There is a counterpart for config.txt, config.ini but it is stored in the same directory as the preraws.
+	4) Addons may override the base simply by having a file of the same name. This is because Rubble does not postfix files with a namespace.
+
+First things first: Get some raws, an addon is not very useful if it has no raws ;) 
+For this tutorial I will be making a simple little mod that adds optional support for Broken Arrow. Broken Arrow is a simple archery rebalence mod that I like to use, but sometimes it's nice to be able to turn it off.
+
+First lets get setup. Install Rubble (if you haven't yet) and create a new directory named "BrokenArrow" in the "source/addons" directory.
+
+We will need to override two files, "item_ammo.txt" and "item_weapon.txt", so open up you raw/objects folder and copy those two files into your new addon folder. 
+Now create a new file named "config.ini" in your addon directory. (This file is Rubble's version of config.txt and works almost exactly like that file does in Blast.)
+
+Open your new configuration file and add these lines:
+	# Use the broken arrow archery rebalance?
+	USE_BROKEN_ARROW = YES
+
+The line that begins with '#' is a comment, comments are ignored by the config file parser.
+Using a config file like this is not very useful in a simple case like this but for more complicated mods it really comes in handy.
+
+Now for the mod itself:
+Broken Arrow nerfs bows and crosbows by changing their stats and the stats of bolts and arrows, lets start with the ammo.
+
+"item_ammo.txt" is really small so I'll just show the whole file:
+[OBJECT:ITEM]
+
+Added optional Broken Arrow mod
+
+{ITEM;AMMO;ITEM_AMMO_BOLTS;
+	[NAME:bolt:bolts]
+	[CLASS:BOLT]
+	[SIZE:150]
+	{IF;$USE_BROKEN_ARROW;YES;
+	[ATTACK:EDGE:5:1000:stab:stabs:NO_SUB:1000];
+	[ATTACK:EDGE:2:2000:stab:stabs:NO_SUB:1000]}
+}{ITEM_CLASS;CROSSBOW}
+
+{ITEM;AMMO;ITEM_AMMO_ARROWS;
+	[NAME:arrow:arrows]
+	[CLASS:ARROW]
+	[SIZE:150]
+	{IF;$USE_BROKEN_ARROW;YES;
+	[ATTACK:EDGE:5:1000:stab:stabs:NO_SUB:1000];
+	[ATTACK:EDGE:2:2000:stab:stabs:NO_SUB:1000]}
+}{ITEM_CLASS;BOW}
+
+{ITEM;AMMO;ITEM_AMMO_BLOWDARTS;
+	[NAME:blowdart:blowdarts]
+	[CLASS:BLOWDART]
+	[SIZE:20]
+	[ATTACK:EDGE:1:50:stick:sticks:NO_SUB:1000]
+}{ITEM_CLASS;BLOWGUN}
+
+The first thing to note is the lack of a file id line at the top, Rubble adds this line automaticly so there is no need to do so manually.
+Notice how every ammo definition is surounded with a template? That is the item template. It allows you to overried items without needing to override the whole file, in this case we are replacing the whole file just because we can, the version of Broken Arrow that comes with Rubble uses a much shorter way (that is not as good for a tutorial).
+ITEM_CLASS works with ITEM to register the item under a specific catagory or "class", this makes it easy to setup entity permitted item lists.
+Now check out the IF template in the bolt definition, there is the variable we defined in the configuration file. The '$' that prefixes its name tells Rubble to look up it's value and use it instead of it's name. Note that Rubble does not prefix variables created from the configuration file with a namespace or "CONFIG_" unlike Blast. This means that you need to be careful not to collide with other addons.
+
+In any case we now have a little mod that makes arrows and bolts penatrate less and have a larger contact area, but only if we set USE_BROKEN_ARROW to YES in our config file.
+
+Now for "item_weapon.txt". This file is rather large so I'll show just the entry for the crossbow (the bow entry is nearly the same):
+{ITEM;WEAPON;ITEM_WEAPON_CROSSBOW;
+	[NAME:crossbow:crossbows]
+	[SIZE:400]
+	[SKILL:HAMMER]
+	[RANGED:CROSSBOW:BOLT]
+	{IF;$USE_BROKEN_ARROW;YES;
+	[SHOOT_FORCE:27]
+	[SHOOT_MAXVEL:200]
+	;
+	[SHOOT_FORCE:1000]
+	[SHOOT_MAXVEL:1000]
+	}
+	[TWO_HANDED:0]
+	[MINIMUM_SIZE:15000]
+	[MATERIAL_SIZE:3]
+	[ATTACK:BLUNT:10000:4000:bash:bashes:NO_SUB:1250]
+}{ITEM_CLASS;CROSSBOW}
+
+Same basic IF and ITEM templates, nothing really new here, so just make the same changes to your copy of ITEM_WEAPON_BOW as well and lets move on.
+
+Now all you need to do is generate the raws.
+
+You little addon should work fine, but if not you have just learned an valuable lesson: Just because Rubble (or Blast for that matter) ran without errors does not mean the result is valid raws. Fix any errors and enjoy!
+
+One more thing, as you saw earlier the ITEM_CLASS template associates an item with a class, here is a simple example of how that is used in an entity:
+Code:
+{#USES_ITEMS;CROSSBOW}
+{#USES_ITEMS;BOW}
+Output:
+[AMMO:ITEM_AMMO_BOLTS]
+[WEAPON:ITEM_WEAPON_CROSSBOW]
+[AMMO:ITEM_AMMO_ARROWS]
+[WEAPON:ITEM_WEAPON_BOW]
+
+The standard base does not make use of item classes (yet)
+
+If you want to see another (better) way to make the above addon look in "source/addons/__broken_arrow"
+
+==============================================
+Tweak Scripts:
+==============================================
+
+Tweak scripts are the most importain thing to happen to Rubble since version 1. They allow you to run arbitrary scripts before or after generation. These scripts can change the raws, allowing you to "tweak" the generated output.
+
+Tweak scripts are written in NCA not Rubble code, so Rubble templates are not avalible except through rubble:calltemplate.
+Each tweak script runs in its own environment just like a NCA user command. The params array is NOT set!
+
+Most tweak scripts will make use of the commands in the raw namespace to walk the raw files and make changes as needed.
+
+As for writing your own tweak scripts... Its complicated, I suggest you not try unless you have a good understanding of the NCA launguage. It would be a very good idea to read the tweak scripts included with Rubble, if you do not understand those (rather simple) scripts then you will have trouble writing your own.
+
+Pitfalls to keep in mind:
+	break, if and loop interaction
+		break is not at all like the break keyword in most programing launguages, for example this example will not work as expected:
+			(loop {
+				(if (int:eq 1 1) {
+					(console:print "1==1")
+					(break false)
+				})
+				(console:print "1!=1 O_O")
+				(break true)
+			})
+		The first break will just make the if command return false. To get the loop to exit you will need to make sure the if command is the last command in the loop. This example is easy to fix, just move the last two commands to the if commands false block, but in many cases it is not so easy. NCA code tends to be deaply nested because of this problem.
+		The reason that break works the way it does is that break is simply a "soft" return, eg it returns at most one block.
+		
+		In Rubble 2.0 (which uses the latest NCA7) you can use the new breakif command. The above example rewritten with breakif:
+			(loop {
+				(if (int:eq 1 1) {
+					(console:print "1==1")
+					(break false)
+				})
+				(breakif (bool:not (nop)) false)
+				(console:print "1!=1 O_O")
+				(break true)
+			})
+		Note the use of nop, this may not always work! (it will in this case) it depends on the order of the commands as the return register is used any time a value is fetched.
+	
+	ret
+		ret will return from the WHOLE SCRIPT, this makes it unsutible for use as as break replacement, unless you want to abuse user commands (not a good idea).
+	
+	Declaring variables in loop and foreach
+		To put it simply, you can't. Or rather you can, but rubble will crash with an error on the next iteration. Remember to declare your variables ahead of time and if you REALLY don't want them around after the loop exits just delvar them away.
+
+==============================================
+Other Random Information:
+==============================================
+
+If you want to allow an item, reaction, or building with a minimum of fuss register it as class "ADDON_HOOK_MOUNTAIN" or "ADDON_HOOK_PLAYABLE". Addon hooks also exist for the other entities.
+
+If you are making a template that takes a variable number of params and you want to impliment it via a different template you may need the ... param.
+Example:
+	{!TEMPLATE;E;
+		{ECHO;...}
+	}
+If Rubble finds a template call where the last param is ... it appends the params from the previous template call to the current template's params. This trick is good for aliases.
+
+There is no check for infinite recursion, so make sure you never recurse without breaking out at some point (unless you want to cause an infinite loop and eat all your memory until Rubble crashes)

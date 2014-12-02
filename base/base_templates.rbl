@@ -1,0 +1,691 @@
+
+'Templates used in the base
+
+Note that to keep the output properly formatted templates often have ugly indentation'
+
+'Load some helpful commands.
+These commands are generally called the "NCASH predefs" as they are loaded by 
+NCASH when it is started with the default settings.'
+{!SCRIPT;
+	'increment variable'
+	(command ++ __name__ {
+		(set [__name__] (int:add [[__name__]] 1))
+	})
+	
+	'decrement variable'
+	(command -- name {
+		(set [name] (int:sub [[name]] 1))
+	})
+	
+	'for loop'
+	(command for __init__ __test__ __incriment__ __code__ {
+		(eval [__init__])
+		(loop {
+			(if (evalinnew [__test__]) {
+				(evalinnew [__code__])
+				(evalinnew [__incriment__])
+				(break true)
+			}{
+				(break 0)
+			})
+		})
+	})
+	
+	'simple while loop'
+	(command while __test__ __code__ {
+		(loop {
+			(if (evalinnew [__test__]) {
+				(evalinnew [__code__])
+				(break true)
+			}{
+				(break 0)
+			})
+		})
+	})
+	
+	'include a file'
+	'requires the file io commands to be loaded'
+	(command include __path__ {
+		(evalinparent (fileio:read [__path__]))
+	})
+}
+
+
+'The comment templates, very simple, just do nothing.'
+{!TEMPLATE;COMMENT;}
+{!TEMPLATE;C;}
+
+{!SCRIPT_TEMPLATE;VOID;...;
+	(foreach [params] {
+		'Note that params here is NOT the same array as the one passed to foreach'
+		(rubble:stageparse [params 1])
+		(break true)
+	})
+	(ret "")
+}
+
+'PANIC, cause Rubble to exit with an error, not used in the base.'
+{!SCRIPT_TEMPLATE;!PANIC;msg;
+	(panic [msg])
+}
+{!SCRIPT_TEMPLATE;PANIC;msg;
+	(panic [msg])
+}
+{!SCRIPT_TEMPLATE;#PANIC;msg;
+	(panic [msg])
+}
+
+'The next two templates are for stripping leading/trailing whitespace from a string.
+A formatting tool mostly, helps keep whitespace under control in generated files.
+May also be used to help control variable expansion.'
+{!SCRIPT_TEMPLATE;ECHO;...;
+	(var tmp)
+	(foreach [params] {
+		(set tmp (str:add [tmp] [params 1]))
+	})
+	(rubble:stageparse [tmp])
+}
+{!TEMPLATE;E;{ECHO;...}}
+
+{!SCRIPT;(var rubble:shared_object_data <map>)}
+{!SCRIPT_TEMPLATE;SHARED_OBJECT;id;raws;
+	(if (exists [rubble:shared_object_data] [id]){
+		(rubble:stageparse [raws])
+		(ret "")
+	}{
+		(set [rubble:shared_object_data] [id] true)
+		(rubble:stageparse [raws])
+	})
+}
+{!SCRIPT_TEMPLATE;SHARED_OBJECT_EXISTS;id;then;else=;
+	(if (exists [rubble:shared_object_data] [id]) {
+		(rubble:stageparse [then])
+	}{
+		(rubble:stageparse [else])
+	})
+}
+
+{!SCRIPT_TEMPLATE;IF;a;b;then;else=;
+	(if (str:cmp [a] [b]){
+		(rubble:stageparse [then])
+	}{
+		(rubble:stageparse [else])
+	})
+}
+
+{!SCRIPT;(var rubble:once_data <map>)}
+{!SCRIPT_TEMPLATE;ONCE;id;raws;
+	(if (exists [rubble:once_data] [id]){
+		(ret "")
+	}{
+		(set [rubble:once_data] [id] true)
+		(rubble:stageparse [raws])
+	})
+}
+
+{!SCRIPT;(var rubble:static_data <map>)}
+{!SCRIPT_TEMPLATE;STATIC;id;raws;
+	(if (exists [rubble:static_data] [id]){
+		(ret [rubble:static_data [id])
+	}{
+		(set [rubble:static_data] [id] (rubble:stageparse [raws]))
+	})
+}
+
+{!SCRIPT_TEMPLATE;SET;name;value;
+	(rubble:setvar [name] [value])
+	(ret "")
+}
+
+{!SCRIPT;(var rubble:adventure_tier_data 0)}
+{!SCRIPT_TEMPLATE;#ADVENTURE_TIER;
+	(set rubble:adventure_tier_data (int:add [rubble:adventure_tier_data] 1))
+	(ret (str:add "[ADVENTURE_TIER:" [rubble:adventure_tier_data] "]"))
+}
+
+'This refactoring made possible by NCA5'
+{!SCRIPT;(command rubble:print params {
+	(foreach [params] {
+		(console:print "    " (rubble:expandvars [params 1]) "\n")
+		(break true)
+	})
+	(ret "")
+})}
+{!SCRIPT_TEMPLATE;!PRINT;...;
+	(rubble:print [params])
+}
+{!SCRIPT_TEMPLATE;PRINT;...;
+	(rubble:print [params])
+}
+{!SCRIPT_TEMPLATE;#PRINT;...;
+	(rubble:print [params])
+}
+
+{!SCRIPT_TEMPLATE;SHARED_PLANT;id;raws;
+	'Tree Tiles'
+	(regex:replace "\\[TREE_TILE:([0-9]+|'.')\\]" [raws] (str:add "[TREE_TILE:{#TILE;TREE_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[DEAD_TREE_TILE:([0-9]+|'.')\\]" [raws] (str:add "[DEAD_TREE_TILE:{#TILE;DEAD_TREE_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[SAPLING_TILE:([0-9]+|'.')\\]" [raws] (str:add "[SAPLING_TILE:{#TILE;SAPLING_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[DEAD_SAPLING_TILE:([0-9]+|'.')\\]" [raws] (str:add "[DEAD_SAPLING_TILE:{#TILE;DEAD_SAPLING_" [id] ";$1}]"))
+	(set raws (nop))
+	
+	'Tree Colors'
+	(regex:replace "\\[TREE_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[TREE_COLOR:{#COLOR;TREE_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[DEAD_TREE_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DEAD_TREE_COLOR:{#COLOR;DEAD_TREE_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[SAPLING_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[SAPLING_COLOR:{#COLOR;SAPLING_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[DEAD_SAPLING_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DEAD_SAPLING_COLOR:{#COLOR;DEAD_SAPLING_" [id] ";$1}]"))
+	(set raws (nop))
+	
+	'Crop Tiles'
+	(regex:replace "\\[PICKED_TILE:([0-9]+|'.')\\]" [raws] (str:add "[PICKED_TILE:{#TILE;PICKED_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[DEAD_PICKED_TILE:([0-9]+|'.')\\]" [raws] (str:add "[DEAD_PICKED_TILE:{#TILE;DEAD_PICKED_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[SHRUB_TILE:([0-9]+|'.')\\]" [raws] (str:add "[SHRUB_TILE:{#TILE;SHRUB_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[DEAD_SHRUB_TILE:([0-9]+|'.')\\]" [raws] (str:add "[DEAD_SHRUB_TILE:{#TILE;DEAD_SHRUB_" [id] ";$1}]"))
+	(set raws (nop))
+	
+	'Crop Colors'
+	(regex:replace "\\[PICKED_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[PICKED_COLOR:{#COLOR;PICKED_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[DEAD_PICKED_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DEAD_PICKED_COLOR:{#COLOR;DEAD_PICKED_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[SHRUB_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[SHRUB_COLOR:{#COLOR;SHRUB_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[DEAD_SHRUB_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DEAD_SHRUB_COLOR:{#COLOR;DEAD_SHRUB_" [id] ";$1}]"))
+	(set raws (nop))
+	
+	'Grass Tiles'
+	(regex:replace "\\[GRASS_TILES:((?:[0-9]+|'.'):(?:[0-9]+|'.'):(?:[0-9]+|'.'):(?:[0-9]+|'.'))\\]" [raws] (str:add "[GRASS_TILES:{#TILE;GRASS_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[ALT_GRASS_TILES:((?:[0-9]+|'.'):(?:[0-9]+|'.'):(?:[0-9]+|'.'):(?:[0-9]+|'.'))\\]" [raws] (str:add "[ALT_GRASS_TILES:{#TILE;ALT_GRASS_" [id] ";$1}]"))
+	(set raws (nop))
+	
+	'Grass Colors'
+	(regex:replace "\\[GRASS_COLORS:((?:[0-9]+:[0-9]+:[0-9]+):(?:[0-9]+:[0-9]+:[0-9]+):(?:[0-9]+:[0-9]+:[0-9]+):(?:[0-9]+:[0-9]+:[0-9]+))\\]" [raws] (str:add "[GRASS_COLORS:{#COLOR;GRASS_" [id] ";$1}]"))
+	(set raws (nop))
+	
+	(str:add
+		"{SHARED_OBJECT;" [id] ";\n"
+		"[PLANT:" [id] "]\n\t"
+		[raws]
+		"\n}"
+	)
+	(rubble:stageparse (nop))
+}
+
+{!SCRIPT_TEMPLATE;SHARED_INORGANIC;id;raws;
+	(regex:replace "\\[ITEM_SYMBOL:([0-9]+|'.')\\]" [raws] (str:add "[ITEM_SYMBOL:{#TILE;ITEM_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[TILE:([0-9]+|'.')\\]" [raws] (str:add "[TILE:{#TILE;" [id] ";$1}]"))
+	(set raws (nop))
+	
+	(regex:replace "\\[DISPLAY_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DISPLAY_COLOR:{#COLOR;" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[BUILD_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[BUILD_COLOR:{#COLOR;BUILD_" [id] ";$1}]"))
+	(set raws (nop))
+	
+	(str:add
+		"{SHARED_OBJECT;" [id] ";\n"
+		"[INORGANIC:" [id] "]\n\t"
+		[raws]
+		"{#_REGISTERED_ORES;" [id] "}"
+		"{#_REGISTERED_REACTION_CLASSES;" [id] "}"
+		"{#_REGISTERED_REACTION_PRODUCTS;" [id] "}"
+		"\n}"
+	)
+	(rubble:stageparse (nop))
+}
+{!SCRIPT_TEMPLATE;SHARED_MATERIAL_TEMPLATE;id;raws;
+	(regex:replace "\\[ITEM_SYMBOL:([0-9]+|'.')\\]" [raws] (str:add "[ITEM_SYMBOL:{#TILE;ITEM_SYMBOL_" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[TILE:([0-9]+|'.')\\]" [raws] (str:add "[TILE:{#TILE;" [id] ";$1}]"))
+	(set raws (nop))
+	
+	(regex:replace "\\[DISPLAY_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DISPLAY_COLOR:{#COLOR;" [id] ";$1}]"))
+	(set raws (nop))
+	(regex:replace "\\[BUILD_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[BUILD_COLOR:{#COLOR;BUILD_" [id] ";$1}]"))
+	(set raws (nop))
+	
+	(str:add
+		"{SHARED_OBJECT;" [id] ";\n"
+		"[MATERIAL_TEMPLATE:" [id] "]\n\t"
+		[raws]
+		"{#_REGISTERED_ORES;" [id] "}"
+		"{#_REGISTERED_REACTION_CLASSES;" [id] "}"
+		"{#_REGISTERED_REACTION_PRODUCTS;" [id] "}"
+		"\n}"
+	)
+	(rubble:stageparse (nop))
+}
+
+{!SCRIPT;(var rubble:ore_data <map>)}
+{!SCRIPT_TEMPLATE;REGISTER_ORE;id;metal;amount;
+	(if (exists [rubble:ore_data] [id]){
+	}{
+		(set [rubble:ore_data] [id] <map>)
+	})
+	
+	(if (exists [rubble:ore_data [id]] [metal]){
+	}{
+		(set [rubble:ore_data [id]] [metal] [amount])
+		(ret "")
+	})
+	
+	(if (int:lt [rubble:ore_data [id] [metal]] [amount]){
+		(set [rubble:ore_data [id]] [metal] [amount])
+	})
+	(ret "")
+}
+{!SCRIPT_TEMPLATE;#_REGISTERED_ORES;id;
+	(var out)
+	
+	(if (exists [rubble:ore_data] [id]){
+	}{
+		(ret "")
+	})
+	
+	(foreach [rubble:ore_data [id]] {
+		(set out (str:add [out] "\n\t[METAL_ORE:" [params 0] ":" [params 1] "]"))
+		(break true)
+	})
+	(ret [out])
+}
+
+{!SCRIPT;(var rubble:reaction_class_data <map>)}
+{!SCRIPT_TEMPLATE;REGISTER_REACTION_CLASS;id;class;
+	(if (exists [rubble:reaction_class_data] [id]){
+	}{
+		(set [rubble:reaction_class_data] [id] <map>)
+		(set [rubble:reaction_class_data [id]] [class] true)
+		(ret "")
+	})
+	
+	(if (exists [rubble:reaction_class_data [id]] [class]){
+	}{
+		(set [rubble:reaction_class_data [id]] [class] true)
+	})
+	(ret "")
+}
+{!SCRIPT_TEMPLATE;#_REGISTERED_REACTION_CLASSES;id;
+	(if (exists [rubble:reaction_class_data] [id]){
+	}{
+		(ret "")
+	})
+	
+	(var out)
+	(foreach [rubble:reaction_class_data [id]] {
+		(set out (str:add [out] "\n\t[REACTION_CLASS:" [params 0] "]"))
+		(break true)
+	})
+	(ret [out])
+}
+
+{!SCRIPT;(var rubble:reaction_product_data <map>)}
+{!SCRIPT_TEMPLATE;REGISTER_REACTION_PRODUCT;id;class;mat;
+	(if (exists [rubble:reaction_product_data] [id]){
+	}{
+		(set [rubble:reaction_product_data] [id] <map>)
+		(set [rubble:reaction_product_data [id]] [class] [mat])
+		(ret "")
+	})
+	
+	(if (exists [rubble:reaction_product_data [id]] [class]){
+	}{
+		(set [rubble:reaction_product_data [id]] [class] [mat])
+	})
+	(ret "")
+}
+{!SCRIPT_TEMPLATE;#_REGISTERED_REACTION_PRODUCTS;id;
+	(if (exists [rubble:reaction_product_data] [id]){
+	}{
+		(ret "")
+	})
+	
+	(var out)
+	(foreach [rubble:reaction_product_data [id]] {
+		(set out (str:add [out] "\n\t[MATERIAL_REACTION_PRODUCT:" [params 0] ":" [params 1] "]"))
+		(break true)
+	})
+	(ret [out])
+}
+
+{!SCRIPT_TEMPLATE;#AQUIFER;
+	(if (str:cmp (rubble:getvar USE_AQUIFERS) "YES"){
+		(ret "[AQUIFER]")
+	}{
+		(ret "AQUIFER Disabled")
+	})
+}
+
+{!SCRIPT;
+	(var rubble:tile_data <map>)
+	(var rubble:color_data <map>)
+	(var rubble:tileset <array>)
+}
+{!SCRIPT_TEMPLATE;SET_TILE;id;tile;
+	(if (exists [rubble:tile_data] [id]){
+	}{
+		(set [rubble:tile_data] [id] [tile])
+	})
+	(ret "")
+}
+{!SCRIPT_TEMPLATE;#TILE;id;default;
+	(set [rubble:tileset] (len [rubble:tileset]) (str:add "{SET_TILE;" [id] ";" [default] "}"))
+	(if (exists [rubble:tile_data] [id]){
+		(ret [rubble:tile_data [id]])
+	}{
+		(ret [default])
+	})
+}
+{!SCRIPT_TEMPLATE;SET_COLOR;id;color;
+	(if (exists [rubble:color_data] [id]){
+	}{
+		(set [rubble:color_data] [id] [color])
+	})
+	(ret "")
+}
+{!SCRIPT_TEMPLATE;#COLOR;id;default;
+	(set [rubble:tileset] (len [rubble:tileset]) (str:add "{SET_COLOR;" [id] ";" [default] "}"))
+	(if (exists [rubble:color_data] [id]){
+		(ret [rubble:color_data [id]])
+	}{
+		(ret [default])
+	})
+}
+{!SCRIPT_TEMPLATE;#WRITE_TILESET;path;
+	(var out "\n")
+	(foreach [rubble:tileset] {
+		(set out (str:add [out] [params 1] "\n"))
+		(break true)
+	})
+	(fileio:write [path] [out])
+	(ret "")
+}
+
+'Tech Templates'
+{!SCRIPT;(var rubble:building_data <map>)}
+{!SCRIPT_TEMPLATE;BUILDING_WORKSHOP;...;
+	(if (int:lt (len [params]) 2){(panic "Invalid param count to BUILDING_WORKSHOP.")})
+	
+	(var id [params 0])
+	(for {(var count 1)}{(int:lt [count] (len [params]))}{(++ count)}{
+		(var class [params [count]])
+		
+		(if (exists [rubble:building_data] [class]){
+			(set [rubble:building_data [class]] (len [rubble:building_data [class]]) [id])
+		}{
+			(set [rubble:building_data] [class] <array>)
+			(set [rubble:building_data [class]] (len [rubble:building_data [class]]) [id])
+		})
+	})
+	(str:add "[BUILDING_WORKSHOP:" [id] "]")
+}
+{!SCRIPT_TEMPLATE;BUILDING_FURNACE;...;
+	(if (int:lt (len [params]) 2){(panic "Invalid param count to BUILDING_FURNACE.")})
+	
+	(var id [params 0])
+	(for {(var count 1)}{(int:lt [count] (len [params]))}{(++ count)}{
+		(var class [params [count]])
+		
+		(if (exists [rubble:building_data] [class]){
+			(set [rubble:building_data [class]] (len [rubble:building_data [class]]) [id])
+		}{
+			(set [rubble:building_data] [class] <array>)
+			(set [rubble:building_data [class]] (len [rubble:building_data [class]]) [id])
+		})
+	})
+	(str:add "[BUILDING_FURNACE:" [id] "]")
+}
+{!SCRIPT_TEMPLATE;#USES_BUILDINGS;...;
+	(if (int:lt (len [params]) 1){(panic "Invalid param count to #USES_BUILDINGS.")})
+	
+	(var buildings <map>)
+	(var buildingnames <array>)
+	(foreach [params] {
+		(var class [params 1])
+		(if (exists [rubble:building_data] [class]){
+			(foreach [rubble:building_data [class]] {
+				(if (exists [buildings] [params 1]){
+					'nop'
+				}{
+					(set [buildings] [params 1] "ok")
+					(set [buildingnames] (len [buildingnames]) [params 1])
+				})
+				(break true)
+			})
+		})
+		(break true)
+	})
+	
+	(var out)
+	(foreach [buildingnames] {
+		(set out (str:add [out] "\n\t[PERMITTED_BUILDING:" [params 1] "]"))
+		(break true)
+	})
+	(ret (str:trimspace [out]))
+}
+
+{!SCRIPT;(var rubble:reaction_data <map>)}
+{!SCRIPT_TEMPLATE;REACTION;...;
+	(if (int:lt (len [params]) 2){(panic "Invalid param count to REACTION.")})
+	
+	(var id [params 0])
+	(for {(var count 1)}{(int:lt [count] (len [params]))}{(++ count)}{
+		(var class [params [count]])
+		
+		(if (exists [rubble:reaction_data] [class]){
+			(set [rubble:reaction_data [class]] (len [rubble:reaction_data [class]]) [id])
+		}{
+			(set [rubble:reaction_data] [class] <array>)
+			(set [rubble:reaction_data [class]] (len [rubble:reaction_data [class]]) [id])
+		})
+	})
+	(str:add "[REACTION:" [id] "]")
+}
+{!SCRIPT_TEMPLATE;#USES_REACTIONS;...;
+	(if (int:lt (len [params]) 1){(panic "Invalid param count to #USES_REACTIONS.")})
+	
+	(var reactions <map>)
+	(var reactionnames <array>)
+	(foreach [params] {
+		(var class [params 1])
+		(if (exists [rubble:reaction_data] [class]){
+			(foreach [rubble:reaction_data [class]] {
+				(if (exists [reactions] [params 1]){
+					'nop'
+				}{
+					(set [reactions] [params 1] "ok")
+					(set [reactionnames] (len [reactionnames]) [params 1])
+				})
+				(break true)
+			})
+		})
+		(break true)
+	})
+	
+	(var out)
+	(foreach [reactionnames] {
+		(set out (str:add [out] "\n\t[PERMITTED_REACTION:" [params 1] "]"))
+		(break true)
+	})
+	(ret (str:trimspace [out]))
+}
+
+{!SCRIPT_TEMPLATE;#USES_TECH;...;
+	(if (int:lt (len [params]) 1){(panic "Invalid param count to #USES_TECH.")})
+	
+	(var buildings <map>)
+	(var buildingnames <array>)
+	(var reactions <map>)
+	(var reactionnames <array>)
+	(foreach [params] {
+		(var class [params 1])
+		(if (exists [rubble:building_data] [class]){
+			(foreach [rubble:building_data [class]] {
+				(if (exists [buildings] [params 1]){
+					'nop'
+				}{
+					(set [buildings] [params 1] true)
+					(set [buildingnames] (len [buildingnames]) [params 1])
+				})
+				(break true)
+			})
+		})
+		(if (exists [rubble:reaction_data] [class]){
+			(foreach [rubble:reaction_data [class]] {
+				(if (exists [reactions] [params 1]){
+					'nop'
+				}{
+					(set [reactions] [params 1] true)
+					(set [reactionnames] (len [reactionnames]) [params 1])
+				})
+				(break true)
+			})
+		})
+		(break true)
+	})
+	
+	(var out)
+	(foreach [buildingnames] {
+		(set out (str:add [out] "\n\t[PERMITTED_BUILDING:" [params 1] "]"))
+		(break true)
+	})
+	(foreach [reactionnames] {
+		(set out (str:add [out] "\n\t[PERMITTED_REACTION:" [params 1] "]"))
+		(break true)
+	})
+	(ret (str:trimspace [out]))
+}
+
+'Item templates'
+{!SCRIPT;
+	(var rubble:item_current_id "")
+	(var rubble:item_current_type "")
+	
+	(var rubble:item_types <map
+		AMMO=false
+		ARMOR=true
+		DIGGER=false
+		GLOVES=true
+		HELM=true
+		INSTRUMENT=false
+		PANTS=true
+		SHIELD=false
+		SHOES=true
+		SIEGEAMMO=false
+		TOOL=false
+		TOY=false
+		TRAPCOMP=false
+		WEAPON=false
+	>)
+	
+	(var rubble:item_rarities <map
+		RARE=1
+		UNCOMMON=2
+		COMMON=3
+		FORCED=4
+	>)
+	
+	(var rubble:item_data <map>)
+}
+{!SCRIPT_TEMPLATE;ITEM;type;id;def;
+	(set rubble:item_current_id [id])
+	(set rubble:item_current_type [type])
+	
+	(if (exists [rubble:item_types] [type]){
+	}{
+		(panic "Invalid item type passed to ITEM.")
+	})
+	
+	(rubble:stageparse (str:add "{SHARED_OBJECT;" [id] ";\n[ITEM_" [type] ":" [id] "]\n\t" [def] "\n}"))
+}
+{!SCRIPT_TEMPLATE;ITEM_CLASS;...;
+	(var type [rubble:item_current_type])
+	(var id [rubble:item_current_id])
+	(var class "")
+	(var rarity "COMMON")
+	
+	(if (int:eq (len [params]) 1){ 'class only'
+		(set class [params 0])
+	}{
+		(if (int:eq (len [params]) 2){ 'class + rarity'
+			(set class [params 0])
+			(set rarity [params 1])
+		}{
+			(if (int:eq (len [params]) 3){ 'all but rarity'
+				(set type [params 0])
+				(set id [params 1])
+				(set class [params 2])
+			}{
+				(if (int:eq (len [params]) 4){ 'full call'
+					(set type [params 0])
+					(set id [params 1])
+					(set class [params 2])
+					(set rarity [params 3])
+				}{
+					(panic "Invalid param count to ITEM_CLASS.")
+				})
+			})
+			
+		})
+	})
+	
+	(if (exists [rubble:item_rarities] [rarity]){
+	}{
+		(panic "Invalid item rarity passed to ITEM_CLASS.")
+	})
+	
+	(if (exists [rubble:item_data] [class]){
+		(if (exists [rubble:item_data [class]] [rubble:item_current_id]) {
+		}{
+			(set [rubble:item_data [class]] [rubble:item_current_id] <map
+				rarity=[rarity]
+				type=[rubble:item_current_type]
+			>)
+		})
+	}{
+		(set [rubble:item_data] [class] <map
+			[rubble:item_current_id]=<map
+				rarity=[rarity]
+				type=[rubble:item_current_type]
+			>
+		>) 
+	})
+	(ret "")
+}
+{!SCRIPT_TEMPLATE;#USES_ITEMS;class;
+	(var out)
+	(if (exists [rubble:item_data] [class]){
+		(foreach [rubble:item_data [class]] {
+			(var type [rubble:item_data [class] [params 0] type])
+			(var rarity [rubble:item_data [class] [params 0] rarity])
+			(if [rubble:item_types [type]] {
+				'Has rarity'
+				(set out (str:add [out] "\n\t[" [type] ":" [params 0] ":" [rarity] "]"))
+			}{
+				'Does not have rarity'
+				(set out (str:add [out] "\n\t[" [type] ":" [params 0] "]"))
+			})
+			(break true)
+		})
+	})
+	(str:trimspace [out])
+}
+
+{!SCRIPT_TEMPLATE;ADDON_HOOKS;id;playable=false;
+	(str:add
+		"{#USES_ITEMS;ADDON_HOOK_" [id] "}"
+		"{#USES_TECH;ADDON_HOOK_" [id] "}"
+		"{#USES_ITEMS;ADDON_HOOK_GENERIC}"
+		"{#USES_TECH;ADDON_HOOK_GENERIC}"
+		(if [playable] {{{#USES_ITEMS;ADDON_HOOK_PLAYABLE}{#USES_TECH;ADDON_HOOK_PLAYABLE}}} {{}})
+	)
+}

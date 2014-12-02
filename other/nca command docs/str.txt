@@ -1,0 +1,90 @@
+PACKAGE
+
+package str
+    import "dctech/nca7/commands/str"
+
+    NCA v7 String Commands.
+
+FUNCTIONS
+
+func CommandStr_Add(state *nca7.State, params []*nca7.Value)
+    Appends two or more strings together.
+
+	str:add a b [c...]
+
+    Returns the result of appending all parameters together.
+
+func CommandStr_Char(state *nca7.State, params []*nca7.Value)
+    Gets char at pos.
+
+	str:char a pos
+
+    Opperand pos is converted to a 64 bit integer. Invalid strings are given
+    the value "0" If the position is out of range returns unchanged and sets
+    the error flag. Returns the character.
+
+func CommandStr_Cmp(state *nca7.State, params []*nca7.Value)
+    Compair two strings.
+
+	str:cmp a b
+
+    Returns true or false.
+
+func CommandStr_Fmt(state *nca7.State, params []*nca7.Value)
+    Formats a string.
+
+	str:fmt format values...
+
+    valid format "verbs" for fmtstr:
+
+	%% literal percent
+	%s the raw string
+	%d as a decimal number
+	%x as a lowercase hexadecimal number
+	%X as an upercase hexadecimal number
+
+    Returns the formated string.
+
+func CommandStr_Left(state *nca7.State, params []*nca7.Value)
+    Return x charecters from the left side of a string.
+
+	str:left str x
+
+    Returns the new string or (if the index is out of range) returns the
+    string and sets the error flag.
+
+func CommandStr_Len(state *nca7.State, params []*nca7.Value)
+    Gets the length of a string.
+
+	str:len a
+
+    Returns the length.
+
+func CommandStr_Right(state *nca7.State, params []*nca7.Value)
+    Return x charecters from the right side of a string.
+
+	str:right str x
+
+    Returns the new string or (if the index is out of range) returns the
+    string and sets the error flag.
+
+func CommandStr_TrimSpace(state *nca7.State, params []*nca7.Value)
+    Trims leading and trailing whitespace from a string.
+
+	str:trimspace str
+
+    Returns str with leading and trailing whitespace removed.
+
+func Setup(state *nca7.State)
+    Adds the string commands to the state. The string commands are:
+
+	str:add
+	str:trimspace
+	str:len
+	str:char
+	str:fmt
+	str:cmp
+	str:left
+	str:right
+
+
