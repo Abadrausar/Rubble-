@@ -1,13 +1,4 @@
 
-(if (exists [rubble:raws] "user_tilesets_mlc_dfhack_twbt.post.rex") {
-	(axis:write [rubble:fs] "out:prep/user_tilesets_mlc_dfhack_twbt.prep.rex" [rubble:raws "user_tilesets_mlc_dfhack_twbt.post.rex"])
-	
-	(rubble:prepfile "MLC 16x16 - Font.png")
-	(rubble:prepfile "MLC 16x16 - Graphics.png")
-	(rubble:prepfile "MLC 16x16 - Overrides.png")
-	(rubble:prepfile "user_tilesets_mlc_dfhack_twbt_overrides.txt")
-})
-
 (rubble:open_d_init)
 (rubble:edit_d_init "PILLAR_TILE" "141")
 
@@ -44,7 +35,7 @@
 (rubble:edit_d_init "TRACK_RAMP_NSEW" "30")
 (rubble:close_d_init)
 
-(axis:write [rubble:fs] "df:data/init/overrides.txt" [rubble:raws "user_tilesets_mlc_dfhack_twbt_overrides.txt"])
+(axis:write [rubble:fs] "df:data/init/overrides.txt" [rubble:raws "user_tilesets_mlc_dfhack_twbt.rbl"])
 
 (rubble:install_tilesheet "MLC 16x16 - Font.png")
 (rubble:install_tilesheet "MLC 16x16 - Graphics.png")

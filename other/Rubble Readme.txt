@@ -42,7 +42,8 @@ Modders will want to read the following (in most-important-first order):
 Install:
 ==============================================
 
-If you have anything in your Dwarf Fortress directory that you want to keep back it up! Rubble will delete all your existing raw files, including creature graphics and the DFHack onLoad.init and init.lua files (and maybe a few other things)!
+If you have anything in your Dwarf Fortress directory that you want to keep back it up! Rubble will delete all your existing raw files, including creature graphics and the DFHack onLoad.init and init.lua files (and many other things)!
+Anything outside of your "data/init" and "raw" directories should be safe, but just in case...
 
 Delete or otherwise remove any old Rubble version you may have.
 Extract the new Rubble to "<DF Directory>/rubble".
@@ -54,7 +55,7 @@ Now you are good to go!
 DO NOT extract a new Rubble version over an old one! This can cause all sorts of hard to find problems!
 
 If you use OSX or Linux, 32 bit binaries for these OSes are included. If you want 64 bit binaries you can compile them yourself, source code is in "./other/src" (along with basic build instructions).
-To use non-Windows binaries they must be placed in the same directory as the windows ones (you can delete the windows binaries if you don't need them). OSX binaries are in "./other/darwin_386", Linux binaries may be found in "./other/linux_386".
+To use non-Windows binaries they must be placed in the same directory as the Windows ones (you can delete the Windows binaries if you don't need them). OSX binaries are in "./other/darwin_386", Linux binaries may be found in "./other/linux_386".
 For more help see the "Rubble OS Specific Information" section in "Rubble Basics".
 
 ==============================================
@@ -67,7 +68,7 @@ This interface is the recommended way of running Rubble, as it always has full s
 
 To use the web UI all you need to do is start the server (rubble_web) and then point your browser to "http://127.0.0.1:2120" (by default), from there just follow the menus.
 
-To make things easy you can create a batch file or shell script named "./other/webUI/browser" that starts your web browser, the server will try to run this file when it starts. This file will be passed the URL for the main menu as an argument, the script should pass this argument through to the browser (so the page opens automatically).
+To make things easy you can create a batch file or shell script in "./other/webUI" named "browser" that starts your web browser, the server will try to run this file when it starts. This file will be passed the URL for the main menu as an argument, the script should pass this argument through to the browser (so the page opens automatically).
 Rubble comes with default scripts for Windows and Linux that should "just work" on most systems.
 For more help with the browser startup script see the "Rubble Web UI Customization" section in "Rubble Basics".
 
@@ -92,16 +93,34 @@ For basic documentation on each command line option run "rubble -h".
 
 Common Tasks:
 
-To activate or deactivate a Rubble addon manually you may set it's entry in addons/addonlist.ini to "true" or "false". If you just installed an addon it will not have an entry until Rubble has run at least once (after the addon was installed). 
-If you want to run Rubble without generating anything so as to update the addon list file just run 'rubble -addonlist'.
+To activate or deactivate a Rubble addon manually you may set it's entry in "addons:dir:addonlist.ini" to "true" or "false". If you just installed an addon it will not have an entry until Rubble has run at least once (after the addon was installed). 
+If you want to run Rubble without generating anything (so as to update the addon list file) just run 'rubble -addonlist'.
 It is possible to specify addons manually as well, just use -addons.
+
+To generate with the last used addons (aka the settings in "addons:dir:addonlist.ini") just run Rubble with no arguments.
+
+Here are a few example command lines to generate various configurations:
+	Vanilla (ignoring the addon list, but not rubble.ini):
+		rubble -addons="Base"
+	
+	Vanilla (ignoring all external settings):
+		rubble -zapaddons -zapconfig -addons="Base"
+	
+	Vanilla with Phoebus tile mappings:
+		rubble -addons="Base;User/Tilesets/Phoebus"
 
 Some addons may allow additional configuration via "config variables", these are generally for advanced users and may be specified with the -config command line option.
 
-If you want to run multiple worlds with radically different addon sets it is a good idea to run "rubble -prep=<region name>" before switching worlds (this is mostly only for tilesets now days, other addons should be good to go unless they do something weird and non-standard).
+Example (vanilla with 10 dummy reactions):
+	rubble -addons="Base;Dev/Dummy Reactions" -config="DEV_DUMMY_REACTION_COUNT=10"
 
-All the Rubble default addons are deterministic, meaning that it is possible to generate the raws twice and (as long as you use the same addons) each time the raws will be exactly the same. This makes it possible to regenerate the raws for a world to allow things like switching tilesets. Unfortunately this is a semi-complicated task to handle by hand, as there is a lot of overhead that the web UI would normally have handled that command line users will have to do manually.
-The first step is to change the "addonlist.ini" file that is in the worlds raw directory, make sure not to change it too much or you can mess up your world!
+To switch tilesets on a world in progress use `rubble -tileset="<region name>" -addons="<name of tileset addon>"`.
+
+For example to switch "region1" to ASCII mappings:
+	rubble -tileset="region1" -addons="User/Tilesets/ASCII"
+
+It is generally possible to regenerate the raws for a world, this is a task fraught with peril, do not attempt unless you know what you are doing!
+The first step is to change the "addonlist.ini" file that is in the world's raw directory, make sure not to change it too much or you can mess up your world!
 If you wish you can change "genconfig.ini" as well, but that is usually a bad idea.
 Now for regenerating the raws, what follows is an example command line to do that for the save "region1":
 	rubble -zapaddons -zapconfig -addons="df:data/save/region1/raw/addonlist.ini" -config="df:data/save/region1/raw/genconfig.ini" -outputdir="df:data/save/region1/raw"

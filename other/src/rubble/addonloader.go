@@ -104,6 +104,8 @@ func (state *State) loadAddon(addonname, path string) {
 			RaiseError("Addon meta file for: " + addonname + " did not return a rubble:addonmeta value!")
 		}
 		addon.Meta = meta
+	} else {
+		addon.Meta = NewMeta()
 	}
 	
 	// Load Files
@@ -115,6 +117,9 @@ func (state *State) loadAddon(addonname, path string) {
 
 		file := NewAddonFile(filepath, dirpath, content)
 		classifyFile(file, filepath)
+		if file.Tags["TSetFile"] || file.Tags["TSetScript"] {
+			addon.Meta.TSet = true
+		}
 		addon.Files[filepath] = file
 	}
 	state.Addons = append(state.Addons, addon)
@@ -132,19 +137,19 @@ func classifyFile(file *AddonFile, filename string) {
 		return
 	}
 
-	if strings.HasSuffix(filename, ".prep.rex") {
-		file.Tags["PrepFile"] = true
-		return
-	}
-
-	if strings.HasSuffix(filename, ".inst.rex") {
-		file.Tags["InstScript"] = true
+	if strings.HasSuffix(filename, ".tset.rex") {
+		file.Tags["TSetScript"] = true
 		return
 	}
 
 	if strings.HasSuffix(filename, ".rbl") {
 		file.Tags["RawFile"] = true
 		file.Tags["NoWrite"] = true
+		return
+	}
+
+	if strings.HasSuffix(filename, ".tset") {
+		file.Tags["TSetFile"] = true
 		return
 	}
 
@@ -198,10 +203,13 @@ func containsParseable(source axis.DataSource, path string) bool {
 		if strings.HasSuffix(filename, ".post.rex") {
 			return true
 		}
-		if strings.HasSuffix(filename, ".prep.rex") {
+		if strings.HasSuffix(filename, ".tset.rex") {
 			return true
 		}
 		if strings.HasSuffix(filename, ".rbl") {
+			return true
+		}
+		if strings.HasSuffix(filename, ".tset") {
 			return true
 		}
 		if strings.HasSuffix(filename, ".txt") {

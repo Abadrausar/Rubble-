@@ -25,7 +25,7 @@ Rex scripting language.
 
 For a description of the Rex syntax see "Rex Basics.txt" in the docs directory.
 
-Rex has two main parts, the Script and the State.
+The Rex runtime has two main parts, the Script and the State.
 
 The Script handles:
 	Internal execution of script code.
@@ -33,9 +33,8 @@ The Script handles:
 
 The State handles:
 	Compilation of scripts.
-	External execution of script code.
-	Storage of global data (modules, types, and commands)
-	Error handling.
+	External execution of script code (wraps the Script with error handling).
+	Storage of global data (modules)
 
 Generally you will only need one State, as it can be used by several scripts at once, the Script on the other hand
 can only be used by one script at a time (as it's name suggests). The only thing the Script handles that the average
@@ -48,16 +47,8 @@ any of these indexes are different and/or if any expected global data is missing
 Most of the stuff that is exported is there for the use of external command packages and advanced applications, most of
 the time if you don't know what it is for then keep your grubby fingers off!
 
-Rex is still quite new, and so I am sure I have missed a bug or three, if you find something that does not work as
-described feel free to let me know :)
-
-If anyone want to do some bug fixing it can be very helpful to set State.NoRecover, this stops Rex from recovering
-panics (and all errors start as a panic at some level) which makes it much easier to trace internal errors.
-Of course NoRecover is only useful for debugging internal errors, script errors do not generally benefit from this 
-setting (and it can actually make things harder, as then the state never gets a chance to fill in position information).
-
 All panics are recovered and turned into errors before they reach user code except in a few cases:
-	Command package Setup(state) functions only recover panics caused by Rex (type rex.ScriptError).
+	Command package `Setup(state)` functions only recover panics caused by Rex (type rex.ScriptError).
 
 Send patches (*snort*) and bug reports (probably) to: milo.christiansen (at) gmail (dot) com
 
@@ -66,10 +57,11 @@ package rex
 
 /*
  Master TODO List:
-
+	
 	The debug commands need expanding.
 	
-	The ScriptError type should have some type flags that can be used to classify errors into categories.
+	Many errors use ErrTypUndefined, change this!
+	
 	Some predefined ScriptError values may be useful.
 	
 	Look for cases where the error flag should be used but is not.

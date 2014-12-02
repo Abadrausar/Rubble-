@@ -4,7 +4,7 @@
 	[DESCRIPTION:A rolling platform for carrying passengers or cargo.]
 	[NAME:wagon:wagons:wagon]
 	[CASTE_NAME:wagon:wagons:wagon]
-	[CREATURE_TILE:{#TILE;EQUIPMENT_WAGON;;'W'}][COLOR:{#COLOR;EQUIPMENT_WAGON;;6:0:0}]
+	[CREATURE_TILE:'W'][COLOR:6:0:0]
 	[EQUIPMENT_WAGON][COMMON_DOMESTIC]
 	[NOT_BUTCHERABLE]
 	[BODY:WAGON]

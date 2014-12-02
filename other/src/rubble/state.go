@@ -62,27 +62,31 @@ import "dctech/axis/axiszip"
 import "dctech/axis/axisrex"
 
 import "rubble/rblutil"
+import "rubble/rblutil/tset"
 
 // This is a list of all Rubble versions in this series
 // (all the listed versions are assumed to be backwards compatible)
 // Index 0 MUST be the current version!
 var Versions = []string{
-	"5.6",
-	"5.5",
-	"5.4",
-	"5.3",
-	"5.2",
-	"5.1",
-	"5.0",
-	"4.7",
-	"4.6",
-	"4.5",
-	"4.4",
-	"4.3",
-	"4.2",
-	"4.1",
-	"4.0",
-	"pre4",
+	"5.7",
+	
+	// Broke the old tileset support and removed support for prep.
+	//"5.6",
+	//"5.5",
+	//"5.4",
+	//"5.3",
+	//"5.2",
+	//"5.1",
+	//"5.0",
+	//"4.7",
+	//"4.6",
+	//"4.5",
+	//"4.4",
+	//"4.3",
+	//"4.2",
+	//"4.1",
+	//"4.0",
+	//"pre4",
 }
 
 // Parse stage constants
@@ -98,6 +102,7 @@ const (
 	StgPostParse
 	StgGlobalExpand
 	StgPostScripts
+	StgApplyTSet
 	StgWrite
 )
 
@@ -314,7 +319,22 @@ func (state *State) Run(addons, config []string) (err error) {
 		return err
 	}
 
+	state.Log.Println("  Updating the Default Addon List File...")
+	err = state.UpdateAddonList("addons:dir:addonlist.ini")
+	if err != nil {
+		return err
+	}
+	
+	state.Log.Separator()
+	state.Log.Println("Generating Sorted Active File List...")
+	state.Files = NewFileList(state.Addons)
+	
 	err = state.Parse()
+	if err != nil {
+		return err
+	}
+
+	err = state.ApplyTileSet()
 	if err != nil {
 		return err
 	}
@@ -340,7 +360,22 @@ func (state *State) RunPreLoaded(addons, config []string) (err error) {
 		return err
 	}
 
+	state.Log.Println("  Updating the Default Addon List File...")
+	err = state.UpdateAddonList("addons:dir:addonlist.ini")
+	if err != nil {
+		return err
+	}
+	
+	state.Log.Separator()
+	state.Log.Println("Generating Sorted Active File List...")
+	state.Files = NewFileList(state.Addons)
+	
 	err = state.Parse()
+	if err != nil {
+		return err
+	}
+
+	err = state.ApplyTileSet()
 	if err != nil {
 		return err
 	}
@@ -498,9 +533,12 @@ func (state *State) Activate(addons, config []string) (err error) {
 	state.Log.Separator()
 	state.Log.Println("Activating...")
 
-	state.Log.Println("  Clearing Addon Activation State...")
+	state.Log.Println("  Clearing Leftover Addon State Information...")
 	for i := range state.Addons {
 		state.Addons[i].Active = false
+		for _, file := range state.Addons[i].Files {
+			file.Tags["Skip"] = false
+		}
 	}
 	
 	state.Log.Println("  Loading Config Variables...")
@@ -617,18 +655,13 @@ func (state *State) Activate(addons, config []string) (err error) {
 		}
 	}
 	
-	state.Log.Println("  Updating the Default Addon List File...")
-	return state.UpdateAddonList("addons:dir:addonlist.ini")
+	return nil
 }
 
 // Parse handles everything from running init scripts to running post scripts.
 // If an error is returned state.CurrentFile and state.Stage will still be set to their last values.
 func (state *State) Parse() (err error) {
 	defer state.trapError(&err)
-
-	state.Log.Separator()
-	state.Log.Println("Generating Sorted Active File List...")
-	state.Files = NewFileList(state.Addons)
 
 	state.Stage = StgInit
 	state.Log.Separator()
@@ -651,16 +684,16 @@ func (state *State) Parse() (err error) {
 	state.Stage = StgPreScripts
 	state.Log.Separator()
 	state.Log.Println("Running Prescripts...")
-	lfiles := state.Files
-	for _, i := range lfiles.Order {
-		if lfiles.Data[i].Tags["Skip"] || !lfiles.Data[i].Tags["PreScript"] {
+	fl := state.Files
+	for _, i := range fl.Order {
+		if fl.Data[i].Tags["Skip"] || !fl.Data[i].Tags["PreScript"] {
 			continue
 		}
 
-		state.CurrentFile = lfiles.Data[i].Name
+		state.CurrentFile = fl.Data[i].Name
 		state.Log.Println("  " + state.Files.Data[i].Name)
 
-		_, err := state.ScriptState.CompileAndRun(string(lfiles.Data[i].Content), lfiles.Data[i].Name)
+		_, err := state.ScriptState.CompileAndRun(string(fl.Data[i].Content), fl.Data[i].Name)
 		if err != nil {
 			return err
 		}
@@ -670,66 +703,66 @@ func (state *State) Parse() (err error) {
 	state.Log.Separator()
 	state.Log.Println("Preparsing...")
 	for _, i := range state.Files.Order {
-		if lfiles.Data[i].Tags["Skip"] || !lfiles.Data[i].Tags["RawFile"] {
+		if fl.Data[i].Tags["Skip"] || !fl.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		state.CurrentFile = lfiles.Data[i].Name
-		state.Log.Println("  " + lfiles.Data[i].Name)
-		lfiles.Data[i].Content = state.ParseFile(lfiles.Data[i].Content, StgUseCurrent, rex.NewPosition(1, 0, lfiles.Data[i].Name))
+		state.CurrentFile = fl.Data[i].Name
+		state.Log.Println("  " + fl.Data[i].Name)
+		fl.Data[i].Content = state.ParseFile(fl.Data[i].Content, StgUseCurrent, rex.NewPosition(1, 0, fl.Data[i].Name))
 	}
 
 	state.Stage = StgParse
 	state.Log.Separator()
 	state.Log.Println("Parsing...")
 	for _, i := range state.Files.Order {
-		if lfiles.Data[i].Tags["Skip"] || !lfiles.Data[i].Tags["RawFile"] {
+		if fl.Data[i].Tags["Skip"] || !fl.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		state.CurrentFile = lfiles.Data[i].Name
-		state.Log.Println("  " + lfiles.Data[i].Name)
-		lfiles.Data[i].Content = state.ParseFile(lfiles.Data[i].Content, StgUseCurrent, rex.NewPosition(1, 0, lfiles.Data[i].Name))
+		state.CurrentFile = fl.Data[i].Name
+		state.Log.Println("  " + fl.Data[i].Name)
+		fl.Data[i].Content = state.ParseFile(fl.Data[i].Content, StgUseCurrent, rex.NewPosition(1, 0, fl.Data[i].Name))
 	}
 
 	state.Stage = StgPostParse
 	state.Log.Separator()
 	state.Log.Println("Postparsing...")
 	for _, i := range state.Files.Order {
-		if lfiles.Data[i].Tags["Skip"] || !lfiles.Data[i].Tags["RawFile"] {
+		if fl.Data[i].Tags["Skip"] || !fl.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		state.CurrentFile = lfiles.Data[i].Name
-		state.Log.Println("  " + lfiles.Data[i].Name)
-		lfiles.Data[i].Content = state.ParseFile(lfiles.Data[i].Content, StgUseCurrent, rex.NewPosition(1, 0, lfiles.Data[i].Name))
+		state.CurrentFile = fl.Data[i].Name
+		state.Log.Println("  " + fl.Data[i].Name)
+		fl.Data[i].Content = state.ParseFile(fl.Data[i].Content, StgUseCurrent, rex.NewPosition(1, 0, fl.Data[i].Name))
 	}
 
 	state.Stage = StgGlobalExpand
 	state.Log.Separator()
 	state.Log.Println("Expanding Variables...")
-	for _, i := range lfiles.Order {
-		if lfiles.Data[i].Tags["Skip"] || !lfiles.Data[i].Tags["RawFile"] {
+	for _, i := range fl.Order {
+		if fl.Data[i].Tags["Skip"] || !fl.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		state.CurrentFile = lfiles.Data[i].Name
-		state.Log.Println("  " + lfiles.Data[i].Name)
-		lfiles.Data[i].Content = []byte(state.ExpandVars(string(lfiles.Data[i].Content)))
+		state.CurrentFile = fl.Data[i].Name
+		state.Log.Println("  " + fl.Data[i].Name)
+		fl.Data[i].Content = []byte(state.ExpandVars(string(fl.Data[i].Content)))
 	}
 
 	state.Stage = StgPostScripts
 	state.Log.Separator()
 	state.Log.Println("Running Postscripts...")
-	for _, i := range lfiles.Order {
-		if lfiles.Data[i].Tags["Skip"] || !lfiles.Data[i].Tags["PostScript"] {
+	for _, i := range fl.Order {
+		if fl.Data[i].Tags["Skip"] || !fl.Data[i].Tags["PostScript"] {
 			continue
 		}
 
-		state.CurrentFile = lfiles.Data[i].Name
+		state.CurrentFile = fl.Data[i].Name
 		state.Log.Println("  " + state.Files.Data[i].Name)
 
-		_, err := state.ScriptState.CompileAndRun(string(lfiles.Data[i].Content), lfiles.Data[i].Name)
+		_, err := state.ScriptState.CompileAndRun(string(fl.Data[i].Content), fl.Data[i].Name)
 		if err != nil {
 			return err
 		}
@@ -739,69 +772,110 @@ func (state *State) Parse() (err error) {
 	return nil
 }
 
+// ApplyTileSet does exactly what it's name suggests.
+// Tileset information is loaded from all active addon that have it and is
+// applied to all normal raw files. This has the side effect of stripping
+// all text before the first raw tag.
+func (state *State) ApplyTileSet() error {
+	state.Stage = StgApplyTSet
+	state.Log.Separator()
+	state.Log.Println("Applying Tileset...")
+	
+	state.Log.Println("  Loading Tileset Files...")
+	fl := state.Files
+	setraw := make([][]*tset.Tag, 0)
+	for _, i := range fl.Order {
+		if fl.Data[i].Tags["Skip"] || !fl.Data[i].Tags["TSetFile"] {
+			continue
+		}
+
+		state.Log.Println("    " + fl.Data[i].Name)
+		tags := tset.Reduce(tset.ParseRaws(fl.Data[i].Content))
+		setraw = append(setraw, tags)
+	}
+	set := tset.Tableize(tset.Flatten(setraw))
+	
+	state.Log.Println("  Applying Tileset Information...")
+	for _, i := range fl.Order {
+		if fl.Data[i].Tags["Skip"] || fl.Data[i].Tags["NoWrite"] || fl.Data[i].Tags["TextFile"] || fl.Data[i].Tags["GraphicsFile"] || !fl.Data[i].Tags["RawFile"] {
+			continue
+		}
+
+		state.Log.Println("    " + fl.Data[i].Name)
+		fl.Data[i].Content = tset.ApplyToFile(fl.Data[i].Content, set)
+	}
+	
+	state.Log.Println("  Running Tileset Scripts...")
+	for _, i := range fl.Order {
+		if fl.Data[i].Tags["Skip"] || !fl.Data[i].Tags["TSetScript"] {
+			continue
+		}
+
+		state.CurrentFile = fl.Data[i].Name
+		state.Log.Println("  " + state.Files.Data[i].Name)
+
+		_, err := state.ScriptState.CompileAndRun(string(fl.Data[i].Content), fl.Data[i].Name)
+		if err != nil {
+			return err
+		}
+	}
+	
+	state.CurrentFile = ""
+	return nil
+}
+
 // Write handles writing the files to their output directories.
-// TODO: Maybe scripts that write custom outputs should queue them up instead and have this function write EVERYTHING out?
 func (state *State) Write() error {
 	state.Stage = StgWrite
 	state.Log.Separator()
 	state.Log.Println("Writing Files...")
 	state.Log.Println("  Writing Raw Files...")
-	lfiles := state.Files
-	for _, i := range lfiles.Order {
-		if lfiles.Data[i].Tags["Skip"] || lfiles.Data[i].Tags["NoWrite"] || lfiles.Data[i].Tags["GraphicsFile"] || !lfiles.Data[i].Tags["RawFile"] {
+	fl := state.Files
+	for _, i := range fl.Order {
+		if fl.Data[i].Tags["Skip"] || fl.Data[i].Tags["NoWrite"] || fl.Data[i].Tags["GraphicsFile"] || !fl.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		state.Log.Println("    " + lfiles.Data[i].Name)
+		state.Log.Println("    " + fl.Data[i].Name)
 
-		file := []byte(rblutil.StripExt(lfiles.Data[i].Name) + "\n\n# Automatically generated, do not edit!\n# Source: " +
-			lfiles.Data[i].Source + "/" + lfiles.Data[i].Name + "\n\n" + string(lfiles.Data[i].Content))
-		err := state.writeFile("out:objects/"+lfiles.Data[i].Name, file)
+		file := []byte(rblutil.StripExt(fl.Data[i].Name) + "\n\n# Automatically generated, do not edit!\n# Source: " +
+			fl.Data[i].Source + "/" + fl.Data[i].Name + "\n\n" + string(fl.Data[i].Content))
+		err := state.writeFile("out:objects/" + fl.Data[i].Name, file)
 		if err != nil {
 			return err
 		}
 	}
 
+	state.Log.Println("  Writing Auxiliary Text Files...")
+	for _, i := range fl.Order {
+		if fl.Data[i].Tags["Skip"] || fl.Data[i].Tags["NoWrite"] || !fl.Data[i].Tags["TextFile"] || !fl.Data[i].Tags["RawFile"] {
+			continue
+		}
+
+		state.Log.Println("    " + fl.Data[i].Name)
+		err := state.writeFile("out:objects/text/" + fl.Data[i].Name, fl.Data[i].Content)
+		if err != nil {
+			return err
+		}
+	}
+	
 	state.Log.Println("  Writing Graphics Files...")
-	for _, i := range lfiles.Order {
-		if lfiles.Data[i].Tags["Skip"] || lfiles.Data[i].Tags["NoWrite"] || !lfiles.Data[i].Tags["GraphicsFile"] {
+	for _, i := range fl.Order {
+		if fl.Data[i].Tags["Skip"] || fl.Data[i].Tags["NoWrite"] || !fl.Data[i].Tags["GraphicsFile"] || !fl.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		state.Log.Println("    " + lfiles.Data[i].Name)
+		state.Log.Println("    " + fl.Data[i].Name)
 
-		file := []byte(rblutil.StripExt(lfiles.Data[i].Name) + "\n\n# Automatically generated, do not edit!\n# Source: " +
-			lfiles.Data[i].Source + "/" + lfiles.Data[i].Name + "\n\n" + string(lfiles.Data[i].Content))
-		err := state.writeFile("out:graphics/"+lfiles.Data[i].Name, file)
+		file := []byte(rblutil.StripExt(fl.Data[i].Name) + "\n\n# Automatically generated, do not edit!\n# Source: " +
+			fl.Data[i].Source + "/" + fl.Data[i].Name + "\n\n" + string(fl.Data[i].Content))
+		err := state.writeFile("out:graphics/" + fl.Data[i].Name, file)
 		if err != nil {
 			return err
 		}
 	}
-
-	state.Log.Println("  Writing Prep Files...")
-	for _, i := range lfiles.Order {
-		if lfiles.Data[i].Tags["Skip"] || lfiles.Data[i].Tags["NoWrite"] || !lfiles.Data[i].Tags["PrepFile"] {
-			continue
-		}
-
-		state.Log.Println("    " + lfiles.Data[i].Name)
-
-		err := state.writeFile("out:prep/"+lfiles.Data[i].Name, lfiles.Data[i].Content)
-		if err != nil {
-			return err
-		}
-	}
-
-	state.Log.Println("  Writing Addon List to Raw Directory...")
-	state.Log.Println("    addonlist.ini")
-	err := state.UpdateAddonList("out:addonlist.ini")
-	if err != nil {
-		return err
-	}
-
-	state.Log.Println("  Writing Config Variables to Raw Directory...")
-	state.Log.Println("    genconfig.ini")
-	return state.DumpConfig("out:genconfig.ini")
+	
+	return nil
 }
 
 // Used by WriteReport
@@ -817,10 +891,31 @@ type varheader struct {
 
 // WriteReport adds a "generation report" to the output directory.
 // This report includes HTML documentation for the addons used as well as
-// information about the configuration variables and their settings.
+// information about the configuration variables, active addons, and tileset.
 func (state *State) WriteReport() error {
 	state.Log.Separator()
 	state.Log.Println("Writing Generation Report...")
+	
+	state.Log.Println("  Writing Addon List to Raw Directory...")
+	state.Log.Println("    addonlist.ini")
+	err := state.UpdateAddonList("out:addonlist.ini")
+	if err != nil {
+		return err
+	}
+
+	state.Log.Println("  Writing Config Variables to Raw Directory...")
+	state.Log.Println("    genconfig.ini")
+	err = state.DumpConfig("out:genconfig.ini")
+	if err != nil {
+		return err
+	}
+	
+	state.Log.Println("  Writing Tileset Config File...")
+	state.Log.Println("    current.tset")
+	err = state.DumpTSet("out:current.tset")
+	if err != nil {
+		return err
+	}
 	
 	state.Log.Println("  Loading Templates...")
 	tmpl, err := rblutil.LoadHTMLTemplatesStatic(state.FS)
@@ -962,10 +1057,32 @@ func (state *State) DumpConfig(path string) error {
 	return state.writeFile(path, []byte(out))
 }
 
+// DumpTSet writes the current tileset values to the indicated file.
+func (state *State) DumpTSet(path string) error {
+	out := []byte("\n# Rubble tileset dump.\n# Automatically generated, do not edit!\n\n")
+
+	fl := state.Files
+	setraw := make([][]*tset.Tag, 0)
+	for _, i := range fl.Order {
+		if fl.Data[i].Tags["Skip"] || fl.Data[i].Tags["NoWrite"] || fl.Data[i].Tags["GraphicsFile"] || !fl.Data[i].Tags["RawFile"] {
+			continue
+		}
+
+		tags := tset.Reduce(tset.ParseRaws(fl.Data[i].Content))
+		setraw = append(setraw, tags)
+	}
+	
+	file := tset.Flatten(setraw)
+	tset.Normalize(file)
+	out = append(out, tset.FormatFile(file)...)
+
+	return state.writeFile(path, out)
+}
+
 // UpdateAddonList writes a list of all addons and their activation status (in INI format)- to the indicated file.
 func (state *State) UpdateAddonList(dest string) error {
 	out := make([]byte, 0, 2048)
-	out = append(out, "\n# Rubble addon list.\n# Version: "+Versions[0]+"\n# Automatically generated, do not edit!\n\n[addons]\n"...)
+	out = append(out, "\n# Rubble addon list.\n# Version: " + Versions[0] + "\n# Automatically generated, do not edit!\n\n[addons]\n"...)
 	for i := range state.Addons {
 		if !state.Addons[i].Meta.Lib {
 			out = append(out, state.Addons[i].Name+"="...)

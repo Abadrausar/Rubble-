@@ -1,56 +1,48 @@
 
-(axis:walkfiles [rubble:fs] "out:objects" block path {
-	(axis:del [rubble:fs] (str:add "out:objects/" [path]))
-	(if (error) {
-		(console:print "Error deleting: " [path] "\n")
-		(error false)
-	})
+# This script clears the "out:" directory.
+
+# EXPERTS ONLY!
+(if (str:cmp (rubble:configvar "_RUBBLE_NO_CLEAR_") "true") {
+	(ret)
 })
 
-(axis:walkfiles [rubble:fs] "out:graphics" block path {
-	(axis:del [rubble:fs] (str:add "out:graphics/" [path]))
-	(if (error) {
-		(console:print "Error deleting: " [path] "\n")
-		(error false)
+# Recursively clears a directory.
+var cleardir = block path {
+	(axis:walkdirs [rubble:fs] [path] block fpath {
+		([cleardir] (str:add [path] "/" [fpath]))
+		
+		(axis:del [rubble:fs] (str:add [path] "/" [fpath]))
+		(onerror {
+			(console:print "  Error deleting: " [path] "/" [fpath] "\n")
+		})
 	})
-})
-
-(axis:walkfiles [rubble:fs] "out:prep" block path {
-	(axis:del [rubble:fs] (str:add "out:prep/" [path]))
-	(if (error) {
-		(console:print "Error deleting: " [path] "\n")
-		(error false)
+	
+	(axis:walkfiles [rubble:fs] [path] block fpath {
+		(axis:del [rubble:fs] (str:add [path] "/" [fpath]))
+		(onerror {
+			(console:print "  Error deleting: " [path] "/" [fpath] "\n")
+		})
 	})
-})
+}
 
-(axis:walkfiles [rubble:fs] "out:dfhack" block path {
-	(axis:del [rubble:fs] (str:add "out:dfhack/" [path]))
-	(if (error) {
-		(console:print "Error deleting: " [path] "\n")
-		(error false)
-	})
-})
+# These are (or at least should be) safe to nuke.
+([cleardir] "out:objects")
+([cleardir] "out:graphics")
+([cleardir] "out:scripts")
 
-(axis:walkfiles [rubble:fs] "out:Docs" block path {
-	(axis:del [rubble:fs] (str:add "out:Docs/" [path]))
-	(if (error) {
-		(console:print "Error deleting: " [path] "\n")
-		(error false)
-	})
-})
+# These directories were created by Rubble in the first place, so go ahead and nuke'em.
+([cleardir] "out:dfhack")
+([cleardir] "out:Docs")
 
-(axis:walkdirs [rubble:fs] "out:Docs" block path {
-	(axis:del [rubble:fs] (str:add "out:Docs/" [path]))
-	(if (error) {
-		(console:print "Error deleting: " [path] "\n")
-		(error false)
-	})
-})
+# Completely remove certain obsolete directories.
+([cleardir] "out:prep")
+(axis:del [rubble:fs] "out:prep")
+(error false)
 
+# Now clear out the various junk that has accumulated in the raw directory itself.
 (axis:walkfiles [rubble:fs] "out:" block path {
 	(axis:del [rubble:fs] (str:add "out:" [path]))
-	(if (error) {
-		(console:print "Error deleting: " [path] "\n")
-		(error false)
+	(onerror {
+		(console:print "  Error deleting: " [path] "\n")
 	})
 })

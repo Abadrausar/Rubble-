@@ -1,8 +1,4 @@
 
-(if (exists [rubble:raws] "user_tilesets_phoebus.pre.rex") {
-	(axis:write [rubble:fs] "out:prep/user_tilesets_phoebus.prep.rex" [rubble:raws "user_tilesets_phoebus.pre.rex"])
-})
-
 (rubble:open_d_init)
 (rubble:edit_d_init "SKY" "32:8:9:0")
 (rubble:edit_d_init "CHASM" "0:0:0:1")

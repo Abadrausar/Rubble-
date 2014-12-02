@@ -2,6 +2,35 @@
 ==============================================
 Changelog:
 ==============================================
+v5.7 (for DF 40.18)
+	Updated to 40.18 (no actual changes needed).
+	Completely rewrote the tileset system, the new system is MUCH better (and MUCH easier to use).
+		The old tileset templates are gone, replaced with a new parse step and some special scripts, see "Rubble Basics".
+		Note that even templates that would still be relevant had to be replaced with script commands for technical reasons.
+	Rewrote some of the standard templates to remove obsolete tileset support (the specialized SHARED_OBJECT templates).
+	Remade the "User/Tilesets/Phoebus" addon to use the new tileset system.
+	Added "User/Tileset/ASCII", use to switch back to ASCII mappings from another tileset.
+	Rubble now writes tileset information every time you generate, look for "out:current.tset".
+	Removed all addons in the "Dev/Tileset" group (as they are obsolete).
+	Stripped all calls to #TILE and #COLOR from the "Base" addon.
+	Added a new operation mode to the interfaces to allow changing tilesets on worlds in progress.
+	Removed prep mode and all support for prep scripts (this mode is obsolete with the new tileset system).
+	Loads of little internal changes to the Rubble engine to support the above changes.
+	Fixed possible bug with the @GRAPHICS_FILE template.
+	Renamed the #INSTALL_GRAPHICS_FILE template to @INSTALL_GRAPHICS_FILE.
+	Fixed the "User/Tileset/Vanilla/Graphics" addon to fit the changed graphics template.
+	Added new base template: @INSTALL_IMAGES_AS_GRAPHICS, runs @INSTALL_GRAPHICS_FILE for all PNG images in an addon.
+	The "Skip" file tag is now cleared for all files when addons are activated.
+		This should not make any difference, but just in case.
+	Versions prior to this one are marked incompatible (what with no more prep support and the tileset templates being gone).
+		This will only effect addons that run a Rubble version check (which is none of them AFAIK).
+	The web UI now times generation, these times only cover the non-interactive portions.
+	Stopped various things from trashing the default addon list file, I hope I didn't break anything...
+	It is now possible to set "_RUBBLE_NO_CLEAR_" to "true" to suppress clearing the output directory (experts only!)
+	Rubble now handles the files in "out:objects/text", see the "@TEXT_FILE" template.
+	Updated the "Base" addon to include the text files.
+	The clear script now does a more complete job of nuking the contents of "out:".
+
 v5.6 (for DF 40.15)
 	"Dev/Tileset/Insert" now adds tileset templates to all creatures.
 	Modified "Base" to have tileset templates in all creatures.

@@ -287,51 +287,33 @@ Tutorial 4: Tileset Addons
 
 This tutorial will show you how to build tileset support into your mod, as well as explain some simple procedures for porting existing tilesets to Rubble.
 
-For details on how to use the templates mentioned here see the "Base Templates" documentation that comes with Rubble.
-
 So you want your cool new mod to support tilesets other than the default? Good thing Rubble goes out of its way to make that easy.
 
-There are 4 core templates that provide support for tilesets:
-	{#TILE;<OBJ>;<ID>;<DEFAULT>}
-	{SET_TILE;<OBJ>;<ID>;<TILE>}
-	{#COLOR;<OBJ>;<ID>;<DEFAULT>}
-	{SET_COLOR;<OBJ>;<ID>;<COLOR>}
+Rubble has two special kinds of files to help deal with tilesets: ".tset" files and ".tset.rex" files. ".tset" files contain definitions that are used for any tile and color information the tileset needs. These files use normal raw syntax, but simplified and with only the tags important to tilesets. ".tset.rex" files are scripts that are more-or-less functionally identical to post scripts, but they are also run if a user adds the tileset to existing raws.
 
-(The SET_XXX templates insert a entry in the tile or color dictionary that is later retrieved by the #TILE or #COLOR template with the same <OBJ> and <ID>, if no entry for the <OBJ> and <ID> is present in the dictionary <DEFAULT> is used.)
+.tset files are normally automatically generated, the esiest way to do this is to create a temporary addon with just the tilesets raws, then generate with ONLY that addon active. In the output directory there will be a file named "current.tset", this should contain what you need.
 
-These templates are a little cumbersome to use but you don't have to. All the specialized SHARED_OBJECT templates will detect tile and color information in their contents and automatically insert calls to #TILE and #COLOR as needed.
-This means that you do not need explicit calls to #TILE or #COLOR as plants, inorganics, tools, and material definitions are handled automatically. Vermin creatures also have some tile information included, but as there is no SHARED_OBJECT template for creatures you will have to insert the tileset templates by hand if you need to edit vermin tile numbers, lucky you there is an addon that mostly automates this.
+Of course you can also make a .tset file by hand, but unless you are making a tileset from scratch generation is faster.
 
-With #TILE and #COLOR handled, all you really need to worry about is SET_TILE and SET_COLOR. If you are adding support for a brand new tileset, the easiest way is to use the "Dev/Tileset/Export" addon. "Dev/Tileset/Export" is a developer addon that makes a list of all calls to #TILE and #COLOR and generates a file containing the corresponding calls to SET_TILE and SET_COLOR.
-You would then edit the generated file to change the tile numbers and colors to match what your tileset needs.
+Once you have your .tset file ready to go (however you got it) create a new addon and add this file as well as your tileset's font image.
 
-If you already have the tileset raws you can use "Dev/Tileset/Insert" to add the templates automatically (and then use "Dev/Tileset/Export" to extract the gathered information).
-THIS PROCEDURE IS ONLY FOR CASES WHERE YOU ALREADY HAVE A FULL SET OF RAWS FOR YOUR TILESET! It is, IMHO, much easier to generate a default tileset addon and then edit that than it is to edit the full raws.
+Now for your tileset install script (the .tset.rex file). This script should install your tileset image and make any changes to the init file that may be needed.
 
-First make a new folder in your addons directory, this will be temporary, so name it anything you want.
-Now copy all the raw files that your tileset modified to your new temporary addon, you want only the changed files.
-
-Now generate the raws, activating ONLY your temporary addon, "Dev/Tileset/Insert", and "Dev/Tileset/Export", the generated raws are useless, what you want is the file "dev_export_tileset.tile_info.rbl" that should be in your current working directory (generally the directory containing "rubble.exe").
-
-Once you have your tileset file ready to go (however you got it) create a new addon and add the tileset file as well as your tileset's font image.
-
-To install you tileset image all you need to do is add a call to INSTALL_TILESHEET to the top of you tileset file, for example:
+To install you tileset image all you need to do is add a call to "rubble:install_tilesheet", for example:
 [code]
-{INSTALL_TILESHEET;test_16x16.png}
+(rubble:install_tilesheet "test_16x16.png")
 [/code]
 
-Now for editing the init files. Rubble provides a set of templates specifically for editing the tileset related init settings found in "init.txt" and "d_init.txt". 
-To set the "font" (eg the tilesheet) you use the SET_FULLSCREEN_TILESHEET and SET_WINDOWED_TILESHEET templates. Both templates also set the font to be used in graphical mode, if you need to set these separately (if you are using Text Will Be Text for example), then use SET_FULLSCREEN_FONT, SET_FULLSCREEN_FONT_GRAPHICS, SET_WINDOWED_FONT, and SET_WINDOWED_FONT_GRAPHICS.
-To set things like track tiles you use OPEN_D_INIT, EDIT_D_INIT, CLOSE_D_INIT, and D_INIT_TO_DEFAULTS. The following example makes pillars look like smooth floors ;)
+Now for editing the init files. Rubble provides a set of commands specifically for editing the tileset related init settings found in "init.txt" and "d_init.txt". 
+To set the "font" (eg the tilesheet) you use the "rubble:set_fullscreen_tilesheet" and "rubble:set_windowed_tilesheet" commands. Both commands also set the font to be used in graphical mode, if you need to set these separately (if you are using Text Will Be Text for example), then use "rubble:set_fullscreen_font", "rubble:set_fullscreen_font_graphics", "rubble:set_windowed_font", and "rubble:set_windowed_font_graphics".
+To set things like track tiles you use "rubble:open_d_init", "rubble:edit_d_init", "rubble:close_d_init", and "rubble:d_init_to_defaults". The following example makes pillars look like smooth floors ;)
 [code]
-{OPEN_D_INIT}
-{EDIT_D_INIT;PILLAR_TILE;'+'}
-{CLOSE_D_INIT}
+(rubble:open_d_init)
+(rubble:edit_d_init PILLAR_TILE "'+'")
+(rubble:close_d_init)
 [/code]
-Note that CLOSE_D_INIT will set ALL tileset related init settings to their defaults unless a call to EDIT_D_INIT has explicitly set that value! This is so that it is easy to reset values changed by other tilesets you may have installed before. 
-If you use all default init settings all you need to do is call D_INIT_TO_DEFAULTS to make sure a different tileset didn't clobber your settings.
-
-If you want to provide prep support (highly recommended!) you will need to include a couple of other scripts in your addon, see "User/Tilesets/MLC/Normal" for an example.
+Note that "rubble:close_d_init" will set ALL tileset related init settings to their defaults unless a call to "rubble:edit_d_init" has explicitly set that value! This is so that it is easy to reset values changed by other tilesets you may have installed before. 
+If you use all default init settings all you need to do is call "rubble:d_init_to_defaults" to make sure a different tileset didn't clobber your settings.
 
 ========================================================
 

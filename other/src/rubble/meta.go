@@ -30,6 +30,10 @@ import "strings"
 type Meta struct {
 	// Is this addon an automatically managed library?
 	Lib bool
+	
+	// Does this addon contain tileset information?
+	// Automatically set by the loader.
+	TSet bool
 
 	// A one line addon description.
 	// For use by user interfaces (not used directly by Rubble).

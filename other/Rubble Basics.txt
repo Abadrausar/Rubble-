@@ -80,7 +80,31 @@ df					The dwarf fortress directory, defaults to ".."
 out					The output directory, by default "df:raw"
 addons:dir			The addons directory, by default "rubble:addons"
 addons:zip			A composite, read-only, directory made up of the contents of all the zip files in the addons directory
-prep				The prep directory, only valid when a prep cycle is running.
+
+==============================================
+File Extensions Used by Rubble (and Their Meanings):
+==============================================
+
+Rubble generally uses file extensions to determine file type, these associations are hardcoded (but may be overridden by clever use of file tags in loader scripts).
+Most of these file types have a dedicated section in this document.
+
+Extension	Tags				Use
+.txt		RawFile				Assumed to be parseable raws that ere to be written to "out:objects".
+.rbl		RawFile, NoWrite	Same as ".txt", but not written out.
+.load.rex	LoadScript			A loader script, run just after addons are activated, but before incompatibilities are checked.
+.init.rex	InitScript			An init script, run just before generation (even if their addon is not active).
+.pre.rex	PreScript			A pre script, run just after init scripts.
+.post.rex	PostScript			A post script, run just after generation.
+.tset.rex	TSetScript			A tileset install script, run whenever a tileset is applied (just after post scripts).
+.tset		TSetFile			A tileset definition file, not parsed!
+.zip		<no tags>			A zipped addon, treated like a directory, see the section about the addon loader.
+.zip.b64	<no tags>			A base64 encoded zipped addon, same as ".zip".
+.webload	<no tags>			A webload file, contains the URL of a zip file to download.
+
+There are some files that have hardcoded names. You may only have one of each of these for each addon (obviously).
+
+Name			Use
+addon.meta		Addon meta-data file, contains information about the addon.
 
 ==============================================
 Template Prefixes Explained:
@@ -169,13 +193,13 @@ Each page template receives raw data about whatever it is supposed to do, in the
 
 Keep in mind that the way the server interacts with these files is hardcoded! Each template receives a specific set of data, and must act a certain way (as observed by the server).
 
-If you wish to use files beyond the default templates (for example images or extra HTML and CSS) the contents of the "./other/webUI/extras" directory is served as "/extras/<filename>". None of the default templates make use of this capability.
+If you wish to use files beyond the default templates (for example images or extra HTML and CSS) the contents of the "./other/webUI/extras" directory are served as "/extras/<filename>". None of the default templates make use of this capability.
 
 For more details on how these templates work see "golang.org/pkg/html/template/".
 For details about exactly what Rubble passes each page you will have to look at the source code ("./other/src/rubble" and "./other/src/rubble/interface/web", specifically the files "meta.go", "addon.go", and "main.go" will be the most helpful).
 
 If anybody comes up with a nicer set of templates (or some better CSS) I want to see them!
-The current look isn't all that great, so this is your chance to get listed in on the about page :p
+The current look isn't all that great, so this is your chance to get listed on the about page :p
 
 ==============================================
 .webload files:
@@ -252,37 +276,39 @@ Most of the time the default value is interpreted as a string, but if you pass a
 Tileset Addons:
 ==============================================
 
-There is a rather good (IMHO) tutorial on tileset addons in the "HowTo Rubble" file, see tutorial #4.
+Tilsets are handled as a special extra generation step. After the raws are generated and just before they are written to disk Rubble collates all ".tset" files and uses the information in them to apply tileset information to the generated raws.
 
-There are two basic kinds of tileset addons, those that just modify the raws to fit a tileset and those that install the full package, tile sheets and all.
+.tset files are normal raws with some minor differences:
+	No "OBJECT" tags are needed, all objects can go in the same file.
+	Any tags that do not deal with tile or color data can be left out.
 
-The addons in the "User/Tilesets/MLC" group are examples of addons that give the full treatment, even though they do not make raw changes they do everything else (change the init files, install the tile sheets, and, in one case installs some special extra files). For an example of one that only installs basic support look at "User/Tilesets/Phoebus".
+For example a .tset file for "creature_amphibians.txt" would be:
+	[CREATURE:TOAD]
+		[CREATURE_TILE:249]
+		[COLOR:2:0:0]
+Simple.
 
-Tileset support is more-or-less automatic so long as you use the SHARED_OBJECT templates (SHARED_INORGANIC and SHARED_PLANT are particularly important), for cases where this is impossible you will need to use #TILE and #COLOR manually. About the only time you will ever need to do this is in creatures. For various reasons creatures do not have a specialized version of the SHARED_OBJECT template (and they are unlikely to ever get one).
+Note that while .tset files use raw syntax they are NOT parsed by Rubble! This is due to the fact that they cannot be parsed when applying a tileset to existing raws, so to keep things consistent they cannot be parsed at all, ever.
 
-As inserting all these templates is something of a pain I have made a simple addon that automates this. "Dev/Tileset/Insert" will take non-Rubble raws and insert the shared object templates, together with calls to #TILE and #COLOR in creatures.
+In general all tileset information will be in a single file (as there is no point in having loads of little files). The .tset file for vanilla DF comes to ~95 KB, so not too large to pack into one file without issues.
 
-There are two basic ways to use "Dev/Tileset/Insert": The first is to activate "Dev/Tileset/Export". This will take the information gathered and export it as a "tileset file", basically a long list of calls to SET_TILE and SET_COLOR that represent the tile/color settings used in the current raw set. The second is to set the configuration variable "DEV_TILESET_INSERT_EXPORT" to "true". This will write all the modified files out to the current directory, allowing you to use them as part of an addon.
+.tset files are generally automatically generated, to make things easy every time you generate the raws Rubble will create one in "out:current.tset" using the information from the current set of addons. If you already have raws for a tileset simply place them in a temporary addon and generate this addon by itself.
 
-The first operation mode is for porting a tileset to Rubble. You take the raws that come with the tileset and add them to a temporary addon, then generate this addon together with "Dev/Tileset/Insert" and "Dev/Tileset/Export" (and NOTHING ELSE) to get an almost finished tileset addon, just add a script to handle any init changes you may need and your done!
+If you want to change the tileset of an already generated raw set rubble provides two ways of doing this:
+	Via the web UI, this is very easy to use, just select your region and addons to load the tileset from.
+	Via the command line: `rubble -tileset="<region name>" -addons="<the name of the tileset addon(s)>"`
 
-Generally the second mode of operation is used when porting a non-Rubble mod to use Rubble, as the SHARED_OBJECT templates are important for many things other than tilesets. See the next section for more details on how to do this.
+Scripts with the extension ".tset.rex" are run as part of generation AND when a tileset is added to a pregenerated raw set. These scripts are functionally identical to post scripts, and provide an easy way to install tileset images or make any needed init changes your tileset may need.
 
-One thing tileset addons need to worry about that most addons do not is prep support. "prep" is Rubble's answer to the problem of running multiple different saves with different non-raw changes. Basically Rubble loads a special "addon" from the save and runs any .prep.rex scripts it contains. These scripts should make sure DF is ready to load the save. For tilesets this means that the prep script should install any tilesheets and make any init changes needed. Generally a tileset addon's prep script can be created from it's initial install script with a bit of cleverness, see the existing tileset addon for examples.
+At some point I may extend this system to cover certain settings in the init files (the tile numbers in d_init), but for now if you need to modify these settings (and almost every tileset does) you will have to use tileset install scripts.
 
-==============================================
-Porting an existing mod to Rubble with "Dev/Tileset/Insert":
-==============================================
+Due to the way init changes must be handled most (if not all) tileset addons will still require "Libs/Base", just do this in the addon.meta file as normal.
 
-The "Dev/Tileset/Insert" addon is primarily for porting tilesets from existing raws, but it can also be used to insert some important templates into your raw set to help jump-start your porting effort.
+If you need (or want) to use a template in a .tset file you will have to parse it by hand. To parse these files you will need to use rubble:stageparse (with an explicit parse stage) from the tileset install script. Multiple calls to the stage parser may be required depending on what templates are used.
+Please note that the base templates will NOT be loaded when applying a tileset to existing raws! (and many of these templates depend on thing that would not be present anyway) If you don't want unhappy users test your tileset addon both during normal generation and in independent application!
+It would also be possible to make Rubble parse these files by playing with the file tags some, but DO NOT DO THIS! It will not work when applying a tileset to existing raws!
 
-The only templates that are handled are the specialized "SHARED_OBJECT" templates as well as #TILE and #COLOR in vermin creatures, but as adding the SHARED_OBJECT templates is usually either the largest or second largest job in porting any mod it really helps.
-
-Most of the time the files processed by "Dev/Tileset/Insert" are not available to the modder, but if you set the config var "DEV_TILESET_INSERT_EXPORT" to "true" then every file it changes will be written to the current working directory. Just copy the files it writes to your addon and save yourself hours of work!
-
-Advanced users may want to look at the tweak script that drives "Dev/Tileset/Insert" so that they can use it's example to write temporary addons/scripts to help with other, more specific, porting tasks. For example if you have lots of reactions it may be worth while to write a script to add the REACTION template to them all (using the reaction name to decide what class to register them as perhaps).
-
-It is easy to forget that Rubble can be used for far more than just generating raws, it also works well for processing them.
+One interesting little "feature" of the way this system works is that it will work on any raw set, even ones that were not generated by Rubble! (also, when applying to existing raws the headers Rubble adds to generated files will be corrupted, but that is only cosmetic and so therefore nothing to worry about)
 
 ==============================================
 The Rubble DFHack Lua Startup Script System:
@@ -326,11 +352,12 @@ Or you can use:
 	local example = rubble.example
 Or, of course, you could just use the full name everywhere :)
 	rubble.example.someFunc()
+The first method (rubble.require) is recommended to ensure compatibility with possible future changes.
 
 Obviously, due to the way they are loaded pseudo modules will only work when a save is loaded, but since they are only for use with region-local scripts this is not an issue.
 
 Pseudo modules have a special value normal modules lack:
-	"module" contains the module name as passed to rubble.mkmodule, this is mostly for internal use.
+	"_name" contains the module name as passed to rubble.mkmodule, this is mostly for internal use.
 
 When working on a module you may wish to reload the scripts and modules, to do this simply run `:lua rubble.reload_scripts()`.
 
@@ -381,7 +408,7 @@ Init scripts are very limited, but also very useful. Basically they are Rex scri
 Init scripts have the extension ".init.rex".
 Use init scripts to do setup that may be shared by multiple addons and HAS to be done. For example an excellent use for a init script is adding namespaces and global variables shared by a bunch of addons in an addon pack.
 
-Another fine use of init scripts is "always active" templates, basically you add a template stub in an init script an the override it with a full version in a pre tweak script. This way clients of your addon can just assume that your addon's template are present allowing you to skip checking to see if it is active. 
+Another fine use of init scripts is "always active" templates, basically you add a template stub in an init script an the override it with a full version in a pre script. This way clients of your addon can just assume that your addon's template are present allowing you to skip checking to see if it is active. 
 (please note that you really only want to do this within an addon pack so that you can be sure the other addon is installed)
 
 Init scripts have a very narrow use-case and should be used with care.
@@ -406,6 +433,8 @@ This can be a BIG problem if you are doing something that may only be done once.
 
 Remember: The loader scripts are run more than once for a reason! Addon state may change significantly between runs, so do not skip any script that you do not absolutely have to.
 
+(skipping loader scripts may not work anymore!)
+
 Luckily these problems are really rare in practice (none of the default addons had any trouble), as there are very few things that NEED to be done from a loader script that cannot be done multiple times. About the only thing that can cause problems is applying patches.
 
 ==============================================
@@ -419,8 +448,14 @@ File tags default to false and can be changed at any time, any string can be use
 To modify and/or read file tags the rubble:filetag command is used:
 	To read a tag:
 		(rubble:filetag "file.name" "TagID")
-	To set a tag:
+	To set or clear a tag:
 		(rubble:filetag "file.name" "TagID" true)
+		(rubble:filetag "file.name" "TagID" false)
+
+It may also be possible to use GenII  to modify these tags:
+	[rubble:addonstbl "Addon/Name" Files "file.name" Tags "TagID" true]
+This may or may not work after generation has started, all the normal GenII cautions apply!
+GenII is the Rex Generic Indexable Interface, it gives low level access to some of Rubble's internals but has a high foot-shot potential, be careful!
 
 Hard Coded File Tags:
 	Tag ID			Use
@@ -428,11 +463,13 @@ Hard Coded File Tags:
 	InitScript		Marks the file as a init script.
 	PreScript		Marks the file as a pre script.
 	PostScript		Marks the file as a post script.
-	PrepFile		The file should be written to the prep addon, or (during prep mode) the file is a prep script.
-	GraphicsFile	The file should be written to "out:graphics".
+	TSetScript		Marks the file as a tileset setup script.
+	TSetFile		Marks the file as a tileset information file, these files are raw text but are NOT parsed!
 	RawFile			Marks the file as parseable raw text.
+	GraphicsFile	Used with RawFile, specifies that the file should be written to "out:graphics" instead of "out:objects".
+	TextFile		Used with RawFile, specifies that the file should be written to "out:objects/text" instead of "out:objects".
 	NoWrite			Used with RawFile, marks the file as not to be written to the objects folder.
-	Skip			The file is to be ignored in any future passes.
+	Skip			The file is to be ignored in any future passes, this tag is automatically cleared at addon activation!
 
 LoadScript and InitScript are only used with certain global files, you will never see these tags when using rubble:filetag, only rubble:gfiletag will show these tags.
 
@@ -480,21 +517,6 @@ The following would replace the file's contents with the uncompressed version:
 Note that if you choose to do things this way you cannot use the .b64 extension unless you want to fix the file tags!
 
 All in all it is much easier to store the file in the script as a string, as in that case you only need to do half as much.
-
-==============================================
-The prep "addon":
-==============================================
-
-prep is a special "addon" that is created automatically during generation and is written to the raw folder. This "addon" contains all the scripts and files needed to make DF ready to load a world generated from that set of raws. Basically it allows you to easily run multiple, very different, worlds without too much trouble. 
-
-Running "rubble -prep=<region name>" should make sure all init setting, tilesets, ect. are installed just as they were when the raws for that world were originally generated.
-(It is the responsibility of each addon to provide any prep support it may need)
-
-Scripts with the extension ".prep.rex" are automatically added to the prep "addon" to be run when a region is prepped, any data files you need will have to be added manually via the "rubble:prepfile" script command.
-
-If you want to revert to the setting used by the main raw folder (if you want to generate a new world or something) just run "rubble -prep=raw".
-
-Most addons do not need to worry about supporting prep, it is only needed for addons that make changes to files outside the raw folder.
 
 ==============================================
 The Addon Loader:
@@ -558,7 +580,7 @@ If you have a data processing task that is far too slow and could be done in par
 Other Random Information:
 ==============================================
 
-If your addon name starts with "__CONFIG_VAR_" or it is named "__EditConfig__" or "__Generate__" then it will break the web UI. Do not use these names! (stupid HTML forms...)
+If your addon name starts with "__CONFIG_VAR_" or it is named "__EditConfig__", "__Generate__", or "__REGION__" then it will break the web UI. Do not use these names! (stupid HTML forms...)
 
 If you want to allow an item, reaction, or building with a minimum of fuss, register it as class "ADDON_HOOK_MOUNTAIN" or "ADDON_HOOK_PLAYABLE". Specific addon hooks also exist for the other entities as well as an ADDON_HOOK_GENERIC that every entity has.
 

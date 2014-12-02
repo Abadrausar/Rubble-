@@ -1,8 +1,4 @@
 
-# This is the prep file version of the base templates
-
-# This is just a copy of "aaa_tilesets_libs_base.pre.rex" with all the templates stripped.
-
 command rubble:install_tilesheet tilesheet {
 	(axis:write [rubble:fs] (str:add "df:data/art/" [tilesheet]) [rubble:raws [tilesheet]])
 }
@@ -377,8 +373,4 @@ command rubble:d_init_to_defaults {
 		(break true)
 	})
 	(axis:write [rubble:fs] "df:data/init/d_init.txt" [rubble:d_init])
-}
-
-command rubble:install_graphics_file tilesheet {
-	(axis:write [rubble:fs] (str:add "out:graphics/" [tilesheet]) [rubble:raws [tilesheet]])
 }

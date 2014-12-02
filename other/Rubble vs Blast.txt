@@ -15,7 +15,7 @@ Pros:
 	Variable expansion, no more GET_VAR, works in any parse stage
 	Many templates for registering objects and the like are replacements for vanilla raw tags allowing better formatting
 	Some files may be parsed but not included in the generated raws
-	Support for easily and quickly installing tilesets from addons
+	Support for easily and quickly installing tilesets from addons (during AND after generation!)
 	Allows you to run "tweak scripts" before or after generation for fine-tuning the results
 	Easy to use HTML-based UI that supports all common actions
 	Support for detailed addon meta data, including dependencies and descriptions.

@@ -45,7 +45,7 @@ var menuPage = loadOr("menu.html", `
 <body>
 	<h1>Welcome to the Rubble Web UI!</h1>
 	<p><a href="./genaddons">Generate raws</a>
-	<p><a href="./prep">Prep a region</a>
+	<p><a href="./tsetregion">Switch tileset for a region</a>
 	<p><a href="./regen">Regenerate a region</a>
 	<p><a href="./addons">List of all addons</a>
 	<p><a href="./log">View Rubble log</a>
@@ -325,16 +325,16 @@ var genvarsPage = template.Must(template.New("genvars").Parse(loadOr("genvars.ht
 </html>
 `)))
 
-// Prep
+// Tileset
 
-var prepPage = template.Must(template.New("prep").Parse(loadOr("prep.html", `
+var tsetregionPage = template.Must(template.New("tsetregion").Parse(loadOr("tsetregion.html", `
 <html>
 <head>
 	<link rel="stylesheet" type="text/css" href="./css"/>
 	<title>Rubble Web UI: Select Region</title>
 </head>
 <body>
-	<form action="./preprun">
+	<form action="./tsetaddons">
 		<table border="0">
 		<tr><td><input type="radio" value="raw" checked name="region"> raw</td></tr>
 		<script language="JavaScript"> 
@@ -348,7 +348,45 @@ var prepPage = template.Must(template.New("prep").Parse(loadOr("prep.html", `
 			}
 		</script>
 		
-		<tr><td><input type="submit" value="Prep Selected Region"/></td></tr>
+		<tr><td><input type="submit" value="Use Selected Region"/></td></tr>
+		</table>
+	</form>
+	<p><a href="./">Back to Menu</a>
+	<p><a href="./kill">Quit</a>
+</body>
+</html>
+`)))
+
+var tsetaddonsPage = template.Must(template.New("tsetaddons").Parse(loadOr("tsetaddons.html", `
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="./css"/>
+	<title>Rubble Web UI: Select Tileset Addon(s)</title>
+</head>
+<body>
+	<form action="./tsetrun">
+		<input type="hidden" value="{{.Region}}" name="__REGION__">
+		<table border="0">
+		<script language="JavaScript">
+			var items = {{.Addons}}
+			for (var i in items) {
+				if (!items[i].Meta.TSet) {
+					continue
+				}
+				if (items[i].Meta.Lib) {
+					continue
+				}
+				
+				document.write("<tr><td nowrap>")
+				document.write("<input type=\"checkbox\" value=\"true\" name=\"" + items[i].Name + "\">")
+				document.write("&nbsp;<a href=\"./addondata?addon=" + items[i].Name + "\">" + items[i].Name.replace(" ", "&nbsp;") + "</a>")
+				document.write("</td><td>")
+				document.write(items[i].Meta.Header)
+				document.write("</td></tr>")
+			}
+		</script>
+		
+		<tr><td><input type="submit" value="Apply Selected Tileset"/></td></tr>
 		</table>
 	</form>
 	<p><a href="./">Back to Menu</a>
@@ -368,7 +406,6 @@ var regenPage = loadOr("regen.html", `
 <body>
 	<p><h2>WARNING!</h2>
 	<p>Regenerating a region's raws is dangerous! If you make any mistakes the region could become unplayable!<br>
-	It is highly recommended that this be only used for switching tilesets and other actions that do not significantly edit the raws.
 	<p>NEVER use regen to update from one version of an addon to another unless you are absolutely SURE that the new version is save compatible with the old version!
 	
 	<p><a href="./">Back to Menu</a>

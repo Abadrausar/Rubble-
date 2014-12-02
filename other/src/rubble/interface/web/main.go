@@ -171,6 +171,7 @@ func main() {
 	http.HandleFunc("/menu", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("UI Transition: \"/menu\"")
 
+		timeStart := time.Now()
 		var err error
 		err, state = rubble.NewState(DFDir, OutputDir, *AddonsDir, log)
 		if err != nil {
@@ -180,6 +181,7 @@ func main() {
 		}
 
 		err = state.Load(*AddonsList, *ConfigList)
+		log.Println("Load time: ", time.Since(timeStart))
 		if err != nil {
 			if _, ok := err.(rubble.Abort); ok {
 				log.Println("Abort:", err)
@@ -351,7 +353,9 @@ func main() {
 		}
 		ConfigList.Set(strings.Join(config, ";"))
 
+		timeStart := time.Now()
 		err = state.RunPreLoaded(addons, *ConfigList)
+		log.Println("Run time: ", time.Since(timeStart))
 		if err != nil {
 			if _, ok := err.(rubble.Abort); ok {
 				log.Println("Abort:", err)
@@ -366,10 +370,10 @@ func main() {
 		http.Redirect(w, r, "./log", http.StatusFound)
 	})
 
-	// Prep
+	// Tileset
 
-	http.HandleFunc("/prep", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("UI Transition: \"/prep\"")
+	http.HandleFunc("/tsetregion", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("UI Transition: \"/tsetregion\"")
 
 		if !axis.Exists(state.FS, "df:data/save") {
 			log.Println("Error: Cannot find save directory.")
@@ -385,7 +389,7 @@ func main() {
 			}
 		}
 
-		err = prepPage.Execute(w, regions)
+		err = tsetregionPage.Execute(w, regions)
 		if err != nil {
 			log.Println("Error:", err)
 			http.Redirect(w, r, "./log", http.StatusFound)
@@ -393,10 +397,47 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("/preprun", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("UI Transition: \"/preprun\"")
+	http.HandleFunc("/tsetaddons", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("UI Transition: \"/tsetaddons\"")
+		
+		region := r.FormValue("region")
+		err = tsetaddonsPage.Execute(w, struct {
+			Region string
+			Addons []*rubble.Addon
+		}{region, state.Addons})
+		if err != nil {
+			log.Println("Error:", err)
+			http.Redirect(w, r, "./log", http.StatusFound)
+			return
+		}
+	})
 
-		err := state.PrepModeRun(r.FormValue("region"))
+	http.HandleFunc("/tsetrun", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("UI Transition: \"/tsetrun\"")
+
+		err := r.ParseForm()
+		if err != nil {
+			log.Println("Error:", err)
+			http.Redirect(w, r, "./log", http.StatusFound)
+			return
+		}
+		
+		addons := []string{}
+		for i := range r.Form {
+			if i == "__REGION__" {
+				continue
+			}
+
+			if v := r.Form[i]; len(v) > 0 {
+				if v[0] == "true" {
+					addons = append(addons, i)
+				}
+			}
+		}
+		
+		timeStart := time.Now()
+		err = rubble.TSetModeRun(r.FormValue("__REGION__"), DFDir, *AddonsDir, addons, log)
+		log.Println("Run time: ", time.Since(timeStart))
 		if err != nil {
 			if _, ok := err.(rubble.Abort); ok {
 				log.Println("Abort:", err)
@@ -560,7 +601,9 @@ func main() {
 		}
 		ConfigList.Set(strings.Join(config, ";"))
 
+		timeStart := time.Now()
 		err = state.RunPreLoaded(addons, *ConfigList)
+		log.Println("Run time: ", time.Since(timeStart))
 		if err != nil {
 			if _, ok := err.(rubble.Abort); ok {
 				log.Println("Abort:", err)

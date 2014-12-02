@@ -55,8 +55,6 @@ import "dctech/rex/commands/thread"
 import "flag"
 import "runtime"
 import "runtime/pprof"
-import "net/http"
-import _ "net/http/pprof"
 
 // The bit about "Enter Ctrl+Z or Ctrl+Break to Exit" is true in Windows when using the default command prompt.
 // Ctrl+Z generates char 26 (0x1A), which is the "DOS EOF char".
@@ -73,11 +71,10 @@ var NoExit bool
 var NoRecover bool
 var Threaded bool
 var Profile string
-var NetProfile string
 
-var preDefPos = rex.NewPosition(41, 1, "main.go")
+var preDefPos = rex.NewPosition(76, 1, "main.go")
 var preDefs = `
-	# nothing
+	# nothing for now...
 `
 
 func main() {
@@ -87,7 +84,6 @@ func main() {
 	flag.BoolVar(&NoRecover, "norecover", false, "If set disables error recovery. Use for debugging the runtime.")
 	flag.BoolVar(&Threaded, "threads", false, "Allows the shell to use more than one processor core, not useful unless running a threaded script.")
 	flag.StringVar(&Profile, "profile", "", "Output CPU profile information to specified file.")
-	flag.StringVar(&NetProfile, "netprofile", "", "Use the http pprof interface on specified port")
 
 	flag.Parse()
 
@@ -103,10 +99,6 @@ func main() {
 		}
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
-	}
-
-	if NetProfile != "" {
-		http.ListenAndServe("localhost:"+NetProfile, nil)
 	}
 
 	fmt.Print(header)
@@ -163,10 +155,11 @@ func main() {
 		}
 
 		val, code, err = state.CompileShell(string(file), code)
+		var ret *rex.Value
 		if err != nil {
 			fmt.Println("Error:", err)
 		} else {
-			ret, err := state.RunShell(script, val)
+			ret, err = state.RunShell(script, val)
 			if err != nil {
 				fmt.Println("Error:", err)
 			}
@@ -175,7 +168,9 @@ func main() {
 
 		if !NoExit {
 			fmt.Println("Exiting...")
-			return
+			
+			// Non-number values convert to 0, so this is perfect.
+			os.Exit(int(ret.Int64()))
 		}
 	}
 

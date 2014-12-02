@@ -55,7 +55,7 @@ func RaiseError(msg string) {
 	panic(ScriptError{Msg: msg})
 }
 
-// RaiseError converts a string to a ScriptError and then panics with it.
+// RaiseErrorType is like RaiseError, except that you can specify an error type.
 // The error's position is filled out when it is caught by the state.
 func RaiseErrorType(msg string, typ ErrType) {
 	panic(ScriptError{Msg: msg, Type: typ})

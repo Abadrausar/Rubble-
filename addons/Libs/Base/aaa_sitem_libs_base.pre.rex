@@ -45,8 +45,6 @@ var rubble:item_rarities = <map
 		(rubble:abort "Error: Invalid item type passed to SHARED_ITEM.")
 	})
 	
-	[def = (regex:replace "\\[TILE:([0-9]+|'.')\\]" [def] (str:add "[TILE:{#TILE;" [id] ";;$1}]"))]
-	
 	(if (str:cmp [type] "DIGGER") {
 		[type = "WEAPON"]
 	})

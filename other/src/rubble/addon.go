@@ -32,7 +32,7 @@ type AddonFile struct {
 	Tags    map[string]bool
 }
 
-// NewAddonFile creates a new addon with the specified name.
+// NewAddonFile creates a new addon file with the specified name.
 func NewAddonFile(name, source string, content []byte) *AddonFile {
 	file := new(AddonFile)
 	file.Name = name
@@ -91,4 +91,44 @@ func NewFileList(data []*Addon) *FileList {
 	sort.Strings(list.Order)
 
 	return list
+}
+
+// NewFileListFunc creates a FileList from the files of all the active addons passed in.
+// Inactive addons are ignored. If filter returns false for a file it is not included.
+// If the addon list is nil an empty (but valid) FileList is returned.
+func NewFileListFunc(data []*Addon, filter func(*AddonFile) bool) *FileList {
+	list := new(FileList)
+	list.Order = make([]string, 0, 100)
+	list.Data = make(map[string]*AddonFile, 100)
+
+	if data == nil {
+		return list
+	}
+
+	for _, addon := range data {
+		if addon.Active {
+			for name, file := range addon.Files {
+				if filter(file) {
+					if _, ok := list.Data[name]; !ok {
+						list.Order = append(list.Order, name)
+					}
+					list.Data[name] = file
+				}
+			}
+		}
+	}
+
+	sort.Strings(list.Order)
+
+	return list
+}
+
+func (list *FileList) AddFiles(files ...*AddonFile) {
+	for _, file := range files {
+		if _, ok := list.Data[file.Name]; !ok {
+			list.Order = append(list.Order, file.Name)
+		}
+		list.Data[file.Name] = file
+	}
+	sort.Strings(list.Order)
 }

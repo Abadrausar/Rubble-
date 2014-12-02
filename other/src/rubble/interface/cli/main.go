@@ -51,7 +51,7 @@ var Bench bool
 var NoRecover bool
 var ExitAfterUpdate bool
 
-var PrepRegion string
+var TSetRegion string
 
 var Threaded bool
 
@@ -96,7 +96,7 @@ func main() {
 	AddonsList = new(rblutil.ArgList)
 	ConfigList = new(rblutil.ArgList)
 
-	PrepRegion = ""
+	TSetRegion = ""
 
 	// Load defaults from config if present
 	log.Println("Attempting to Read Config File: ./rubble.ini")
@@ -127,8 +127,8 @@ func main() {
 				ExitAfterUpdate, _ = strconv.ParseBool(value)
 			case "norecover":
 				NoRecover, _ = strconv.ParseBool(value)
-			case "prep":
-				PrepRegion = value
+			case "tileset":
+				TSetRegion = value
 			case "threads":
 				Threaded, _ = strconv.ParseBool(value)
 			case "profile":
@@ -146,21 +146,21 @@ func main() {
 	flags.StringVar(&OutputDir, "outputdir", OutputDir, "Where should Rubble write the generated raw files? May be an AXIS path (only the 'rubble' and 'df' location IDs work).")
 	flags.Var(AddonsDir, "addonsdir", "Rubble addons directory. May be an AXIS path (only the 'rubble', 'df', and 'out' location IDs work).")
 
-	flags.Var(AddonsList, "addons", "List of addons to load. This is optional. If the value is a file path then the file is read as an ini file containing config variables. May be specified more than once.")
+	flags.Var(AddonsList, "addons", "List of addons to load. This is optional. If the value is a file path then the file is read as an ini file containing addon activation information. May be specified more than once.")
 	flags.Var(ConfigList, "config", "List of config variables. This is optional. If the value is a file path then the file is read as an ini file containing config variables. May be specified more than once.")
 
 	flags.BoolVar(&ZapAddons, "zapaddons", ZapAddons, "Ignore any -addons flags loaded from rubble.ini.")
 	flags.BoolVar(&ZapConfig, "zapconfig", ZapConfig, "Ignore any -config flags loaded from rubble.ini.")
 
-	flags.BoolVar(&Bench, "bench", Bench, "Display the elapsed time before exiting. Only works if no errors were encountered.")
+	flags.BoolVar(&Bench, "bench", Bench, "Display the elapsed time before exiting.")
 
 	flags.BoolVar(&ExitAfterUpdate, "addonlist", ExitAfterUpdate, "Update the addon list and exit.")
 
 	flags.BoolVar(&NoRecover, "norecover", NoRecover, "Should Rubble not recover errors? Useful for debugging.")
 
-	flags.StringVar(&PrepRegion, "prep", PrepRegion, "Name of a world to prepare DF for loading (or \"raw\" for the base raw folder). Use this to make sure tilesets, init changes, and DFHack scripts match the world's requirements.")
+	flags.StringVar(&TSetRegion, "tileset", TSetRegion, "Name of a world (or 'raw' for the main raw directory) to apply a tileset to (use -addons to specify the tileset).")
 
-	flags.BoolVar(&Threaded, "threads", Threaded, "Allows Rubble to use more than one processor core, not useful except for running threaded scripts.")
+	flags.BoolVar(&Threaded, "threads", Threaded, "Allows Rubble to use more than one processor core (it may anyway in some cases), not useful except for running threaded scripts.")
 
 	flags.StringVar(&Profile, "profile", "", "Output CPU profile information to specified file.")
 
@@ -197,16 +197,8 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	err, state := rubble.NewState(DFDir, OutputDir, *AddonsDir, log)
-	if err != nil {
-		log.Println("Error:", err)
-		os.Exit(1)
-	}
-	state.NoRecover = NoRecover
-	state.ScriptState.NoRecover = NoRecover
-
-	if ExitAfterUpdate {
-		err := state.Load(*AddonsList, *ConfigList)
+	if TSetRegion != "" {
+		err := rubble.TSetModeRun(TSetRegion, DFDir, *AddonsDir, *AddonsList, log)
 		if Bench {
 			log.Println("Run time: ", time.Since(timeStart))
 		}
@@ -221,9 +213,31 @@ func main() {
 		log.Println("Done.")
 		return
 	}
+	
+	err, state := rubble.NewState(DFDir, OutputDir, *AddonsDir, log)
+	if err != nil {
+		log.Println("Error:", err)
+		os.Exit(1)
+	}
+	state.NoRecover = NoRecover
+	state.ScriptState.NoRecover = NoRecover
 
-	if PrepRegion != "" {
-		err := state.PrepModeRun(PrepRegion)
+	if ExitAfterUpdate {
+		err := state.Load(*AddonsList, *ConfigList)
+		if err != nil {
+			if Bench {
+				log.Println("Run time: ", time.Since(timeStart))
+			}
+			if _, ok := err.(rubble.Abort); ok {
+				log.Println("Abort:", err)
+			} else {
+				log.Println("Error:", err)
+			}
+			os.Exit(1)
+		}
+		
+		state.Log.Println("  Updating the Default Addon List File...")
+		err = state.UpdateAddonList("addons:dir:addonlist.ini")
 		if Bench {
 			log.Println("Run time: ", time.Since(timeStart))
 		}

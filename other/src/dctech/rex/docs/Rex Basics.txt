@@ -610,3 +610,37 @@ var b = [a]
 var x = (if (isnil [a]) {"nil"}{"non-nil"})
 
 # x == "nil" or "non-nil"
+
+==============================================
+EBNF for Rex
+==============================================
+
+What follows *should* be complete, correct, EBNF for Rex. I am not exactly expert at writing such things so there may be (minor) errors.
+
+rawstr ::= /* a sequence of characters with no "delimiters", eg none of: \n\r \t#(){}[]<>=:"'` */
+
+delimstr ::= /* A sequence of characters that both starts and ends with the same character from the following: "'` */
+
+string ::= rawstr | delimstr
+
+// Basic Syntax
+value ::= command | variable | objectlit | string
+
+name ::= rawstr [':' rawstr]
+
+command ::= '(' (value | name) {value} ')'
+
+variable ::= '[' (value | name) {value} {'=' value} ']'
+
+objectlit ::= '<' name {value ['=' value]} '>'
+
+block ::= '{' {value} '}'
+
+// Declarations
+vardecl ::= 'var' name ['=' value]
+
+moddecl ::= 'module' name
+
+args ::= {name ['=' value]}
+comdecl ::= 'command' name [args] block
+blockdecl ::= 'block' [args] block

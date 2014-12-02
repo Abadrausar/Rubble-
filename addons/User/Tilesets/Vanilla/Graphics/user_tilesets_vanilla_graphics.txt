@@ -1,4 +1,4 @@
-[OBJECT:GRAPHICS]{@GRAPHICS_FILE}{#INSTALL_GRAPHICS_FILE;user_tilesets_vanilla_graphics.bmp}
+[OBJECT:GRAPHICS]{@GRAPHICS_FILE}{@INSTALL_GRAPHICS_FILE;user_tilesets_vanilla_graphics.bmp}
 
 [TILE_PAGE:DWARVES]
 	[FILE:user_tilesets_vanilla_graphics.bmp]

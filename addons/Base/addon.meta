@@ -4,7 +4,7 @@
 	description=`
 The following changes have been made from vanilla:
 	Some of the files have been re-indented (tag order is not effected).
-	The dwarf creature has templates from the "Libs/Castes" addon installed.
+	The dwarf creature has templates from the "Libs/Castes" addon inserted.
 	Specialized SHARED_OBJECT templates have been inserted where appropriate.
 	REACTION and BUILDING_WORKSHOP templates have been inserted where appropriate.
 	@BUILD_KEY templates have been inserted where appropriate.
@@ -12,8 +12,8 @@ The following changes have been made from vanilla:
 	!ENTITY_PLAYABLE templates have been added to all entities.
 	The dwarven outpost liaison has been modded to works as a trade rep if the dwarves are unplayable.
 	Dwarves have the alchemist labor permitted in their entity.
-	Creatures have #TILE and #COLOR templates inserted.
 	All file IDs have been stripped.
+	The files from "objects/text" have been added (with appropriate templates inserted).
 	Added #ENTITY_NOBLES to all entities except SKULKING and SUBTERRANEAN_ANIMAL_PEOPLES.
 `
 	

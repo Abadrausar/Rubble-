@@ -103,37 +103,6 @@ command rubble:sharedobject_add id raws {
 # Specialized versions of SHARED_OBJECT
 
 (rubble:template "SHARED_PLANT" block id raws {
-	# Tree Tiles
-	[raws = (regex:replace "\\[TREE_TILE:([0-9]+|'.')\\]" [raws] (str:add "[TREE_TILE:{#TILE;" [id] ";TREE;$1}]"))]
-	[raws = (regex:replace "\\[DEAD_TREE_TILE:([0-9]+|'.')\\]" [raws] (str:add "[DEAD_TREE_TILE:{#TILE;" [id] ";DEAD_TREE;$1}]"))]
-	[raws = (regex:replace "\\[SAPLING_TILE:([0-9]+|'.')\\]" [raws] (str:add "[SAPLING_TILE:{#TILE;" [id] ";SAPLING;$1}]"))]
-	[raws = (regex:replace "\\[DEAD_SAPLING_TILE:([0-9]+|'.')\\]" [raws] (str:add "[DEAD_SAPLING_TILE:{#TILE;" [id] ";DEAD_SAPLING;$1}]"))]
-	
-	# Tree Colors
-	[raws = (regex:replace "\\[TREE_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[TREE_COLOR:{#COLOR;" [id] ";TREE;$1}]"))]
-	[raws = (regex:replace "\\[DEAD_TREE_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DEAD_TREE_COLOR:{#COLOR;" [id] ";DEAD_TREE;$1}]"))]
-	[raws = (regex:replace "\\[SAPLING_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[SAPLING_COLOR:{#COLOR;" [id] ";SAPLING;$1}]"))]
-	[raws = (regex:replace "\\[DEAD_SAPLING_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DEAD_SAPLING_COLOR:{#COLOR;" [id] ";DEAD_SAPLING;$1}]"))]
-	
-	# Crop Tiles
-	[raws = (regex:replace "\\[PICKED_TILE:([0-9]+|'.')\\]" [raws] (str:add "[PICKED_TILE:{#TILE;" [id] ";PICKED;$1}]"))]
-	[raws = (regex:replace "\\[DEAD_PICKED_TILE:([0-9]+|'.')\\]" [raws] (str:add "[DEAD_PICKED_TILE:{#TILE;" [id] ";DEAD_PICKED;$1}]"))]
-	[raws = (regex:replace "\\[SHRUB_TILE:([0-9]+|'.')\\]" [raws] (str:add "[SHRUB_TILE:{#TILE;" [id] ";SHRUB;$1}]"))]
-	[raws = (regex:replace "\\[DEAD_SHRUB_TILE:([0-9]+|'.')\\]" [raws] (str:add "[DEAD_SHRUB_TILE:{#TILE;" [id] ";DEAD_SHRUB;$1}]"))]
-	
-	# Crop Colors
-	[raws = (regex:replace "\\[PICKED_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[PICKED_COLOR:{#COLOR;" [id] ";PICKED;$1}]"))]
-	[raws = (regex:replace "\\[DEAD_PICKED_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DEAD_PICKED_COLOR:{#COLOR;" [id] ";DEAD_PICKED;$1}]"))]
-	[raws = (regex:replace "\\[SHRUB_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[SHRUB_COLOR:{#COLOR;" [id] ";SHRUB;$1}]"))]
-	[raws = (regex:replace "\\[DEAD_SHRUB_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DEAD_SHRUB_COLOR:{#COLOR;DEAD_SHRUB" [id] ";DEAD_SHRUB;$1}]"))]
-	
-	# Grass Tiles
-	[raws = (regex:replace "\\[GRASS_TILES:((?:[0-9]+|'.'):(?:[0-9]+|'.'):(?:[0-9]+|'.'):(?:[0-9]+|'.'))\\]" [raws] (str:add "[GRASS_TILES:{#TILE;" [id] ";GRASS;$1}]"))]
-	[raws = (regex:replace "\\[ALT_GRASS_TILES:((?:[0-9]+|'.'):(?:[0-9]+|'.'):(?:[0-9]+|'.'):(?:[0-9]+|'.'))\\]" [raws] (str:add "[ALT_GRASS_TILES:{#TILE;" [id] ";ALT_GRASS;$1}]"))]
-	
-	# Grass Colors
-	[raws = (regex:replace "\\[GRASS_COLORS:((?:[0-9]+:[0-9]+:[0-9]+):(?:[0-9]+:[0-9]+:[0-9]+):(?:[0-9]+:[0-9]+:[0-9]+):(?:[0-9]+:[0-9]+:[0-9]+))\\]" [raws] (str:add "[GRASS_COLORS:{#COLOR;" [id] ";GRASS;$1}]"))]
-	
 	(rubble:stageparse (str:add
 		"{SHARED_OBJECT;" [id] ";\n"
 		"[PLANT:" [id] "]\n\t"
@@ -143,12 +112,6 @@ command rubble:sharedobject_add id raws {
 })
 
 (rubble:template "SHARED_INORGANIC" block id raws {
-	[raws = (regex:replace "\\[ITEM_SYMBOL:([0-9]+|'.')\\]" [raws] (str:add "[ITEM_SYMBOL:{#TILE;" [id] ";ITEM;$1}]"))]
-	[raws = (regex:replace "\\[TILE:([0-9]+|'.')\\]" [raws] (str:add "[TILE:{#TILE;" [id] ";;$1}]"))]
-	
-	[raws = (regex:replace "\\[DISPLAY_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DISPLAY_COLOR:{#COLOR;" [id] ";;$1}]"))]
-	[raws = (regex:replace "\\[BUILD_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[BUILD_COLOR:{#COLOR;" [id] ";BUILD;$1}]"))]
-	
 	(rubble:stageparse (str:add
 		"{SHARED_OBJECT;" [id] ";\n"
 		"[INORGANIC:" [id] "]\n\t"
@@ -158,12 +121,6 @@ command rubble:sharedobject_add id raws {
 })
 
 (rubble:template "SHARED_MATERIAL_TEMPLATE" block id raws {
-	[raws = (regex:replace "\\[ITEM_SYMBOL:([0-9]+|'.')\\]" [raws] (str:add "[ITEM_SYMBOL:{#TILE;" [id] ";ITEM_SYMBOL;$1}]"))]
-	[raws = (regex:replace "\\[TILE:([0-9]+|'.')\\]" [raws] (str:add "[TILE:{#TILE;" [id] ";;$1}]"))]
-	
-	[raws = (regex:replace "\\[DISPLAY_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[DISPLAY_COLOR:{#COLOR;" [id] ";;$1}]"))]
-	[raws = (regex:replace "\\[BUILD_COLOR:([0-9]+:[0-9]+:[0-9]+)\\]" [raws] (str:add "[BUILD_COLOR:{#COLOR;" [id] ";BUILD;$1}]"))]
-	
 	(rubble:stageparse (str:add
 		"{SHARED_OBJECT;" [id] ";\n"
 		"[MATERIAL_TEMPLATE:" [id] "]\n\t"

@@ -4,9 +4,14 @@ If you see something nice in here that you want to use with your mod feel free t
 
 You know, the problem with formal TODO lists like this is that they rapidly fill up with things that I should do, but am too lazy to finish for the foreseeable future...
 
+The fastest way to ensure something never gets done is to add it to this list, *sigh*
+
+================================================================
+
 Make the effect of "User/Speluncaphobia" wear off when maximum cave adaption hits.
 
 "User/Speluncaphobia/DFHack" is bugged (that or DFHack is). Determine where the problem is and fix it (or get it fixed)!
+	It's an item-trigger issue, wait for it to be fixed and things should start working.
 
 Playable everyone:
 	Remember: Most of the special stuff needs to be in generic addons, if you want to play dwarves with elven wood working that should be possible. The race addon should just set a general "flavor".
@@ -42,21 +47,6 @@ Finish the powered sensors:
 	Other:
 		Repeater (wait y ticks, turn on, wait x ticks, turn off, repeat)
 
-Succession fort tools
-	A way to handle multiple tilesets on one world (in a user friendly way).
-	The problem is that the current system (regen) is too easy to mess a world up with.
-	
-	Proposal A:
-		A special "succession mode":
-			Batch generate a special raw set that supports multiple tilesets (via raw switching)
-				You choose your addons, then choose tileset addons, one raw set is generated per tileset addon
-		A tileset switcher utility (using the already generated raw sets)
-		
-	Proposal B:
-		A utility that reads a Rubble tileset file and modifies existing raws with the information.
-		Basically the parsing from "Dev/Tileset/Insert" paired with something to parse the tileset file.
-		More flexible than proposal A, but may be harder to implement.
-
 Crystal Thorn
 	A slow growing (but not too slow!) farmable plant that has two uses:
 		It may be processed to a low value raw gem
@@ -73,7 +63,7 @@ Port the old "BD/Farming/Basics", but with faster plant growth.
 	Add more "special" plants (like the above idea), make sure there are several plants for each niche, etc.
 		Some plants should be similar, but with different processing and/or byproducts
 			For example several oil plants, some fast growing, but producing a cheap toxic oil (good only for soap) and some slow growing, but capable of producing an edible oil that can be cooked OR made into soap.
-			Another example would be berries, they can be eaten or brewed, while some other plants may be ground then pressed, to provide both food AND drink from the same plant.
+			Another example would be berries, they can be eaten or brewed, while some other plants may be ground then pressed, to provide both food AND drink from the same plant (although press cake would be less valuable than the whole plant).
 	Now that I have a good system for config vars variable difficulty is possible...
 
 A powered screw press.

@@ -1,0 +1,8 @@
+<rubble:addonmeta
+	header=`Restores the default ASCII tile mappings.`
+	
+	description=`
+This addon is strictly for use when switching tilesets on a world in progress.
+It is possible to use during normal generation, but it won't do anything.
+`
+>
