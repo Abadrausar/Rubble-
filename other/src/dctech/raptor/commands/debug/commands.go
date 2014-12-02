@@ -44,7 +44,6 @@ func Setup(state *raptor.State) {
 	state.NewNativeCommand("debug:list", CommandDebug_List)
 	state.NewNativeCommand("debug:namespace", CommandDebug_NameSpace)
 	state.NewNativeCommand("debug:env", CommandDebug_Env)
-	state.NewNativeCommand("debug:clrret", CommandDebug_ClrRet)
 }
 
 // Break into the debugging shell.
@@ -242,11 +241,4 @@ func CommandDebug_Env(script *raptor.Script, params []*raptor.Value) {
 		}
 	}
 	script.Println("+-------------------------------------------+")
-}
-
-// Set the return value to nil.
-// 	debug:clrret
-// Returns nil.
-func CommandDebug_ClrRet(script *raptor.Script, params []*raptor.Value) {
-	script.RetVal = nil
 }

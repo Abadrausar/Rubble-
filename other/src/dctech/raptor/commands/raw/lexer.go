@@ -33,8 +33,6 @@ const (
 	stReadParam
 )
 
-var lex *rawlexer
-
 // rawlexer is a Dwarf Fortress raw file lexer reading from a string.
 // The lexer interfaces with Raptor by acting like an Indexable.
 type rawlexer struct {

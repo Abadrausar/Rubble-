@@ -1,0 +1,39 @@
+
+Early versions of Rubble were heavily based on a similar utility, Blast, but recent versions resemble that utility only in the basic syntax.
+
+Compared to Blast:
+Pros:
+	No need for an external runtime, Rubble is a native application
+	Addons may override each other's files
+	Full parser/lexer, not just a bunch of regular expressions
+	It's really easy to mix script code and raw text in a template, use whichever one is easier
+	Variable expansion, no more GET_VAR, works in any parse stage
+	Many templates for registering objects and the like are replacements for vanilla raw tags allowing better formatting
+	Some files may be parsed but not included in the generated raws
+	Support for easily and quickly installing tilesets as addons
+	Allows you to run "tweak scripts" before or after generation for fine-tuning the results
+	Support for external launchers via the command line
+	Easy to use GUI to enable and disable addons (it's windows only, sorry)
+	Addons can be grouped into directories to make relations clear (and to make addon packs easy to distribute)
+	Support for loading addons (and groups of addons) directly from zip files
+	Has an extra template prefix for greater flexibility
+	Faster (not that it really matters)
+
+Cons:
+	No support for handling file name collisions in any way other than as an override
+	No support for Blast namespaces (eg. @, @@, and @@@)
+	Variables are simple key:value pairs instead of Blast's more powerful system
+	No built-in pretty printer (unless, like me, you think of this as a pro :) )
+	No per-addon configuration file (unless you script in support for one)
+	The scripting language isn't exactly mainstream
+
+
+Why Another Raw Generator?
+
+Blast is too... narrow. It allows you to do all kinds of stuff but is too hard (for me) to extend. Basically I just wanted something that allowed me to do most of the things I could do with Blast, but with less fuss.
+
+Of course if you know Perl and don't want to learn Raptor (Rubble's scripting language) you will be in the same situation I was in with Blast, just in reverse ;)
+
+I have put a huge amount of effort into making Rubble as flexible and powerful as possible, so newer features like tweak scripts and the new addon loader make Blast look like a toy, a cool, powerful toy, but a toy nonetheless.
+
+Blast is still a good utility, but if you don't mind learning a new scripting language (and even if you do) Rubble is far more powerful.

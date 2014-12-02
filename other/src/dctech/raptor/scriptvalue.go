@@ -26,13 +26,14 @@ package raptor
 import "strconv"
 
 const (
-	TypObject  = iota // Generic data, possibly an Indexable.
-	TypString         // A string
-	TypInt            // An int64
-	TypFloat          // A float64
-	TypBool           // A boolean
-	TypCode           // A *CompiledScript
-	TypCommand        // A command reference, basicly a string with a special type value.
+	TypNil  = iota // Nothing.
+	TypObject      // Generic data, possibly an Indexable.
+	TypString      // A string
+	TypInt         // An int64
+	TypFloat       // A float64
+	TypBool        // A boolean
+	TypCode        // A *CompiledScript
+	TypCommand     // A command reference, basically a string with a special type value.
 )
 
 // Why do I have this type? It makes refactoring easier.
@@ -45,7 +46,16 @@ type Value struct {
 	Pos  *PositionInfo
 }
 
-// NewValueString creates a new Value from a string
+// NewValue creates a new nil Value.
+func NewValue() *Value {
+	this := new(Value)
+	this.Type = TypNil
+	this.Data = nil
+	this.Pos = NewPositionInfo(0, -1)
+	return this
+}
+
+// NewValueString creates a new Value from a string.
 func NewValueString(val string) *Value {
 	this := new(Value)
 	this.Type = TypString
@@ -54,7 +64,7 @@ func NewValueString(val string) *Value {
 	return this
 }
 
-// NewValueInt64 creates a new Value from a int64
+// NewValueInt64 creates a new Value from a int64.
 func NewValueInt64(val int64) *Value {
 	this := new(Value)
 	this.Type = TypInt
@@ -63,7 +73,7 @@ func NewValueInt64(val int64) *Value {
 	return this
 }
 
-// NewValueFloat64 creates a new Value from a float64
+// NewValueFloat64 creates a new Value from a float64.
 func NewValueFloat64(val float64) *Value {
 	this := new(Value)
 	this.Type = TypFloat
@@ -72,7 +82,7 @@ func NewValueFloat64(val float64) *Value {
 	return this
 }
 
-// NewValueBool creates a new Value from a bool
+// NewValueBool creates a new Value from a bool.
 func NewValueBool(val bool) *Value {
 	this := new(Value)
 	this.Type = TypBool
@@ -81,7 +91,7 @@ func NewValueBool(val bool) *Value {
 	return this
 }
 
-// NewValueCode creates a new Value from a *CompiledScript
+// NewValueCode creates a new Value from a *CompiledScript.
 func NewValueCode(val *CompiledScript) *Value {
 	this := new(Value)
 	this.Type = TypCode
@@ -90,7 +100,7 @@ func NewValueCode(val *CompiledScript) *Value {
 	return this
 }
 
-// NewValueObject creates a new Value with the type TypObject
+// NewValueObject creates a new Value with the type TypObject.
 func NewValueObject(val EmptyInterface) *Value {
 	this := new(Value)
 	this.Type = TypObject
@@ -99,7 +109,7 @@ func NewValueObject(val EmptyInterface) *Value {
 	return this
 }
 
-// NewValueCommand creates a new Value with the type TypCommand
+// NewValueCommand creates a new Value with the type TypCommand.
 func NewValueCommand(val string) *Value {
 	this := new(Value)
 	this.Type = TypCommand
@@ -127,6 +137,11 @@ func TokenToValue(tok *Token) *Value {
 		this.Type = TypBool
 		this.Data = false
 		return this
+	}
+
+	if tok.Lexeme == "nil" {
+		this.Type = TypNil
+		this.Data = nil
 	}
 
 	intval, err := strconv.ParseInt(tok.Lexeme, 0, 64)
@@ -184,6 +199,9 @@ func (this *Value) CodeString() string {
 		}
 
 		return index.CodeString()
+	
+	case TypNil:
+		return "nil"
 	}
 	panic("CodeString: Script Value has invalid Type.")
 }
@@ -220,6 +238,9 @@ func (this *Value) String() string {
 		}
 
 		return index.String()
+		
+	case TypNil:
+		return "nil"
 	}
 	panic("String: Script Value has invalid Type.")
 }
@@ -254,6 +275,9 @@ func (this *Value) Int64() int64 {
 		return 0
 
 	case TypObject:
+		return 0
+		
+	case TypNil:
 		return 0
 	}
 	panic("Int64: Script Value has invalid Type.")
@@ -290,6 +314,9 @@ func (this *Value) Float64() float64 {
 
 	case TypObject:
 		return 0.0
+		
+	case TypNil:
+		return 0.0
 	}
 	panic("Float64: Script Value has invalid Type.")
 }
@@ -322,6 +349,9 @@ func (this *Value) Bool() bool {
 
 	case TypObject:
 		return this.Data != nil
+		
+	case TypNil:
+		return false
 	}
 	panic("Bool: Script Value has invalid Type.")
 }

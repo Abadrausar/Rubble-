@@ -1,4 +1,15 @@
 
+v2.2
+	Added new type: nil, used for new/empty values.
+		Converts as "nil", 0, false
+	Removed debug:clrret, no longer needed/useful.
+	var now sets uninitialized variables to nil.
+	The syntax checker may now attempt to check commands and object literals.
+		(may result in false positives for missing commands)
+	New param for shell: "-all", makes the syntax checker check commands and object literals.
+	New base command: copy, makes a new script value with the same value as the old.
+	New command package: thread, adds threading support.
+
 v2.1.2
 	Added new version of the Run function to the state: RunShell.
 		Used for cases where you would expect "global" variables to be preserved.

@@ -32,6 +32,14 @@ func CommandCommand(script *raptor.Script, params []*raptor.Value)
 
     Returns unchanged.
 
+func CommandCopy(script *raptor.Script, params []*raptor.Value)
+    Copies a value.
+
+	copy value
+
+    Note that this command may not be useful for types object and code. The
+    new value has invalid position info. Returns the new value.
+
 func CommandDelCommand(script *raptor.Script, params []*raptor.Value)
     Deletes a command. Be careful with this one! Some actions are not
     reversable from a script.
@@ -239,6 +247,7 @@ func Setup(state *raptor.State)
 	delnamespace
 	var
 	delvar
+	copy
 	this
 	set
 	exists

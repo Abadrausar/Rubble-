@@ -7,13 +7,6 @@ package debug
 
 FUNCTIONS
 
-func CommandDebug_ClrRet(script *raptor.Script, params []*raptor.Value)
-    Set the return value to nil.
-
-	debug:clrret
-
-    Returns nil.
-
 func CommandDebug_Env(script *raptor.Script, params []*raptor.Value)
     List variables in all environments.
 

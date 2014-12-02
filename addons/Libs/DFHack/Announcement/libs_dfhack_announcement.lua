@@ -42,5 +42,5 @@ local color = _G[color_id]
 dfhack.gui.showAnnouncement(text, color)
 
 local log = io.open('gamelog.txt', 'a')
-log:write(msg.."\n")
+log:write(text.."\n")
 log:close()

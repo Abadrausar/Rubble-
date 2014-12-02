@@ -311,8 +311,8 @@ func (this *State) RunCommand(script *Script, command string, params ...*Value) 
 		script.Code.Clear()
 		script.Envs.Clear()
 		script.Host = nil
-		//script.RetVal = nil
-		script.This = nil
+		//script.RetVal = NewValue()
+		script.This = NewValue()
 		script.Exit = false
 		script.Return = false
 		script.Break = false
@@ -353,8 +353,8 @@ func (this *State) Run(script *Script) (ret *Value, err error) {
 		script.Code.Clear()
 		script.Envs.Clear()
 		script.Host = nil
-		//script.RetVal = nil
-		script.This = nil
+		//script.RetVal = NewValue()
+		script.This = NewValue()
 		script.Exit = false
 		script.Return = false
 		script.Break = false
@@ -395,8 +395,8 @@ func (this *State) RunShell(script *Script) (ret *Value, err error) {
 		script.Code.Clear()
 		script.Envs.ClearAllButRoot()
 		script.Host = nil
-		//script.RetVal = nil
-		script.This = nil
+		//script.RetVal = NewValue()
+		script.This = NewValue()
 		script.Exit = false
 		script.Return = false
 		script.Break = false
@@ -406,3 +406,32 @@ func (this *State) RunShell(script *Script) (ret *Value, err error) {
 	script.Exec()
 	return // Required :(
 }
+
+// Validate checks a script to make sure all braces are matched and things like derefs are correctly formed.
+// Running this from the State allows some further interactions.
+// See the docs for the Script version for more details.
+func (this *State) Validate(script *Script) (err error) {
+	script.Host = this
+	
+	err = nil
+
+	defer func() {
+		if x := recover(); x != nil {
+			switch i := x.(type) {
+			case error:
+				err = i
+			case string:
+				err = fmt.Errorf("%v Near %v", i, script.Code.Last().Position())
+			default:
+				err = errors.New(fmt.Sprint(i))
+			}
+		}
+		
+		script.Host = nil
+		script.Code.Clear()
+	}()
+	
+	script.validate()
+	return
+}
+

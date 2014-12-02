@@ -44,8 +44,10 @@ import "dctech/raptor/commands/raw"
 import "dctech/raptor/commands/regex"
 import "dctech/raptor/commands/sort"
 import "dctech/raptor/commands/str"
+import "dctech/raptor/commands/thread"
 import "io/ioutil"
 import "flag"
+import "runtime"
 
 // The bit about "Enter Ctrl+Z to exit." is true in windows when using the default command prompt, 
 // I have no idea how to generate an EOF in linux/mac.
@@ -59,10 +61,12 @@ var ScriptPath string
 var Compile string
 var BinVersion int
 var Validate bool
+var ValidateAll bool
 var NoExit bool
 var NoPredefs bool
 var NoRecover bool
 var LexTest bool
+var Threaded bool
 
 var preDefs = `
 	# increment variable
@@ -108,13 +112,19 @@ func main() {
 	flag.StringVar(&Compile, "compile", "", "Path to the output file. Changes to compile mode. Needs -script to be set.")
 	flag.IntVar(&BinVersion, "binversion", 4, "Force a specific binary version. Fallback rules still apply.")
 	flag.BoolVar(&Validate, "validate", false, "Run script through the syntax checker and exit. Use with -script.")
+	flag.BoolVar(&ValidateAll, "all", false, "Check commands and object literals, may result in false positives. Use with -validate.")
 	flag.BoolVar(&NoExit, "noexit", false, "If set changes from batch mode to interactive mode. Use with -script.")
 	flag.BoolVar(&NoPredefs, "nopredefs", false, "If set disables the shell predefs.")
 	flag.BoolVar(&NoRecover, "norecover", false, "If set disables error recovery. Use for debuging the runtime.")
 	flag.BoolVar(&LexTest, "lextest", false, "Makes the shell run a lexer test and exit.")
+	flag.BoolVar(&Threaded, "threads", false, "Allows the shell to use more than one processor core, not useful unless running a threaded script.")
 
 	flag.Parse()
 
+	if Threaded {
+		runtime.GOMAXPROCS(runtime.NumCPU())
+	}
+	
 	fmt.Print(header)
 
 	// Lexer test
@@ -142,7 +152,7 @@ func main() {
 	script := raptor.NewScript()
 	state.NoRecover = NoRecover
 
-	if Validate {
+	if Validate && !ValidateAll {
 		fmt.Println("Validating Script File...")
 		if ScriptPath == "" {
 			fmt.Println("Validate Error: No script set.")
@@ -188,6 +198,7 @@ func main() {
 	regex.Setup(state)
 	sort.Setup(state)
 	str.Setup(state)
+	thread.Setup(state)
 
 	// Add any command line params to the state.
 	script.AddParams(flag.Args()...)
@@ -202,6 +213,34 @@ func main() {
 			fmt.Println("Predefine Ret:", rtn)
 		}
 		script.RetVal = nil
+	}
+
+	if Validate && ValidateAll {
+		fmt.Println("Validating Script File...")
+		if ScriptPath == "" {
+			fmt.Println("Validate Error: No script set.")
+			return
+		}
+		
+		file, err := ioutil.ReadFile(ScriptPath)
+		if err != nil {
+			fmt.Println("Validate Error:", err)
+			return
+		}
+		
+		err = raptor.LoadFile(file, script)
+		if err != nil {
+			fmt.Println("Validate Error:", err)
+			return
+		}
+		
+		err = state.Validate(script)
+		if err != nil {
+			fmt.Println("Validate Error:", err)
+			return
+		}
+		fmt.Println("Validation Successful.")
+		return
 	}
 
 	// Compile the provided script if Compile is set

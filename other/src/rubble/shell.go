@@ -54,7 +54,7 @@ func ShellModeRun() {
 	
 	script := raptor.NewScript()
 
-	if Validate {
+	if Validate && !ValidateAll {
 		LogPrintln("Validating Script File...")
 		if ScriptPath == "" {
 			LogPrintln("Validate Error: No script set.")
@@ -95,6 +95,34 @@ func ShellModeRun() {
 			LogPrintln("Predefine Ret:", rtn)
 		}
 		script.RetVal = nil
+	}
+
+	if Validate && ValidateAll {
+		LogPrintln("Validating Script File...")
+		if ScriptPath == "" {
+			LogPrintln("Validate Error: No script set.")
+			return
+		}
+		
+		file, err := ioutil.ReadFile(ScriptPath)
+		if err != nil {
+			LogPrintln("Validate Error:", err)
+			return
+		}
+		
+		err = raptor.LoadFile(file, script)
+		if err != nil {
+			LogPrintln("Validate Error:", err)
+			return
+		}
+		
+		err = GlobalRaptorState.Validate(script)
+		if err != nil {
+			LogPrintln("Validate Error:", err)
+			return
+		}
+		LogPrintln("Validation Successful.")
+		return
 	}
 
 	// Compile the provided script if Compile is set

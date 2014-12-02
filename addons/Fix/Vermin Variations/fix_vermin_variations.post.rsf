@@ -101,36 +101,36 @@
 		[CVCT_REPLACEMENT:ANY_LAKE]
 ")
 
-(if (exists [rubble:raws] "c_variation_default"){}{(ret "")})
-(var file (raw:init [rubble:raws "c_variation_default"]))
-(var tag (raw:current))
+(if (exists [rubble:raws] "c_variation_default.txt"){}{(ret "")})
+(var file (raw:init [rubble:raws "c_variation_default.txt"]))
+(var tag (raw:current [file]))
 (loop {
-	(raw:advance)
+	(raw:advance [file])
 	
-	(if (raw:valid){}{(breakloop false)})
+	(if (raw:valid [file]){}{(breakloop false)})
 	
 	(if (str:cmp [tag id] "CREATURE_VARIATION") {
 		(if (int:eq (len [tag]) 1) {
 			
 			(if (str:cmp [tag 0] "ANIMAL_PERSON") {
-				(raw:append [fixbiomes])
+				(raw:append [file] [fixbiomes])
 			})
 			
 			(if (str:cmp [tag 0] "ANIMAL_PERSON_LEGLESS") {
-				(raw:append [fixbiomes])
+				(raw:append [file] [fixbiomes])
 			})
 			
 			(if (str:cmp [tag 0] "GIANT") {
-				(raw:append (str:add [fixbiomes] [fixage]))
+				(raw:append [file] (str:add [fixbiomes] [fixage]))
 			})
 			
 		}{
-			(panic "invalid param count to CREATURE_VARIATION raw tag in c_variation_default")
+			(panic "invalid param count to CREATURE_VARIATION raw tag in c_variation_default.txt")
 		})
 	})
 	
 	(break true)
 })
 
-(set [rubble:raws] "c_variation_default" (raw:dump))
+(set [rubble:raws] "c_variation_default.txt" (raw:dump [file]))
 (ret "")

@@ -7,7 +7,9 @@ The information here details how it should be, if that's not how it is, it's a b
 ==============================================
 Detailed Order of Execution
 ==============================================
-
+	
+	This does not take shell mode into consideration!
+	
 	Config file is loaded (if present)
 	Commandline options are processed
 	All addons are loaded

@@ -5,14 +5,14 @@
 (foreach [rubble:raws] {
 	(if (str:cmp "inorganic_" (str:left [params 0] 10)) {
 		(var file (raw:init [params 1]))
-		(var tag (raw:current))
+		(var tag (raw:current [file]))
 		
 		(console:print "    " [params 0] "\n")
 		
 		(loop {
-			(raw:advance)
+			(raw:advance [file])
 			
-			(if (raw:valid){}{(breakloop false)})
+			(if (raw:valid [file]){}{(breakloop false)})
 			
 			(if (str:cmp [tag id] "AQUIFER") {
 				(raw:disable)
@@ -25,7 +25,7 @@
 		(set aquifercounttotal (int:add [aquifercounttotal] [aquifercount]))
 		(set aquifercount 0)
 		
-		(set [rubble:raws] [params 0] (raw:dump))
+		(set [rubble:raws] [params 0] (raw:dump [file]))
 	})
 	(break true)
 })

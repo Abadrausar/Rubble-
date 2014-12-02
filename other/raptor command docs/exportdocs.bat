@@ -19,3 +19,4 @@ call export raw
 call export regex
 call export sort
 call export str
+call export thread

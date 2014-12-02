@@ -1,6 +1,6 @@
 	
 Rubble Template Documentation
-User Templates defined in the base/templates addon.
+User Templates defined in the "Base/Templates" addon.
 
 ==============================================
 {COMMENT;<STUFF>...}

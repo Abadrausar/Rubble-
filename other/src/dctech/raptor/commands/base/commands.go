@@ -40,6 +40,7 @@ import "dctech/raptor"
 //	delnamespace
 //	var
 //	delvar
+//	copy
 //	this
 //	set
 //	exists
@@ -70,6 +71,7 @@ func Setup(state *raptor.State) {
 	state.NewNativeCommand("delnamespace", CommandDelNamespace)
 	state.NewNativeCommand("var", CommandVar)
 	state.NewNativeCommand("delvar", CommandDelVar)
+	state.NewNativeCommand("copy", CommandCopy)
 	state.NewNativeCommand("this", CommandThis)
 	state.NewNativeCommand("set", CommandSet)
 	state.NewNativeCommand("exists", CommandExists)
@@ -250,7 +252,7 @@ func CommandVar(script *raptor.Script, params []*raptor.Value) {
 		script.RetVal = params[1]
 		return
 	}
-	script.NewVar(params[0].String(), raptor.NewValueString(""))
+	script.NewVar(params[0].String(), raptor.NewValue())
 }
 
 // Deletes a variable.
@@ -261,6 +263,49 @@ func CommandDelVar(script *raptor.Script, params []*raptor.Value) {
 		panic("Wrong number of params to delvar.")
 	}
 	script.RetVal = script.DeleteVar(params[0].String())
+}
+
+// Copies a value.
+// 	copy value
+// Note that this command may not be useful for types object and code.
+// The new value has invalid position info.
+// Returns the new value.
+func CommandCopy(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to copy.")
+	}
+	
+	val := new(raptor.Value)
+	val.Type = params[0].Type
+	val.Pos = raptor.NewPositionInfo(0, -1)
+	
+	switch val.Type {
+	case raptor.TypString:
+		val.Data = params[0].Data.(string) // Not sure if this is needed, but it should work at least.
+
+	case raptor.TypInt:
+		val.Data = params[0].Data.(int64)
+
+	case raptor.TypFloat:
+		val.Data = params[0].Data.(float64)
+
+	case raptor.TypBool:
+		val.Data = params[0].Data.(bool)
+
+	case raptor.TypCode:
+		val.Data = params[0].Data
+
+	case raptor.TypCommand:
+		val.Data = params[0].Data.(string)
+
+	case raptor.TypObject:
+		val.Data = params[0].Data
+	
+	case raptor.TypNil:
+		val.Data = nil
+	}
+	
+	script.RetVal = val
 }
 
 // Retrieves the current "this" value.

@@ -62,8 +62,8 @@ func loadDir(source dcfs.DataSource, addonname, path string, addons []*Addon) []
 		path += "/"
 	}
 	
-	// Load a forced init script if any.
-	loadForcedInit(source, dirpath)
+	// Load a init script if any.
+	loadInit(source, dirpath)
 	
 	if containsParseable(source, dirpath) {
 		addons = append(addons, loadAddon(source, addonname, dirpath))
@@ -111,49 +111,61 @@ func classifyFile(file *AddonFile, filename string) string {
 	if strings.HasSuffix(filename, ".pre.rsf") || strings.HasSuffix(filename, ".pre.rbf") {
 		// is pre script
 		file.PreScript = true
-		return StripExt(StripExt(filename))
+		return filename
 	}
 	if strings.HasSuffix(filename, ".post.rsf") || strings.HasSuffix(filename, ".post.rbf") {
 		// is post script
 		file.PostScript = true
-		return StripExt(StripExt(filename))
+		return filename
 	}
 
 	if strings.HasSuffix(filename, ".rbl") {
 		// is rubble code (do not write out after parse)
 		file.NoWrite = true
-		return StripExt(filename)
+		return filename
 	}
 
 	if strings.HasSuffix(filename, ".txt") {
 		// is raw file
-		return StripExt(filename)
+		return filename
 	}
 
 	file.UserData = true
 	return filename
 }
 
-func loadForcedInit(source dcfs.DataSource, path string) {
+func loadInit(source dcfs.DataSource, path string) {
+	dirpath := path
 	if path != "" {
 		path += "/"
 	}
 	
-	content, err := source.OpenAndRead(path + "forced_init.rsf")
-	if err != nil {
-		content, err = source.OpenAndRead(path + "forced_init.rbf")
-		if err != nil {
-			return // No init script this addon
+	for _, filepath := range source.ListFiles(dirpath) {
+		if strings.HasSuffix(filepath, ".init.rsf") {
+			
+			content, err := source.OpenAndRead(path + filepath)
+			if err != nil {
+				panic(err)
+			}
+			ForcedInit = append(ForcedInit, content)
+			continue
+		}
+		if strings.HasSuffix(filepath, ".init.rbf") {
+			
+			content, err := source.OpenAndRead(path + filepath)
+			if err != nil {
+				panic(err)
+			}
+			ForcedInit = append(ForcedInit, content)
 		}
 	}
 	
-	ForcedInit = append(ForcedInit, content)
-	return 
+	return
 }
 
 func containsParseable(source dcfs.DataSource, path string) bool {
 	for _, filename := range source.ListFiles(path) {
-		if filename == "forced_init.rsf" || filename == "forced_init.rbf" {
+		if strings.HasSuffix(filename, ".init.rsf") || strings.HasSuffix(filename, ".init.rbf") {
 			continue
 		}
 		if strings.HasSuffix(filename, ".rsf") {

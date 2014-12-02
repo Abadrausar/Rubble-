@@ -26,6 +26,7 @@ import "flag"
 import "strings"
 import "io/ioutil"
 import "os"
+import "runtime"
 
 // Getting usage info and flag parse errors into the log file is a pain in the a**
 var Flags = flag.NewFlagSet("rubble", flag.ExitOnError)
@@ -46,9 +47,12 @@ var ScriptPath string
 var Compile string
 var BinVersion int
 var Validate bool
+var ValidateAll bool
 var NoExit bool
 var NoPredefs bool
 var RunForcedInit bool
+
+var Threaded bool
 
 func ParseCommandLine() {
 	Flags.SetOutput(logFile)
@@ -116,9 +120,16 @@ func ParseCommandLine() {
 	Flags.StringVar(&Compile, "compile", "", "Shell Mode: Path to the output file. Changes to compile mode. Needs -script to be set.")
 	Flags.IntVar(&BinVersion, "binversion", 4, "Shell Mode: Force a specific binary version. Fallback rules still apply.")
 	Flags.BoolVar(&Validate, "validate", false, "Shell Mode: Run script through the syntax checker and exit. Use with -script.")
+	Flags.BoolVar(&ValidateAll, "all", false, "Shell Mode: Check commands and object literals, may result in false positives. Use with -validate.")
 	Flags.BoolVar(&NoExit, "noexit", false, "Shell Mode: If set changes from batch mode to interactive mode. Use with -script.")
 	Flags.BoolVar(&NoPredefs, "nopredefs", false, "Shell Mode: If set disables the shell predefs.")
 	Flags.BoolVar(&RunForcedInit, "forcedinit", false, "Shell Mode: Run the Rubble forced init scripts before entering shell mode.")
 	
+	Flags.BoolVar(&Threaded, "threads", false, "Allows Rubble to use more than one processor core, not useful except for running threaded tweak scripts.")
+	
 	Flags.Parse(os.Args[1:])
+	
+	if Threaded {
+		runtime.GOMAXPROCS(runtime.NumCPU())
+	}
 }

@@ -245,7 +245,7 @@
 		(ret "")
 	})
 	
-	(var out)
+	(var out "")
 	(foreach [rubble:reaction_class_data [id]] {
 		(set out (str:add [out] "\n\t[REACTION_CLASS:" [params 0] "]"))
 		(break true)
@@ -274,7 +274,7 @@
 		(ret "")
 	})
 	
-	(var out)
+	(var out "")
 	(foreach [rubble:reaction_product_data [id]] {
 		(set out (str:add [out] "\n\t[MATERIAL_REACTION_PRODUCT:" [params 0] ":" [params 1] "]"))
 		(break true)

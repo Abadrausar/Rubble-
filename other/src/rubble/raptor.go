@@ -40,6 +40,7 @@ import "dctech/raptor/commands/raw"
 import "dctech/raptor/commands/regex"
 import "dctech/raptor/commands/sort"
 import "dctech/raptor/commands/str"
+import "dctech/raptor/commands/thread"
 
 import "regexp"
 import "strings"
@@ -70,6 +71,7 @@ func InitScripting() {
 	regex.Setup(state)
 	sort.Setup(state)
 	str.Setup(state)
+	thread.Setup(state)
 	
 	state.NewNameSpace("rubble")
 	state.NewNamespacedVar("rubble:dfdir", raptor.NewValueString(DFDir))

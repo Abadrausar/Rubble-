@@ -24,16 +24,19 @@ package sort
 
 import "dctech/raptor"
 import "sort"
+import "sync"
 
 type OrderedMap struct {
 	data map[string]*raptor.Value
 	order []string
+	lock *sync.RWMutex
 }
 
 func NewOrderedMap() raptor.EditIndexable {
 	this := new(OrderedMap)
 	this.data = make(map[string]*raptor.Value, 20)
 	this.order = make([]string, 0, 20)
+	this.lock = new(sync.RWMutex)
 	return this
 }
 
@@ -52,20 +55,27 @@ func NewOrderedMapFromIndexable(input raptor.Indexable) raptor.EditIndexable {
 }
 
 func (this *OrderedMap) Get(index string) *raptor.Value {
+	this.lock.RLock()
 	if _, ok := this.data[index]; ok {
-		return this.data[index]
+		tmp := this.data[index]
+		this.lock.RUnlock()
+		return tmp
 	}
+	this.lock.RUnlock()
 	return raptor.NewValueInt64(0)
 }
 
 func (this *OrderedMap) Set(index string, value *raptor.Value) bool {
+	this.lock.Lock()
 	if _, ok := this.data[index]; ok {
 		this.data[index] = value
+		this.lock.Unlock()
 		return true
 	}
 	this.order = append(this.order, index)
 	sort.Strings(this.order)
 	this.data[index] = value
+	this.lock.Unlock()
 	return true
 }
 

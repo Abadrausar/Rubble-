@@ -19,7 +19,7 @@ func CommandSort_New(script *raptor.Script, params []*raptor.Value)
 
 	sort:new
 
-    Returns a new (empty) ordered map.
+    Ordered maps are also thread safe. Returns a new (empty) ordered map.
 
 func NewOrderedMap() raptor.EditIndexable
 

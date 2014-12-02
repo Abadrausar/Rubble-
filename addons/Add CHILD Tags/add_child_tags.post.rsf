@@ -12,18 +12,19 @@
 
 # This loop makes a list of all creatures that do NOT have a CHILD tag...
 (console:print "    Generating Table...\n")
-(console:print "    (DOES_NOT_EXIST and EQUIPMENT_WAGON count as CHILD tags)\n")
+(console:print "    (DOES_NOT_EXIST, NOT_LIVING, and EQUIPMENT_WAGON count as CHILD tags)\n")
+(console:print "    (Vermin are skipped.)\n")
 (foreach [rubble:raws] {
 	(if (str:cmp "creature_" (str:left [params 0] 9)) {
 		(var file (raw:init [params 1]))
-		(var tag (raw:current))
+		(var tag (raw:current [file]))
 		
 		(console:print "      " [params 0] "\n")
 		
 		(loop {
-			(raw:advance)
+			(raw:advance [file])
 			
-			(if (raw:valid){}{(breakloop false)})
+			(if (raw:valid [file]){}{(breakloop false)})
 				
 			(if (str:cmp [tag id] "CREATURE") {
 				(++ creaturecount)
@@ -50,6 +51,22 @@
 			})
 			
 			(if (str:cmp [tag id] "EQUIPMENT_WAGON") {
+				(set haschild true)
+			})
+			
+			(if (str:cmp [tag id] "NOT_LIVING") {
+				(set haschild true)
+			})
+			
+			(if (str:cmp [tag id] "VERMIN_GROUNDER") {
+				(set haschild true)
+			})
+			
+			(if (str:cmp [tag id] "VERMIN_SOIL") {
+				(set haschild true)
+			})
+			
+			(if (str:cmp [tag id] "VERMIN_SOIL_COLONY") {
 				(set haschild true)
 			})
 			
@@ -80,19 +97,19 @@
 (foreach [rubble:raws] {
 	(if (str:cmp "creature_" (str:left [params 0] 9)) {
 		(var file (raw:init [params 1]))
-		(var tag (raw:current))
+		(var tag (raw:current [file]))
 		
 		(console:print "      " [params 0] "\n")
 		
 		(loop {
-			(raw:advance)
+			(raw:advance [file])
 			
-			(if (raw:valid){}{(breakloop false)})
+			(if (raw:valid [file]){}{(breakloop false)})
 				
 			(if (str:cmp [tag id] "CREATURE") {
 				(if (int:eq (len [tag]) 1) {
 					(if (exists [noCHILD] [tag 0]) {
-						(raw:append "\n\t[CHILD:1]")
+						(raw:append [file] "\n\t[CHILD:1]")
 						(++ fixedcount)
 					})
 				}{
@@ -106,7 +123,7 @@
 		(set fixedcounttotal (int:add [fixedcounttotal] [fixedcount]))
 		(set fixedcount 0)
 		
-		(set [rubble:raws] [params 0] (raw:dump))
+		(set [rubble:raws] [params 0] (raw:dump [file]))
 	})
 	(break true)
 })

@@ -66,6 +66,9 @@ To enter the shell run:
 To validate a script (syntax check only) run:
 'rubble -shell -validate -script="<script path>"'
 
+To validate a script (command and object lit check, may result in false positives) run:
+'rubble -shell -validate -all -forcedinit -nopredefs -script="<script path>"'
+
 To run a script in batch mode run:
 'rubble -shell -script="<script path>"'
 
@@ -122,16 +125,16 @@ Pitfalls to keep in mind:
 		To put it simply, you can't. Or rather you can, but Rubble will crash with an error on the next iteration. Remember to declare your variables ahead of time and if you REALLY don't want them around after the loop exits just delvar them away or surround the whole mess in a call to evalinnew.
 
 ==============================================
-Forced Initialization Scripts:
+FInitialization Scripts:
 ==============================================
 
-Forced init scripts are very limited, but also very useful. Basically they are Raptor scripts that ALWAYS run, even when their containing addon is not active.
-Forced init scripts are always named "forced_init.rsf" (or .rbf, .rsf takes precedence).
-Use forced init scripts to do setup that may be shared by multiple addons and HAS to be done. For example an excellent use for a forced init script is adding namespaces and global variables shared by a bunch of addons in an addon pack.
+Init scripts are very limited, but also very useful. Basically they are Raptor scripts that ALWAYS run, even when their containing addon is not active.
+Forced init scripts have the extension ".init.rsf" (or .rbf, .rsf takes precedence).
+Use init scripts to do setup that may be shared by multiple addons and HAS to be done. For example an excellent use for a forced init script is adding namespaces and global variables shared by a bunch of addons in an addon pack.
 
-Forced init scripts have a very narrow use-case and should be used with care.
+Init scripts have a very narrow use-case and should be used with care.
 
-Forced init scripts are still loaded as "user data" if their containing addon contains any parseables! Due to the way files override each other it is unlikely that this could be useful, but it is more work than it is worth to override the default behavior.
+Init scripts are still loaded as "user data" if their containing addon contains any parseables!
 
 ==============================================
 .rbf:
@@ -157,12 +160,11 @@ The following rules determine how addons are loaded:
 	Zip files and directories are identical as far as the loader is concerned except as otherwise specified.
 	If an addon contains one or more directories, the directories are loaded as child addons.
 	An addon without parseable files (.txt, .rbl, .rsf, .rbf) is not loaded (but any child addons are).
-		A forced init script is not considered a paresable file. (but such a script will still run)
+		An init script is not considered a paresable file. (but such a script will still run)
 
 The following rules determine how addon files override each other (if there is a name collision):
 	Addons in zip files will always override addons in directories.
 	Addons are loaded in alphabetical order, addon "aaa/zzz" will override "aaa/hhh" but not "bbb/zzz"
-	The file extension is ignored for parseable files (xyz/do_something.pre.rsf will override abc/do_something.post.rsf)
 
 If you have readmes or the like in an otherwise empty addon it is recommended that you do not give them a file extension, or better yet surround the file contents with <pre></pre> tags and change the extension to .htm, In any case you do not want such an addon appearing in addonlist.ini, so do not use any of the "parseable" extensions (.txt, .rbl, .rsf, .rbf).
 WTF was toady thinking when he used the .txt extension for raw files? Why not use .dfr or just .raw? (aside from the fact .raw is used by some audio files)

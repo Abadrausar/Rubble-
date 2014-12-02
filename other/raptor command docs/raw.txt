@@ -10,58 +10,57 @@ FUNCTIONS
 func CommandRaw_Advance(script *raptor.Script, params []*raptor.Value)
     Advances the parser to the next raw tag.
 
-	raw:advance
+	raw:advance file
 
     Returns unchanged.
 
 func CommandRaw_Append(script *raptor.Script, params []*raptor.Value)
     Adds text after the current tag.
 
-	raw:append text
+	raw:append file text
 
     Returns unchanged.
 
 func CommandRaw_Current(script *raptor.Script, params []*raptor.Value)
     Returns an indexable that always points to the current tag. You only
-    need to call this once.
+    need to call this once per file.
 
-	raw:current
+	raw:current file
 
     Returns the current raw tag.
 
 func CommandRaw_Disable(script *raptor.Script, params []*raptor.Value)
     Disables the current tag.
 
-	raw:disable
+	raw:disable file
 
     Returns unchanged.
 
 func CommandRaw_Dump(script *raptor.Script, params []*raptor.Value)
-    Dumps the raw file being opperated on as a string. Use this to write out
-    your edits.
+    Dumps a raw file as a string. Use this to write out your edits.
 
-	raw:dump
+	raw:dump file
 
     Returns the raw text.
 
 func CommandRaw_Init(script *raptor.Script, params []*raptor.Value)
-    Initalizes the raw parser.
+    Initializes the raw parser.
 
 	raw:init text
 
-    Returns unchanged.
+    Returns a handle to the raw file.
 
 func CommandRaw_Replace(script *raptor.Script, params []*raptor.Value)
     Replaces the current tag.
 
-	raw:replace replacement
+	raw:replace file replacement
 
     Returns unchanged.
 
 func CommandRaw_Valid(script *raptor.Script, params []*raptor.Value)
     Returns true if there is a valid tag.
 
-	raw:valid
+	raw:valid file
 
     Returns true or false.
 

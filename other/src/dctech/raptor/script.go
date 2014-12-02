@@ -49,6 +49,8 @@ func NewScript() *Script {
 	rtn.Envs = NewEnvStore()
 	rtn.Code = NewBlockStore()
 	rtn.Output = nil
+	rtn.This = NewValue()
+	rtn.RetVal = NewValue()
 	return rtn
 }
 
@@ -532,6 +534,8 @@ func (this *Script) fetchValue() *Value {
 // Validate checks a script to make sure all braces are matched and things like derefs are correctly formed.
 // Validate CANNOT ensure a script is valid! Validate will only find obvious syntax errors.
 // The check is "destructive" eg the code is consumed.
+// If validate is called from the state is will run further checks for commands and object literals 
+// (Note that this may result in false missing command errors).
 func (this *Script) Validate() (err error) {
 	err = nil
 
@@ -564,13 +568,30 @@ func (this *Script) validate() {
 
 func (this *Script) validateCommand() {
 	this.Code.Last().GetToken(TknCmdBegin)
-
+	
 	// Get the command's name
-	this.validateValue()
+	name := this.validateValue()
+	paramcount := -1
+	params := 0
 
+	if this.Host != nil {
+		// Check params and command existence
+		command := this.GetCommand(name.String())
+		if !command.VarParams || !command.Native {
+			paramcount = len(command.Params)
+		}
+	}
+	
 	// Read the commands parameters if any
 	for !this.Code.Last().CheckLookAhead(TknCmdEnd) {
 		this.validateValue()
+		params++
+	}
+	
+	if paramcount != -1 {
+		if paramcount != params {
+			panic("Invalid param count to " + name.String() + ".")
+		}
 	}
 	
 	this.Code.Last().GetToken(TknCmdEnd)
@@ -592,7 +613,11 @@ func (this *Script) validateDeref() {
 func (this *Script) validateObjLit() {
 	this.Code.Last().GetToken(TknObjLitBegin)
 
-	this.validateValue()
+	name := this.validateValue()
+	
+	if this.Host != nil {
+		this.GetType(name.String())
+	}
 
 	for !this.Code.Last().CheckLookAhead(TknObjLitEnd) {
 		this.validateValue()

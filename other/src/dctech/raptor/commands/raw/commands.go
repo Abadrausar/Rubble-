@@ -47,55 +47,92 @@ func Setup(state *raptor.State) {
 	state.NewNativeCommand("raw:dump", CommandRaw_Dump)
 }
 
-// Initalizes the raw parser.
+// Initializes the raw parser.
 // 	raw:init text
-// Returns unchanged.
+// Returns a handle to the raw file.
 func CommandRaw_Init(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to raw:text.")
+		panic("Wrong number of params to raw:init.")
 	}
-
-	lex = newRawLexer(params[0].String())
+	
+	script.RetVal = raptor.NewValueObject(newRawLexer(params[0].String()))
 }
 
 // Advances the parser to the next raw tag.
-// 	raw:advance
+// 	raw:advance file
 // Returns unchanged.
 func CommandRaw_Advance(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to raw:advance.")
+	}
+	if _, ok := params[0].Data.(*rawlexer); !ok {
+		panic("raw:advance: Param 0 is not a raw lexer.")
+	}
+	lex := params[0].Data.(*rawlexer)
+	
 	lex.advance()
 }
 
 // Returns true if there is a valid tag.
-// 	raw:valid
+// 	raw:valid file
 // Returns true or false.
 func CommandRaw_Valid(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to raw:valid.")
+	}
+	if _, ok := params[0].Data.(*rawlexer); !ok {
+		panic("raw:valid: Param 0 is not a raw lexer.")
+	}
+	lex := params[0].Data.(*rawlexer)
+	
 	script.RetVal = raptor.NewValueBool(lex.tagvalid)
 }
 
 // Returns an indexable that always points to the current tag.
-// You only need to call this once.
-// 	raw:current
+// You only need to call this once per file.
+// 	raw:current file
 // Returns the current raw tag.
 func CommandRaw_Current(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to raw:current.")
+	}
+	if _, ok := params[0].Data.(*rawlexer); !ok {
+		panic("raw:current: Param 0 is not a raw lexer.")
+	}
+	lex := params[0].Data.(*rawlexer)
+	
 	script.RetVal = raptor.NewValueObject(lex)
 }
 
 // Disables the current tag.
-// 	raw:disable
+// 	raw:disable file
 // Returns unchanged.
 func CommandRaw_Disable(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to raw:disable.")
+	}
+	if _, ok := params[0].Data.(*rawlexer); !ok {
+		panic("raw:disable: Param 0 is not a raw lexer.")
+	}
+	lex := params[0].Data.(*rawlexer)
+	
 	lex.source[lex.tagbegin] = '-'
 	lex.source[lex.tagend] = '-'
 }
 
 // Replaces the current tag.
-// 	raw:replace replacement
+// 	raw:replace file replacement
 // Returns unchanged.
 func CommandRaw_Replace(script *raptor.Script, params []*raptor.Value) {
-	if len(params) != 1 {
+	if len(params) != 2 {
 		panic("Wrong number of params to raw:replace.")
 	}
-	newstring := params[0].String()
+	if _, ok := params[0].Data.(*rawlexer); !ok {
+		panic("raw:replace: Param 0 is not a raw lexer.")
+	}
+	lex := params[0].Data.(*rawlexer)
+	
+	newstring := params[1].String()
 	beginstr := lex.source[:lex.tagbegin]
 	endstr := lex.source[lex.tagend+1:]
 
@@ -110,13 +147,18 @@ func CommandRaw_Replace(script *raptor.Script, params []*raptor.Value) {
 }
 
 // Adds text after the current tag.
-// 	raw:append text
+// 	raw:append file text
 // Returns unchanged.
 func CommandRaw_Append(script *raptor.Script, params []*raptor.Value) {
-	if len(params) != 1 {
+	if len(params) != 2 {
 		panic("Wrong number of params to raw:append.")
 	}
-	newstring := params[0].String()
+	if _, ok := params[0].Data.(*rawlexer); !ok {
+		panic("raw:append: Param 0 is not a raw lexer.")
+	}
+	lex := params[0].Data.(*rawlexer)
+	
+	newstring := params[1].String()
 	beginstr := lex.source[:lex.tagend+1]
 	endstr := lex.source[lex.tagend+1:]
 
@@ -130,10 +172,18 @@ func CommandRaw_Append(script *raptor.Script, params []*raptor.Value) {
 	lex.source = rtn
 }
 
-// Dumps the raw file being opperated on as a string.
+// Dumps a raw file as a string.
 // Use this to write out your edits.
-// 	raw:dump
+// 	raw:dump file
 // Returns the raw text.
 func CommandRaw_Dump(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to raw:dump.")
+	}
+	if _, ok := params[0].Data.(*rawlexer); !ok {
+		panic("raw:dump: Param 0 is not a raw lexer.")
+	}
+	lex := params[0].Data.(*rawlexer)
+	
 	script.RetVal = raptor.NewValueString(string(lex.source))
 }

@@ -52,6 +52,7 @@ func CommandSort_Map(script *raptor.Script, params []*raptor.Value) {
 
 // Creates a new ordered map.
 // 	sort:new
+// Ordered maps are also thread safe.
 // Returns a new (empty) ordered map.
 func CommandSort_New(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 {

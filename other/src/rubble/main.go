@@ -45,7 +45,7 @@ func main() {
 		}
 	}()
 
-	LogPrintln("Rubble v3.5")
+	LogPrintln("Rubble v3.6")
 	LogPrintln("After Blast comes Rubble.")
 	LogPrintln("=============================================")
 
@@ -308,10 +308,10 @@ func main() {
 		LogPrintln("  " + Files.Files[i].Path)
 
 		// HACK: Redo this
-		file := []byte(i + "\n\n" + string(Files.Files[i].Content))
-		err := ioutil.WriteFile(OutputDir+"/"+i+".txt", file, 0600)
+		file := []byte(StripExt(i) + "\n\n" + string(Files.Files[i].Content))
+		err := ioutil.WriteFile(OutputDir+"/"+i, file, 0600)
 		if err != nil {
-			panic("Script Error: " + err.Error())
+			panic("Write Error: " + err.Error())
 		}
 	}
 	LogPrintln("Done.")

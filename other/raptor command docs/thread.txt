@@ -1,0 +1,55 @@
+PACKAGE
+
+package thread
+    import "dctech/raptor/commands/thread"
+
+    Raptor Threading Commands.
+
+FUNCTIONS
+
+func CommandThread_Channel(script *raptor.Script, params []*raptor.Value)
+    Creates a new communications channel.
+
+	thread:channel [buffer]
+
+    Returns the new channel.
+
+func CommandThread_Close(script *raptor.Script, params []*raptor.Value)
+    Close a communications channel.
+
+	thread:close channel
+
+    Returns unchanged.
+
+func CommandThread_New(script *raptor.Script, params []*raptor.Value)
+    Creates a new thread.
+
+	thread:new code [params...]
+
+    WARNING! The base types map and array are NOT thread safe! Returns
+    unchanged.
+
+func CommandThread_Receive(script *raptor.Script, params []*raptor.Value)
+    Receive a value from a communications channel.
+
+	thread:receive channel
+
+    If the channel is closed, always returns nil Returns the received value.
+
+func CommandThread_Send(script *raptor.Script, params []*raptor.Value)
+    Send a value on a communications channel.
+
+	thread:send channel value
+
+    Sending to a closed channel is a runtime error. Returns unchanged.
+
+func Setup(state *raptor.State)
+    Adds the threading commands to the state. The threading commands are:
+
+	thread:new
+	thread:channel
+	thread:send
+	thread:receive
+	thread:close
+
+

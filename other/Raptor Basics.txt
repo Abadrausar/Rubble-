@@ -52,6 +52,10 @@ Variables may contain objects, objects may be Indexable, if so you may pass in a
 To read from nested indexables you may either nest the dereferences or just pass them in as a list like so: [test_var 1 2 3] (needless to say the second way is better)
 Dereference Syntax: [variable [index...]]
 
+WARNING! One thing that may cause BIG issues if you are not careful: when a variable is "dereferenced" the value you get is the value stored in the variable, no big deal right? Wrong. You get a REFERENCE to that value so if you assign the value to a different variable they will both point to the same script value object.
+This little "feature" is sometimes annoying but it is also useful at times. 
+If you want to pass something "by value" the base commands have a command to "copy" a value (note that it does not work on "object" types, just int, float, bool, string and the like).
+
 ==============================================
 Namespaces and Environments
 ==============================================
@@ -72,8 +76,8 @@ The run-time knows how to convert between types automatically, though some types
 
 The parser examines incoming data and tries to convert it to the various types using these rules:
 	if lexeme is "true" or "false" type is bool
+	if lexeme is "nil" type is nil
 	if lexeme can be converted into an int without error type is int
-	if lexeme can be converted into a float without error type is float
 	else type is string
 
 For Objects there is a special syntax. The Object literal syntax only works for types that are registered with the state.

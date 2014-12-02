@@ -4,35 +4,13 @@ Rubble: After Blast comes Rubble
 ==============================================
 Overview:
 ==============================================
-Rubble is a raw generator, eg. it takes "preraws" and generates Dwarf Fortress raw files from them. 
 
-Early versions of Rubble were heavily based on a similar utility, Blast, but recent versions resemble that utility only in the basic syntax.
+Rubble is a raw generator, eg. it takes "preraws" and generates Dwarf Fortress raw files from them.
 
-Compared to Blast:
-Pros:
-	No need for an external runtime, Rubble is a native application
-	Addons may override each other's files
-	Full parser/lexer, not just a bunch of regular expressions
-	It's really easy to mix script code and raw text in a template, use whichever one is easier
-	Variable expansion, no more GET_VAR, works in any parse stage
-	Many templates for registering objects and the like are replacements for vanilla raw tags allowing better formatting
-	Some files may be parsed but not included in the generated raws
-	Support for easily and quickly installing tilesets as addons
-	Allows you to run "tweak scripts" before or after generation for fine-tuning the results
-	Support for external launchers via the command line
-	Easy to use GUI to enable and disable addons (it's windows only, sorry)
-	Addons can be grouped into directories to make relations clear (and to make addon packs easy to distribute)
-	Support for loading addons (and groups of addons) directly from zip files
-	Has an extra template prefix for greater flexibility
-	Faster (not that it really matters)
+By using "templates" (either predefined or defined yourself) you can greatly simplify the task of writing a Dwarf Fortress mod.
+For example, there are templates that automate registering workshops and reactions, which will not only save you time but also reduce the chance of bugs as well.
 
-Cons:
-	No support for handling file name collisions in any way other than as an override
-	No support for Blast namespaces (eg. @, @@, and @@@)
-	Variables are simple key:value pairs instead of Blast's more powerful system
-	No built-in pretty printer (unless, like me, you think of this as a pro :) )
-	No per-addon configuration file (unless you script in support for one)
-	The scripting language isn't exactly mainstream
+For non-modders Rubble makes it easy to install mini-mods so you can create your perfect custom Dwarf Fortress.
 
 Required Reading for Modders (in most-important-first order):
 	This readme
@@ -47,29 +25,17 @@ Required Reading for Modders (in most-important-first order):
 If you do not plan on doing any modding the only thing you need to read is this readme.
 
 ==============================================
-Why Another Raw Generator?
-==============================================
-
-Blast is too... narrow. It allows you to do all kinds of stuff but is too hard (for me) to extend. Basically I just wanted something that allowed me to do most of the things I could do with Blast, but with less fuss.
-
-Of course if you know Perl and don't want to learn Raptor (Rubble's scripting language) you will be in the same situation I was in with Blast, just in reverse ;)
-
-I have put a huge amount of effort into making Rubble as flexible and powerful as possible, so newer features like tweak scripts and the new addon loader make Blast look like a toy, a cool, powerful toy, but a toy nonetheless.
-
-Blast is still a good utility, but if you don't mind learning a new scripting language (and even if you do) Rubble is far more powerful.
-
-==============================================
 Install:
 ==============================================
 
-Backup your "raw/objects" folder!
+Backup your "raw/objects" folder! Rubble will delete all your existing raw files!
 Extract Rubble to "<DF Directory>/rubble".
-Install your addons to "rubble/addons"
-Run "rubble -addonlist"
+Install your addons to "<DF Directory>/rubble/addons"
+Run "rubble -addonlist" OR run "Rubble GUI.exe"
 
 Now you are good to go! Documentation (as you have obviously discovered) is in the "rubble/other" folder as is source code and OSX/Linux binaries.
 
-To activate or deactivate a Rubble addon you may set it's entry in addons/addonlist.ini to false. If you just added an addon it will not have an entry until Rubble has run at least once (after the addon was added). 
+To activate or deactivate a Rubble addon you may set it's entry in addons/addonlist.ini to "true" or "false". If you just added an addon it will not have an entry until Rubble has run at least once (after the addon was added). 
 If you want to run Rubble without generating anything so as to update the addon list file just run 'rubble -addonlist'
 
 If you can (eg. you are running on windows) it is HIGHLY recommended to use the GUI. The GUI automates the process of updating and editing addonlist.ini and is generally much faster then doing everything by hand (plus you don't have to mess around with the command prompt, if you dislike that kind of thing)
@@ -100,7 +66,7 @@ These two options are mostly for use by external launchers.
 
 If you want to regenerate the raws for a save just run 'rubble -outputdir="../data/save/<savename>/raw/objects"'
 
-All directories used by Rubble must exist.
+All directories used by Rubble must exist (you should get an error message if not).
 
 ==============================================
 Included Addons:
@@ -109,14 +75,12 @@ Included Addons:
 I include addons in the base Rubble install that fix bugs, demo something useful, or are just too useful to leave out. 
 Needless to say these addons make a good place to look for info on how to do something. Sorry about the lack of comments in the addon files, I need to fix that sometime.
 
-If you like the addons that come with Rubble you may also want to get Better Dorfs: <BD URL here>
-Better Dorfs adds many more addons, mostly new/reworked industries and other useful things that didn't seem generic enough to include directly in Rubble.
-
 If you want to generate the Rubble version of "vanilla DF" you will need to activate the "Base/Files", "Base/Templates", and "Base/Clear" addons, these addons are already active in the default addonlist.ini.
 
 Add CHILD Tags:
 	Adds a CHILD tag to every creature that does not already have one.
-	(DOES_NOT_EXIST and EQUIPMENT_WAGON count as CHILD tags for the purpose of this script)
+	DOES_NOT_EXIST, NOT_LIVING, and EQUIPMENT_WAGON count as CHILD tags for the purpose of this script, 
+	vermin are also skipped.
 	This is an advanced tweak script that processes files in multiple passes.
 	This addon is stand-alone, as it uses no outside templates.
 
@@ -135,7 +99,7 @@ Base/Templates:
 	Do not disable unless you like error messages :)
 
 Dev/Cheat:
-	A bunch  of cheat reactions to allow for fast setup of testing forts.
+	A bunch of cheat reactions to allow for fast setup of testing forts.
 	Build a "Heavy Supply Wagon" workshop, both the building and all reactions are free.
 	Uses animal caretaker skill (the most useless skill I could think of :) )
 
@@ -221,6 +185,28 @@ If you really want to be helpful run "rubble -norecover" and post that log as we
 ==============================================
 Changelog:
 ==============================================
+v3.6
+	Updated to Raptor 2.2
+		Changes:
+			Added a new type (nil)
+			Added a new mode for the syntax checker
+			Removed obsolete command: debug:clrret, use nil.
+			Added new command: copy, allows you to copy a value.
+			Added a simple threading library (threading is not useful in Rubble by default).
+			Raw lexer commands now require/return a lexer handle.
+		This update (particularly the raw parser changes) will break most post (and a few pre) tweak scripts!
+	To go with the Raptor threading library you can now run Rubble in "threaded" mode via "-threads".
+		This is only useful for multi-threaded tweak scripts, default off.
+	Fixed bug in "Libs/DFHack/Announcement", message is now written to gamelog as expected.
+	The filename key for rubble:raws no longer has it's extension stripped
+		This should resolve issues with files overriding each other when they shouldn't.
+		WARNING! This change will break some tweak scripts! (it's an easy fix)
+	Updated the tweak scripts to handle the changes to rubble:raws and the raw parser.
+	Forced init scripts are now ust called "init scripts" and no longer need to be named "forced_init".
+		Now they use the extension ".init.rsf", functionality is unchanged.
+	Renamed the Base init script to "base.init.rsf"
+	The "Add CHILD Tags" addon is a little more discriminating.
+
 v3.5
 	Updated to Raptor 2.1.2
 		2.1.2 adds two new commands, sort:new and sort:map as well as fixing an issue in the shell.
