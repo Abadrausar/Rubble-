@@ -38,8 +38,7 @@ var AddonsList string
 var ConfigList string
 
 var LexTest bool
-var NCARecover bool
-var RblRecover bool
+var NoRecover bool
 var ExitAfterUpdate bool
 
 func ParseCommandLine() {
@@ -51,11 +50,14 @@ func ParseCommandLine() {
 	AddonsDir = "./addons"
 
 	// Load defaults from config if present
-	LogPrintln("Attempting to Read Config File: ./rubble.cfg")
-	file, err := ioutil.ReadFile("./rubble.cfg")
+	LogPrintln("Attempting to Read Config File: ./rubble.ini")
+	file, err := ioutil.ReadFile("./rubble.ini")
 	if err == nil {
 		lines := strings.Split(string(file), "\n")
 		for i := range lines {
+			if strings.HasPrefix(strings.TrimSpace(lines[i]), "[") {
+				continue
+			}
 			if strings.HasPrefix(strings.TrimSpace(lines[i]), "#") {
 				continue
 			}
@@ -70,6 +72,7 @@ func ParseCommandLine() {
 			}
 
 			parts[0] = strings.TrimSpace(parts[0])
+			parts[1] = strings.TrimSpace(parts[1])
 
 			switch parts[0] {
 			case "dfdir":
@@ -97,8 +100,11 @@ func ParseCommandLine() {
 	Flags.BoolVar(&ExitAfterUpdate, "addonlist", false, "Update the addon list and exit.")
 
 	Flags.BoolVar(&LexTest, "lextest", false, "Run a Rubble lexer test. No files will be written.")
-	Flags.BoolVar(&NCARecover, "scrrecover", true, "Should the scripting system recover errors? Useful for debugging.")
-	Flags.BoolVar(&RblRecover, "rblrecover", true, "Should Rubble recover errors? Useful for debugging.")
+	Flags.BoolVar(&NoRecover, "norecover", false, "Should Rubble not recover errors? Useful for debugging.")
 
 	Flags.Parse(os.Args[1:])
+	
+	LogPrintln(DFDir)
+	LogPrintln(OutputDir)
+	LogPrintln(AddonsDir)
 }

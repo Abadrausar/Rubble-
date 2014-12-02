@@ -47,7 +47,7 @@ func Setup(state *raptor.State) {
 // Count values of 0 or less are given the value 1.
 // 	bit:lshift a [count]
 // Returns the param shifted "count" places
-func CommandBit_LShift(state *raptor.State, params []*raptor.Value) {
+func CommandBit_LShift(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 && len(params) != 2 {
 		panic("Wrong number of params to bit:lshift.")
 	}
@@ -62,7 +62,7 @@ func CommandBit_LShift(state *raptor.State, params []*raptor.Value) {
 		}
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() << opp2)
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() << opp2)
 	return
 }
 
@@ -70,7 +70,7 @@ func CommandBit_LShift(state *raptor.State, params []*raptor.Value) {
 // Count values of 0 or less are given the value 1.
 // 	bit:rshift a [count]
 // Returns the param shifted "count" places
-func CommandBit_RShift(state *raptor.State, params []*raptor.Value) {
+func CommandBit_RShift(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 && len(params) != 2 {
 		panic("Wrong number of params to bit:rshift.")
 	}
@@ -85,54 +85,54 @@ func CommandBit_RShift(state *raptor.State, params []*raptor.Value) {
 		}
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() >> opp2)
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() >> opp2)
 	return
 }
 
 // Ands two values.
 // 	bit:and a b
 // Returns a & b
-func CommandBit_And(state *raptor.State, params []*raptor.Value) {
+func CommandBit_And(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to bit:and.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() & params[1].Int64())
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() & params[1].Int64())
 	return
 }
 
 // Ors two values.
 // 	bit:or a b
 // Returns a | b
-func CommandBit_Or(state *raptor.State, params []*raptor.Value) {
+func CommandBit_Or(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to bit:or.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() | params[1].Int64())
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() | params[1].Int64())
 	return
 }
 
 // Xors two values.
 // 	bit:xor a b
 // Returns a ^ b
-func CommandBit_Xor(state *raptor.State, params []*raptor.Value) {
+func CommandBit_Xor(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to bit:xor.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() ^ params[1].Int64())
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() ^ params[1].Int64())
 	return
 }
 
 // Inverts a value.
 // 	bit:not a
 // Returns a ^ -1
-func CommandBit_Not(state *raptor.State, params []*raptor.Value) {
+func CommandBit_Not(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to bit:not.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() ^ -1)
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() ^ -1)
 	return
 }

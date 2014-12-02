@@ -69,6 +69,9 @@ func (this *DirReader) OpenAndRead(path string) ([]byte, error) {
 
 func (this *DirReader) ListDirs(dir string) []string {
 	dir = filepath.ToSlash(dir)
+	if dir == "" {
+		dir = "."
+	}
 	rtn := make([]string, 0, 10)
 
 	files, err := ioutil.ReadDir(this.path + "/" + dir)
@@ -86,8 +89,11 @@ func (this *DirReader) ListDirs(dir string) []string {
 
 func (this *DirReader) ListFiles(dir string) []string {
 	dir = filepath.ToSlash(dir)
+	if dir == "" {
+		dir = "."
+	}
 	rtn := make([]string, 0, 20)
-
+	
 	files, err := ioutil.ReadDir(this.path + "/" + dir)
 	if err != nil {
 		return rtn

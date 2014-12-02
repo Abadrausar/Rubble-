@@ -1,6 +1,6 @@
 	
 Rubble Template Documentation
-User Templates defined in the base_templates addon.
+User Templates defined in the base/templates addon.
 
 ==============================================
 {COMMENT;<STUFF>...}
@@ -33,6 +33,10 @@ User Templates defined in the base_templates addon.
 {SHARED_OBJECT_EXISTS;<ID>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
 	If a SHARED_OBJECT with the id <ID> exists then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
 	This is very useful for making addons with additional behavior that depends on things (items, materials, ect) from other addons.
+
+==============================================
+{SHARED_OBJECT_ADD;<ID>;<PRERAWS>}
+	Appends the result of parsing <PRERAWS> to the end of SHARED_OBJECT <ID>. If that shared object does not exist it still parses <PRERAWS> but nothing is done with the result.
 
 ==============================================
 {IF;<STRING1>;<STRING2>;<THEN_PRERAWS>}
@@ -76,7 +80,7 @@ User Templates defined in the base_templates addon.
 	
 	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws.
 	
-	SHARED_PLANT is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS as an id.
+	SHARED_PLANT is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS and SHARED_OBJECT_ADD as an id.
 
 ==============================================
 {SHARED_INORGANIC;<ID>;<DEFINITION>}
@@ -86,7 +90,7 @@ User Templates defined in the base_templates addon.
 	
 	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_ORE, REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
 	
-	SHARED_INORGANIC is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS as an id.
+	SHARED_INORGANIC is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS and SHARED_OBJECT_ADD as an id.
 
 ==============================================
 {SHARED_MATERIAL_TEMPLATE;<ID>;<DEFINITION>}
@@ -97,11 +101,11 @@ User Templates defined in the base_templates addon.
 	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
 	Uses SHARED_OBJECT, make sure <ID> is unique.
 	
-	SHARED_MATERIAL_TEMPLATE is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS as an id.
+	SHARED_MATERIAL_TEMPLATE is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS and SHARED_OBJECT_ADD as an id.
 
 ==============================================
-{REGISTER_ORE;<ORE>;<METAL>;<AMOUNT>}
-	Adds a [METAL_ORE:<METAL>:<AMOUNT>] tag to the definition of <ORE>. For this to work, <ORE> must be registered as a SHARED_INORGANIC or SHARED_MATERIAL_TEMPLATE. If this is called multiple times with the same <ORE> and <METAL>, the highest <AMOUNT> is used.
+{REGISTER_ORE;<INORGANIC>;<METAL>;<AMOUNT>}
+	Adds a [METAL_ORE:<METAL>:<AMOUNT>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC or SHARED_MATERIAL_TEMPLATE. If this is called multiple times with the same <INORGANIC> and <METAL>, the highest <AMOUNT> is used.
 
 ==============================================
 {REGISTER_REACTION_CLASS;<INORGANIC>;<CLASS>}

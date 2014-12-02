@@ -7,6 +7,22 @@ There used to be a tutorial here, but it got badly obsolete.
 For now I have just removed it.
 
 ==============================================
+Template Prefixes Explained:
+==============================================
+
+When a template is run is determined by a one character prefix (or lack of a prefix).
+There are three parse stages and four prefixes.
+Prefix	Meaning
+!		Preparse, a template with this prefix will run in the preparse stage.
+none	Parse, a template with no prefix will run in the parse stage.
+#		Postparse, a template with this prefix will run in the postparse stage.
+@		ASAP, a template with this prefix will run in the earliest possible parse stage.
+
+@ templates are usually run in preparse but could be run in any stage depending on when it is parsed (parsing can be delayed by nesting in a later parse stage template for example).
+
+The template prefix is part of the template's name, you cannot change a template's parse stage by calling it with a different prefix (unless you rename the template)
+
+==============================================
 Tileset Addons:
 ==============================================
 
@@ -31,12 +47,12 @@ Tweak Scripts:
 
 Tweak scripts are the most important thing to happen to Rubble since version 1. They allow you to run arbitrary scripts before or after generation. These scripts can change the raws, allowing you to "tweak" the generated output.
 
-Tweak scripts are written in Raptor not Rubble code, so Rubble templates are not available except through rubble:calltemplate.
+Tweak scripts are written in Raptor not Rubble code, so Rubble templates are not available except through rubble:calltemplate or rubble:stageparse.
 Each tweak script runs in its own environment just like a Raptor user command. The params array is NOT set!
 
 Most tweak scripts will make use of the commands in the raw namespace to walk the raw files and make changes as needed.
 
-As for writing your own tweak scripts... I suggest you not try unless you have a good understanding of the Raptor language. It would be a very good idea to read the tweak scripts included with Rubble, if you do not understand those (rather simple) scripts then you will have trouble writing your own.
+As for writing your own tweak scripts... I suggest you not try unless you have a good understanding of the Raptor language. It would be a very good idea to read the tweak scripts included with Rubble, if you do not understand those scripts then you will have trouble writing your own.
 
 Pitfalls to keep in mind:
 	break, if and loop interaction
@@ -52,7 +68,7 @@ Pitfalls to keep in mind:
 		The first break will just make the if command return false. To get the loop to exit you will need to make sure the if command is the last command in the loop. This example is easy to fix, just move the last two commands to the if commands false block, but in many cases it is not so easy.
 		The reason that break works the way it does is that break is simply a "soft" return, eg it returns at most one block.
 		 
-		The breakloop command is much more like the common break keyword but it only works with commands that handle the BreakLoop exit state (loop and foreach as of Raptor v1.0)
+		The breakloop command is much more like the common break keyword but it only works with commands that handle the BreakLoop exit state (loop and foreach as of Raptor v2.0)
 		
 		The above example rewritten with breakloop:
 			(loop {
@@ -64,6 +80,7 @@ Pitfalls to keep in mind:
 				
 				# equivalent to most languages continue keyword
 				# in this case a normal break or even just a bare true would work as well
+				# if you do not explicitly return true at the end of a loop you may exit unexpectedly
 				(breakloop true)
 			})
 	
@@ -71,27 +88,40 @@ Pitfalls to keep in mind:
 		To put it simply, you can't. Or rather you can, but Rubble will crash with an error on the next iteration. Remember to declare your variables ahead of time and if you REALLY don't want them around after the loop exits just delvar them away or surround the whole mess in a call to evalinnew.
 
 ==============================================
-Archived Addons:
+The Addon Loader:
 ==============================================
 
-There are two ways to pack addons into zip files:
-	One addon per zip, with all addon files in the root of the archive
-	Multiple addons per zip, with each addon in a directory in the root of the archive
+Rubble has a recursive addon loader that can read addons from zip files or directories.
+What this means is that you can group addons in directories to have something like an addon tree.
 
-To make Rubble recognize an archive as a pack file (multiple addons per archive) you need to use the extension .pack.zip
+The following rules determine how addons are loaded:
+	Zip files may only be used in the root addon folder.
+	Addons in a zip always override addons in a directory.
+	Addons are loaded in alphabetical order except as otherwise specified.
+	Zip files and directories are identical as far as the loader is concerned except as otherwise specified.
+	If an addon contains one or more directories, the directories are loaded as child addons.
+	An addon without parseable files (.txt, .rbl, .rsf, .rbf) is not loaded (but any child addons are).
 
-Examples:
+The following rules determine how addon files override each other (if there is a name collision):
+	Addons in zip files will always override addons in directories.
+	Addons are loaded in alphabetical order, addon "aaa/zzz" will override "aaa/hhh" but not "bbb/zzz"
+	The file extension is ignored for parseable files (xyz/do_something.pre.rsf will override abc/do_something.post.rsf)
 
-test_addon.zip
-	file1.txt
-	file2.rbl
-	file3.pre.rsf
-	
-Test Pack.pack.zip
-	addon1
-		do_something.post.rsf
-	addon2
-		some_file.txt
+If you have readmes or the like in an otherwise empty addon it is recommended that you do not give them a file extension, or better yet surround the file contents with <pre></pre> tags and change the extension to .htm, In any case you do not want such an addon appearing in addonlist.ini, so do not use any of the "parseable" extensions (.txt, .rbl, .rsf, .rbf).
+WTF was toady thinking when he used the .txt extension for raw files? Why not use .dfr or just .raw? (aside from the fact .raw is used by some audio files)
+
+All addons are loaded into memory, but only the active addons are processed.
+An addon is active if:
+	It's name is listed on the command line in the -addons option
+	If it's entry in addonlist.ini equals "true"
+
+If any addon names are specified via the -addons option then addonlist.ini is never read (but it is updated)
+
+So why do you (the modder) need to know all this? To put it simply you need to know what is permissible for structuring your addon so that you can choose an optimal method that makes it easy on both you and your users. 
+
+Do you want to use multiple small addons or just one large one? Do you want all of your mod's addons in one large directory, or do you want to group related things together? These decisions are important part of deciding how you want to package your mod and how you want the addon list presented to users.
+
+For example Better Dorfs, a mod of mine, groups all of its addons into the "Better Dorfs" addon. This means that users see, for example the Saurians addon, as "Better Dorfs/Saurians". If I was to add a saurian specific addon I would probably put the new addon in "Better Dorfs/Saurians/<new addon name>". This grouping helps make it obvious what goes with what, making the lives of your users a little more pleasant.
 
 ==============================================
 Other Random Information:
@@ -106,4 +136,8 @@ Example:
 	}
 If Rubble finds a template call where the last param is ... it appends the params from the previous template call to the current template's params. This trick is good for aliases.
 
-There is no check for infinite recursion, so make sure you never recurse without breaking out at some point (unless you want to cause an infinite loop and eat all your memory until Rubble crashes)
+There is no check for infinite recursion, so make sure you never recurse without breaking out at some point (unless you want to cause an infinite loop and eat all your memory until Rubble crashes). 
+The reason there is no recursion check is that there are valid reasons to have deep recursion, and any infinite loops created by recursion like this are errors that should caught in testing. If you are too lazy to do proper testing it is not my job to hold your hand, plus just how many programming languages have you used that had such a check? 
+
+If any of the documentation is not 100% clear just ask. I know everything there is to know about how Rubble works and so I tend to forget to put "obvious" stuff in the docs. A reminder that I forgot something is more a help than a hindrance.
+But please don't ask for help until you have read everything!

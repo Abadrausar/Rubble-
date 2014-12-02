@@ -30,7 +30,7 @@ func NewScriptMap() raptor.EditIndexable {
 	return make(ScriptMap, 20)
 }
 
-func NewScriptMapFromLit(state *raptor.State, keys []string, values []*raptor.Value) *raptor.Value {
+func NewScriptMapFromLit(script *raptor.Script, keys []string, values []*raptor.Value) *raptor.Value {
 	if len(values) != 0 {
 		if keys == nil {
 			panic("Map may not be initalized without keys.")

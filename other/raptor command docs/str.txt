@@ -7,14 +7,14 @@ package str
 
 FUNCTIONS
 
-func CommandStr_Add(state *raptor.State, params []*raptor.Value)
+func CommandStr_Add(script *raptor.Script, params []*raptor.Value)
     Appends two or more strings together.
 
 	str:add a b [c...]
 
     Returns the result of appending all parameters together.
 
-func CommandStr_Char(state *raptor.State, params []*raptor.Value)
+func CommandStr_Char(script *raptor.Script, params []*raptor.Value)
     Gets char at pos.
 
 	str:char a pos
@@ -23,14 +23,14 @@ func CommandStr_Char(state *raptor.State, params []*raptor.Value)
     the value 0 If the position is out of range returns unchanged and sets
     the error flag. Returns the character.
 
-func CommandStr_Cmp(state *raptor.State, params []*raptor.Value)
+func CommandStr_Cmp(script *raptor.Script, params []*raptor.Value)
     Compare two strings.
 
 	str:cmp a b
 
     Returns true or false.
 
-func CommandStr_Find(state *raptor.State, params []*raptor.Value)
+func CommandStr_Find(script *raptor.Script, params []*raptor.Value)
     Search for a substring in a string.
 
 	str:find string substring
@@ -38,7 +38,7 @@ func CommandStr_Find(state *raptor.State, params []*raptor.Value)
     Returns the position of the substring or -1 if the substring is not
     present.
 
-func CommandStr_Fmt(state *raptor.State, params []*raptor.Value)
+func CommandStr_Fmt(script *raptor.Script, params []*raptor.Value)
     Formats a string.
 
 	str:fmt format values...
@@ -53,7 +53,7 @@ func CommandStr_Fmt(state *raptor.State, params []*raptor.Value)
 
     Returns the formatted string.
 
-func CommandStr_Left(state *raptor.State, params []*raptor.Value)
+func CommandStr_Left(script *raptor.Script, params []*raptor.Value)
     Return x characters from the left side of a string.
 
 	str:left str x
@@ -61,14 +61,14 @@ func CommandStr_Left(state *raptor.State, params []*raptor.Value)
     Returns the new string or (if the index is out of range) returns the
     string and sets the error flag.
 
-func CommandStr_Len(state *raptor.State, params []*raptor.Value)
+func CommandStr_Len(script *raptor.Script, params []*raptor.Value)
     Gets the length of a string.
 
 	str:len a
 
     Returns the length.
 
-func CommandStr_Mid(state *raptor.State, params []*raptor.Value)
+func CommandStr_Mid(script *raptor.Script, params []*raptor.Value)
     Returns count characters from a string.
 
 	str:mid str start count
@@ -76,7 +76,7 @@ func CommandStr_Mid(state *raptor.State, params []*raptor.Value)
     Returns the new string or (if start or count is out of range) returns as
     close a result as possible and sets the error flag.
 
-func CommandStr_Replace(state *raptor.State, params []*raptor.Value)
+func CommandStr_Replace(script *raptor.Script, params []*raptor.Value)
     Replaces search with replace in source.
 
 	str:replace source search replace occurrence
@@ -84,7 +84,7 @@ func CommandStr_Replace(state *raptor.State, params []*raptor.Value)
     Occurrence gives a number of times to carry out the replacement, use -1
     to replace all. Returns the new string.
 
-func CommandStr_Right(state *raptor.State, params []*raptor.Value)
+func CommandStr_Right(script *raptor.Script, params []*raptor.Value)
     Return x characters from the right side of a string.
 
 	str:right str x
@@ -92,21 +92,21 @@ func CommandStr_Right(state *raptor.State, params []*raptor.Value)
     Returns the new string or (if the index is out of range) returns the
     string and sets the error flag.
 
-func CommandStr_ToLower(state *raptor.State, params []*raptor.Value)
+func CommandStr_ToLower(script *raptor.Script, params []*raptor.Value)
     Converts str to lower case.
 
 	str:tolower str
 
     Returns the string with all letters converted to lower case.
 
-func CommandStr_ToUpper(state *raptor.State, params []*raptor.Value)
+func CommandStr_ToUpper(script *raptor.Script, params []*raptor.Value)
     Converts str to upper case.
 
 	str:toupper str
 
     Returns the string with all letters converted to upper case.
 
-func CommandStr_TrimLeft(state *raptor.State, params []*raptor.Value)
+func CommandStr_TrimLeft(script *raptor.Script, params []*raptor.Value)
     Remove x characters from the left side of a string.
 
 	str:trimleft str x
@@ -114,7 +114,7 @@ func CommandStr_TrimLeft(state *raptor.State, params []*raptor.Value)
     Returns the new string or (if the index is out of range) returns the
     string and sets the error flag.
 
-func CommandStr_TrimRight(state *raptor.State, params []*raptor.Value)
+func CommandStr_TrimRight(script *raptor.Script, params []*raptor.Value)
     Remove x characters from the right side of a string.
 
 	str:trimright str x
@@ -122,7 +122,7 @@ func CommandStr_TrimRight(state *raptor.State, params []*raptor.Value)
     Returns the new string or (if the index is out of range) returns the
     string and sets the error flag.
 
-func CommandStr_TrimSpace(state *raptor.State, params []*raptor.Value)
+func CommandStr_TrimSpace(script *raptor.Script, params []*raptor.Value)
     Trims leading and trailing whitespace from a string.
 
 	str:trimspace str

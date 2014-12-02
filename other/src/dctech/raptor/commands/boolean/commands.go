@@ -40,35 +40,35 @@ func Setup(state *raptor.State) {
 // Ands two values.
 // 	bool:and a b
 // Returns a && b
-func CommandBool_And(state *raptor.State, params []*raptor.Value) {
+func CommandBool_And(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to bool:and.")
 	}
 
-	state.RetVal = raptor.NewValueBool(params[0].Bool() && params[1].Bool())
+	script.RetVal = raptor.NewValueBool(params[0].Bool() && params[1].Bool())
 	return
 }
 
 // Ors two values.
 // 	bool:or a b
 // Returns a || b
-func CommandBool_Or(state *raptor.State, params []*raptor.Value) {
+func CommandBool_Or(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to bool:or.")
 	}
 
-	state.RetVal = raptor.NewValueBool(params[0].Bool() || params[1].Bool())
+	script.RetVal = raptor.NewValueBool(params[0].Bool() || params[1].Bool())
 	return
 }
 
 // Inverts a value.
 // 	bool:not a
 // Returns !a
-func CommandBool_Not(state *raptor.State, params []*raptor.Value) {
+func CommandBool_Not(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to bool:not.")
 	}
 
-	state.RetVal = raptor.NewValueBool(!params[0].Bool())
+	script.RetVal = raptor.NewValueBool(!params[0].Bool())
 	return
 }

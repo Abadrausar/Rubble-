@@ -66,7 +66,7 @@ func Setup(state *raptor.State) {
 // Appends two or more strings together.
 // 	str:add a b [c...]
 // Returns the result of appending all parameters together.
-func CommandStr_Add(state *raptor.State, params []*raptor.Value) {
+func CommandStr_Add(script *raptor.Script, params []*raptor.Value) {
 	if len(params) <= 1 {
 		panic("str:add needs at least two params.")
 	}
@@ -76,31 +76,31 @@ func CommandStr_Add(state *raptor.State, params []*raptor.Value) {
 		result += val.String()
 	}
 
-	state.RetVal = raptor.NewValueString(result)
+	script.RetVal = raptor.NewValueString(result)
 	return
 }
 
 // Trims leading and trailing whitespace from a string.
 // 	str:trimspace str
 // Returns str with leading and trailing whitespace removed.
-func CommandStr_TrimSpace(state *raptor.State, params []*raptor.Value) {
+func CommandStr_TrimSpace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong param count to str:trimspace.")
 	}
 
-	state.RetVal = raptor.NewValueString(strings.TrimSpace(params[0].String()))
+	script.RetVal = raptor.NewValueString(strings.TrimSpace(params[0].String()))
 	return
 }
 
 // Gets the length of a string.
 // 	str:len a
 // Returns the length.
-func CommandStr_Len(state *raptor.State, params []*raptor.Value) {
+func CommandStr_Len(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong param count to str:len.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(int64(len(params[0].String())))
+	script.RetVal = raptor.NewValueInt64(int64(len(params[0].String())))
 	return
 }
 
@@ -109,18 +109,18 @@ func CommandStr_Len(state *raptor.State, params []*raptor.Value) {
 // Operand pos is converted to a 64 bit integer. Invalid strings are given the value 0
 // If the position is out of range returns unchanged and sets the error flag.
 // Returns the character.
-func CommandStr_Char(state *raptor.State, params []*raptor.Value) {
+func CommandStr_Char(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong param count to str:char.")
 	}
 
 	pos := params[1].Int64()
 	if pos >= int64(len(params[0].String())) {
-		state.Error = true
+		script.Error = true
 		return
 	}
 
-	state.RetVal = raptor.NewValueString(string(params[0].String()[pos]))
+	script.RetVal = raptor.NewValueString(string(params[0].String()[pos]))
 	return
 }
 
@@ -133,7 +133,7 @@ func CommandStr_Char(state *raptor.State, params []*raptor.Value) {
 //	%x as a lowercase hexadecimal number
 //	%X as an upercase hexadecimal number
 // Returns the formatted string.
-func CommandStr_Fmt(state *raptor.State, params []*raptor.Value) {
+func CommandStr_Fmt(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 2 {
 		panic("Wrong param count to str:fmt.")
 	}
@@ -205,37 +205,37 @@ func CommandStr_Fmt(state *raptor.State, params []*raptor.Value) {
 		output = append(output, val)
 	}
 
-	state.RetVal = raptor.NewValueString(string(output))
+	script.RetVal = raptor.NewValueString(string(output))
 	return
 }
 
 // Compare two strings.
 // 	str:cmp a b
 // Returns true or false.
-func CommandStr_Cmp(state *raptor.State, params []*raptor.Value) {
+func CommandStr_Cmp(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong param count to str:cmp.")
 	}
 
 	result := params[0].String() == params[1].String()
-	state.RetVal = raptor.NewValueBool(result)
+	script.RetVal = raptor.NewValueBool(result)
 }
 
 // Search for a substring in a string.
 // 	str:find string substring
 // Returns the position of the substring or -1 if the substring is not present.
-func CommandStr_Find(state *raptor.State, params []*raptor.Value) {
+func CommandStr_Find(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong param count to str:find.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(int64(strings.Index(params[0].String(), params[1].String())))
+	script.RetVal = raptor.NewValueInt64(int64(strings.Index(params[0].String(), params[1].String())))
 }
 
 // Return x characters from the left side of a string.
 // 	str:left str x
 // Returns the new string or (if the index is out of range) returns the string and sets the error flag.
-func CommandStr_Left(state *raptor.State, params []*raptor.Value) {
+func CommandStr_Left(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong param count to str:left.")
 	}
@@ -243,17 +243,17 @@ func CommandStr_Left(state *raptor.State, params []*raptor.Value) {
 	index := int(params[1].Int64())
 	str := params[0].String()
 	if len(str) < index {
-		state.RetVal = raptor.NewValueString(str)
-		state.Error = true
+		script.RetVal = raptor.NewValueString(str)
+		script.Error = true
 		return
 	}
-	state.RetVal = raptor.NewValueString(string([]byte(str))[:index])
+	script.RetVal = raptor.NewValueString(string([]byte(str))[:index])
 }
 
 // Remove x characters from the left side of a string.
 // 	str:trimleft str x
 // Returns the new string or (if the index is out of range) returns the string and sets the error flag.
-func CommandStr_TrimLeft(state *raptor.State, params []*raptor.Value) {
+func CommandStr_TrimLeft(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong param count to str:trimleft.")
 	}
@@ -261,17 +261,17 @@ func CommandStr_TrimLeft(state *raptor.State, params []*raptor.Value) {
 	index := int(params[1].Int64())
 	str := params[0].String()
 	if len(str) < index {
-		state.RetVal = raptor.NewValueString(str)
-		state.Error = true
+		script.RetVal = raptor.NewValueString(str)
+		script.Error = true
 		return
 	}
-	state.RetVal = raptor.NewValueString(string([]byte(str))[index:])
+	script.RetVal = raptor.NewValueString(string([]byte(str))[index:])
 }
 
 // Return x characters from the right side of a string.
 // 	str:right str x
 // Returns the new string or (if the index is out of range) returns the string and sets the error flag.
-func CommandStr_Right(state *raptor.State, params []*raptor.Value) {
+func CommandStr_Right(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong param count to str:right.")
 	}
@@ -279,17 +279,17 @@ func CommandStr_Right(state *raptor.State, params []*raptor.Value) {
 	index := int(params[1].Int64())
 	str := params[0].String()
 	if len(str) < index {
-		state.RetVal = raptor.NewValueString(str)
-		state.Error = true
+		script.RetVal = raptor.NewValueString(str)
+		script.Error = true
 		return
 	}
-	state.RetVal = raptor.NewValueString(string([]byte(str))[len(str)-index:])
+	script.RetVal = raptor.NewValueString(string([]byte(str))[len(str)-index:])
 }
 
 // Remove x characters from the right side of a string.
 // 	str:trimright str x
 // Returns the new string or (if the index is out of range) returns the string and sets the error flag.
-func CommandStr_TrimRight(state *raptor.State, params []*raptor.Value) {
+func CommandStr_TrimRight(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong param count to str:trimright.")
 	}
@@ -297,18 +297,18 @@ func CommandStr_TrimRight(state *raptor.State, params []*raptor.Value) {
 	index := int(params[1].Int64())
 	str := params[0].String()
 	if len(str) < index {
-		state.RetVal = raptor.NewValueString(str)
-		state.Error = true
+		script.RetVal = raptor.NewValueString(str)
+		script.Error = true
 		return
 	}
-	state.RetVal = raptor.NewValueString(string([]byte(str))[:len(str)-index])
+	script.RetVal = raptor.NewValueString(string([]byte(str))[:len(str)-index])
 }
 
 // Returns count characters from a string.
 // 	str:mid str start count
 // Returns the new string or (if start or count is out of range) returns as close a 
 // result as possible and sets the error flag.
-func CommandStr_Mid(state *raptor.State, params []*raptor.Value) {
+func CommandStr_Mid(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 3 {
 		panic("Wrong param count to str:mid.")
 	}
@@ -317,16 +317,16 @@ func CommandStr_Mid(state *raptor.State, params []*raptor.Value) {
 	count := int(params[2].Int64())
 	str := params[0].String()
 	if len(str) < start {
-		state.RetVal = raptor.NewValueString("")
-		state.Error = true
+		script.RetVal = raptor.NewValueString("")
+		script.Error = true
 		return
 	}
 	if len(str) < start+count {
-		state.RetVal = raptor.NewValueString(string([]byte(str))[start:])
-		state.Error = true
+		script.RetVal = raptor.NewValueString(string([]byte(str))[start:])
+		script.Error = true
 		return
 	}
-	state.RetVal = raptor.NewValueString(string([]byte(str))[start : start+count])
+	script.RetVal = raptor.NewValueString(string([]byte(str))[start : start+count])
 }
 
 // Replaces search with replace in source.
@@ -334,33 +334,33 @@ func CommandStr_Mid(state *raptor.State, params []*raptor.Value) {
 // Occurrence gives a number of times to carry out the replacement, 
 // use -1 to replace all.
 // Returns the new string.
-func CommandStr_Replace(state *raptor.State, params []*raptor.Value) {
+func CommandStr_Replace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 4 {
 		panic("Wrong param count to str:replace.")
 	}
 
 	tmp := strings.Replace(params[0].String(), params[1].String(), params[2].String(), int(params[3].Int64()))
-	state.RetVal = raptor.NewValueString(tmp)
+	script.RetVal = raptor.NewValueString(tmp)
 }
 
 // Converts str to lower case.
 // 	str:tolower str
 // Returns the string with all letters converted to lower case.
-func CommandStr_ToLower(state *raptor.State, params []*raptor.Value) {
+func CommandStr_ToLower(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong param count to str:tolower.")
 	}
 
-	state.RetVal = raptor.NewValueString(strings.ToLower(params[0].String()))
+	script.RetVal = raptor.NewValueString(strings.ToLower(params[0].String()))
 }
 
 // Converts str to upper case.
 // 	str:toupper str
 // Returns the string with all letters converted to upper case.
-func CommandStr_ToUpper(state *raptor.State, params []*raptor.Value) {
+func CommandStr_ToUpper(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong param count to str:toupper.")
 	}
 
-	state.RetVal = raptor.NewValueString(strings.ToUpper(params[0].String()))
+	script.RetVal = raptor.NewValueString(strings.ToUpper(params[0].String()))
 }

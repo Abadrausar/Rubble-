@@ -12,6 +12,7 @@
 
 # This loop makes a list of all creatures that do NOT have a CHILD tag...
 (console:print "    Generating Table...\n")
+(console:print "    (DOES_NOT_EXIST and EQUIPMENT_WAGON count as CHILD tags)\n")
 (foreach [rubble:raws] {
 	(if (str:cmp "creature_" (str:left [params 0] 9)) {
 		(var file (raw:init [params 1]))
@@ -41,6 +42,14 @@
 			})
 			
 			(if (str:cmp [tag id] "CHILD") {
+				(set haschild true)
+			})
+			
+			(if (str:cmp [tag id] "DOES_NOT_EXIST") {
+				(set haschild true)
+			})
+			
+			(if (str:cmp [tag id] "EQUIPMENT_WAGON") {
 				(set haschild true)
 			})
 			

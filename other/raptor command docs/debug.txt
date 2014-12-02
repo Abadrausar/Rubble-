@@ -7,35 +7,35 @@ package debug
 
 FUNCTIONS
 
-func CommandDebug_ClrRet(state *raptor.State, params []*raptor.Value)
+func CommandDebug_ClrRet(script *raptor.Script, params []*raptor.Value)
     Set the return value to nil.
 
 	debug:clrret
 
     Returns nil.
 
-func CommandDebug_Env(state *raptor.State, params []*raptor.Value)
+func CommandDebug_Env(script *raptor.Script, params []*raptor.Value)
     List variables in all environments.
 
 	debug:env
 
     Returns unchanged.
 
-func CommandDebug_List(state *raptor.State, params []*raptor.Value)
+func CommandDebug_List(script *raptor.Script, params []*raptor.Value)
     List all global data. This is mostly for use in interactive shells.
 
 	debug:list
 
     Returns unchanged.
 
-func CommandDebug_NameSpace(state *raptor.State, params []*raptor.Value)
+func CommandDebug_NameSpace(script *raptor.Script, params []*raptor.Value)
     Print information about a namespace.
 
 	debug:namespace name
 
     Returns unchanged.
 
-func CommandDebug_Shell(state *raptor.State, params []*raptor.Value)
+func CommandDebug_Shell(script *raptor.Script, params []*raptor.Value)
     Break into the debugging shell. This command will provide an interactive
     shell until eof is reached, on windows this may be simulated by pressing
     CTRL+Z followed by <ENTER>.
@@ -44,7 +44,7 @@ func CommandDebug_Shell(state *raptor.State, params []*raptor.Value)
 
     Returns the return value of the last command to be run.
 
-func CommandDebug_Value(state *raptor.State, params []*raptor.Value)
+func CommandDebug_Value(script *raptor.Script, params []*raptor.Value)
     Print information about a script value.
 
 	debug:value value

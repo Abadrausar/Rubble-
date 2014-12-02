@@ -50,107 +50,107 @@ func Setup(state *raptor.State) {
 // Adds two values.
 // 	int:add a b
 // Returns a + b
-func CommandInt_Add(state *raptor.State, params []*raptor.Value) {
+func CommandInt_Add(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to int:add.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() + params[1].Int64())
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() + params[1].Int64())
 	return
 }
 
 // Subtracts two values.
 // 	int:sub a b
 // Returns a - b
-func CommandInt_Sub(state *raptor.State, params []*raptor.Value) {
+func CommandInt_Sub(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to int:sub.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() - params[1].Int64())
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() - params[1].Int64())
 	return
 }
 
 // Divides two values.
 // 	int:div a b
 // Returns a / b
-func CommandInt_Div(state *raptor.State, params []*raptor.Value) {
+func CommandInt_Div(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to int:div.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() / params[1].Int64())
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() / params[1].Int64())
 	return
 }
 
 // Gives the remainder of dividing two values.
 // 	int:mod a b
 // Returns a % b
-func CommandInt_Mod(state *raptor.State, params []*raptor.Value) {
+func CommandInt_Mod(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to int:mod.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() % params[1].Int64())
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() % params[1].Int64())
 	return
 }
 
 // Multiplies two values.
 // 	int:mul a b
 // Returns a * b
-func CommandInt_Mul(state *raptor.State, params []*raptor.Value) {
+func CommandInt_Mul(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to int:mul.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64() * params[1].Int64())
+	script.RetVal = raptor.NewValueInt64(params[0].Int64() * params[1].Int64())
 	return
 }
 
 // Integer greater than.
 // 	int:gt a b
 // Returns true or false.
-func CommandInt_Gt(state *raptor.State, params []*raptor.Value) {
+func CommandInt_Gt(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to int:gt.")
 	}
 
 	result := params[0].Int64() > params[1].Int64()
 	if result {
-		state.RetVal = raptor.NewValueBool(true)
+		script.RetVal = raptor.NewValueBool(true)
 		return
 	}
-	state.RetVal = raptor.NewValueBool(false)
+	script.RetVal = raptor.NewValueBool(false)
 }
 
 // Integer less than.
 // 	int:lt a b
 // Returns true or false.
-func CommandInt_Lt(state *raptor.State, params []*raptor.Value) {
+func CommandInt_Lt(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to int:lt.")
 	}
 
 	result := params[0].Int64() < params[1].Int64()
 	if result {
-		state.RetVal = raptor.NewValueBool(true)
+		script.RetVal = raptor.NewValueBool(true)
 		return
 	}
-	state.RetVal = raptor.NewValueBool(false)
+	script.RetVal = raptor.NewValueBool(false)
 }
 
 // Integer equal.
 // 	int:eq a b
 // Returns true or false.
-func CommandInt_Eq(state *raptor.State, params []*raptor.Value) {
+func CommandInt_Eq(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to int:eq.")
 	}
 
 	result := params[0].Int64() == params[1].Int64()
 	if result {
-		state.RetVal = raptor.NewValueBool(true)
+		script.RetVal = raptor.NewValueBool(true)
 		return
 	}
-	state.RetVal = raptor.NewValueBool(false)
+	script.RetVal = raptor.NewValueBool(false)
 }

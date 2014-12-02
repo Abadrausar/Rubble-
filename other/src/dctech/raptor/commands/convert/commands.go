@@ -47,70 +47,70 @@ func Setup(state *raptor.State) {
 // Not all values will produce useful results.
 // 	convert:int value
 // Returns the converted value.
-func CommandConvert_Int(state *raptor.State, params []*raptor.Value) {
+func CommandConvert_Int(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to convert:int.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(params[0].Int64())
+	script.RetVal = raptor.NewValueInt64(params[0].Int64())
 }
 
 // Forces a value to type float.
 // Not all values will produce useful results.
 // 	convert:float value
 // Returns the converted value.
-func CommandConvert_Float(state *raptor.State, params []*raptor.Value) {
+func CommandConvert_Float(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to convert:float.")
 	}
 
-	state.RetVal = raptor.NewValueFloat64(params[0].Float64())
+	script.RetVal = raptor.NewValueFloat64(params[0].Float64())
 }
 
 // Forces a value to type bool.
 // Not all values will produce useful results.
 // 	convert:bool value
 // Returns the converted value.
-func CommandConvert_Bool(state *raptor.State, params []*raptor.Value) {
+func CommandConvert_Bool(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to convert:bool.")
 	}
 
-	state.RetVal = raptor.NewValueBool(params[0].Bool())
+	script.RetVal = raptor.NewValueBool(params[0].Bool())
 }
 
 // Forces a value to type string.
 // Not all values will produce useful results.
 // 	convert:string value
 // Returns the converted value.
-func CommandConvert_String(state *raptor.State, params []*raptor.Value) {
+func CommandConvert_String(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to convert:string.")
 	}
 
-	state.RetVal = raptor.NewValueString(params[0].String())
+	script.RetVal = raptor.NewValueString(params[0].String())
 }
 
 // Forces a value to type command.
 // Not all values will produce useful results.
 // 	convert:command value
 // Returns the converted value.
-func CommandConvert_Command(state *raptor.State, params []*raptor.Value) {
+func CommandConvert_Command(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to convert:command.")
 	}
 
-	state.RetVal = raptor.NewValueCommand(params[0].String())
+	script.RetVal = raptor.NewValueCommand(params[0].String())
 }
 
 // Converts a value into a string that you can write out for parsing later.
 // Not all values will produce useful results.
 // 	convert:escape value
 // Returns a properly escaped string representaion of value.
-func CommandConvert_Escape(state *raptor.State, params []*raptor.Value) {
+func CommandConvert_Escape(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to convert:escape.")
 	}
 
-	state.RetVal = raptor.NewValueString(params[0].CodeString())
+	script.RetVal = raptor.NewValueString(params[0].CodeString())
 }

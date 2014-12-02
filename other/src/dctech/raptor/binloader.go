@@ -30,18 +30,18 @@ import "compress/flate"
 
 // The functions in this file are for end users to allow storing scripts in binary format.
 
-// LoadFile will load a file and add its code to the state. Automaticly handles both source and binary files.
+// LoadFile will load a file and add its code to a script. Automatically handles both source and binary files.
 // The error is the result from LoadBinary if it is called and fails.
-func LoadFile(code []byte, state *State) error {
+func LoadFile(code []byte, script *Script) error {
 	if ValidateBinary(code) {
 		bin, err := LoadBinary(code)
 		if err != nil {
 			return err
 		}
-		state.Code.AddCodeSource(NewCompiledLexer(bin))
+		script.Code.AddCodeSource(NewCompiledLexer(bin))
 		return nil
 	}
-	state.Code.Add(string(code))
+	script.Code.Add(string(code))
 	return nil
 }
 

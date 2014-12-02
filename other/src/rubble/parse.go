@@ -81,6 +81,10 @@ func stageTemplate(name string, stage int) bool {
 		panic("Invalid template name.")
 	}
 
+	if name[0] == '@' {
+		return true
+	}
+	
 	switch stage {
 	case stgPreParse:
 		return name[0] == '!'

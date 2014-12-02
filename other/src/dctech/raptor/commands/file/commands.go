@@ -52,66 +52,66 @@ func Setup(state *raptor.State) {
 // Delete an empty directory.
 // 	file:deldir path
 // Returns unchanged or an error message. May set the Error flag.
-func CommandFile_DelDir(state *raptor.State, params []*raptor.Value) {
+func CommandFile_DelDir(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:deldir.")
 	}
 
 	info, err := os.Lstat(params[0].String())
 	if err != nil {
-		state.Error = true
+		script.Error = true
 		return
 	}
 	if info.IsDir() {
 		err := os.Remove(params[0].String())
 		if err != nil {
-			state.Error = true
+			script.Error = true
 		}
 		return
 	}
-	state.Error = true
+	script.Error = true
 	return
 }
 
 // Delete a directory and all sub dirs and files.
 // 	file:deltree path
 // Returns unchanged or an error message. May set the Error flag.
-func CommandFile_DelTree(state *raptor.State, params []*raptor.Value) {
+func CommandFile_DelTree(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:deltree.")
 	}
 
 	info, err := os.Lstat(params[0].String())
 	if err != nil {
-		state.RetVal = raptor.NewValueString(err.Error())
-		state.Error = true
+		script.RetVal = raptor.NewValueString(err.Error())
+		script.Error = true
 		return
 	}
 	if info.IsDir() {
 		err := os.RemoveAll(params[0].String())
 		if err != nil {
-			state.RetVal = raptor.NewValueString(err.Error())
-			state.Error = true
+			script.RetVal = raptor.NewValueString(err.Error())
+			script.Error = true
 		}
 		return
 	}
-	state.RetVal = raptor.NewValueString("File not a directory.")
-	state.Error = true
+	script.RetVal = raptor.NewValueString("File not a directory.")
+	script.Error = true
 	return
 }
 
 // Create a new directory.
 // 	file:newdir path
 // Returns unchanged or an error message. May set the Error flag.
-func CommandFile_NewDir(state *raptor.State, params []*raptor.Value) {
+func CommandFile_NewDir(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:newdir.")
 	}
 
 	err := os.Mkdir(params[0].String(), 0600)
 	if err != nil {
-		state.RetVal = raptor.NewValueString(err.Error())
-		state.Error = true
+		script.RetVal = raptor.NewValueString(err.Error())
+		script.Error = true
 	}
 	return
 }
@@ -119,68 +119,68 @@ func CommandFile_NewDir(state *raptor.State, params []*raptor.Value) {
 // Delete a file.
 // 	file:del path
 // Returns unchanged or an error message. May set the Error flag.
-func CommandFile_Del(state *raptor.State, params []*raptor.Value) {
+func CommandFile_Del(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:del.")
 	}
 
 	info, err := os.Lstat(params[0].String())
 	if err != nil {
-		state.RetVal = raptor.NewValueString(err.Error())
-		state.Error = true
+		script.RetVal = raptor.NewValueString(err.Error())
+		script.Error = true
 		return
 	}
 	if !info.IsDir() {
 		err := os.Remove(params[0].String())
 		if err != nil {
-			state.RetVal = raptor.NewValueString(err.Error())
-			state.Error = true
+			script.RetVal = raptor.NewValueString(err.Error())
+			script.Error = true
 		}
 		return
 	}
-	state.RetVal = raptor.NewValueString("File is a directory.")
-	state.Error = true
+	script.RetVal = raptor.NewValueString("File is a directory.")
+	script.Error = true
 	return
 }
 
 // Checks if a file exists.
 // 	file:exists path
 // Returns true or false.
-func CommandFile_Exists(state *raptor.State, params []*raptor.Value) {
+func CommandFile_Exists(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:exists.")
 	}
 
 	info, err := os.Lstat(params[0].String())
 	if err != nil {
-		state.RetVal = raptor.NewValueBool(false)
+		script.RetVal = raptor.NewValueBool(false)
 		return
 	}
 	if info.IsDir() {
-		state.RetVal = raptor.NewValueBool(false)
+		script.RetVal = raptor.NewValueBool(false)
 		return
 	}
-	state.RetVal = raptor.NewValueBool(true)
+	script.RetVal = raptor.NewValueBool(true)
 }
 
 // Checks if a directory exists.
 // 	file:direxists path
 // Returns true or false.
-func CommandFile_DirExists(state *raptor.State, params []*raptor.Value) {
+func CommandFile_DirExists(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:direxists.")
 	}
 
 	info, err := os.Lstat(params[0].String())
 	if err != nil {
-		state.RetVal = raptor.NewValueBool(false)
+		script.RetVal = raptor.NewValueBool(false)
 		return
 	}
 	if !info.IsDir() {
-		state.RetVal = raptor.NewValueBool(false)
+		script.RetVal = raptor.NewValueBool(false)
 		return
 	}
-	state.RetVal = raptor.NewValueBool(true)
+	script.RetVal = raptor.NewValueBool(true)
 	return
 }
 
@@ -189,15 +189,15 @@ func CommandFile_DirExists(state *raptor.State, params []*raptor.Value) {
 // Calles code (as a command) for every file found:
 //	code path
 // Returns nil or an error message. May set the Error flag.
-func CommandFile_WalkFiles(state *raptor.State, params []*raptor.Value) {
+func CommandFile_WalkFiles(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to file:walkfiles.")
 	}
 
 	files, err := ioutil.ReadDir(params[0].String())
 	if err != nil {
-		state.RetVal = raptor.NewValueString(err.Error())
-		state.Error = true
+		script.RetVal = raptor.NewValueString(err.Error())
+		script.Error = true
 		return
 	}
 
@@ -207,25 +207,25 @@ func CommandFile_WalkFiles(state *raptor.State, params []*raptor.Value) {
 			continue
 		}
 
-		state.Envs.Add(raptor.NewEnvironment())
+		script.Envs.Add(raptor.NewEnvironment())
 
-		state.AddParams(file.Name())
+		script.AddParams(file.Name())
 
 		//lex := raptor.NewCompiledLexer(code)
 		//for {
 		//	lex.Advance()
-		//	state.Println(lex.CurrentTkn(), lex.CurrentTkn().Lexeme)
+		//	script.Println(lex.CurrentTkn(), lex.CurrentTkn().Lexeme)
 		//	if lex.CheckLookAhead(raptor.TknINVALID) {
 		//		return
 		//	}
 		//}
 
-		state.Code.AddCodeSource(raptor.NewCompiledLexer(code))
-		state.Exec()
-		state.Envs.Remove()
-		state.Return = false
+		script.Code.AddCodeSource(raptor.NewCompiledLexer(code))
+		script.Exec()
+		script.Envs.Remove()
+		script.Return = false
 	}
-	state.RetVal = nil
+	script.RetVal = nil
 }
 
 // Iterate over all the directories in a directory.
@@ -233,15 +233,15 @@ func CommandFile_WalkFiles(state *raptor.State, params []*raptor.Value) {
 // Calles code (as a command) for every directory found:
 //	code path
 // Returns nil or an error message. May set the Error flag.
-func CommandFile_WalkDirs(state *raptor.State, params []*raptor.Value) {
+func CommandFile_WalkDirs(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:walkdirs.")
 	}
 
 	files, err := ioutil.ReadDir(params[0].String())
 	if err != nil {
-		state.RetVal = raptor.NewValueString(err.Error())
-		state.Error = true
+		script.RetVal = raptor.NewValueString(err.Error())
+		script.Error = true
 		return
 	}
 
@@ -251,14 +251,14 @@ func CommandFile_WalkDirs(state *raptor.State, params []*raptor.Value) {
 			continue
 		}
 
-		state.Envs.Add(raptor.NewEnvironment())
+		script.Envs.Add(raptor.NewEnvironment())
 
-		state.AddParams(file.Name())
+		script.AddParams(file.Name())
 
-		state.Code.AddCodeSource(raptor.NewCompiledLexer(code))
-		state.Exec()
-		state.Envs.Remove()
-		state.Return = false
+		script.Code.AddCodeSource(raptor.NewCompiledLexer(code))
+		script.Exec()
+		script.Envs.Remove()
+		script.Return = false
 	}
-	state.RetVal = nil
+	script.RetVal = nil
 }

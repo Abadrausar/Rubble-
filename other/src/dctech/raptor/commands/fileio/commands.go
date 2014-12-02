@@ -39,24 +39,24 @@ func Setup(state *raptor.State) {
 // Read from file.
 // 	fileio:read path
 // Returns file contents or an error message. May set the Error flag.
-func CommandFileIO_Read(state *raptor.State, params []*raptor.Value) {
+func CommandFileIO_Read(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to fileio:read.")
 	}
 
 	file, err := ioutil.ReadFile(params[0].String())
 	if err != nil {
-		state.Error = true
-		state.RetVal = raptor.NewValueString("error:" + err.Error())
+		script.Error = true
+		script.RetVal = raptor.NewValueString("error:" + err.Error())
 		return
 	}
-	state.RetVal = raptor.NewValueString(string(file))
+	script.RetVal = raptor.NewValueString(string(file))
 }
 
 // Write to file.
 // 	fileio:write path contents
 // Returns unchanged or an error message. May set the Error flag.
-func CommandFileIO_Write(state *raptor.State, params []*raptor.Value) {
+func CommandFileIO_Write(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to fileio:write.")
 	}
@@ -65,8 +65,8 @@ func CommandFileIO_Write(state *raptor.State, params []*raptor.Value) {
 	// well I do know that it is a file permission.
 	err := ioutil.WriteFile(params[0].String(), []byte(params[1].String()), 0600)
 	if err != nil {
-		state.Error = true
-		state.RetVal = raptor.NewValueString("error:" + err.Error())
+		script.Error = true
+		script.RetVal = raptor.NewValueString("error:" + err.Error())
 		return
 	}
 }

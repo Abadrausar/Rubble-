@@ -1,19 +1,14 @@
 
-# This file uses Rubble, to install this tileset extract all files into a folder in the Rubble addons directory.
-# For manual installation just copy the files in "img" to "data/art" and edit your init file to use the new tileset.
-# All tile numbers/colors are the same as vanilla.
-
-
 # Edit the init files.
 
 (var init (fileio:read (str:add [rubble:dfdir] "/data/init/init.txt")))
 (var d_init (fileio:read (str:add [rubble:dfdir] "/data/init/d_init.txt")))
 
-(set init (regex:replace "\\[FONT:[^]]+\\]" [init] "[FONT:MLC 10x10.png]"))
-(set init (regex:replace "\\[FULLFONT:[^]]+\\]" [init] "[FULLFONT:MLC 16x16.png]"))
+(set init (regex:replace "\\[FONT:[^]]+\\]" [init] "[FONT:curses_640x300.png]"))
+(set init (regex:replace "\\[FULLFONT:[^]]+\\]" [init] "[FULLFONT:curses_800x600.png]"))
 
-(set init (regex:replace "\\[GRAPHICS_FONT:[^]]+\\]" [init] "[GRAPHICS_FONT:MLC 10x10.png]"))
-(set init (regex:replace "\\[GRAPHICS_FULLFONT:[^]]+\\]" [init] "[GRAPHICS_FULLFONT:MLC 16x16.png]"))
+(set init (regex:replace "\\[GRAPHICS_FONT:[^]]+\\]" [init] "[GRAPHICS_FONT:curses_square_16x16.png]"))
+(set init (regex:replace "\\[GRAPHICS_FULLFONT:[^]]+\\]" [init] "[GRAPHICS_FULLFONT:curses_square_16x16.png]"))
 
 (set d_init (regex:replace "\\[SKY:[0-9]+:[0-9]+:[0-9]+:[0-9]+\\]" [d_init] "[SKY:178:3:0:0]"))
 (set d_init (regex:replace "\\[CHASM:[0-9]+:[0-9]+:[0-9]+:[0-9]+\\]" [d_init] "[CHASM:178:3:0:0]"))
@@ -53,8 +48,5 @@
 
 (fileio:write (str:add [rubble:dfdir] "/data/init/init.txt") [init])
 (fileio:write (str:add [rubble:dfdir] "/data/init/d_init.txt") [d_init])
-
-(fileio:write (str:add [rubble:dfdir] "/data/art/MLC 10x10.png") [rubble:raws "MLC 10x10.png"])
-(fileio:write (str:add [rubble:dfdir] "/data/art/MLC 16x16.png") [rubble:raws "MLC 16x16.png"])
 
 (ret "")

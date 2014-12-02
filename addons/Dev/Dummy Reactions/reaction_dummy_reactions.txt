@@ -1,0 +1,46 @@
+[OBJECT:REACTION]
+
+The following are "dummy" reactions used to add content after worldgen.
+{!SCRIPT;
+	(var rubble:dummy_reaction_count 0)
+	(rubble:template "DUMMY_REACTION" {
+		(++ rubble:dummy_reaction_count)
+		(rubble:stageparse (str:add 
+		"{REACTION;DUMMY_REACTION_" [rubble:dummy_reaction_count] ";ADDON_HOOK_PLAYABLE}\n"
+		"\tAdd your reaction body here"
+		))
+	})
+	(ret "")
+}
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+{DUMMY_REACTION}
+
+
+

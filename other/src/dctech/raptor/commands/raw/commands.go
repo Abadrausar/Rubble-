@@ -50,7 +50,7 @@ func Setup(state *raptor.State) {
 // Initalizes the raw parser.
 // 	raw:init text
 // Returns unchanged.
-func CommandRaw_Init(state *raptor.State, params []*raptor.Value) {
+func CommandRaw_Init(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to raw:text.")
 	}
@@ -61,29 +61,29 @@ func CommandRaw_Init(state *raptor.State, params []*raptor.Value) {
 // Advances the parser to the next raw tag.
 // 	raw:advance
 // Returns unchanged.
-func CommandRaw_Advance(state *raptor.State, params []*raptor.Value) {
+func CommandRaw_Advance(script *raptor.Script, params []*raptor.Value) {
 	lex.advance()
 }
 
 // Returns true if there is a valid tag.
 // 	raw:valid
 // Returns true or false.
-func CommandRaw_Valid(state *raptor.State, params []*raptor.Value) {
-	state.RetVal = raptor.NewValueBool(lex.tagvalid)
+func CommandRaw_Valid(script *raptor.Script, params []*raptor.Value) {
+	script.RetVal = raptor.NewValueBool(lex.tagvalid)
 }
 
 // Returns an indexable that always points to the current tag.
 // You only need to call this once.
 // 	raw:current
 // Returns the current raw tag.
-func CommandRaw_Current(state *raptor.State, params []*raptor.Value) {
-	state.RetVal = raptor.NewValueObject(lex)
+func CommandRaw_Current(script *raptor.Script, params []*raptor.Value) {
+	script.RetVal = raptor.NewValueObject(lex)
 }
 
 // Disables the current tag.
 // 	raw:disable
 // Returns unchanged.
-func CommandRaw_Disable(state *raptor.State, params []*raptor.Value) {
+func CommandRaw_Disable(script *raptor.Script, params []*raptor.Value) {
 	lex.source[lex.tagbegin] = '-'
 	lex.source[lex.tagend] = '-'
 }
@@ -91,7 +91,7 @@ func CommandRaw_Disable(state *raptor.State, params []*raptor.Value) {
 // Replaces the current tag.
 // 	raw:replace replacement
 // Returns unchanged.
-func CommandRaw_Replace(state *raptor.State, params []*raptor.Value) {
+func CommandRaw_Replace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to raw:replace.")
 	}
@@ -112,7 +112,7 @@ func CommandRaw_Replace(state *raptor.State, params []*raptor.Value) {
 // Adds text after the current tag.
 // 	raw:append text
 // Returns unchanged.
-func CommandRaw_Append(state *raptor.State, params []*raptor.Value) {
+func CommandRaw_Append(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to raw:append.")
 	}
@@ -134,6 +134,6 @@ func CommandRaw_Append(state *raptor.State, params []*raptor.Value) {
 // Use this to write out your edits.
 // 	raw:dump
 // Returns the raw text.
-func CommandRaw_Dump(state *raptor.State, params []*raptor.Value) {
-	state.RetVal = raptor.NewValueString(string(lex.source))
+func CommandRaw_Dump(script *raptor.Script, params []*raptor.Value) {
+	script.RetVal = raptor.NewValueString(string(lex.source))
 }

@@ -7,7 +7,7 @@ package csv
 
 FUNCTIONS
 
-func CommandCsv_Parse(state *raptor.State, params []*raptor.Value)
+func CommandCsv_Parse(script *raptor.Script, params []*raptor.Value)
     Parse a csv file. The returned file is an Indexable of Indexables.
     Indexing rules are the same as for array.
 

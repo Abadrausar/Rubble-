@@ -57,6 +57,7 @@ var header = ` +----------------------------------------------------------------
 var ScriptPath string
 var Compile string
 var BinVersion int
+var Validate bool
 var NoExit bool
 var NoPredefs bool
 var NoRecover bool
@@ -105,6 +106,7 @@ func main() {
 	flag.StringVar(&ScriptPath, "script", "", "Path to the input script, if any. Changes to batch mode. Needed for -compile")
 	flag.StringVar(&Compile, "compile", "", "Path to the output file. Changes to compile mode. Needs -script to be set.")
 	flag.IntVar(&BinVersion, "binversion", 4, "Force a specific binary version. Fallback rules still apply.")
+	flag.BoolVar(&Validate, "validate", false, "Run script through the syntax checker and exit. Use with -script.")
 	flag.BoolVar(&NoExit, "noexit", false, "If set changes from batch mode to interactive mode. Use with -script.")
 	flag.BoolVar(&NoPredefs, "nopredefs", false, "If set disables the shell predefs.")
 	flag.BoolVar(&NoRecover, "norecover", false, "If set disables error recovery. Use for debuging the runtime.")
@@ -136,7 +138,36 @@ func main() {
 	}
 
 	state := raptor.NewState()
+	script := raptor.NewScript()
 	state.NoRecover = NoRecover
+
+	if Validate {
+		fmt.Println("Validating Script File...")
+		if ScriptPath == "" {
+			fmt.Println("Validate Error: No script set.")
+			return
+		}
+		
+		file, err := ioutil.ReadFile(ScriptPath)
+		if err != nil {
+			fmt.Println("Validate Error:", err)
+			return
+		}
+		
+		err = raptor.LoadFile(file, script)
+		if err != nil {
+			fmt.Println("Validate Error:", err)
+			return
+		}
+		
+		err = script.Validate()
+		if err != nil {
+			fmt.Println("Validate Error:", err)
+			return
+		}
+		fmt.Println("Validation Successful.")
+		return
+	}
 
 	// Load commands
 	base.Setup(state)
@@ -157,18 +188,18 @@ func main() {
 	str.Setup(state)
 
 	// Add any command line params to the state.
-	state.AddParams(flag.Args()...)
+	script.AddParams(flag.Args()...)
 
 	// Load predefs if desired.
 	if !NoPredefs {
 		fmt.Println("Loading Predefined User Commands...")
-		state.Code.AddCodeSource(raptor.NewLexer(preDefs, 64, 1))
-		rtn, err := state.Run()
+		script.Code.AddCodeSource(raptor.NewLexer(preDefs, 64, 1))
+		rtn, err := state.Run(script)
 		if err != nil {
 			fmt.Println("Predefine Error:", err)
 			fmt.Println("Predefine Ret:", rtn)
 		}
-		state.RetVal = nil
+		script.RetVal = nil
 	}
 
 	// Compile the provided script if Compile is set
@@ -249,13 +280,13 @@ func main() {
 			return
 		}
 
-		err = raptor.LoadFile(file, state)
+		err = raptor.LoadFile(file, script)
 		if err != nil {
 			fmt.Println("Error:", err)
 			return
 		}
 
-		rtn, err := state.Run()
+		rtn, err := state.Run(script)
 		if err != nil {
 			fmt.Println("Error:", err)
 		}
@@ -293,8 +324,8 @@ func main() {
 		}
 
 		if curchar[0] == byte('\n') && !escape {
-			state.Code.Add(string(line))
-			rtn, err := state.Run()
+			script.Code.Add(string(line))
+			rtn, err := state.Run(script)
 			if err != nil {
 				fmt.Println("Error:", err)
 			}

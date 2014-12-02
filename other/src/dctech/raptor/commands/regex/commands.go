@@ -37,11 +37,11 @@ func Setup(state *raptor.State) {
 // Runs a regular expression search and replace.
 // 	regex:replace regex input replace
 // Returns input with all strings matching regex replaced with replace.
-func CommandRegEx_Replace(state *raptor.State, params []*raptor.Value) {
+func CommandRegEx_Replace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 3 {
 		panic("Wrong number of params to regex:replace.")
 	}
 
 	regEx := regexp.MustCompile(params[0].String())
-	state.RetVal = raptor.NewValueString(regEx.ReplaceAllString(params[1].String(), params[2].String()))
+	script.RetVal = raptor.NewValueString(regEx.ReplaceAllString(params[1].String(), params[2].String()))
 }

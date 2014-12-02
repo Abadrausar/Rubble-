@@ -46,6 +46,9 @@ type Template struct {
 	// The native template handler
 	Handler NativeTemplate
 
+	// The script template code
+	Code *raptor.CompiledScript
+	
 	// The user template text
 	Text string
 
@@ -90,28 +93,26 @@ func (this *Template) Call(params []string) string {
 
 	// Script template
 	if this.NCA {
-		GlobalRaptorState.Code.Add(this.Text)
-		GlobalRaptorState.Envs.Add(raptor.NewEnvironment())
+		script := raptor.NewScript()
+		script.Code.AddCodeSource(raptor.NewCompiledLexer(this.Code))
 
 		// Handle params
 		if len(this.Params) == 1 && this.Params[0].Name == "..." {
-			GlobalRaptorState.AddParams(params...)
+			script.AddParams(params...)
 		} else {
 			for i := range this.Params {
 				if len(params) <= i {
-					GlobalRaptorState.NewVar(this.Params[i].Name, raptor.NewValueString(this.Params[i].Default))
+					script.NewVar(this.Params[i].Name, raptor.NewValueString(this.Params[i].Default))
 				} else {
-					GlobalRaptorState.NewVar(this.Params[i].Name, raptor.NewValueString(params[i]))
+					script.NewVar(this.Params[i].Name, raptor.NewValueString(params[i]))
 				}
 			}
 		}
 
-		rtn, err := GlobalRaptorState.Run()
+		rtn, err := GlobalRaptorState.Run(script)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
-
-		GlobalRaptorState.Envs.Remove()
 
 		if rtn == nil {
 			return ""
@@ -176,10 +177,10 @@ func NewUserTemplate(name string, text string, params []*TemplateParam) {
 	Templates[name] = rtn
 }
 
-func NewScriptTemplate(name string, text string, params []*TemplateParam) {
+func NewScriptTemplate(name string, code *raptor.CompiledScript, params []*TemplateParam) {
 	rtn := new(Template)
 	rtn.NCA = true
-	rtn.Text = text
+	rtn.Code = code
 	rtn.Params = params
 	Templates[name] = rtn
 }

@@ -7,7 +7,7 @@ package regex
 
 FUNCTIONS
 
-func CommandRegEx_Replace(state *raptor.State, params []*raptor.Value)
+func CommandRegEx_Replace(script *raptor.Script, params []*raptor.Value)
     Runs a regular expression search and replace.
 
 	regex:replace regex input replace

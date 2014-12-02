@@ -26,6 +26,7 @@ import "io/ioutil"
 import "path/filepath"
 import "strings"
 import "dctech/raptor"
+import "os"
 
 func main() {
 	// init logging
@@ -33,17 +34,18 @@ func main() {
 
 	// Init crash handler
 	defer func() {
-		if !RblRecover {
+		if NoRecover {
 			return
 		}
 
 		if x := recover(); x != nil {
 			LogPrintln("Error:", x)
 			LogPrintln("  Near line:", LastLine, "In last file.")
+			os.Exit(1)
 		}
 	}()
 
-	LogPrintln("Rubble v2.1")
+	LogPrintln("Rubble v3.1")
 	LogPrintln("After Blast comes Rubble.")
 	LogPrintln("=============================================")
 
@@ -185,19 +187,16 @@ func main() {
 
 		LogPrintln("  " + Files.Files[i].Path)
 
-		err := raptor.LoadFile(Files.Files[i].Content, GlobalRaptorState)
+		script := raptor.NewScript()
+		err := raptor.LoadFile(Files.Files[i].Content, script)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
 
-		GlobalRaptorState.Envs.Add(raptor.NewEnvironment())
-
-		_, err = GlobalRaptorState.Run()
+		_, err = GlobalRaptorState.Run(script)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
-
-		GlobalRaptorState.Envs.Remove()
 	}
 
 	LogPrintln("=============================================")
@@ -258,19 +257,16 @@ func main() {
 
 		LogPrintln("  " + Files.Files[i].Path)
 
-		err := raptor.LoadFile(Files.Files[i].Content, GlobalRaptorState)
+		script := raptor.NewScript()
+		err := raptor.LoadFile(Files.Files[i].Content, script)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
-
-		GlobalRaptorState.Envs.Add(raptor.NewEnvironment())
-
-		_, err = GlobalRaptorState.Run()
+		
+		_, err = GlobalRaptorState.Run(script)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
-
-		GlobalRaptorState.Envs.Remove()
 	}
 
 	LogPrintln("=============================================")
@@ -284,7 +280,10 @@ func main() {
 
 		// HACK: Redo this
 		file := []byte(i + "\n\n" + string(Files.Files[i].Content))
-		ioutil.WriteFile(OutputDir+"/"+i+".txt", file, 0600)
+		err := ioutil.WriteFile(OutputDir+"/"+i+".txt", file, 0600)
+		if err != nil {
+			panic("Script Error: " + err.Error())
+		}
 	}
 	LogPrintln("Done.")
 }

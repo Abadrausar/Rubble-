@@ -7,7 +7,7 @@ package base
 
 FUNCTIONS
 
-func CommandBreak(state *raptor.State, params []*raptor.Value)
+func CommandBreak(script *raptor.Script, params []*raptor.Value)
     A "soft" return, break will never return more than one level.
 
 	break [value]
@@ -17,7 +17,7 @@ func CommandBreak(state *raptor.State, params []*raptor.Value)
     returns a specific value and/or "returning" a value to loop. Returns
     value or unchanged.
 
-func CommandBreakLoop(state *raptor.State, params []*raptor.Value)
+func CommandBreakLoop(script *raptor.Script, params []*raptor.Value)
     Forces a return until it hits a loop or foreach command or the script
     exits.
 
@@ -25,14 +25,14 @@ func CommandBreakLoop(state *raptor.State, params []*raptor.Value)
 
     Returns value or unchanged.
 
-func CommandCommand(state *raptor.State, params []*raptor.Value)
+func CommandCommand(script *raptor.Script, params []*raptor.Value)
     Creates a new user command.
 
 	command name code [paramName...]
 
     Returns unchanged.
 
-func CommandDelCommand(state *raptor.State, params []*raptor.Value)
+func CommandDelCommand(script *raptor.Script, params []*raptor.Value)
     Deletes a command. Be careful with this one! Some actions are not
     reversable from a script.
 
@@ -40,7 +40,7 @@ func CommandDelCommand(state *raptor.State, params []*raptor.Value)
 
     Returns unchanged.
 
-func CommandDelNamespace(state *raptor.State, params []*raptor.Value)
+func CommandDelNamespace(script *raptor.Script, params []*raptor.Value)
     Deletes a namespace. Be careful with this one! Some actions are not
     reversable from a script. For example it may be a very bad idea to
     delete debug or int.
@@ -49,14 +49,14 @@ func CommandDelNamespace(state *raptor.State, params []*raptor.Value)
 
     Returns unchanged.
 
-func CommandDelVar(state *raptor.State, params []*raptor.Value)
+func CommandDelVar(script *raptor.Script, params []*raptor.Value)
     Deletes a variable.
 
 	delvar name
 
     Returns the deleted vars value.
 
-func CommandError(state *raptor.State, params []*raptor.Value)
+func CommandError(script *raptor.Script, params []*raptor.Value)
     Manipulates the error flag.
 
 	error [value]
@@ -65,28 +65,28 @@ func CommandError(state *raptor.State, params []*raptor.Value)
     flag pass a boolean value. Returns unchanged or the value of the error
     flag.
 
-func CommandEval(state *raptor.State, params []*raptor.Value)
+func CommandEval(script *raptor.Script, params []*raptor.Value)
     Evaluates code in the current environment.
 
 	eval code
 
     Returns the return value of the last command in the code it runs.
 
-func CommandEvalInNew(state *raptor.State, params []*raptor.Value)
+func CommandEvalInNew(script *raptor.Script, params []*raptor.Value)
     Evaluates code in a new environment.
 
 	evalinnew code
 
     Returns the return value of the last command in the code it runs.
 
-func CommandEvalInParent(state *raptor.State, params []*raptor.Value)
+func CommandEvalInParent(script *raptor.Script, params []*raptor.Value)
     Evaluates code in the current environment's parent.
 
 	evalinparent code
 
     Returns the return value of the last command in the code it runs.
 
-func CommandExists(state *raptor.State, params []*raptor.Value)
+func CommandExists(script *raptor.Script, params []*raptor.Value)
     Returns true (-1) if variable exists or if a index exists in a map or
     array.
 
@@ -95,14 +95,14 @@ func CommandExists(state *raptor.State, params []*raptor.Value)
 
     Returns true or false.
 
-func CommandExit(state *raptor.State, params []*raptor.Value)
+func CommandExit(script *raptor.Script, params []*raptor.Value)
     Exit the script.
 
 	exit [value]
 
     Returns value or unchanged.
 
-func CommandForEach(state *raptor.State, params []*raptor.Value)
+func CommandForEach(script *raptor.Script, params []*raptor.Value)
     Runs code as command for each entry in a map or array value.
 
 	foreach objectvalue code
@@ -115,7 +115,7 @@ func CommandForEach(state *raptor.State, params []*raptor.Value)
     work with breakloop. Returns the return value of the last command in
     code.
 
-func CommandGetCommand(state *raptor.State, params []*raptor.Value)
+func CommandGetCommand(script *raptor.Script, params []*raptor.Value)
     Gets a reference to a command. Note that command references are just
     strings with a special type. This type is needed to make this work
     correctly.
@@ -124,7 +124,7 @@ func CommandGetCommand(state *raptor.State, params []*raptor.Value)
 
     Returns a reference to the command.
 
-func CommandIf(state *raptor.State, params []*raptor.Value)
+func CommandIf(script *raptor.Script, params []*raptor.Value)
     If the condition is true run true code else if false code exists call
     false code.
 
@@ -133,14 +133,14 @@ func CommandIf(state *raptor.State, params []*raptor.Value)
     Returns the return value of the last command in the code it runs or
     unchanged.
 
-func CommandLen(state *raptor.State, params []*raptor.Value)
+func CommandLen(script *raptor.Script, params []*raptor.Value)
     Fetches the element count of an Indexable.
 
 	len value
 
     Returns the element count.
 
-func CommandLoop(state *raptor.State, params []*raptor.Value)
+func CommandLoop(script *raptor.Script, params []*raptor.Value)
     Runs code for as long as the code returns true.
 
 	loop code
@@ -149,21 +149,21 @@ func CommandLoop(state *raptor.State, params []*raptor.Value)
     false unless loop exited with ret (In which case the return value is
     unusable by the command calling loop anyway).
 
-func CommandNamespace(state *raptor.State, params []*raptor.Value)
+func CommandNamespace(script *raptor.Script, params []*raptor.Value)
     Creates a new namespace.
 
 	namespace name
 
     Returns unchanged.
 
-func CommandNop(state *raptor.State, params []*raptor.Value)
+func CommandNop(script *raptor.Script, params []*raptor.Value)
     Does nothing.
 
 	nop
 
     Returns unchanged.
 
-func CommandRet(state *raptor.State, params []*raptor.Value)
+func CommandRet(script *raptor.Script, params []*raptor.Value)
     Return from current command.
 
 	ret [value]
@@ -172,14 +172,14 @@ func CommandRet(state *raptor.State, params []*raptor.Value)
     from inside a loop will not return from the loop, it will return from
     the command that called loop. See break. Returns value or unchanged.
 
-func CommandRun(state *raptor.State, params []*raptor.Value)
+func CommandRun(script *raptor.Script, params []*raptor.Value)
     Runs code as a user command.
 
 	run code [params...]
 
     Returns the return value of the last command in the code it runs.
 
-func CommandSet(state *raptor.State, params []*raptor.Value)
+func CommandSet(script *raptor.Script, params []*raptor.Value)
     Sets the value of variable "name" to value or sets the value of the map
     or array at index to value.
 
@@ -188,7 +188,7 @@ func CommandSet(state *raptor.State, params []*raptor.Value)
 
     Returns value.
 
-func CommandThis(state *raptor.State, params []*raptor.Value)
+func CommandThis(script *raptor.Script, params []*raptor.Value)
     Retrieves the current "this" value. The value returned by this command
     will only be useful under certain circumstaces!
 
@@ -196,7 +196,7 @@ func CommandThis(state *raptor.State, params []*raptor.Value)
 
     Returns the value of the This register.
 
-func CommandVar(state *raptor.State, params []*raptor.Value)
+func CommandVar(script *raptor.Script, params []*raptor.Value)
     Creates a new variable setting the value to value if present.
 
 	var name [value]
@@ -205,16 +205,16 @@ func CommandVar(state *raptor.State, params []*raptor.Value)
 
 func NewScriptArray() raptor.EditIndexable
 
-func NewScriptArrayFromLit(state *raptor.State, keys []string, values []*raptor.Value) *raptor.Value
+func NewScriptArrayFromLit(script *raptor.Script, keys []string, values []*raptor.Value) *raptor.Value
 
 func NewScriptArraySized(size int) raptor.EditIndexable
 
 func NewScriptMap() raptor.EditIndexable
 
-func NewScriptMapFromLit(state *raptor.State, keys []string, values []*raptor.Value) *raptor.Value
+func NewScriptMapFromLit(script *raptor.Script, keys []string, values []*raptor.Value) *raptor.Value
 
 func Setup(state *raptor.State)
-    Setup adds the base commands to the state. The base commands are:
+    Setup adds the base commands to the script. The base commands are:
 
 	nop
 	ret

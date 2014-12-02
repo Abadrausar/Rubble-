@@ -22,6 +22,13 @@ misrepresented as being the original software.
 
 package raptor
 
+import "sync"
+
+// ObjectFactory is the function signature for a literal converter.
+// keys may be nil, a specific implementation may panic with an error if
+// a nil or non-nil keys is expected but not found.
+type ObjectFactory func(script *Script, keys []string, values []*Value) *Value
+
 // An Enviroment is where all variables are stored.
 // Nesting is handled by State via EnvStore.
 // Touch only if you know what you are doing!
@@ -39,18 +46,18 @@ func NewEnvironment() *Environment {
 // also contain other namespaces and commands.
 // Touch only if you know what you are doing!
 type NameSpace struct {
-	Vars       map[string]*Value
-	Commands   map[string]*Command
-	Types      map[string]ObjectFactory
-	NameSpaces map[string]*NameSpace
+	Commands   *CommandStore
+	NameSpaces *NameSpaceStore
+	Types      *TypeStore
+	Vars       *ValueStore
 }
 
 func NewNameSpace() *NameSpace {
 	rtn := new(NameSpace)
-	rtn.Vars = make(map[string]*Value)
-	rtn.Commands = make(map[string]*Command)
-	rtn.Types = make(map[string]ObjectFactory)
-	rtn.NameSpaces = make(map[string]*NameSpace)
+	rtn.Vars = NewValueStore()
+	rtn.Commands = NewCommandStore()
+	rtn.NameSpaces = NewNameSpaceStore()
+	rtn.Types = NewTypeStore()
 	return rtn
 }
 
@@ -61,6 +68,7 @@ type EnvStore []*Environment
 func NewEnvStore() *EnvStore {
 	rtn := new(EnvStore)
 	*rtn = make([]*Environment, 0, 20)
+	rtn.Add(NewEnvironment())
 	return rtn
 }
 
@@ -77,6 +85,11 @@ func (this *EnvStore) Remove() *Environment {
 		this.Add(NewEnvironment())
 	}
 	return rtn
+}
+
+func (this *EnvStore) Clear() {
+	*this = (*this)[0:0]
+	this.Add(NewEnvironment())
 }
 
 func (this *EnvStore) Last() *Environment {
@@ -119,9 +132,231 @@ func (this *BlockStore) Remove() CodeSource {
 }
 
 func (this *BlockStore) Clear() {
-	*this = make([]CodeSource, 0, 20)
+	*this = (*this)[0:0]
 }
 
 func (this *BlockStore) Last() CodeSource {
 	return (*this)[len(*this)-1]
+}
+
+// Concurrency support
+
+// CommandStore is for storing script commands.
+type CommandStore struct {
+	data map[string]*Command
+	lock *sync.RWMutex
+}
+
+// NewCommandStore creates and initializes a CommandStore.
+func NewCommandStore() *CommandStore {
+	rtn := new(CommandStore)
+	rtn.data = make(map[string]*Command)
+	rtn.lock = new(sync.RWMutex)
+	return rtn
+}
+
+// Fetch retrieves a value from the store. Fetch is reentrant.
+func (this *CommandStore) Fetch(name string) *Command {
+	this.lock.RLock()
+	rtn := this.data[name]
+	this.lock.RUnlock()
+	return rtn
+}
+
+// Store adds/updates a value in the store. Store is reentrant.
+func (this *CommandStore) Store(name string, obj *Command) {
+	this.lock.Lock()
+	this.data[name] = obj
+	this.lock.Unlock()
+}
+
+// Delete removes a value from the store. Delete is reentrant.
+func (this *CommandStore) Delete(name string) {
+	this.lock.Lock()
+	delete(this.data, name)
+	this.lock.Unlock()
+}
+
+// Exist checks to see if an item exists in the store. Exist is reentrant.
+func (this *CommandStore) Exist(name string) bool {
+	this.lock.RLock()
+	_, rtn := this.data[name]
+	this.lock.RUnlock()
+	return rtn
+}
+
+// DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING!
+func (this *CommandStore) BeginLowLevel() map[string]*Command {
+	this.lock.Lock()
+	return this.data
+}
+
+// DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING!
+func (this *CommandStore) EndLowLevel() {
+	this.lock.Unlock()
+}
+
+// NameSpaceStore is for storing script namespaces.
+type NameSpaceStore struct {
+	data map[string]*NameSpace
+	lock *sync.RWMutex
+}
+
+// NewNameSpaceStore creates and initializes a NameSpaceStore.
+func NewNameSpaceStore() *NameSpaceStore {
+	rtn := new(NameSpaceStore)
+	rtn.data = make(map[string]*NameSpace)
+	rtn.lock = new(sync.RWMutex)
+	return rtn
+}
+
+// Fetch retrieves a value from the store. Fetch is reentrant.
+func (this *NameSpaceStore) Fetch(name string) *NameSpace {
+	this.lock.RLock()
+	rtn := this.data[name]
+	this.lock.RUnlock()
+	return rtn
+}
+
+// Store adds/updates a value in the store. Store is reentrant.
+func (this *NameSpaceStore) Store(name string, obj *NameSpace) {
+	this.lock.Lock()
+	this.data[name] = obj
+	this.lock.Unlock()
+}
+
+// Delete removes a value from the store. Delete is reentrant.
+func (this *NameSpaceStore) Delete(name string) {
+	this.lock.Lock()
+	delete(this.data, name)
+	this.lock.Unlock()
+}
+
+// Exist checks to see if an item exists in the store. Exist is reentrant.
+func (this *NameSpaceStore) Exist(name string) bool {
+	this.lock.RLock()
+	_, rtn := this.data[name]
+	this.lock.RUnlock()
+	return rtn
+}
+
+// DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING!
+func (this *NameSpaceStore) BeginLowLevel() map[string]*NameSpace {
+	this.lock.Lock()
+	return this.data
+}
+
+// DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING!
+func (this *NameSpaceStore) EndLowLevel() {
+	this.lock.Unlock()
+}
+
+// TypeStore is for storing ObjectFactorys.
+type TypeStore struct {
+	data map[string]ObjectFactory
+	lock *sync.RWMutex
+}
+
+// NewTypeStore creates and initializes a TypeStore.
+func NewTypeStore() *TypeStore {
+	rtn := new(TypeStore)
+	rtn.data = make(map[string]ObjectFactory)
+	rtn.lock = new(sync.RWMutex)
+	return rtn
+}
+
+// Fetch retrieves a value from the store. Fetch is reentrant.
+func (this *TypeStore) Fetch(name string) ObjectFactory {
+	this.lock.RLock()
+	rtn := this.data[name]
+	this.lock.RUnlock()
+	return rtn
+}
+
+// Store adds/updates a value in the store. Store is reentrant.
+func (this *TypeStore) Store(name string, obj ObjectFactory) {
+	this.lock.Lock()
+	this.data[name] = obj
+	this.lock.Unlock()
+}
+
+// Delete removes a value from the store. Delete is reentrant.
+func (this *TypeStore) Delete(name string) {
+	this.lock.Lock()
+	delete(this.data, name)
+	this.lock.Unlock()
+}
+
+// Exist checks to see if an item exists in the store. Exist is reentrant.
+func (this *TypeStore) Exist(name string) bool {
+	this.lock.RLock()
+	_, rtn := this.data[name]
+	this.lock.RUnlock()
+	return rtn
+}
+
+// DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING!
+func (this *TypeStore) BeginLowLevel() map[string]ObjectFactory {
+	this.lock.Lock()
+	return this.data
+}
+
+// DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING!
+func (this *TypeStore) EndLowLevel() {
+	this.lock.Unlock()
+}
+
+// TypeStore is for storing ObjectFactorys.
+type ValueStore struct {
+	data map[string]*Value
+	lock *sync.RWMutex
+}
+
+// NewTypeStore creates and initializes a TypeStore.
+func NewValueStore() *ValueStore {
+	rtn := new(ValueStore)
+	rtn.data = make(map[string]*Value)
+	rtn.lock = new(sync.RWMutex)
+	return rtn
+}
+
+// Fetch retrieves a value from the store. Fetch is reentrant.
+func (this *ValueStore) Fetch(name string) *Value {
+	this.lock.RLock()
+	rtn := this.data[name]
+	this.lock.RUnlock()
+	return rtn
+}
+
+// Store adds/updates a value in the store. Store is reentrant.
+func (this *ValueStore) Store(name string, obj *Value) {
+	this.lock.Lock()
+	this.data[name] = obj
+	this.lock.Unlock()
+}
+
+// Delete removes a value from the store. Delete is reentrant.
+func (this *ValueStore) Delete(name string) {
+	this.lock.Lock()
+	delete(this.data, name)
+	this.lock.Unlock()
+}
+
+// Exist checks to see if an item exists in the store. Exist is reentrant.
+func (this *ValueStore) Exist(name string) bool {
+	this.lock.RLock()
+	_, rtn := this.data[name]
+	this.lock.RUnlock()
+	return rtn
+}
+
+// DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING!
+func (this *ValueStore) BeginLowLevel() map[string]*Value {
+	this.lock.Lock()
+	return this.data
+}
+
+// DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING!
+func (this *ValueStore) EndLowLevel() {
+	this.lock.Unlock()
 }

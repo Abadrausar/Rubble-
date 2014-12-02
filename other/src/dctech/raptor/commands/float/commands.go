@@ -48,95 +48,95 @@ func Setup(state *raptor.State) {
 // Adds two values.
 // 	float:add a b
 // Returns a + b
-func CommandFloat_Add(state *raptor.State, params []*raptor.Value) {
+func CommandFloat_Add(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to float:add.")
 	}
 
-	state.RetVal = raptor.NewValueFloat64(params[0].Float64() + params[1].Float64())
+	script.RetVal = raptor.NewValueFloat64(params[0].Float64() + params[1].Float64())
 	return
 }
 
 // Subtracts two values.
 // 	float:sub a b
 // Returns a - b
-func CommandFloat_Sub(state *raptor.State, params []*raptor.Value) {
+func CommandFloat_Sub(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to float:sub.")
 	}
 
-	state.RetVal = raptor.NewValueFloat64(params[0].Float64() - params[1].Float64())
+	script.RetVal = raptor.NewValueFloat64(params[0].Float64() - params[1].Float64())
 	return
 }
 
 // Divides two values.
 // 	float:div a b
 // Returns a / b
-func CommandFloat_Div(state *raptor.State, params []*raptor.Value) {
+func CommandFloat_Div(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to float:div.")
 	}
 
-	state.RetVal = raptor.NewValueFloat64(params[0].Float64() / params[1].Float64())
+	script.RetVal = raptor.NewValueFloat64(params[0].Float64() / params[1].Float64())
 	return
 }
 
 // Multiplies two values.
 // 	float:mul a b
 // Returns a * b
-func CommandFloat_Mul(state *raptor.State, params []*raptor.Value) {
+func CommandFloat_Mul(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to float:mul.")
 	}
 
-	state.RetVal = raptor.NewValueFloat64(params[0].Float64() * params[1].Float64())
+	script.RetVal = raptor.NewValueFloat64(params[0].Float64() * params[1].Float64())
 	return
 }
 
 // Floating point greater than.
 // 	float:gt a b
 // Returns true or false.
-func CommandFloat_Gt(state *raptor.State, params []*raptor.Value) {
+func CommandFloat_Gt(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to float:gt.")
 	}
 
 	result := params[0].Float64() > params[1].Float64()
 	if result {
-		state.RetVal = raptor.NewValueBool(true)
+		script.RetVal = raptor.NewValueBool(true)
 		return
 	}
-	state.RetVal = raptor.NewValueBool(false)
+	script.RetVal = raptor.NewValueBool(false)
 }
 
 // Floating point less than.
 // 	float:lt a b
 // Returns true or false.
-func CommandFloat_Lt(state *raptor.State, params []*raptor.Value) {
+func CommandFloat_Lt(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to float:lt.")
 	}
 
 	result := params[0].Float64() < params[1].Float64()
 	if result {
-		state.RetVal = raptor.NewValueBool(true)
+		script.RetVal = raptor.NewValueBool(true)
 		return
 	}
-	state.RetVal = raptor.NewValueBool(false)
+	script.RetVal = raptor.NewValueBool(false)
 }
 
 // Floating point equal.
 // 	float:eq a b
 // Returns true or false.
-func CommandFloat_Eq(state *raptor.State, params []*raptor.Value) {
+func CommandFloat_Eq(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to float:eq.")
 	}
 
 	result := params[0].Float64() == params[1].Float64()
 	if result {
-		state.RetVal = raptor.NewValueBool(true)
+		script.RetVal = raptor.NewValueBool(true)
 		return
 	}
-	state.RetVal = raptor.NewValueBool(false)
+	script.RetVal = raptor.NewValueBool(false)
 }

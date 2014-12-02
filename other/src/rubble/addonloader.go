@@ -28,40 +28,49 @@ import "io/ioutil"
 
 func LoadAddons(path string) []*Addon {
 	addonlist := make([]*Addon, 0, 20)
-
+	
+	LogPrintln(path)
 	source, err := dcfs.NewDirReader(path)
 	if err != nil {
 		panic(err)
 	}
 
-	for _, dir := range source.ListDirs(".") {
-		addonlist = append(addonlist, loadAddon(source, dir, dir))
+	for _, dir := range source.ListDirs("") {
+		addonlist = loadDir(source, dir, dir, addonlist)
 	}
 
-	for _, file := range source.ListFiles(".") {
-		if strings.HasSuffix(file, ".pack.zip") {
-			zip, err := dcfs.NewZipReader(path + "/" + file)
-			if err != nil {
-				panic(err)
-			}
-
-			for _, dir := range zip.ListDirs(".") {
-				addonlist = append(addonlist, loadAddon(zip, StripExt(StripExt(file))+"/"+dir, dir))
-			}
-			continue
-		}
-
+	for _, file := range source.ListFiles("") {
 		if strings.HasSuffix(file, ".zip") {
 			zip, err := dcfs.NewZipReader(path + "/" + file)
 			if err != nil {
 				panic(err)
 			}
-			addonlist = append(addonlist, loadAddon(zip, StripExt(file), "."))
-			continue
+
+			addonlist = loadDir(zip, StripExt(file), "", addonlist)
 		}
 	}
 
 	return addonlist
+}
+
+func loadDir(source dcfs.DataSource, addonname, path string, addons []*Addon) []*Addon {
+	dirpath := path
+	if path != "" {
+		path += "/"
+	}
+	
+	if containsParseable(source, dirpath) {
+		addons = append(addons, loadAddon(source, addonname, dirpath))
+	}
+	
+	dirs := source.ListDirs(dirpath)
+	if len(dirs) != 0 {
+		for _, dir := range dirs {
+			addons = loadDir(source, addonname + "/" + dir, path + dir, addons)
+		}
+	}
+	
+	return addons
 }
 
 func loadAddon(source dcfs.DataSource, addonname, path string) *Addon {
@@ -69,9 +78,7 @@ func loadAddon(source dcfs.DataSource, addonname, path string) *Addon {
 	LogPrintln(addonname)
 	
 	dirpath := path
-	if path == "." {
-		path = ""
-	} else {
+	if path != "" {
 		path += "/"
 	}
 	
@@ -119,6 +126,28 @@ func classifyFile(file *AddonFile, filename string) string {
 
 	file.UserData = true
 	return filename
+}
+
+func containsParseable(source dcfs.DataSource, path string) bool {
+	for _, filename := range source.ListFiles(path) {
+		if strings.HasSuffix(filename, ".rsf") {
+			// is script
+			return true
+		}
+		if strings.HasSuffix(filename, ".rbf") {
+			// is binary script
+			return true
+		}
+		if strings.HasSuffix(filename, ".rbl") {
+			// is rubble code
+			return true
+		}
+		if strings.HasSuffix(filename, ".txt") {
+			// is raw file
+			return true
+		}
+	}
+	return false
 }
 
 func UpdateAddonList(dest string, addons []*Addon) {

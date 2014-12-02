@@ -7,14 +7,14 @@ package fileio
 
 FUNCTIONS
 
-func CommandFileIO_Read(state *raptor.State, params []*raptor.Value)
+func CommandFileIO_Read(script *raptor.Script, params []*raptor.Value)
     Read from file.
 
 	fileio:read path
 
     Returns file contents or an error message. May set the Error flag.
 
-func CommandFileIO_Write(state *raptor.State, params []*raptor.Value)
+func CommandFileIO_Write(script *raptor.Script, params []*raptor.Value)
     Write to file.
 
 	fileio:write path contents

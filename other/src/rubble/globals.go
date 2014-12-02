@@ -66,7 +66,7 @@ type AddonFile struct {
 	NoWrite    bool
 }
 
-// IsRaw returns true is the addon file is a raw file or rbl file.
+// IsRaw returns true if the addon file is a raw file or rbl file.
 func (this *AddonFile) IsRaw() bool {
 	return !this.PreScript && !this.PostScript && !this.UserData
 }
@@ -102,7 +102,9 @@ func NewFileList(data []*Addon) *FileList {
 	for _, addon := range data {
 		if addon.Active {
 			for name, file := range addon.Files {
-				this.Order = append(this.Order, name)
+				if _, ok := this.Files[name]; !ok {
+					this.Order = append(this.Order, name)
+				}
 				this.Files[name] = file
 			}
 		}

@@ -1,6 +1,0 @@
-
-'Uses Vanilla Values
-
-This file would normaly contain a LONG list of calls to SET_TILE and SET_COLOR
-
-It is HIGHLY recomended that this file be generated via #WRITE_TILESET'

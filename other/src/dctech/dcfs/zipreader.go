@@ -27,6 +27,7 @@ import "io/ioutil"
 import "errors"
 import "strings"
 import "archive/zip"
+import "path"
 import "path/filepath"
 
 type ZipReader struct {
@@ -72,11 +73,16 @@ func (this *ZipReader) OpenAndRead(path string) ([]byte, error) {
 
 func (this *ZipReader) ListDirs(dir string) []string {
 	rtn := make([]string, 0, 10)
+	dir = filepath.ToSlash(dir)
+	if dir == "" {
+		dir = "."
+	}
+	
 	for _, f := range this.zip.File {
 		if f.FileInfo().IsDir() {
 			name := strings.TrimRight(f.Name, "/")
-			if filepath.Dir(name) == dir {
-				rtn = append(rtn, filepath.Base(name))
+			if path.Dir(name) == dir {
+				rtn = append(rtn, path.Base(name))
 			}
 		}
 	}
@@ -85,11 +91,15 @@ func (this *ZipReader) ListDirs(dir string) []string {
 
 func (this *ZipReader) ListFiles(dir string) []string {
 	dir = filepath.ToSlash(dir)
+	if dir == "" {
+		dir = "."
+	}
 	rtn := make([]string, 0, 20)
+	
 	for _, f := range this.zip.File {
 		if !f.FileInfo().IsDir() {
-			if filepath.Dir(f.Name) == dir {
-				rtn = append(rtn, filepath.Base(f.Name))
+			if path.Dir(f.Name) == dir {
+				rtn = append(rtn, path.Base(f.Name))
 			}
 		}
 	}

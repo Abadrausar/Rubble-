@@ -47,7 +47,7 @@ func Setup(state *raptor.State) {
 // Runs an external program and waits for it to exit.
 // 	env:exec path [args]
 // Returns unchanged.
-func CommandEnv_Exec(state *raptor.State, params []*raptor.Value) {
+func CommandEnv_Exec(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 1 {
 		panic("Wrong number of params to env:exec.")
 	}
@@ -76,18 +76,18 @@ func CommandEnv_Exec(state *raptor.State, params []*raptor.Value) {
 // Gets the value of an environment variable.
 // 	env:getvar name
 // Returns the variables value.
-func CommandEnv_GetVar(state *raptor.State, params []*raptor.Value) {
+func CommandEnv_GetVar(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to getenv.")
 	}
 
-	state.RetVal = raptor.NewValueString(os.Getenv(params[0].String()))
+	script.RetVal = raptor.NewValueString(os.Getenv(params[0].String()))
 }
 
 // Sets the value of an environment variable.
 // 	env:setvar name value
 // Returns the old value.
-func CommandEnv_SetVar(state *raptor.State, params []*raptor.Value) {
+func CommandEnv_SetVar(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to setenv.")
 	}
@@ -96,25 +96,25 @@ func CommandEnv_SetVar(state *raptor.State, params []*raptor.Value) {
 	if err != nil {
 		panic(err)
 	}
-	state.RetVal = rtn
+	script.RetVal = rtn
 }
 
 // Get the working dir.
 // 	env:getwd
 // Returns the working directory.
-func CommandEnv_GetWD(state *raptor.State, params []*raptor.Value) {
+func CommandEnv_GetWD(script *raptor.Script, params []*raptor.Value) {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
 
-	state.RetVal = raptor.NewValueString(wd)
+	script.RetVal = raptor.NewValueString(wd)
 }
 
 // Set the working dir.
 // 	env:setwd path
 // Returns unchanged.
-func CommandEnv_SetWD(state *raptor.State, params []*raptor.Value) {
+func CommandEnv_SetWD(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to env:setwd.")
 	}

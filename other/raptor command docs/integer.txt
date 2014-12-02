@@ -7,56 +7,56 @@ package integer
 
 FUNCTIONS
 
-func CommandInt_Add(state *raptor.State, params []*raptor.Value)
+func CommandInt_Add(script *raptor.Script, params []*raptor.Value)
     Adds two values.
 
 	int:add a b
 
     Returns a + b
 
-func CommandInt_Div(state *raptor.State, params []*raptor.Value)
+func CommandInt_Div(script *raptor.Script, params []*raptor.Value)
     Divides two values.
 
 	int:div a b
 
     Returns a / b
 
-func CommandInt_Eq(state *raptor.State, params []*raptor.Value)
+func CommandInt_Eq(script *raptor.Script, params []*raptor.Value)
     Integer equal.
 
 	int:eq a b
 
     Returns true or false.
 
-func CommandInt_Gt(state *raptor.State, params []*raptor.Value)
+func CommandInt_Gt(script *raptor.Script, params []*raptor.Value)
     Integer greater than.
 
 	int:gt a b
 
     Returns true or false.
 
-func CommandInt_Lt(state *raptor.State, params []*raptor.Value)
+func CommandInt_Lt(script *raptor.Script, params []*raptor.Value)
     Integer less than.
 
 	int:lt a b
 
     Returns true or false.
 
-func CommandInt_Mod(state *raptor.State, params []*raptor.Value)
+func CommandInt_Mod(script *raptor.Script, params []*raptor.Value)
     Gives the remainder of dividing two values.
 
 	int:mod a b
 
     Returns a % b
 
-func CommandInt_Mul(state *raptor.State, params []*raptor.Value)
+func CommandInt_Mul(script *raptor.Script, params []*raptor.Value)
     Multiplies two values.
 
 	int:mul a b
 
     Returns a * b
 
-func CommandInt_Sub(state *raptor.State, params []*raptor.Value)
+func CommandInt_Sub(script *raptor.Script, params []*raptor.Value)
     Subtracts two values.
 
 	int:sub a b

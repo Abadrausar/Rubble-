@@ -40,7 +40,7 @@ func Setup(state *raptor.State) {
 // The returned file is an Indexable of Indexables. Indexing rules are the same as for array.
 // 	csv:parse filecontents
 // Returns the csv file or an error message. May set the Error flag.
-func CommandCsv_Parse(state *raptor.State, params []*raptor.Value) {
+func CommandCsv_Parse(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to csv.parse.")
 	}
@@ -48,8 +48,8 @@ func CommandCsv_Parse(state *raptor.State, params []*raptor.Value) {
 	csvreader := bytes.NewBuffer([]byte(params[0].String()))
 	file, err := csv.NewReader(csvreader).ReadAll()
 	if err != nil {
-		state.Error = true
-		state.RetVal = raptor.NewValueString("error:" + err.Error())
+		script.Error = true
+		script.RetVal = raptor.NewValueString("error:" + err.Error())
 		return
 	}
 
@@ -64,5 +64,5 @@ func CommandCsv_Parse(state *raptor.State, params []*raptor.Value) {
 		records[i] = raptor.NewValueObject(&tmp)
 	}
 	tmp := CSVFile(records)
-	state.RetVal = raptor.NewValueObject(&tmp)
+	script.RetVal = raptor.NewValueObject(&tmp)
 }

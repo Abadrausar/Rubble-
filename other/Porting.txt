@@ -1,4 +1,6 @@
 
+This file will be removed in version 3.2
+
 ==============================================
 Porting Scripts to Raptor:
 ==============================================
@@ -6,7 +8,7 @@ Porting Scripts to Raptor:
 If there is anyone (aside from me) who has written any NCA code for Rubble, said code will need to be ported to Raptor.
 Good thing it's simple.
 
-The only differences visible to a user are the lack of curly bracket strings and the change in comment syntax.
+The only differences visible to a user are the lack of curly bracket strings, some command changes, and the change in comment syntax.
 
 comments are now line based and begin with a # symbol
 eg.

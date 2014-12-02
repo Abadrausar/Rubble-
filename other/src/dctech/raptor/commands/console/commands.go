@@ -36,8 +36,8 @@ func Setup(state *raptor.State) {
 // Print a list of values.
 // 	print [value...]
 // Returns unchanged.
-func CommandConsole_Print(state *raptor.State, params []*raptor.Value) {
+func CommandConsole_Print(script *raptor.Script, params []*raptor.Value) {
 	for _, val := range params {
-		state.Print(val.String())
+		script.Print(val.String())
 	}
 }

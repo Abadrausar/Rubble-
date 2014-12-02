@@ -37,8 +37,14 @@ Call a Rubble template.
 	
 	Returns the templates return value.
 
+Defines a Rubble script template.
+
+	rubble:template name [params...] code
+	
+	Returns unchanged.
+
 Variables
 	rubble:dfdir		The Dwarf Fortress directory
 	rubble:outputdir	The Rubble output directory
 	rubble:addonsdir	The directory where any addons may be found
-	rubble:raws			This is an EditIndexable that stores string versions of all files
+	rubble:raws			This is an EditIndexable that stores string versions of all active addon files

@@ -52,21 +52,21 @@ func Setup(state *raptor.State) {
 // on windows this may be simulated by pressing CTRL+Z followed by <ENTER>.
 // 	debug:shell
 // Returns the return value of the last command to be run.
-func CommandDebug_Shell(state *raptor.State, params []*raptor.Value) {
+func CommandDebug_Shell(script *raptor.Script, params []*raptor.Value) {
 	line := make([]byte, 0, 100)
 	curchar := make([]byte, 1, 1)
 	escape := false
 
-	state.Println("+-------------------------------------------+")
-	state.Println("Raptor Debugging Shell")
-	state.Print(">>>")
+	script.Println("+-------------------------------------------+")
+	script.Println("Raptor Debugging Shell")
+	script.Print(">>>")
 	for {
 		_, err := os.Stdin.Read(curchar)
 		if err == io.EOF {
-			state.Println("Exiting...")
+			script.Println("Exiting...")
 			break
 		} else if err != nil {
-			state.Println("Read Error:", err, "\nExiting...")
+			script.Println("Read Error:", err, "\nExiting...")
 			break
 		}
 
@@ -80,15 +80,16 @@ func CommandDebug_Shell(state *raptor.State, params []*raptor.Value) {
 		}
 
 		if curchar[0] == byte('\n') && !escape {
-			state.Code.Add(string(line))
-			rtn, err := state.Run()
+			script.Code.Add(string(line))
+			err := script.SafeExec()
 			if err != nil {
-				state.Println("Error:", err)
+				script.Println("Error:", err)
+				script.Println("Internal state may be messed up!")
 			}
-			state.Println("Ret:", rtn)
+			script.Println("Ret:", script.RetVal)
 
 			line = line[:0]
-			state.Print(">>>")
+			script.Print(">>>")
 			continue
 		}
 
@@ -97,52 +98,52 @@ func CommandDebug_Shell(state *raptor.State, params []*raptor.Value) {
 		}
 
 		if curchar[0] == byte('\n') && escape {
-			state.Print(">>>")
+			script.Print(">>>")
 		}
 
 		escape = false
 		line = append(line, curchar...)
 	}
-	state.Println("+-------------------------------------------+")
+	script.Println("+-------------------------------------------+")
 }
 
 // Print information about a script value.
 // 	debug:value value
 // Returns unchanged.
-func CommandDebug_Value(state *raptor.State, params []*raptor.Value) {
+func CommandDebug_Value(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to debug:value.")
 	}
 
-	state.Println("+-------------------------------------------+")
-	state.Println("Raptor Script Value Inspector")
+	script.Println("+-------------------------------------------+")
+	script.Println("Raptor Script Value Inspector")
 	if params[0] == nil {
-		state.Println("Value == nil: Aborting")
-		state.Println("+-------------------------------------------+")
+		script.Println("Value == nil: Aborting")
+		script.Println("+-------------------------------------------+")
 		return
 	}
-	state.Println("Data:", params[0].Data)
+	script.Println("Data:", params[0].Data)
 	switch params[0].Type {
 	case raptor.TypString:
-		state.Println("Type: TypString")
+		script.Println("Type: TypString")
 	case raptor.TypInt:
-		state.Println("Type: TypInt")
+		script.Println("Type: TypInt")
 	case raptor.TypFloat:
-		state.Println("Type: TypFloat")
+		script.Println("Type: TypFloat")
 	case raptor.TypBool:
-		state.Println("Type: TypBool")
+		script.Println("Type: TypBool")
 	case raptor.TypObject:
-		state.Println("Type: TypObject")
+		script.Println("Type: TypObject")
 	case raptor.TypCode:
-		state.Println("Type: TypCode")
+		script.Println("Type: TypCode")
 	}
-	state.Println(params[0].Pos)
+	script.Println(params[0].Pos)
 	obj := params[0].Indexable()
 	if obj != nil {
-		state.Println("Value Is Indexable")
+		script.Println("Value Is Indexable")
 
 		len := obj.Len()
-		state.Println("len: ", len)
+		script.Println("len: ", len)
 		if len > 0 {
 			w := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
 			fmt.Fprintf(w, "%v\t%v\n", "Key", "Value")
@@ -153,86 +154,99 @@ func CommandDebug_Value(state *raptor.State, params []*raptor.Value) {
 			w.Flush()
 		}
 	}
-	state.Println("+-------------------------------------------+")
+	script.Println("+-------------------------------------------+")
 }
 
 // List all global data. This is mostly for use in interactive shells.
 // 	debug:list
 // Returns unchanged.
-func CommandDebug_List(state *raptor.State, params []*raptor.Value) {
-	state.Println("+-------------------------------------------+")
-	state.Println("Raptor Global Data")
-	state.Println("Namespaces:")
-	for i := range state.NameSpaces {
-		state.Println("\t" + i)
+func CommandDebug_List(script *raptor.Script, params []*raptor.Value) {
+	script.Println("+-------------------------------------------+")
+	script.Println("Raptor Global Data")
+	
+	script.Println("Namespaces:")
+	for i := range script.Host.NameSpaces.BeginLowLevel() {
+		script.Println("\t" + i)
 	}
-	state.Println("Commands:")
-	for i := range state.Commands {
-		state.Println("\t" + i)
+	script.Host.NameSpaces.EndLowLevel()
+	
+	script.Println("Commands:")
+	for i := range script.Host.Commands.BeginLowLevel() {
+		script.Println("\t" + i)
 	}
-	state.Println("Variables:")
-	envs := []*raptor.Environment(*state.Envs)
+	script.Host.Commands.EndLowLevel()
+	
+	script.Println("Variables:")
+	envs := []*raptor.Environment(*script.Envs)
 	for i := range envs[0].Vars {
-		state.Println("\t" + i)
+		script.Println("\t" + i)
 	}
-	state.Println("Registers:")
-	state.Println("\tExit:", state.Exit)
-	state.Println("\tReturn:", state.Return)
-	state.Println("\tBreak:", state.Break)
-	state.Println("\tBreakLoop:", state.BreakLoop)
-	state.Println("\tError:", state.Error)
-	state.Println("\tNoRecover:", state.NoRecover)
-	state.Println("\tRetVal:", state.RetVal)
-	state.Println("\tThis:", state.This)
-	state.Println("+-------------------------------------------+")
+	
+	script.Println("Registers:")
+	script.Println("\tExit:", script.Exit)
+	script.Println("\tReturn:", script.Return)
+	script.Println("\tBreak:", script.Break)
+	script.Println("\tBreakLoop:", script.BreakLoop)
+	script.Println("\tError:", script.Error)
+	script.Println("\tNoRecover:", script.Host.NoRecover)
+	script.Println("\tRetVal:", script.RetVal)
+	script.Println("\tThis:", script.This)
+	script.Println("+-------------------------------------------+")
 }
 
 // Print information about a namespace.
 // 	debug:namespace name
 // Returns unchanged.
-func CommandDebug_NameSpace(state *raptor.State, params []*raptor.Value) {
+func CommandDebug_NameSpace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to debug:namespace.")
 	}
 
-	namespace := state.ParseNameSpaceName(params[0].String())
+	namespace := script.ParseNameSpaceName(params[0].String())
 
-	state.Println("+-------------------------------------------+")
-	state.Println("Raptor Namespace Inspector")
-	state.Println("Commands:")
-	for i := range namespace.Commands {
-		state.Println("\t" + i)
+	script.Println("+-------------------------------------------+")
+	script.Println("Raptor Namespace Inspector")
+	
+	script.Println("Namespaces:")
+	for i := range namespace.NameSpaces.BeginLowLevel() {
+		script.Println("\t" + i)
 	}
-	state.Println("Namespaces:")
-	for i := range namespace.NameSpaces {
-		state.Println("\t" + i)
+	namespace.NameSpaces.EndLowLevel()
+	
+	script.Println("Commands:")
+	for i := range namespace.Commands.BeginLowLevel() {
+		script.Println("\t" + i)
 	}
-	state.Println("Variables:")
-	for i := range namespace.Vars {
-		state.Println("\t" + i)
+	namespace.Commands.EndLowLevel()
+	
+	script.Println("Variables:")
+	for i := range namespace.Vars.BeginLowLevel() {
+		script.Println("\t" + i)
 	}
-	state.Println("+-------------------------------------------+")
+	namespace.Vars.EndLowLevel()
+	
+	script.Println("+-------------------------------------------+")
 }
 
 // List variables in all environments.
 // 	debug:env
 // Returns unchanged.
-func CommandDebug_Env(state *raptor.State, params []*raptor.Value) {
-	state.Println("+-------------------------------------------+")
-	state.Println("Raptor Environment Inspector")
-	envs := []*raptor.Environment(*state.Envs)
+func CommandDebug_Env(script *raptor.Script, params []*raptor.Value) {
+	script.Println("+-------------------------------------------+")
+	script.Println("Raptor Environment Inspector")
+	envs := []*raptor.Environment(*script.Envs)
 	for x := range envs {
-		state.Println("Environment #", x, ":")
+		script.Println("Environment #", x, ":")
 		for i := range envs[x].Vars {
-			state.Println("\t" + i)
+			script.Println("\t" + i)
 		}
 	}
-	state.Println("+-------------------------------------------+")
+	script.Println("+-------------------------------------------+")
 }
 
 // Set the return value to nil.
 // 	debug:clrret
 // Returns nil.
-func CommandDebug_ClrRet(state *raptor.State, params []*raptor.Value) {
-	state.RetVal = nil
+func CommandDebug_ClrRet(script *raptor.Script, params []*raptor.Value) {
+	script.RetVal = nil
 }

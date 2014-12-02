@@ -5,160 +5,166 @@
 
 # Load some helpful commands.
 # These are the same "shell predefs" that are loaded by the Raptor shell by default.
-{!SCRIPT;
-	# increment variable
-	(command ++ __name__ {
-		(set [__name__] (int:add [[__name__]] 1))
-	})
-	
-	# decrement variable
-	(command -- __name__ {
-		(set [__name__] (int:sub [[__name__]] 1))
-	})
-	
-	# for loop
-	(command for __init__ __test__ __incriment__ __code__ {
-		(eval [__init__])
-		(loop {
-			(if (evalinnew [__test__]) {}{(breakloop false)})
-			(evalinnew [__code__])
-			(evalinnew [__incriment__])
-			(break true)
-		})
-	})
-	
-	# while loop
-	(command while __test__ __code__ {
-		(loop {
-			(if (evalinnew [__test__]) {}{(breakloop false)})
-			(evalinnew [__code__])
-			(break true)
-		})
-	})
-	
-	# include a file
-	# requires the file io commands to be loaded
-	(command include __path__ {
-		(evalinparent (fileio:read [__path__]))
-	})
-	
-	(ret "")
-}
 
+# increment variable
+(command ++ __name__ {
+	(set [__name__] (int:add [[__name__]] 1))
+})
+
+# decrement variable
+(command -- __name__ {
+	(set [__name__] (int:sub [[__name__]] 1))
+})
+
+# for loop
+(command for __init__ __test__ __incriment__ __code__ {
+	(eval [__init__])
+	(loop {
+		(if (evalinnew [__test__]) {}{(breakloop false)})
+		(evalinnew [__code__])
+		(evalinnew [__incriment__])
+		(break true)
+	})
+})
+
+# while loop
+(command while __test__ __code__ {
+	(loop {
+		(if (evalinnew [__test__]) {}{(breakloop false)})
+		(evalinnew [__code__])
+		(break true)
+	})
+})
+
+# include a file
+# requires the file io commands to be loaded
+(command include __path__ {
+	(evalinparent (fileio:read [__path__]))
+})
 
 # The comment templates, very simple, just do nothing.
-{!TEMPLATE;COMMENT;}
-{!TEMPLATE;C;}
+(rubble:template "COMMENT" {(ret "")})
+(rubble:template "C" {(ret "")})
 
-{!SCRIPT_TEMPLATE;VOID;...;
+(rubble:template "VOID" ... {
 	(foreach [params] {
 		# Note that params here is NOT the same array as the one passed to foreach
 		(rubble:stageparse [params 1])
 		(break true)
 	})
 	(ret "")
-}
+})
 
-# PANIC, cause Rubble to exit with an error, not used in the base.
-{!SCRIPT_TEMPLATE;!PANIC;msg;
-	(panic [msg])
-}
-{!SCRIPT_TEMPLATE;PANIC;msg;
-	(panic [msg])
-}
-{!SCRIPT_TEMPLATE;#PANIC;msg;
-	(panic [msg])
-}
+# ABORT, cause Rubble to exit with an error, not used in the base.
+(rubble:template "!ABORT" msg {(rubble:abort [msg])})
+(rubble:template "ABORT" msg {(rubble:abort [msg])})
+(rubble:template "#ABORT" msg {(rubble:abort [msg])})
 
 # The next two templates are for stripping leading/trailing whitespace from a string.
 # A formatting tool mostly, helps keep whitespace under control in generated files.
 # May also be used to help control variable expansion.
-{!SCRIPT_TEMPLATE;ECHO;...;
+(rubble:template "ECHO" ... {
 	(var tmp)
 	(foreach [params] {
 		(set tmp (str:add [tmp] [params 1]))
 	})
 	(rubble:stageparse [tmp])
-}
-{!TEMPLATE;E;{ECHO;...}}
+})
+(rubble:template "E" ... {
+	(var tmp)
+	(foreach [params] {
+		(set tmp (str:add [tmp] [params 1]))
+	})
+	(rubble:stageparse [tmp])
+})
 
-{!SCRIPT;(var rubble:shared_object_data <map>)(ret "")}
-{!SCRIPT_TEMPLATE;SHARED_OBJECT;id;raws;
+# Shared Object, the single most important template in all of Rubble
+(var rubble:shared_object_data <map>)
+(rubble:template "SHARED_OBJECT" id raws {
 	(if (exists [rubble:shared_object_data] [id]){
 		(rubble:stageparse [raws])
 		(ret "")
 	}{
-		(set [rubble:shared_object_data] [id] true)
-		(rubble:stageparse [raws])
+		(set [rubble:shared_object_data] [id] (rubble:stageparse [raws]))
+		(ret (str:add "{#_INSERT_SHARED_OBJECT;" [id] "}"))
 	})
-}
-{!SCRIPT_TEMPLATE;SHARED_OBJECT_EXISTS;id;then;else=;
+})
+(rubble:template "SHARED_OBJECT_EXISTS" id then "else=" {
 	(if (exists [rubble:shared_object_data] [id]) {
 		(rubble:stageparse [then])
 	}{
 		(rubble:stageparse [else])
 	})
-}
+})
+(rubble:template "SHARED_OBJECT_ADD" id raws {
+	(if (exists [rubble:shared_object_data] [id]){
+		(set [rubble:shared_object_data] [id] 
+			(str:add [rubble:shared_object_data [id]] "\n\t" (rubble:stageparse [raws]))
+		)
+	}{
+		(rubble:stageparse [raws])
+	})
+	(ret "")
+})
+(rubble:template "#_INSERT_SHARED_OBJECT" id {
+	(if (exists [rubble:shared_object_data] [id]){
+		(rubble:stageparse [rubble:shared_object_data [id]])
+	}{
+		(ret "")
+	})
+})
 
-{!SCRIPT_TEMPLATE;IF;a;b;then;else=;
+(rubble:template "IF" a b then "else=" {
 	(if (str:cmp [a] [b]){
 		(rubble:stageparse [then])
 	}{
 		(rubble:stageparse [else])
 	})
-}
+})
 
-{!SCRIPT;(var rubble:once_data <map>)(ret "")(ret "")}
-{!SCRIPT_TEMPLATE;ONCE;id;raws;
+(var rubble:once_data <map>)
+(rubble:template "ONCE" id raws {
 	(if (exists [rubble:once_data] [id]){
 		(ret "")
 	}{
 		(set [rubble:once_data] [id] true)
 		(rubble:stageparse [raws])
 	})
-}
+})
 
-{!SCRIPT;(var rubble:static_data <map>)(ret "")}
-{!SCRIPT_TEMPLATE;STATIC;id;raws;
+(var rubble:static_data <map>)
+(rubble:template "STATIC" id raws {
 	(if (exists [rubble:static_data] [id]){
-		(ret [rubble:static_data [id])
+		(ret [rubble:static_data [id]])
 	}{
 		(set [rubble:static_data] [id] (rubble:stageparse [raws]))
 	})
-}
+})
 
-{!SCRIPT_TEMPLATE;SET;name;value;
+(rubble:template "SET" name value {
 	(rubble:setvar [name] [value])
 	(ret "")
-}
+})
 
-{!SCRIPT;(var rubble:adventure_tier_data 0)(ret "")}
-{!SCRIPT_TEMPLATE;#ADVENTURE_TIER;
+(var rubble:adventure_tier_data 0)
+(rubble:template "#ADVENTURE_TIER" {
 	(set rubble:adventure_tier_data (int:add [rubble:adventure_tier_data] 1))
 	(ret (str:add "[ADVENTURE_TIER:" [rubble:adventure_tier_data] "]"))
-}
+})
 
 # This refactoring made possible by NCA5
-{!SCRIPT;(command rubble:print params {
+(command rubble:print params {
 	(foreach [params] {
 		(console:print "    " (rubble:expandvars [params 1]) "\n")
 		(break true)
 	})
 	(ret "")
 })
-(ret "")
-}
-{!SCRIPT_TEMPLATE;!PRINT;...;
-	(rubble:print [params])
-}
-{!SCRIPT_TEMPLATE;PRINT;...;
-	(rubble:print [params])
-}
-{!SCRIPT_TEMPLATE;#PRINT;...;
-	(rubble:print [params])
-}
+(rubble:template "!PRINT" {(rubble:print [params])})
+(rubble:template "PRINT" {(rubble:print [params])})
+(rubble:template "#PRINT" {(rubble:print [params])})
 
-{!SCRIPT_TEMPLATE;SHARED_PLANT;id;raws;
+(rubble:template "SHARED_PLANT" id raws {
 	# Tree Tiles
 	(regex:replace "\\[TREE_TILE:([0-9]+|'.')\\]" [raws] (str:add "[TREE_TILE:{#TILE;TREE_" [id] ";$1}]"))
 	(set raws (nop))
@@ -216,9 +222,9 @@
 		"\n}"
 	)
 	(rubble:stageparse (nop))
-}
+})
 
-{!SCRIPT_TEMPLATE;SHARED_INORGANIC;id;raws;
+(rubble:template "SHARED_INORGANIC" id raws {
 	(regex:replace "\\[ITEM_SYMBOL:([0-9]+|'.')\\]" [raws] (str:add "[ITEM_SYMBOL:{#TILE;ITEM_" [id] ";$1}]"))
 	(set raws (nop))
 	(regex:replace "\\[TILE:([0-9]+|'.')\\]" [raws] (str:add "[TILE:{#TILE;" [id] ";$1}]"))
@@ -239,8 +245,9 @@
 		"\n}"
 	)
 	(rubble:stageparse (nop))
-}
-{!SCRIPT_TEMPLATE;SHARED_MATERIAL_TEMPLATE;id;raws;
+})
+
+(rubble:template "SHARED_MATERIAL_TEMPLATE" id raws {
 	(regex:replace "\\[ITEM_SYMBOL:([0-9]+|'.')\\]" [raws] (str:add "[ITEM_SYMBOL:{#TILE;ITEM_SYMBOL_" [id] ";$1}]"))
 	(set raws (nop))
 	(regex:replace "\\[TILE:([0-9]+|'.')\\]" [raws] (str:add "[TILE:{#TILE;" [id] ";$1}]"))
@@ -261,10 +268,10 @@
 		"\n}"
 	)
 	(rubble:stageparse (nop))
-}
+})
 
-{!SCRIPT;(var rubble:ore_data <map>)(ret "")}
-{!SCRIPT_TEMPLATE;REGISTER_ORE;id;metal;amount;
+(var rubble:ore_data <map>)
+(rubble:template "REGISTER_ORE" id metal amount {
 	(if (exists [rubble:ore_data] [id]){
 	}{
 		(set [rubble:ore_data] [id] <map>)
@@ -280,8 +287,8 @@
 		(set [rubble:ore_data [id]] [metal] [amount])
 	})
 	(ret "")
-}
-{!SCRIPT_TEMPLATE;#_REGISTERED_ORES;id;
+})
+(rubble:template "#_REGISTERED_ORES" id {
 	(var out)
 	
 	(if (exists [rubble:ore_data] [id]){
@@ -294,10 +301,10 @@
 		(break true)
 	})
 	(ret [out])
-}
+})
 
-{!SCRIPT;(var rubble:reaction_class_data <map>)(ret "")}
-{!SCRIPT_TEMPLATE;REGISTER_REACTION_CLASS;id;class;
+(var rubble:reaction_class_data <map>)
+(rubble:template "REGISTER_REACTION_CLASS" id class {
 	(if (exists [rubble:reaction_class_data] [id]){
 	}{
 		(set [rubble:reaction_class_data] [id] <map>)
@@ -310,8 +317,8 @@
 		(set [rubble:reaction_class_data [id]] [class] true)
 	})
 	(ret "")
-}
-{!SCRIPT_TEMPLATE;#_REGISTERED_REACTION_CLASSES;id;
+})
+(rubble:template "#_REGISTERED_REACTION_CLASSES" id {
 	(if (exists [rubble:reaction_class_data] [id]){
 	}{
 		(ret "")
@@ -323,10 +330,10 @@
 		(break true)
 	})
 	(ret [out])
-}
+})
 
-{!SCRIPT;(var rubble:reaction_product_data <map>)(ret "")}
-{!SCRIPT_TEMPLATE;REGISTER_REACTION_PRODUCT;id;class;mat;
+(var rubble:reaction_product_data <map>)
+(rubble:template "REGISTER_REACTION_PRODUCT" id class mat {
 	(if (exists [rubble:reaction_product_data] [id]){
 	}{
 		(set [rubble:reaction_product_data] [id] <map>)
@@ -339,8 +346,8 @@
 		(set [rubble:reaction_product_data [id]] [class] [mat])
 	})
 	(ret "")
-}
-{!SCRIPT_TEMPLATE;#_REGISTERED_REACTION_PRODUCTS;id;
+})
+(rubble:template "#_REGISTERED_REACTION_PRODUCTS" id {
 	(if (exists [rubble:reaction_product_data] [id]){
 	}{
 		(ret "")
@@ -352,45 +359,42 @@
 		(break true)
 	})
 	(ret [out])
-}
+})
 
-{!SCRIPT;
-	(var rubble:tile_data <map>)
-	(var rubble:color_data <map>)
-	(var rubble:tileset <array>)
-	(ret "")
-}
-{!SCRIPT_TEMPLATE;SET_TILE;id;tile;
+(var rubble:tile_data <map>)
+(var rubble:color_data <map>)
+(var rubble:tileset <array>)
+(rubble:template "SET_TILE" id tile {
 	(if (exists [rubble:tile_data] [id]){
 	}{
 		(set [rubble:tile_data] [id] [tile])
 	})
 	(ret "")
-}
-{!SCRIPT_TEMPLATE;#TILE;id;default;
+})
+(rubble:template "#TILE" id default {
 	(set [rubble:tileset] (len [rubble:tileset]) (str:add "{SET_TILE;" [id] ";" [default] "}"))
 	(if (exists [rubble:tile_data] [id]){
 		(ret [rubble:tile_data [id]])
 	}{
 		(ret [default])
 	})
-}
-{!SCRIPT_TEMPLATE;SET_COLOR;id;color;
+})
+(rubble:template "SET_COLOR" id color {
 	(if (exists [rubble:color_data] [id]){
 	}{
 		(set [rubble:color_data] [id] [color])
 	})
 	(ret "")
-}
-{!SCRIPT_TEMPLATE;#COLOR;id;default;
+})
+(rubble:template "#COLOR" id default {
 	(set [rubble:tileset] (len [rubble:tileset]) (str:add "{SET_COLOR;" [id] ";" [default] "}"))
 	(if (exists [rubble:color_data] [id]){
 		(ret [rubble:color_data [id]])
 	}{
 		(ret [default])
 	})
-}
-{!SCRIPT_TEMPLATE;#WRITE_TILESET;path;
+})
+(rubble:template "#WRITE_TILESET" path {
 	(var out "\n")
 	(foreach [rubble:tileset] {
 		(set out (str:add [out] [params 1] "\n"))
@@ -398,11 +402,11 @@
 	})
 	(fileio:write [path] [out])
 	(ret "")
-}
+})
 
 # Tech Templates
-{!SCRIPT;(var rubble:building_data <map>)(ret "")}
-{!SCRIPT_TEMPLATE;BUILDING_WORKSHOP;...;
+(var rubble:building_data <map>)
+(rubble:template "BUILDING_WORKSHOP" ... {
 	(if (int:lt (len [params]) 2){(panic "Invalid param count to BUILDING_WORKSHOP.")})
 	
 	(var id [params 0])
@@ -417,8 +421,8 @@
 		})
 	})
 	(str:add "[BUILDING_WORKSHOP:" [id] "]")
-}
-{!SCRIPT_TEMPLATE;BUILDING_FURNACE;...;
+})
+(rubble:template "BUILDING_FURNACE" ... {
 	(if (int:lt (len [params]) 2){(panic "Invalid param count to BUILDING_FURNACE.")})
 	
 	(var id [params 0])
@@ -433,8 +437,8 @@
 		})
 	})
 	(str:add "[BUILDING_FURNACE:" [id] "]")
-}
-{!SCRIPT_TEMPLATE;#USES_BUILDINGS;...;
+})
+(rubble:template "#USES_BUILDINGS" ... {
 	(if (int:lt (len [params]) 1){(panic "Invalid param count to #USES_BUILDINGS.")})
 	
 	(var buildings <map>)
@@ -461,10 +465,10 @@
 		(break true)
 	})
 	(ret (str:trimspace [out]))
-}
+})
 
-{!SCRIPT;(var rubble:reaction_data <map>)(ret "")}
-{!SCRIPT_TEMPLATE;REACTION;...;
+(var rubble:reaction_data <map>)
+(rubble:template "REACTION" ... {
 	(if (int:lt (len [params]) 2){(panic "Invalid param count to REACTION.")})
 	
 	(var id [params 0])
@@ -479,8 +483,8 @@
 		})
 	})
 	(str:add "[REACTION:" [id] "]")
-}
-{!SCRIPT_TEMPLATE;#USES_REACTIONS;...;
+})
+(rubble:template "#USES_REACTIONS" ... {
 	(if (int:lt (len [params]) 1){(panic "Invalid param count to #USES_REACTIONS.")})
 	
 	(var reactions <map>)
@@ -507,9 +511,9 @@
 		(break true)
 	})
 	(ret (str:trimspace [out]))
-}
+})
 
-{!SCRIPT_TEMPLATE;#USES_TECH;...;
+(rubble:template "#USES_TECH" ... {
 	(if (int:lt (len [params]) 1){(panic "Invalid param count to #USES_TECH.")})
 	
 	(var buildings <map>)
@@ -553,43 +557,39 @@
 		(break true)
 	})
 	(ret (str:trimspace [out]))
-}
+})
 
 # Item templates
-{!SCRIPT;
-	(var rubble:item_current_id "")
-	(var rubble:item_current_type "")
-	
-	# Set to true if item type allows rarity
-	(var rubble:item_types <map
-		AMMO=false
-		ARMOR=true
-		DIGGER=false
-		GLOVES=true
-		HELM=true
-		INSTRUMENT=false
-		PANTS=true
-		SHIELD=false
-		SHOES=true
-		SIEGEAMMO=false
-		TOOL=false
-		TOY=false
-		TRAPCOMP=false
-		WEAPON=false
-	>)
-	
-	(var rubble:item_rarities <map
-		RARE=1
-		UNCOMMON=2
-		COMMON=3
-		FORCED=4
-	>)
-	
-	(var rubble:item_data <map>)
-	
-	(ret "")
-}
-{!SCRIPT_TEMPLATE;ITEM;type;id;def;
+(var rubble:item_current_id "")
+(var rubble:item_current_type "")
+
+# Set to true if item type allows rarity
+(var rubble:item_types <map
+	AMMO=false
+	ARMOR=true
+	DIGGER=false
+	GLOVES=true
+	HELM=true
+	INSTRUMENT=false
+	PANTS=true
+	SHIELD=false
+	SHOES=true
+	SIEGEAMMO=false
+	TOOL=false
+	TOY=false
+	TRAPCOMP=false
+	WEAPON=false
+>)
+
+(var rubble:item_rarities <map
+	RARE=1
+	UNCOMMON=2
+	COMMON=3
+	FORCED=4
+>)
+
+(var rubble:item_data <map>)
+(rubble:template "ITEM" type id def {
 	(set rubble:item_current_id [id])
 	(set rubble:item_current_type [type])
 	
@@ -599,26 +599,30 @@
 	})
 	
 	(rubble:stageparse (str:add "{SHARED_OBJECT;" [id] ";\n[ITEM_" [type] ":" [id] "]\n\t" [def] "\n}"))
-}
-{!SCRIPT_TEMPLATE;ITEM_CLASS;...;
+})
+(rubble:template "ITEM_CLASS" ... {
 	(var type [rubble:item_current_type])
 	(var id [rubble:item_current_id])
 	(var class "")
 	(var rarity "COMMON")
 	
-	(if (int:eq (len [params]) 1){ # class only
+	(if (int:eq (len [params]) 1){
+		# class only
 		(set class [params 0])
 	}{
-		(if (int:eq (len [params]) 2){ # class + rarity
+		(if (int:eq (len [params]) 2){
+			# class + rarity
 			(set class [params 0])
 			(set rarity [params 1])
 		}{
-			(if (int:eq (len [params]) 3){ # all but rarity
+			(if (int:eq (len [params]) 3){
+				# all but rarity
 				(set type [params 0])
 				(set id [params 1])
 				(set class [params 2])
 			}{
-				(if (int:eq (len [params]) 4){ # full call
+				(if (int:eq (len [params]) 4){
+					# full call
 					(set type [params 0])
 					(set id [params 1])
 					(set class [params 2])
@@ -653,8 +657,8 @@
 		>) 
 	})
 	(ret "")
-}
-{!SCRIPT_TEMPLATE;#USES_ITEMS;class;
+})
+(rubble:template "#USES_ITEMS" class {
 	(var out)
 	(if (exists [rubble:item_data] [class]){
 		(foreach [rubble:item_data [class]] {
@@ -671,9 +675,9 @@
 		})
 	})
 	(str:trimspace [out])
-}
+})
 
-{!SCRIPT_TEMPLATE;ADDON_HOOKS;id;playable=false;
+(rubble:template "ADDON_HOOKS" id "playable=false" {
 	(str:add
 		"{#USES_ITEMS;ADDON_HOOK_" [id] "}"
 		"{#USES_TECH;ADDON_HOOK_" [id] "}"
@@ -681,4 +685,4 @@
 		"{#USES_TECH;ADDON_HOOK_GENERIC}"
 		(if [playable] {"{#USES_ITEMS;ADDON_HOOK_PLAYABLE}{#USES_TECH;ADDON_HOOK_PLAYABLE}"} {""})
 	)
-}
+})

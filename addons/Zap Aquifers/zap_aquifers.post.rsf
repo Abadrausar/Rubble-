@@ -12,7 +12,6 @@
 		(loop {
 			(raw:advance)
 			
-			(breakif (bool:not ) false)
 			(if (raw:valid){}{(breakloop false)})
 			
 			(if (str:cmp [tag id] "AQUIFER") {

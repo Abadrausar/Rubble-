@@ -28,6 +28,6 @@ import "io"
 type DataSource interface {
 	Open(path string) (io.ReadCloser, error)
 	OpenAndRead(path string) ([]byte, error)
-	ListDirs(dir string) []string  // use "." for the top level
-	ListFiles(dir string) []string // use "." for the top level
+	ListDirs(dir string) []string  // use "" for the top level
+	ListFiles(dir string) []string // use "" for the top level
 }

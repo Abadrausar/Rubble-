@@ -1,0 +1,17 @@
+
+==============================================
+Building Rubble:
+==============================================
+
+To build Rubble you need to have Go (golang.org) installed.
+
+One you have Go installed add <rubbledir>/other to your GOPATH
+
+Now all you need to do is fire up a command prompt and run:
+go build rubble
+
+If you plan on doing any modding with Rubble you may as well run:
+go build dctech/raptor/raptor
+This will compile the Raptor shell, which is a great learning tool.
+
+All of the other packages that are included are dependencies of either Raptor or Rubble.

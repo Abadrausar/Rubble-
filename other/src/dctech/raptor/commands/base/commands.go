@@ -25,7 +25,7 @@ package base
 
 import "dctech/raptor"
 
-// Setup adds the base commands to the state.
+// Setup adds the base commands to the script.
 // The base commands are:
 //	nop
 //	ret
@@ -80,7 +80,7 @@ func Setup(state *raptor.State) {
 	state.NewNativeCommand("if", CommandIf)
 	state.NewNativeCommand("loop", CommandLoop)
 	state.NewNativeCommand("foreach", CommandForEach)
-
+    
 	state.RegisterType("map", NewScriptMapFromLit)
 	state.RegisterType("array", NewScriptArrayFromLit)
 }
@@ -88,7 +88,7 @@ func Setup(state *raptor.State) {
 // Does nothing.
 // 	nop
 // Returns unchanged.
-func CommandNop(state *raptor.State, params []*raptor.Value) {
+func CommandNop(script *raptor.Script, params []*raptor.Value) {
 }
 
 // Return from current command.
@@ -97,29 +97,29 @@ func CommandNop(state *raptor.State, params []*raptor.Value) {
 // loop will not return from the loop, it will return from the command that called loop.
 // See break.
 // Returns value or unchanged.
-func CommandRet(state *raptor.State, params []*raptor.Value) {
+func CommandRet(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
 		panic("Wrong number of params to ret.")
 	}
 
-	state.Return = true
+	script.Return = true
 	if len(params) > 0 {
-		state.RetVal = params[0]
+		script.RetVal = params[0]
 	}
 }
 
 // Exit the script.
 // 	exit [value]
 // Returns value or unchanged.
-func CommandExit(state *raptor.State, params []*raptor.Value) {
+func CommandExit(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
 		panic("Wrong number of params to exit.")
 	}
 
+	script.Exit = true
 	if len(params) > 0 {
-		state.RetVal = params[0]
+		script.RetVal = params[0]
 	}
-	state.Exit = true
 }
 
 // A "soft" return, break will never return more than one level.
@@ -127,28 +127,28 @@ func CommandExit(state *raptor.State, params []*raptor.Value) {
 // Calling break inside a loop or if command will return from the current BLOCK not the command itself,
 // this makes break good for ensuring if returns a specific value and/or "returning" a value to loop.
 // Returns value or unchanged.
-func CommandBreak(state *raptor.State, params []*raptor.Value) {
+func CommandBreak(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
 		panic("Wrong number of params to break.")
 	}
 
-	state.Break = true
+	script.Break = true
 	if len(params) > 0 {
-		state.RetVal = params[0]
+		script.RetVal = params[0]
 	}
 }
 
 // Forces a return until it hits a loop or foreach command or the script exits.
 // 	breakloop [value]
 // Returns value or unchanged.
-func CommandBreakLoop(state *raptor.State, params []*raptor.Value) {
+func CommandBreakLoop(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
 		panic("Wrong number of params to breakloop.")
 	}
 
-	state.BreakLoop = true
+	script.BreakLoop = true
 	if len(params) > 0 {
-		state.RetVal = params[0]
+		script.RetVal = params[0]
 	}
 }
 
@@ -156,34 +156,34 @@ func CommandBreakLoop(state *raptor.State, params []*raptor.Value) {
 // 	error [value]
 // If you pass no params the error flag will returned, to set or unset the flag pass a boolean value.
 // Returns unchanged or the value of the error flag.
-func CommandError(state *raptor.State, params []*raptor.Value) {
+func CommandError(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
 		panic("Wrong number of params to error.")
 	}
 
 	if len(params) == 0 {
-		state.RetVal = raptor.NewValueBool(state.Error)
+		script.RetVal = raptor.NewValueBool(script.Error)
 		return
 	}
-	state.Error = params[0].Bool()
+	script.Error = params[0].Bool()
 }
 
 // Creates a new user command.
 // 	command name code [paramName...]
 // Returns unchanged.
-func CommandCommand(state *raptor.State, params []*raptor.Value) {
+func CommandCommand(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 2 {
 		panic("Wrong number of params to command.")
 	}
 	if len(params) == 2 {
 		// no params
-		state.NewUserCommand(params[0].String(), params[1], make([]*raptor.Value, 0, 0))
+		script.NewUserCommand(params[0].String(), params[1], make([]*raptor.Value, 0, 0))
 	} else if len(params) == 3 && params[1].String() == "..." {
 		// variable params
-		state.NewUserCommand(params[0].String(), params[2], nil)
+		script.NewUserCommand(params[0].String(), params[2], nil)
 	} else {
 		// fixed param count
-		state.NewUserCommand(params[0].String(), params[len(params)-1], params[1:len(params)-1])
+		script.NewUserCommand(params[0].String(), params[len(params)-1], params[1:len(params)-1])
 	}
 }
 
@@ -191,35 +191,35 @@ func CommandCommand(state *raptor.State, params []*raptor.Value) {
 // Be careful with this one! Some actions are not reversable from a script.
 // 	delcommand name
 // Returns unchanged.
-func CommandDelCommand(state *raptor.State, params []*raptor.Value) {
+func CommandDelCommand(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to delcommand.")
 	}
 
-	state.DeleteCommand(params[0].String())
+	script.DeleteCommand(params[0].String())
 }
 
 // Gets a reference to a command.
 // Note that command references are just strings with a special type. This type is needed to make this work correctly.
 // 	getcommand name
 // Returns a reference to the command.
-func CommandGetCommand(state *raptor.State, params []*raptor.Value) {
+func CommandGetCommand(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to getcommand.")
 	}
 
-	state.RetVal = raptor.NewValueCommand(params[0].String())
+	script.RetVal = raptor.NewValueCommand(params[0].String())
 }
 
 // Creates a new namespace.
 // 	namespace name 
 // Returns unchanged.
-func CommandNamespace(state *raptor.State, params []*raptor.Value) {
+func CommandNamespace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to namespace.")
 	}
 
-	state.NewNameSpace(params[0].String())
+	script.NewNameSpace(params[0].String())
 }
 
 // Deletes a namespace. 
@@ -227,60 +227,60 @@ func CommandNamespace(state *raptor.State, params []*raptor.Value) {
 // For example it may be a very bad idea to delete debug or int.
 // 	delnamespace name 
 // Returns unchanged.
-func CommandDelNamespace(state *raptor.State, params []*raptor.Value) {
+func CommandDelNamespace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to delnamespace.")
 	}
 
-	state.DeleteNameSpace(params[0].String())
+	script.DeleteNameSpace(params[0].String())
 }
 
 // Creates a new variable setting the value to value if present.
 // 	var name [value]
 // Returns value or unchanged.
-func CommandVar(state *raptor.State, params []*raptor.Value) {
+func CommandVar(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 && len(params) != 2 {
 		panic("Wrong number of params to var.")
 	}
 
 	if len(params) > 1 {
-		state.NewVar(params[0].String(), params[1])
-		state.RetVal = params[1]
+		script.NewVar(params[0].String(), params[1])
+		script.RetVal = params[1]
 		return
 	}
-	state.NewVar(params[0].String(), raptor.NewValueString(""))
+	script.NewVar(params[0].String(), raptor.NewValueString(""))
 }
 
 // Deletes a variable.
 // 	delvar name
 // Returns the deleted vars value.
-func CommandDelVar(state *raptor.State, params []*raptor.Value) {
+func CommandDelVar(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to delvar.")
 	}
-	state.RetVal = state.DeleteVar(params[0].String())
+	script.RetVal = script.DeleteVar(params[0].String())
 }
 
 // Retrieves the current "this" value.
 // The value returned by this command will only be useful under certain circumstaces!
 // 	this
 // Returns the value of the This register.
-func CommandThis(state *raptor.State, params []*raptor.Value) {
-	state.RetVal = state.This
+func CommandThis(script *raptor.Script, params []*raptor.Value) {
+	script.RetVal = script.This
 }
 
 // Sets the value of variable "name" to value or sets the value of the map or array at index to value.
 // 	set name value
 // 	set objectvalue index value
 // Returns value.
-func CommandSet(state *raptor.State, params []*raptor.Value) {
+func CommandSet(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 && len(params) != 3 {
 		panic("Wrong number of params to set.")
 	}
 
 	if len(params) == 2 {
-		state.SetValue(params[0].String(), params[1])
-		state.RetVal = params[1]
+		script.SetValue(params[0].String(), params[1])
+		script.RetVal = params[1]
 		return
 	}
 
@@ -292,24 +292,24 @@ func CommandSet(state *raptor.State, params []*raptor.Value) {
 	if !val.Set(params[1].String(), params[2]) {
 		panic("Attempt to write to readonly index with set.")
 	}
-	state.RetVal = params[2]
+	script.RetVal = params[2]
 }
 
 // Returns true (-1) if variable exists or if a index exists in a map or array.
 // 	exists name
 //	exists value index
 // Returns true or false.
-func CommandExists(state *raptor.State, params []*raptor.Value) {
+func CommandExists(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 && len(params) != 2 {
 		panic("Wrong number of params to exists.")
 	}
 
 	if len(params) == 1 {
-		if state.VarExists(params[0].String()) {
-			state.RetVal = raptor.NewValueInt64(-1)
+		if script.VarExists(params[0].String()) {
+			script.RetVal = raptor.NewValueInt64(-1)
 			return
 		}
-		state.RetVal = raptor.NewValueInt64(0)
+		script.RetVal = raptor.NewValueInt64(0)
 		return
 	}
 
@@ -319,16 +319,16 @@ func CommandExists(state *raptor.State, params []*raptor.Value) {
 	}
 
 	if val.Exists(params[1].String()) {
-		state.RetVal = raptor.NewValueBool(true)
+		script.RetVal = raptor.NewValueBool(true)
 		return
 	}
-	state.RetVal = raptor.NewValueBool(false)
+	script.RetVal = raptor.NewValueBool(false)
 }
 
 // Fetches the element count of an Indexable.
 // 	len value
 // Returns the element count.
-func CommandLen(state *raptor.State, params []*raptor.Value) {
+func CommandLen(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to len.")
 	}
@@ -338,87 +338,87 @@ func CommandLen(state *raptor.State, params []*raptor.Value) {
 		panic("Non-Indexable object passed to exists.")
 	}
 
-	state.RetVal = raptor.NewValueInt64(val.Len())
+	script.RetVal = raptor.NewValueInt64(val.Len())
 }
 
 // Runs code as a user command.
 // 	run code [params...]
 // Returns the return value of the last command in the code it runs.
-func CommandRun(state *raptor.State, params []*raptor.Value) {
+func CommandRun(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 1 {
 		panic("Wrong number of params to run.")
 	}
 
-	state.Envs.Add(raptor.NewEnvironment())
+	script.Envs.Add(raptor.NewEnvironment())
 
-	state.AddParamsValue(params[1:]...)
+	script.AddParamsValue(params[1:]...)
 
-	state.Code.AddCodeSource(params[0].CodeSource())
-	state.Exec()
-	state.Envs.Remove()
-	state.Return = false
+	script.Code.AddCodeSource(params[0].CodeSource())
+	script.Exec()
+	script.Envs.Remove()
+	script.Return = false
 }
 
 // Evaluates code in the current environment.
 // 	eval code
 // Returns the return value of the last command in the code it runs.
-func CommandEval(state *raptor.State, params []*raptor.Value) {
+func CommandEval(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to eval.")
 	}
 
-	state.Code.AddCodeSource(params[0].CodeSource())
-	state.Exec()
+	script.Code.AddCodeSource(params[0].CodeSource())
+	script.Exec()
 }
 
 // Evaluates code in the current environment's parent.
 // 	evalinparent code
 // Returns the return value of the last command in the code it runs.
-func CommandEvalInParent(state *raptor.State, params []*raptor.Value) {
+func CommandEvalInParent(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to evalinparent.")
 	}
-	if len(*state.Envs) <= 1 {
+	if len(*script.Envs) <= 1 {
 		panic("Call to evalinparent from code running in root env.")
 	}
 
-	state.Code.AddCodeSource(params[0].CodeSource())
-	tempEnv := state.Envs.Remove()
-	state.Exec()
-	state.Envs.Add(tempEnv)
+	script.Code.AddCodeSource(params[0].CodeSource())
+	tempEnv := script.Envs.Remove()
+	script.Exec()
+	script.Envs.Add(tempEnv)
 }
 
 // Evaluates code in a new environment.
 // 	evalinnew code
 // Returns the return value of the last command in the code it runs.
-func CommandEvalInNew(state *raptor.State, params []*raptor.Value) {
+func CommandEvalInNew(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to evalinnew.")
 	}
 
-	state.Code.AddCodeSource(params[0].CodeSource())
-	state.Envs.Add(raptor.NewEnvironment())
-	state.Exec()
-	state.Envs.Remove()
+	script.Code.AddCodeSource(params[0].CodeSource())
+	script.Envs.Add(raptor.NewEnvironment())
+	script.Exec()
+	script.Envs.Remove()
 }
 
 // If the condition is true run true code else if false code exists call false code.
 // 	if condition truecode [falsecode]
 // Returns the return value of the last command in the code it runs or unchanged.
-func CommandIf(state *raptor.State, params []*raptor.Value) {
+func CommandIf(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 && len(params) != 3 {
 		panic("Wrong number of params to if.")
 	}
 
 	if params[0].Bool() {
-		state.Code.AddCompiledScript(params[1].CompiledScript())
-		state.Exec()
+		script.Code.AddCompiledScript(params[1].CompiledScript())
+		script.Exec()
 		return
 	}
 
 	if len(params) > 2 {
-		state.Code.AddCompiledScript(params[2].CompiledScript())
-		state.Exec()
+		script.Code.AddCompiledScript(params[2].CompiledScript())
+		script.Exec()
 		return
 	}
 }
@@ -427,17 +427,17 @@ func CommandIf(state *raptor.State, params []*raptor.Value) {
 // 	loop code
 // Returns the return value of the last command in the code it runs, always false unless loop
 // exited with ret (In which case the return value is unusable by the command calling loop anyway).
-func CommandLoop(state *raptor.State, params []*raptor.Value) {
+func CommandLoop(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to loop.")
 	}
 
 	code := params[0].CompiledScript()
 	for {
-		state.Code.AddCodeSource(raptor.NewCompiledLexer(code))
-		state.Exec()
-		state.BreakLoop = false
-		if !state.RetVal.Bool() {
+		script.Code.AddCodeSource(raptor.NewCompiledLexer(code))
+		script.Exec()
+		script.BreakLoop = false
+		if !script.RetVal.Bool() {
 			return
 		}
 	}
@@ -451,7 +451,7 @@ func CommandLoop(state *raptor.State, params []*raptor.Value) {
 // If code returns false foreach aborts.
 // Does not stop returns, but does work with breakloop.
 // Returns the return value of the last command in code.
-func CommandForEach(state *raptor.State, params []*raptor.Value) {
+func CommandForEach(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to foreach.")
 	}
@@ -464,14 +464,14 @@ func CommandForEach(state *raptor.State, params []*raptor.Value) {
 	code := params[1].CompiledScript()
 
 	for _, i := range val.Keys() {
-		state.Code.AddCodeSource(raptor.NewCompiledLexer(code))
-		state.Envs.Add(raptor.NewEnvironment())
-		state.AddParamsValue(raptor.NewValueString(i), val.Get(i))
-		state.Exec()
-		state.BreakLoop = false
-		if !state.RetVal.Bool() {
+		script.Code.AddCodeSource(raptor.NewCompiledLexer(code))
+		script.Envs.Add(raptor.NewEnvironment())
+		script.AddParamsValue(raptor.NewValueString(i), val.Get(i))
+		script.Exec()
+		script.BreakLoop = false
+		if !script.RetVal.Bool() {
 			return
 		}
-		state.Envs.Remove()
+		script.Envs.Remove()
 	}
 }

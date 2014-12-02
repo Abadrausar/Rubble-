@@ -69,7 +69,7 @@ func tempScriptTemplate(params []string) string {
 	}
 
 	name := params[0]
-	text := params[len(params)-1]
+	code := raptor.Compile(params[len(params)-1], &raptor.PositionInfo{Line:0, Column:-1})
 	paramNames := params[1 : len(params)-1]
 
 	parsedParams := make([]*TemplateParam, 0, len(paramNames))
@@ -87,7 +87,7 @@ func tempScriptTemplate(params []string) string {
 		parsedParams = append(parsedParams, rtn)
 	}
 
-	NewScriptTemplate(name, text, parsedParams)
+	NewScriptTemplate(name, code, parsedParams)
 
 	return ""
 }
@@ -97,19 +97,17 @@ func tempScript(params []string) string {
 		panic("Wrong number of params to SCRIPT.")
 	}
 
-	GlobalRaptorState.Code.Add(params[0])
-	GlobalRaptorState.Envs.Add(raptor.NewEnvironment())
+	script := raptor.NewScript()
+	script.Code.Add(params[0])
 
 	if len(params) > 1 {
-		GlobalRaptorState.AddParams(params[1:]...)
+		script.AddParams(params[1:]...)
 	}
 
-	rtn, err := GlobalRaptorState.Run()
+	rtn, err := GlobalRaptorState.Run(script)
 	if err != nil {
 		panic("Script Error: " + err.Error())
 	}
-
-	GlobalRaptorState.Envs.Remove()
 
 	if rtn == nil {
 		return ""

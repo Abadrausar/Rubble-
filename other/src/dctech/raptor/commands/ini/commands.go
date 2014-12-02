@@ -45,32 +45,32 @@ func Setup(state *raptor.State) {
 // Create a new (empty) ini file.
 // 	ini:create
 // Returns the ini file
-func CommandIni_Create(state *raptor.State, params []*raptor.Value) {
-	state.RetVal = raptor.NewValueObject(ini.NewFile())
+func CommandIni_Create(script *raptor.Script, params []*raptor.Value) {
+	script.RetVal = raptor.NewValueObject(ini.NewFile())
 }
 
 // Parse an ini file.
 // 	ini:parse filecontents
 // Returns the ini file or an error message. May set the Error flag.
-func CommandIni_Parse(state *raptor.State, params []*raptor.Value) {
+func CommandIni_Parse(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to ini:parse.")
 	}
 
 	file, err := ini.Parse(params[0].String())
 	if err != nil {
-		state.Error = true
-		state.RetVal = raptor.NewValueString(err.Error())
+		script.Error = true
+		script.RetVal = raptor.NewValueString(err.Error())
 		return
 	}
 
-	state.RetVal = raptor.NewValueObject(file)
+	script.RetVal = raptor.NewValueObject(file)
 }
 
 // Format an ini file for writing to disk.
 // 	ini:format file
 // Returns the string representation of the ini file or an error message. May set the Error flag.
-func CommandIni_Format(state *raptor.State, params []*raptor.Value) {
+func CommandIni_Format(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to ini:format.")
 	}
@@ -82,13 +82,13 @@ func CommandIni_Format(state *raptor.State, params []*raptor.Value) {
 		panic("ini:format's Param 0 is not an *ini.File.")
 	}
 	file := params[0].Data.(*ini.File)
-	state.RetVal = raptor.NewValueString(ini.Format(file))
+	script.RetVal = raptor.NewValueString(ini.Format(file))
 }
 
 // Gets a specific value from an ini file.
 // 	ini:getvalue file sectionname keyname
 // Returns the value or an error message. May set the Error flag.
-func CommandIni_GetValue(state *raptor.State, params []*raptor.Value) {
+func CommandIni_GetValue(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 3 {
 		panic("Wrong number of params to ini:getvalue.")
 	}
@@ -103,17 +103,17 @@ func CommandIni_GetValue(state *raptor.State, params []*raptor.Value) {
 
 	val, err := file.Get(params[1].String(), params[2].String())
 	if err != nil {
-		state.Error = true
-		state.RetVal = raptor.NewValueString(err.Error())
+		script.Error = true
+		script.RetVal = raptor.NewValueString(err.Error())
 		return
 	}
-	state.RetVal = raptor.NewValueString(val)
+	script.RetVal = raptor.NewValueString(val)
 }
 
 // Sets a specific value in an ini file.
 // 	ini:setvalue file sectionname keyname value
 // Returns unchanged or an error message. May set the Error flag.
-func CommandIni_SetValue(state *raptor.State, params []*raptor.Value) {
+func CommandIni_SetValue(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 4 {
 		panic("Wrong number of params to ini:setvalue.")
 	}

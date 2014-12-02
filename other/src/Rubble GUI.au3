@@ -21,14 +21,49 @@ $AddonList[0] = 0
 Dim $AddonItemList[1]
 $AddonItemList[0] = 0
 
-Dim $Main = GUICreate("Rubble GUI", 466, 239, -1, -1)
-Dim $hAddons = GUICtrlCreateTreeView(5, 5, 300, 200, BitOR($GUI_SS_DEFAULT_TREEVIEW,$TVS_CHECKBOXES), $WS_EX_CLIENTEDGE)
-Dim $hRun = GUICtrlCreateButton("Run Rubble!", 310, 5, 150, 50)
-Dim $hOtherOptions = GUICtrlCreateInput("", 5, 210, 455, 21)
-GUISetState(@SW_SHOW)
+Global $Main = GUICreate("Rubble GUI", 437, 459, -1, -1, BitOR($GUI_SS_DEFAULT_GUI,$WS_SIZEBOX,$WS_THICKFRAME))
+Global $hAddons = GUICtrlCreateTreeView(8, 8, 420, 352, BitOR($GUI_SS_DEFAULT_TREEVIEW,$TVS_CHECKBOXES), $WS_EX_CLIENTEDGE)
+GUICtrlSetResizing(-1, $GUI_DOCKLEFT+$GUI_DOCKRIGHT+$GUI_DOCKTOP+$GUI_DOCKBOTTOM)
+Global $hRun = GUICtrlCreateButton("Run Rubble!", 8, 416, 422, 34)
+GUICtrlSetResizing(-1, $GUI_DOCKLEFT+$GUI_DOCKRIGHT+$GUI_DOCKBOTTOM+$GUI_DOCKHEIGHT)
+Global $hOtherOptions = GUICtrlCreateInput("", 8, 392, 423, 21)
+GUICtrlSetResizing(-1, $GUI_DOCKLEFT+$GUI_DOCKRIGHT+$GUI_DOCKBOTTOM+$GUI_DOCKHEIGHT)
+GUICtrlCreateLabel("Extra Rubble Commandline Options", 8, 368, 418, 17)
+GUICtrlSetResizing(-1, $GUI_DOCKLEFT+$GUI_DOCKBOTTOM+$GUI_DOCKHEIGHT)
 
-_LoadAddons()
+Dim $Rubble = IniRead(@ScriptDir & "\gui.ini", "general", "rubble", ".")
+Dim $AddonDir = $Rubble & "\addons"
+If FileExists($Rubble & "\rubble.ini") Then
+	$AddonDir = IniRead($Rubble & "\rubble.ini", "path", "addonsdir", $AddonDir)
+EndIf
+
+RunWait($Rubble & "/rubble.exe" & ' -addonlist', $Rubble , @SW_HIDE)
+
+If Not FileExists($AddonDir & "\addonlist.ini") Then
+	MsgBox(16, "Loading Error", "Rubble failed to generate/update the addonlist.ini, are you sure you set this thing up right?")
+	Exit 1
+EndIf
+
+Dim $AddonList[1]
+$AddonList[0] = 0
+Dim $AddonItemList[1]
+$AddonItemList[0] = 0
+
+Local $section = IniReadSection($AddonDir & "\addonlist.ini", "addons")
+For $X = 1 To $section[0][0]
+	_ArrayAdd($AddonList, $section[$X][0])
+	_ArrayAdd($AddonItemList, GUICtrlCreateTreeViewItem($section[$X][0], $hAddons))
+	$AddonList[0] += 1
+	$AddonItemList[0] +=1
+
+	If $section[$X][1] == "true" Then
+		GUICtrlSetState($AddonItemList[$AddonItemList[0]], $GUI_CHECKED)
+	EndIf
+Next
+
 GUICtrlSetData($hOtherOptions, IniRead(@ScriptDir & "\gui.ini", "general", "otheroptions", ""))
+
+GUISetState(@SW_SHOW)
 
 Dim $msg
 While 1
@@ -45,34 +80,9 @@ While 1
 				EndIf
 			Next
 			$addons = StringTrimLeft($addons,1)
-			Run(@ComSpec & ' /k rubble.exe -addons="' & $addons & '" ' & GUICtrlRead($hOtherOptions))
+			Run(@ComSpec & ' /k ""./rubble.exe" -addons="' & $addons & '" ' & GUICtrlRead($hOtherOptions) & '"', $Rubble)
 			IniWrite(@ScriptDir & "\gui.ini", "general", "otheroptions", GUICtrlRead($hOtherOptions))
+			IniWrite(@ScriptDir & "\gui.ini", "general", "rubble", $Rubble)
 			Exit
 	EndSwitch
 WEnd
-
-Func _LoadAddons()
-	RunWait('rubble.exe -addonlist', @ScriptDir, @SW_HIDE)
-
-	If Not FileExists(@ScriptDir & "\addons\addonlist.ini") Then
-		MsgBox(16, "Loading Error", "Rubble failed to generate/update the addonlist.ini, are you sure you set this thing up right?")
-		Exit 1
-	EndIf
-
-	Dim $AddonList[1]
-	$AddonList[0] = 0
-	Dim $AddonItemList[1]
-	$AddonItemList[0] = 0
-
-	Local $section = IniReadSection(@ScriptDir & "\addons\addonlist.ini", "addons")
-	For $X = 1 To $section[0][0]
-		_ArrayAdd($AddonList, $section[$X][0])
-		_ArrayAdd($AddonItemList, GUICtrlCreateTreeViewItem($section[$X][0], $hAddons))
-		$AddonList[0] += 1
-		$AddonItemList[0] +=1
-
-		If $section[$X][1] == "true" Then
-			GUICtrlSetState($AddonItemList[$AddonItemList[0]], $GUI_CHECKED)
-		EndIf
-	Next
-EndFunc

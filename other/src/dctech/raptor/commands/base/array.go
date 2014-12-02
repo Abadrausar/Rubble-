@@ -37,7 +37,7 @@ func NewScriptArraySized(size int) raptor.EditIndexable {
 	return &tmp
 }
 
-func NewScriptArrayFromLit(state *raptor.State, keys []string, values []*raptor.Value) *raptor.Value {
+func NewScriptArrayFromLit(script *raptor.Script, keys []string, values []*raptor.Value) *raptor.Value {
 	if keys != nil {
 		panic("array may not be initalized with keys.")
 	}
