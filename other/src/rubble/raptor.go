@@ -1,5 +1,5 @@
 /*
-Copyright 2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -80,15 +80,21 @@ func InitScripting() {
 	state.NewNamespacedVar("rubble:addonsdir", raptor.NewValueString(AddonsDir))
 	state.NewNamespacedVar("rubble:raws", raptor.NewValueObject(NewIndexableRaws()))
 	
-	array := make([]*raptor.Value, 0, 20)
+	versionKeys := make([]string, 0, 20)
+	versionVals := make([]*raptor.Value, 0, 20)
+	for i := range RubbleCompat {
+		versionKeys = append(versionKeys, i)
+		versionVals = append(versionVals, raptor.NewValueBool(RubbleCompat[i]))
+	}
+	state.NewNamespacedVar("rubble:compat", raptor.NewValueObject(NewReadOnlyMap(versionKeys, versionVals)))
+	
+	addons := make([]*raptor.Value, 0, 20)
 	for i := range Addons {
 		if Addons[i].Active == true {
-			array = append(array, raptor.NewValueString(Addons[i].Name))
+			addons = append(addons, raptor.NewValueString(Addons[i].Name))
 		}
 	}
-	state.NewNamespacedVar("rubble:activeaddons", raptor.NewValueObject(raptor.NewParamsArray(array)))
-	
-	state.NewNativeCommand("panic", CommandPanic)
+	state.NewNamespacedVar("rubble:activeaddons", raptor.NewValueObject(raptor.NewParamsArray(addons)))
 	
 	state.NewNativeCommand("rubble:abort", CommandRubble_Abort)
 	
@@ -198,10 +204,12 @@ func CommandRubble_Parse(script *raptor.Script, params []*raptor.Value) {
 
 	if len(params) == 2 {
 		stage := int(params[0].Int64())
-		script.RetVal = raptor.NewValueString(string(Parse([]byte(params[0].String()), stage)))
+		script.RetVal = raptor.NewValueString(string(Parse([]byte(params[0].String()), stage,
+			NewPositionRaptor(params[0].Pos))))
 		return
 	}
-	script.RetVal = raptor.NewValueString(string(Parse([]byte(params[0].String()), stgUseCurrent)))
+	script.RetVal = raptor.NewValueString(string(Parse([]byte(params[0].String()), stgUseCurrent,
+		NewPositionRaptor(params[0].Pos))))
 }
 
 // Calls a Rubble template.
@@ -212,16 +220,19 @@ func CommandRubble_CallTemplate(script *raptor.Script, params []*raptor.Value) {
 		panic("Wrong number of params to rubble:calltemplate.")
 	}
 	name := params[0].String()
-	strParams := make([]string, 0, len(params)-1)
+	
+	// Rubble Value! NOT Raptor Value
+	strParams := make([]*Value, 0, len(params)-1)
+	
 	for _, val := range params[1:] {
-		strParams = append(strParams, val.String())
+		strParams = append(strParams, NewValueRaptor(val))
 	}
 
 	if _, ok := Templates[name]; !ok {
 		panic("Invalid template: " + name)
 	}
 
-	script.RetVal = raptor.NewValueString(Templates[name].Call(strParams))
+	script.RetVal = Templates[name].Call(strParams).Raptor()
 }
 
 // Expands Rubble variables.
@@ -232,7 +243,10 @@ func CommandRubble_ExpandVars(script *raptor.Script, params []*raptor.Value) {
 		panic("Wrong number of params to rubble:expandvars.")
 	}
 
-	script.RetVal = raptor.NewValueString(ExpandVars(params[0].String()))
+	pos := params[0].Pos
+	val := raptor.NewValueString(ExpandVars(params[0].String()))
+	val.Pos = pos
+	script.RetVal = val
 }
 
 // Defines a Rubble script template.
@@ -244,7 +258,7 @@ func CommandRubble_Template(script *raptor.Script, params []*raptor.Value) {
 	}
 	
 	name := params[0].String()
-	code := params[len(params)-1].CompiledScript()
+	code := params[len(params)-1].Code()
 	paramNames := params[1:len(params)-1]
 
 	parsedParams := make([]*TemplateParam, 0, len(paramNames))

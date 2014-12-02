@@ -1,4 +1,13 @@
 
+v3.0
+	The great refactoring!
+	Position info should be at least a little more accurate.
+	Positions may now include a file name.
+	The API should be a little easier to use (and much more consistent).
+		Lots of internal names have changed, scripts should be unaffected.
+	Fixed a minor issue with <nil> return values in the shell (not type nil, an actual null pointer)
+	Added convert:type, return a value's type as a string.
+
 v2.2
 	Added new type: nil, used for new/empty values.
 		Converts as "nil", 0, false

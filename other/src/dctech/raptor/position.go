@@ -1,54 +1,51 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
-
-This software is provided 'as-is', without any express or implied warranty. In
-no event will the authors be held liable for any damages arising from the use of
-this software.
-
-Permission is granted to anyone to use this software for any purpose, including
-commercial applications, and to alter it and redistribute it freely, subject to
-the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim
-that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not
-required.
-
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
+For copyright/license see header in file "doc.go"
 */
 
 package raptor
 
 import "fmt"
 
-// PositionInfo stores line and column information for a CodeSource Token.
-// If the column is -1 then the line number is a token number instead.
-// Please do not change values after creation, these things get passed and stored all over the place.
-type PositionInfo struct {
+// Position stores line, column, and file information for a Token or Value.
+// If the column is -1 then the line number is a token offset instead.
+// Be careful about changing values after creation, these things get passed and stored all over the place.
+type Position struct {
 	Line   int
 	Column int
+	File   string
 }
 
-// NewPositionInfo creates and returns a new PositionInfo object.
-// To create an Alt PositionInfo pass -1 as the column
-func NewPositionInfo(line, column int) *PositionInfo {
-	this := new(PositionInfo)
+// NewPosition creates and returns a new Position object.
+// To create a token offset Position pass -1 as the column and the offset as the line.
+func NewPosition(line, column int, file string) *Position {
+	this := new(Position)
 	this.Line = line
 	this.Column = column
+	this.File = file
 	return this
 }
 
-// String returns strings of the form "Line: x Column: y" or "Token: x".
-func (this *PositionInfo) String() string {
-	if this.Column == -1 {
-		return fmt.Sprint("Token: ", this.Line)
-	}
-	return fmt.Sprint("Line: ", this.Line, " Column: ", this.Column)
+// Copy copies a Position object, more useful than it sounds.
+func (this *Position) Copy() *Position {
+	return NewPosition(this.Line, this.Column, this.File)
 }
 
-func (this *PositionInfo) IsTokenNumber() bool {
-	return this.Column == -1
+// String returns strings of one of the following forms: 
+//	"somefile.rsf|L:x|C:y"
+//	"somefile.rbf|T:x"
+//	"L:x|C:y"
+//	"T:x"
+func (this *Position) String() string {
+	out := ""
+	
+	if this.File != "" {
+		out += this.File + "|"
+	}
+	
+	if this.Column == -1 {
+		out += fmt.Sprintf("T:%v", this.Line)
+	}
+	out += fmt.Sprintf("L:%v|C:%v", this.Line, this.Column)
+	
+	return out
 }

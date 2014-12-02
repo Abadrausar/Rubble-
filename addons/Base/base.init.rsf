@@ -41,7 +41,8 @@
 
 # Rubble specific commands
 
-# Dependency check
+# Dependency checks
+
 (command rubble:requireaddon me addon {
 	(if (rubble:addonactive [addon]) {
 	}{
@@ -57,7 +58,8 @@
 	})
 })
 
-# Group dependency check
+# Group dependency checks
+
 # Example (rubble:grouprequires "Better Dorfs" "Better Dorfs/Base")
 (command rubble:grouprequires me addon {
 	(var found false)

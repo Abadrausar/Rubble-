@@ -1,5 +1,5 @@
 /*
-Copyright 2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -34,12 +34,12 @@ func SetupBuiltins() {
 	NewNativeTemplate("#SCRIPT", tempScript)
 }
 
-func tempTemplate(params []string) string {
+func tempTemplate(params []*Value) *Value {
 	if len(params) < 2 {
 		panic("Wrong number of params to !TEMPLATE.")
 	}
 
-	name := params[0]
+	name := params[0].Data
 	text := params[len(params)-1]
 	paramNames := params[1 : len(params)-1]
 
@@ -47,70 +47,71 @@ func tempTemplate(params []string) string {
 
 	for _, val := range paramNames {
 		rtn := new(TemplateParam)
-		if strings.Contains(val, "=") {
-			parts := strings.SplitN(val, "=", 2)
+		if strings.Contains(val.Data, "=") {
+			parts := strings.SplitN(val.Data, "=", 2)
 			rtn.Name = parts[0]
 			rtn.Default = parts[1]
 			parsedParams = append(parsedParams, rtn)
 			continue
 		}
-		rtn.Name = val
+		rtn.Name = val.Data
 		parsedParams = append(parsedParams, rtn)
 	}
 
 	NewUserTemplate(name, text, parsedParams)
 
-	return ""
+	return NewValue("")
 }
 
-func tempScriptTemplate(params []string) string {
+func tempScriptTemplate(params []*Value) *Value {
 	if len(params) < 2 {
 		panic("Wrong number of params to !SCRIPT_TEMPLATE.")
 	}
 
-	name := params[0]
-	code := raptor.Compile(params[len(params)-1], &raptor.PositionInfo{Line:0, Column:-1})
+	name := params[0].Data
+	code := raptor.NewCode(raptor.NewLexer(params[len(params)-1].Data, params[len(params)-1].Pos.Raptor()))
 	paramNames := params[1 : len(params)-1]
 
 	parsedParams := make([]*TemplateParam, 0, len(paramNames))
 
 	for _, val := range paramNames {
 		rtn := new(TemplateParam)
-		if strings.Contains(val, "=") {
-			parts := strings.SplitN(val, "=", 2)
+		if strings.Contains(val.Data, "=") {
+			parts := strings.SplitN(val.Data, "=", 2)
 			rtn.Name = parts[0]
 			rtn.Default = parts[1]
 			parsedParams = append(parsedParams, rtn)
 			continue
 		}
-		rtn.Name = val
+		rtn.Name = val.Data
 		parsedParams = append(parsedParams, rtn)
 	}
 
 	NewScriptTemplate(name, code, parsedParams)
 
-	return ""
+	return NewValue("")
 }
 
-func tempScript(params []string) string {
+func tempScript(params []*Value) *Value {
 	if len(params) < 1 {
 		panic("Wrong number of params to SCRIPT.")
 	}
 
 	script := raptor.NewScript()
-	script.Code.Add(params[0])
+	script.Code.AddString(params[0].Data, params[0].Pos.Raptor())
 
+	
 	if len(params) > 1 {
-		script.AddParams(params[1:]...)
+		tmp := make([]*raptor.Value, 0, len(params)-1)
+		for i := range params[1:] {
+			tmp = append(tmp, params[i+1].Raptor())
+		}
+		script.AddParamsValue(tmp...)
 	}
 
 	rtn, err := GlobalRaptorState.Run(script)
 	if err != nil {
 		panic("Script Error: " + err.Error())
 	}
-
-	if rtn == nil {
-		return ""
-	}
-	return rtn.String()
+	return NewValueRaptor(rtn)
 }

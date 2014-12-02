@@ -1,5 +1,5 @@
 /*
-Copyright 2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -36,7 +36,18 @@ const (
 type Token struct {
 	Lexeme string
 	Type   int
-	Line   int
+	Pos    *Position
+}
+func NewToken(lexeme string, typ int, pos *Position) *Token {
+	this := new(Token)
+	this.Lexeme = lexeme
+	this.Type = typ
+	this.Pos = pos.Copy()
+	return this
+}
+
+func (this *Token) Value() *Value {
+	return NewValuePos(this.Lexeme, this.Pos)
 }
 
 func (this *Token) String() string {

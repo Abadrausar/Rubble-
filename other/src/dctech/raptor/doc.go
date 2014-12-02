@@ -1,5 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
+Copyright 2012-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -21,12 +21,12 @@ misrepresented as being the original software.
 */
 
 /*
-Raptor scripting launguage.
+Raptor scripting language.
 
 raptor n.
 A dromaeosaurid dinosaur, especially a velociraptor or utahraptor.
 
-Raptor is a simple command launguage similar in concept to TCL.
+Raptor is a simple command language similar in concept to TCL.
 Raptor is based on the syntax of NCA but is faster. Not all NCA syntax exists in Raptor, for example 
 curly brackets '{}' are not string delimiters but are used for the new type, code blocks. 
 There are also many new features like new types and some basic OOP support.
@@ -40,12 +40,12 @@ If lexing a double-quote string (that is being used as code) that has \n escape 
 the position will not match the source.
 
 Error positions generated from compiled (binary) scripts are almost useless as position 
-is given as a number of tokens from the begining of the current block. Unless you know what 
+is given as a number of tokens from the beginning of the current block. Unless you know what 
 block the error is in the position is nearly useless. Best bet is to restart with a source 
 version of the script and re-induce the error.
 
-Valuable debuging information can sometimes be aquired by causing your error to happen both normaly and 
-with State.NoRecover set to false. Note that this does require some knowlege of the Raptor internals.
+Valuable debugging information can sometimes be acquired by causing your error to happen both normally and 
+with State.NoRecover set to false. Note that this does require some knowledge of the Raptor internals.
 
 Note that any commands or internal functions that say that they may "panic with an error" have all such 
 panics recovered before they can reach any user code (unless State.NoRecover is true).

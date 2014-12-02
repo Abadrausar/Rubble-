@@ -1,5 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
+Copyright 2012-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -59,7 +59,7 @@ func CommandThread_New(script *raptor.Script, params []*raptor.Value) {
 
 	scr.AddParamsValue(params[1:]...)
 
-	scr.Code.AddCodeSource(params[0].CodeSource())
+	scr.Code.Add(params[0].CodeSource())
 	go func(){
 		_, err := script.Host.Run(scr)
 		if err != nil {

@@ -1,5 +1,5 @@
 /*
-Copyright 2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -27,7 +27,7 @@ import "regexp"
 import "strconv"
 import "dctech/raptor"
 
-type NativeTemplate func([]string) string
+type NativeTemplate func([]*Value) *Value
 
 var Templates = make(map[string]*Template)
 
@@ -47,10 +47,10 @@ type Template struct {
 	Handler NativeTemplate
 
 	// The script template code
-	Code *raptor.CompiledScript
+	Code *raptor.Code
 	
 	// The user template text
-	Text string
+	Text *Value
 
 	// Param names/defaults for user commands
 	Params []*TemplateParam
@@ -61,33 +61,25 @@ var repTokenNumberRegEx = regexp.MustCompile("%[1-9]+")
 
 var varNameRegEx = regexp.MustCompile("^\\$\\{?([a-zA-Z_][a-zA-Z0-9_]*)\\}?$")
 
-// Call runs a template. The output is run through the stage parser.
-func (this *Template) Call(params []string) string {
+// Call runs a template. The output is run through the stage parser for (non script) user templates.
+func (this *Template) Call(params []*Value) *Value {
 	// prep params
 	if len(params) != 0 {
-		if params[len(params)-1] == "..." {
+		if params[len(params)-1].Data == "..." {
 			params = append(params[:len(params)-1], PrevParams...)
 		} else {
-			PrevParams = make([]string, len(params))
+			PrevParams = make([]*Value, len(params))
 			copy(PrevParams, params)
 		}
 	} else {
-		PrevParams = make([]string, 0)
+		PrevParams = make([]*Value, 0)
 	}
 
 	for i := range params {
-		params[i] = strings.TrimSpace(params[i])
+		params[i].Data = strings.TrimSpace(params[i].Data)
 
-		// Old way
-		// If the param is a variable name replace with value
-		// Does not replace variables embeded in other text
-		//name := varNameRegEx.FindStringSubmatch(params[i])
-		//if name != nil {
-		//	params[i] = varNameRegEx.ReplaceAllString(params[i], VariableData[name[1]])
-		//}
-		
-		// New way, just expand everything
-		params[i] = ExpandVars(params[i])
+		// just expand everything
+		params[i].Data = ExpandVars(params[i].Data)
 	}
 
 	// Native template
@@ -98,17 +90,21 @@ func (this *Template) Call(params []string) string {
 	// Script template
 	if this.NCA {
 		script := raptor.NewScript()
-		script.Code.AddCodeSource(raptor.NewCompiledLexer(this.Code))
+		script.Code.Add(raptor.NewCodeReader(this.Code))
 
 		// Handle params
 		if len(this.Params) == 1 && this.Params[0].Name == "..." {
-			script.AddParams(params...)
+			tmp := make([]*raptor.Value, 0, len(params))
+			for i := range params {
+				tmp = append(tmp, params[i].Raptor())
+			}
+			script.AddParamsValue(tmp...)
 		} else {
 			for i := range this.Params {
 				if len(params) <= i {
 					script.NewVar(this.Params[i].Name, raptor.NewValueString(this.Params[i].Default))
 				} else {
-					script.NewVar(this.Params[i].Name, raptor.NewValueString(params[i]))
+					script.NewVar(this.Params[i].Name, params[i].Raptor())
 				}
 			}
 		}
@@ -117,22 +113,18 @@ func (this *Template) Call(params []string) string {
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
-
-		if rtn == nil {
-			return ""
-		}
-		return rtn.String()
+		return NewValueRaptor(rtn)
 	}
 
 	// User template
-	out := ExpandVars(this.Text)
+	out := ExpandVars(this.Text.Data)
 
 	// Named replacement tokens
 	for i := range this.Params {
 		if len(params) <= i {
 			out = strings.Replace(out, "%{"+this.Params[i].Name+"}", this.Params[i].Default, -1)
 		} else {
-			out = strings.Replace(out, "%{"+this.Params[i].Name+"}", params[i], -1)
+			out = strings.Replace(out, "%{"+this.Params[i].Name+"}", params[i].Data, -1)
 		}
 	}
 	out = repTokenNameRegEx.ReplaceAllStringFunc(out, func(in string) string {
@@ -140,7 +132,7 @@ func (this *Template) Call(params []string) string {
 		for i := range this.Params {
 			if this.Params[i].Name == in {
 				if len(params) > i {
-					return params[i]
+					return params[i].Data
 				}
 				return this.Params[i].Default
 			}
@@ -156,7 +148,7 @@ func (this *Template) Call(params []string) string {
 			panic(err)
 		}
 		if len(params) >= int(i) {
-			return params[i-1]
+			return params[i-1].Data
 		}
 		if len(this.Params) >= int(i) {
 			return this.Params[i-1].Default
@@ -164,7 +156,8 @@ func (this *Template) Call(params []string) string {
 		return "%" + in
 	})
 
-	return string(Parse([]byte(out), stgUseCurrent))
+	return NewValuePos(string(Parse([]byte(out), stgUseCurrent, this.Text.Pos)), this.Text.Pos)
+	
 }
 
 func NewNativeTemplate(name string, handler NativeTemplate) {
@@ -174,14 +167,14 @@ func NewNativeTemplate(name string, handler NativeTemplate) {
 	Templates[name] = rtn
 }
 
-func NewUserTemplate(name string, text string, params []*TemplateParam) {
+func NewUserTemplate(name string, text *Value, params []*TemplateParam) {
 	rtn := new(Template)
 	rtn.Text = text
 	rtn.Params = params
 	Templates[name] = rtn
 }
 
-func NewScriptTemplate(name string, code *raptor.CompiledScript, params []*TemplateParam) {
+func NewScriptTemplate(name string, code *raptor.Code, params []*TemplateParam) {
 	rtn := new(Template)
 	rtn.NCA = true
 	rtn.Code = code

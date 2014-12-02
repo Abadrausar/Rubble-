@@ -1,33 +1,54 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
-
-This software is provided 'as-is', without any express or implied warranty. In
-no event will the authors be held liable for any damages arising from the use of
-this software.
-
-Permission is granted to anyone to use this software for any purpose, including
-commercial applications, and to alter it and redistribute it freely, subject to
-the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim
-that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not
-required.
-
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
+For copyright/license see header in file "doc.go"
 */
 
 package raptor
 
 import "fmt"
 
+// Token values
+// THESE ARE ORDER/VALUE SENSITIVE!!!!!!
+const (
+	TknINVALID     = iota - 1 // Invalid
+	TknCmdBegin               // (
+	TknCmdEnd                 // )
+	TknDerefBegin             // [
+	TknDerefEnd               // ]
+	TknObjLitBegin            // <
+	TknObjLitEnd              // >
+	TknObjLitSplit            // =
+	TknCodeBegin              // {
+	TknCodeEnd                // }
+	TknString                 // A string, this needs to come last.
+)
+
+// Used to generate lexemes from token numbers.
+// There is no entry for TknINVALID or TknString.
+var TknLexemes = []string{
+	"(",
+	")",
+	"[",
+	"]",
+	"<",
+	">",
+	"=",
+	"{",
+	"}"}
+
 type Token struct {
 	Lexeme string
 	Type   int
-	Pos    *PositionInfo
+	Pos    *Position
+}
+
+// NewToken is for use by CodeSource implementations.
+// To help streamline things pos is copied, not used directly.
+func NewToken(lexeme string, typ int, pos *Position) *Token {
+	this := new(Token)
+	this.Lexeme = lexeme
+	this.Type = typ
+	this.Pos = pos.Copy()
+	return this
 }
 
 func (this *Token) String() string {

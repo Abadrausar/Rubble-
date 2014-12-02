@@ -1,23 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
-
-This software is provided 'as-is', without any express or implied warranty. In
-no event will the authors be held liable for any damages arising from the use of
-this software.
-
-Permission is granted to anyone to use this software for any purpose, including
-commercial applications, and to alter it and redistribute it freely, subject to
-the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim
-that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not
-required.
-
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
+For copyright/license see header in file "doc.go"
 */
 
 package raptor
@@ -32,22 +14,6 @@ const (
 	stReadStr
 )
 
-// Token values
-// THESE ARE ORDER/VALUE SENSITIVE!!!!!!
-const (
-	TknINVALID     = iota - 1 // Invalid
-	TknCmdBegin               // (
-	TknCmdEnd                 // )
-	TknDerefBegin             // [
-	TknDerefEnd               // ]
-	TknObjLitBegin            // <
-	TknObjLitEnd              // >
-	TknObjLitSplit            // =
-	TknCodeBegin              // {
-	TknCodeEnd                // }
-	TknString                 // A string, this needs to come last to make pre-lexing easier.
-)
-
 // Lexer is a Raptor CodeSource reading from a string.
 type Lexer struct {
 	look    *Token
@@ -55,8 +21,7 @@ type Lexer struct {
 
 	source string
 
-	line   int
-	column int
+	pos    *Position
 
 	index int
 	state int
@@ -64,25 +29,24 @@ type Lexer struct {
 	lexeme []byte
 
 	token       int
-	tokenline   int
-	tokencolumn int
+	tokenpos    *Position
 
 	strdepth int
 	objdepth int
 }
 
 // Returns a new Lexer.
-func NewLexer(input string, startline, startcolumn int) *Lexer {
+// pos is forced to be a line, column position.
+func NewLexer(input string, pos *Position) *Lexer {
 	this := new(Lexer)
 
 	this.source = input
 
-	if startline < 0 || startcolumn < 0 {
-		startline = 1
-		startcolumn = 1
+	this.pos = pos.Copy()
+	if this.pos.Column == -1 {
+		this.pos.Line = 1
+		this.pos.Column = 1
 	}
-	this.line = startline
-	this.column = startcolumn
 
 	this.index = 0
 	this.state = stReset
@@ -90,8 +54,7 @@ func NewLexer(input string, startline, startcolumn int) *Lexer {
 	this.lexeme = make([]byte, 0, 20)
 
 	this.token = TknINVALID
-	this.tokenline = startline
-	this.tokencolumn = startcolumn
+	this.tokenpos = pos.Copy()
 
 	this.strdepth = 0
 	this.objdepth = 0
@@ -105,10 +68,9 @@ func NewLexer(input string, startline, startcolumn int) *Lexer {
 // Advance retrieves the next token from the stream.
 // For most purposes use GetToken instead.
 func (this *Lexer) Advance() {
-
 	if this.index > len(this.source) {
 		this.current = this.look
-		this.look = &Token{"INVALID", TknINVALID, NewPositionInfo(this.tokenline, this.tokencolumn)}
+		this.look = NewToken("INVALID", TknINVALID, this.tokenpos)
 		return
 	}
 
@@ -117,11 +79,11 @@ func (this *Lexer) Advance() {
 		i := this.index
 		lookok := len(this.source) - this.index
 
-		if dat[i] == '\n' && this.line >= 0 {
-			this.line++
-			this.column = 0
+		if dat[i] == '\n' && this.pos.Line >= 0 {
+			this.pos.Line++
+			this.pos.Column = 0
 		} else {
-			this.column++
+			this.pos.Column++
 		}
 
 		// Lexing Begin
@@ -184,11 +146,10 @@ func (this *Lexer) Advance() {
 				continue
 			}
 			this.current = this.look
-			this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+			this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 			this.state = stReadDQStr
 			this.token = TknString
-			this.tokenline = this.line
-			this.tokencolumn = this.column
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:0]
 			this.index++
 			return
@@ -207,11 +168,10 @@ func (this *Lexer) Advance() {
 		// Parentheses
 		if dat[i] == '(' {
 			this.current = this.look
-			this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+			this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 			this.state = stReset
 			this.token = TknCmdBegin
-			this.tokenline = this.line
-			this.tokencolumn = this.column
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:1]
 			this.lexeme[0] = '('
 			this.index++
@@ -219,11 +179,10 @@ func (this *Lexer) Advance() {
 		}
 		if dat[i] == ')' {
 			this.current = this.look
-			this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+			this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 			this.state = stReset
 			this.token = TknCmdEnd
-			this.tokenline = this.line
-			this.tokencolumn = this.column
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:1]
 			this.lexeme[0] = ')'
 			this.index++
@@ -233,11 +192,10 @@ func (this *Lexer) Advance() {
 		// Square Brackets
 		if dat[i] == '[' {
 			this.current = this.look
-			this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+			this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 			this.state = stReset
 			this.token = TknDerefBegin
-			this.tokenline = this.line
-			this.tokencolumn = this.column
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:1]
 			this.lexeme[0] = '['
 			this.index++
@@ -245,11 +203,10 @@ func (this *Lexer) Advance() {
 		}
 		if dat[i] == ']' {
 			this.current = this.look
-			this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+			this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 			this.state = stReset
 			this.token = TknDerefEnd
-			this.tokenline = this.line
-			this.tokencolumn = this.column
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:1]
 			this.lexeme[0] = ']'
 			this.index++
@@ -260,11 +217,10 @@ func (this *Lexer) Advance() {
 		if dat[i] == '<' {
 			this.objdepth++
 			this.current = this.look
-			this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+			this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 			this.state = stReset
 			this.token = TknObjLitBegin
-			this.tokenline = this.line
-			this.tokencolumn = this.column
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:1]
 			this.lexeme[0] = '<'
 			this.index++
@@ -273,11 +229,10 @@ func (this *Lexer) Advance() {
 		if dat[i] == '>' {
 			this.objdepth--
 			this.current = this.look
-			this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+			this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 			this.state = stReset
 			this.token = TknObjLitEnd
-			this.tokenline = this.line
-			this.tokencolumn = this.column
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:1]
 			this.lexeme[0] = '>'
 			this.index++
@@ -285,11 +240,10 @@ func (this *Lexer) Advance() {
 		}
 		if dat[i] == '=' && this.objdepth > 0 {
 			this.current = this.look
-			this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+			this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 			this.state = stReset
 			this.token = TknObjLitSplit
-			this.tokenline = this.line
-			this.tokencolumn = this.column
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:1]
 			this.lexeme[0] = '='
 			this.index++
@@ -298,11 +252,10 @@ func (this *Lexer) Advance() {
 
 		if dat[i] == '{' {
 			this.current = this.look
-			this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+			this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 			this.state = stReset
 			this.token = TknCodeBegin
-			this.tokenline = this.line
-			this.tokencolumn = this.column
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:1]
 			this.lexeme[0] = '{'
 			this.index++
@@ -310,11 +263,10 @@ func (this *Lexer) Advance() {
 		}
 		if dat[i] == '}' {
 			this.current = this.look
-			this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+			this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 			this.state = stReset
 			this.token = TknCodeEnd
-			this.tokenline = this.line
-			this.tokencolumn = this.column
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:1]
 			this.lexeme[0] = '}'
 			this.index++
@@ -328,11 +280,10 @@ func (this *Lexer) Advance() {
 		}
 
 		this.current = this.look
-		this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+		this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 		this.state = stReadStr
 		this.token = TknString
-		this.tokenline = this.line
-		this.tokencolumn = this.column
+		this.tokenpos = this.pos.Copy()
 		this.lexeme = this.lexeme[0:1]
 		this.lexeme[0] = dat[i]
 		this.index++
@@ -341,7 +292,7 @@ func (this *Lexer) Advance() {
 
 	if this.index == len(this.source) {
 		this.current = this.look
-		this.look = &Token{string(this.lexeme), this.token, NewPositionInfo(this.tokenline, this.tokencolumn)}
+		this.look = NewToken(string(this.lexeme), this.token, this.tokenpos)
 		this.index++
 		return
 	}
@@ -355,34 +306,4 @@ func (this *Lexer) CurrentTkn() *Token {
 // LookAhead returns the lookahead token.
 func (this *Lexer) LookAhead() *Token {
 	return this.look
-}
-
-// Position returns a PositionInfo for the last token fetched.
-func (this *Lexer) Position() *PositionInfo {
-	return NewPositionInfo(this.tokenline, this.tokencolumn)
-}
-
-// GetToken gets the next token, and panics with an error if it's not of type tokenType.
-// May cause a panic if the lexer encounters an error
-// Used as a type checked Advance
-func (this *Lexer) GetToken(tokenTypes ...int) {
-	this.Advance()
-
-	for _, val := range tokenTypes {
-		if this.current.Type == val {
-			return
-		}
-	}
-
-	ExitOnTokenExpected(this.current, tokenTypes...)
-}
-
-// CheckLookAhead checks to see if the look ahead is one of tokenTypes and if so returns true
-func (this *Lexer) CheckLookAhead(tokenTypes ...int) bool {
-	for _, val := range tokenTypes {
-		if this.look.Type == val {
-			return true
-		}
-	}
-	return false
 }

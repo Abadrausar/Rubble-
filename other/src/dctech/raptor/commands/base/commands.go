@@ -1,5 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
+Copyright 2012-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -277,7 +277,7 @@ func CommandCopy(script *raptor.Script, params []*raptor.Value) {
 	
 	val := new(raptor.Value)
 	val.Type = params[0].Type
-	val.Pos = raptor.NewPositionInfo(0, -1)
+	val.Pos = raptor.NewPosition(0, -1, "")
 	
 	switch val.Type {
 	case raptor.TypString:
@@ -400,7 +400,7 @@ func CommandRun(script *raptor.Script, params []*raptor.Value) {
 
 	script.AddParamsValue(params[1:]...)
 
-	script.Code.AddCodeSource(params[0].CodeSource())
+	script.Code.Add(params[0].CodeSource())
 	script.Exec()
 	script.Envs.Remove()
 	script.Return = false
@@ -414,7 +414,7 @@ func CommandEval(script *raptor.Script, params []*raptor.Value) {
 		panic("Wrong number of params to eval.")
 	}
 
-	script.Code.AddCodeSource(params[0].CodeSource())
+	script.Code.Add(params[0].CodeSource())
 	script.Exec()
 }
 
@@ -429,7 +429,7 @@ func CommandEvalInParent(script *raptor.Script, params []*raptor.Value) {
 		panic("Call to evalinparent from code running in root env.")
 	}
 
-	script.Code.AddCodeSource(params[0].CodeSource())
+	script.Code.Add(params[0].CodeSource())
 	tempEnv := script.Envs.Remove()
 	script.Exec()
 	script.Envs.Add(tempEnv)
@@ -443,7 +443,7 @@ func CommandEvalInNew(script *raptor.Script, params []*raptor.Value) {
 		panic("Wrong number of params to evalinnew.")
 	}
 
-	script.Code.AddCodeSource(params[0].CodeSource())
+	script.Code.Add(params[0].CodeSource())
 	script.Envs.Add(raptor.NewEnvironment())
 	script.Exec()
 	script.Envs.Remove()
@@ -460,7 +460,7 @@ func CommandTrap(script *raptor.Script, params []*raptor.Value) {
 		panic("Wrong number of params to trap.")
 	}
 
-	script.Code.AddCodeSource(params[0].CodeSource())
+	script.Code.Add(params[0].CodeSource())
 	err := script.SafeExec()
 	if err != nil {
 		script.Error = true
@@ -477,13 +477,13 @@ func CommandIf(script *raptor.Script, params []*raptor.Value) {
 	}
 
 	if params[0].Bool() {
-		script.Code.AddCompiledScript(params[1].CompiledScript())
+		script.Code.AddCode(params[1].Code())
 		script.Exec()
 		return
 	}
 
 	if len(params) > 2 {
-		script.Code.AddCompiledScript(params[2].CompiledScript())
+		script.Code.AddCode(params[2].Code())
 		script.Exec()
 		return
 	}
@@ -498,9 +498,9 @@ func CommandLoop(script *raptor.Script, params []*raptor.Value) {
 		panic("Wrong number of params to loop.")
 	}
 
-	code := params[0].CompiledScript()
+	code := params[0].Code()
 	for {
-		script.Code.AddCodeSource(raptor.NewCompiledLexer(code))
+		script.Code.Add(raptor.NewCodeReader(code))
 		script.Exec()
 		script.BreakLoop = false
 		if !script.RetVal.Bool() {
@@ -527,10 +527,10 @@ func CommandForEach(script *raptor.Script, params []*raptor.Value) {
 		panic("Non-Indexable object passed to foreach.")
 	}
 
-	code := params[1].CompiledScript()
+	code := params[1].Code()
 
 	for _, i := range val.Keys() {
-		script.Code.AddCodeSource(raptor.NewCompiledLexer(code))
+		script.Code.Add(raptor.NewCodeReader(code))
 		script.Envs.Add(raptor.NewEnvironment())
 		script.AddParamsValue(raptor.NewValueString(i), val.Get(i))
 		script.Exec()

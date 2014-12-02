@@ -1,5 +1,5 @@
 /*
-Copyright 2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -147,7 +147,8 @@ func loadInit(source dcfs.DataSource, path string) {
 			if err != nil {
 				panic(err)
 			}
-			ForcedInit = append(ForcedInit, content)
+			ForcedInit[filepath] = content
+			ForcedInitOrder = append(ForcedInitOrder, filepath)
 			continue
 		}
 		if strings.HasSuffix(filepath, ".init.rbf") {
@@ -156,7 +157,8 @@ func loadInit(source dcfs.DataSource, path string) {
 			if err != nil {
 				panic(err)
 			}
-			ForcedInit = append(ForcedInit, content)
+			ForcedInit[filepath] = content
+			ForcedInitOrder = append(ForcedInitOrder, filepath)
 		}
 	}
 	

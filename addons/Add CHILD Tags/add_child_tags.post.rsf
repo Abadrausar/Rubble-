@@ -13,7 +13,7 @@
 # This loop makes a list of all creatures that do NOT have a CHILD tag...
 (console:print "    Generating Table...\n")
 (console:print "    (DOES_NOT_EXIST, NOT_LIVING, and EQUIPMENT_WAGON count as CHILD tags)\n")
-(console:print "    (Vermin are skipped.)\n")
+(console:print "    (Vermin are also skipped.)\n")
 (foreach [rubble:raws] {
 	(if (str:cmp "creature_" (str:left [params 0] 9)) {
 		(var file (raw:init [params 1]))

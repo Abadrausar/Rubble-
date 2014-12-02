@@ -34,7 +34,7 @@ Get the value of a Rubble variable.
 
 Parse Rubble code.
 	
-	rubble:stageparse code
+	rubble:stageparse code [stage]
 	
 	Note that how code is parsed depends on the parse stage.
 	Returns the result of running code through the stage parser.

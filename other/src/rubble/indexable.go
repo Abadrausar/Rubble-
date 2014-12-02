@@ -1,5 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -23,6 +23,8 @@ misrepresented as being the original software.
 package main
 
 import "dctech/raptor"
+
+// Indexable Raws
 
 type IndexableRaws int
 
@@ -85,5 +87,49 @@ func (this IndexableRaws) String() string {
 }
 
 func (this IndexableRaws) CodeString() string {
+	return raptor.GenericIndexableToCodeString("map", this, true)
+}
+
+// Read-only Map
+
+type ReadOnlyMap map[string]*raptor.Value
+
+func NewReadOnlyMap(keys []string, values []*raptor.Value) raptor.Indexable {
+	this := make(ReadOnlyMap, len(keys))
+	for i, key := range keys {
+		this[key] = values[i]
+	}
+	return this
+}
+
+func (this ReadOnlyMap) Get(index string) *raptor.Value {
+	if _, ok := this[index]; ok {
+		return this[index]
+	}
+	return raptor.NewValue()
+}
+
+func (this ReadOnlyMap) Exists(index string) bool {
+	_, ok := this[index]
+	return ok
+}
+
+func (this ReadOnlyMap) Len() int64 {
+	return int64(len(this))
+}
+
+func (this ReadOnlyMap) Keys() []string {
+	rtn := make([]string, 0, len(this))
+	for key := range this {
+		rtn = append(rtn, key)
+	}
+	return rtn
+}
+
+func (this ReadOnlyMap) String() string {
+	return raptor.GenericIndexableToString("map", this)
+}
+
+func (this ReadOnlyMap) CodeString() string {
 	return raptor.GenericIndexableToCodeString("map", this, true)
 }

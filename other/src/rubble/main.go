@@ -1,5 +1,5 @@
 /*
-Copyright 2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -40,7 +40,7 @@ func main() {
 
 		if x := recover(); x != nil {
 			LogPrintln("Error:", x)
-			LogPrintln("  Near line:", LastLine, "In last file.")
+			LogPrintln("  Near", LastLine)
 			os.Exit(1)
 		}
 	}()
@@ -72,9 +72,8 @@ func main() {
 			UpdateAddonList(AddonsDir, Addons)
 			LogPrintln("Rubble has no files to parse, aborting.")
 			return
-		} else if ShellMode {
+		} else if err != nil && ShellMode {
 			LogPrintln("Read failed (this is bad if unexpected)\n  Error:", err)
-			UpdateAddonList(AddonsDir, Addons)
 			LogPrintln("Rubble has no files to parse but shell mode is active, continuing.")
 		}
 
@@ -137,10 +136,10 @@ func main() {
 		return
 	}
 
-	// Test lexer
+	// Test lexer, shell mode test happens later.
 	if LexTest && !ShellMode {
 		for _, i := range Files.Order {
-			lex := NewLexer(Files.Files[i].Content)
+			lex := NewLexer(Files.Files[i].Content, NewPosition(1, Files.Files[i].Path))
 			for {
 				lex.Advance()
 				if lex.Current.Type == tknINVALID {
@@ -180,10 +179,12 @@ func main() {
 	InitScripting()
 	
 	if !ShellMode || RunForcedInit {
-		LogPrintln("Running Forced Init Scripts.")
-		for i := range ForcedInit {
+		LogPrintln("Running Init Scripts.")
+		for _, i := range ForcedInitOrder {
+			LogPrintln("  " + i)
+			
 			script := raptor.NewScript()
-			err := raptor.LoadFile(ForcedInit[i], script)
+			err := raptor.LoadFile(i, ForcedInit[i], script)
 			if err != nil {
 				panic("Script Error: " + err.Error())
 			}
@@ -194,7 +195,7 @@ func main() {
 			}
 		}
 	} else {
-		LogPrintln("Skipping Forced Init Scripts.")
+		LogPrintln("Skipping Init Scripts.")
 	}
 	
 	LogPrintln("Adding Builtins.")
@@ -217,7 +218,7 @@ func main() {
 		LogPrintln("  " + Files.Files[i].Path)
 
 		script := raptor.NewScript()
-		err := raptor.LoadFile(Files.Files[i].Content, script)
+		err := raptor.LoadFile(Files.Files[i].Path, Files.Files[i].Content, script)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
@@ -237,7 +238,7 @@ func main() {
 		}
 
 		LogPrintln("  " + Files.Files[i].Path)
-		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent)
+		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent, NewPosition(1, Files.Files[i].Path))
 	}
 
 	LogPrintln("=============================================")
@@ -249,7 +250,7 @@ func main() {
 		}
 
 		LogPrintln("  " + Files.Files[i].Path)
-		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent)
+		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent, NewPosition(1, Files.Files[i].Path))
 	}
 
 	LogPrintln("=============================================")
@@ -261,7 +262,7 @@ func main() {
 		}
 
 		LogPrintln("  " + Files.Files[i].Path)
-		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent)
+		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent, NewPosition(1, Files.Files[i].Path))
 	}
 
 	LogPrintln("=============================================")
@@ -287,7 +288,7 @@ func main() {
 		LogPrintln("  " + Files.Files[i].Path)
 
 		script := raptor.NewScript()
-		err := raptor.LoadFile(Files.Files[i].Content, script)
+		err := raptor.LoadFile(Files.Files[i].Path, Files.Files[i].Content, script)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}

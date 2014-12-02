@@ -53,10 +53,18 @@ func CommandConvert_String(script *raptor.Script, params []*raptor.Value)
 
     Returns the converted value.
 
+func CommandConvert_Type(script *raptor.Script, params []*raptor.Value)
+    Returns a values internal type.
+
+	convert:type value
+
+    Returns the values type.
+
 func Setup(state *raptor.State)
     Adds the type conversion commands to the state. The type conversion
     commands are:
 
+	convert:type
 	convert:int
 	convert:float
 	convert:bool

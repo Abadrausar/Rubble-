@@ -1,5 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
+Copyright 2012-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -201,7 +201,7 @@ func CommandFile_WalkFiles(script *raptor.Script, params []*raptor.Value) {
 		return
 	}
 
-	code := params[1].CompiledScript()
+	code := params[1].Code()
 	for _, file := range files {
 		if file.IsDir() {
 			continue
@@ -211,16 +211,7 @@ func CommandFile_WalkFiles(script *raptor.Script, params []*raptor.Value) {
 
 		script.AddParams(file.Name())
 
-		//lex := raptor.NewCompiledLexer(code)
-		//for {
-		//	lex.Advance()
-		//	script.Println(lex.CurrentTkn(), lex.CurrentTkn().Lexeme)
-		//	if lex.CheckLookAhead(raptor.TknINVALID) {
-		//		return
-		//	}
-		//}
-
-		script.Code.AddCodeSource(raptor.NewCompiledLexer(code))
+		script.Code.Add(raptor.NewCodeReader(code))
 		script.Exec()
 		script.Envs.Remove()
 		script.Return = false
@@ -245,7 +236,7 @@ func CommandFile_WalkDirs(script *raptor.Script, params []*raptor.Value) {
 		return
 	}
 
-	code := params[1].CompiledScript()
+	code := params[1].Code()
 	for _, file := range files {
 		if !file.IsDir() {
 			continue
@@ -255,7 +246,7 @@ func CommandFile_WalkDirs(script *raptor.Script, params []*raptor.Value) {
 
 		script.AddParams(file.Name())
 
-		script.Code.AddCodeSource(raptor.NewCompiledLexer(code))
+		script.Code.Add(raptor.NewCodeReader(code))
 		script.Exec()
 		script.Envs.Remove()
 		script.Return = false

@@ -1,24 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
-
-This software is provided 'as-is', without any express or implied warranty. In
-no event will the authors be held liable for any damages arising from the use of
-this software.
-
-Permission is granted to anyone to use this software for any purpose, including
-commercial applications, and to alter it and redistribute it freely, subject to
-the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim
-that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not
-required.
-
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
-
+For copyright/license see header in file "doc.go"
 */
 
 package main
@@ -68,6 +49,7 @@ var NoRecover bool
 var LexTest bool
 var Threaded bool
 
+var preDefPos = raptor.NewPosition(53, 1, "main.go")
 var preDefs = `
 	# increment variable
 	(command ++ __name__ {
@@ -129,20 +111,20 @@ func main() {
 
 	// Lexer test
 	if LexTest {
-		lex := raptor.NewLexer(preDefs, 64, 1)
+		lex := raptor.NewLexer(preDefs, preDefPos)
 		if ScriptPath != "" {
 			file, err := ioutil.ReadFile(ScriptPath)
 			if err != nil {
 				fmt.Println("Error:", err)
 				return
 			}
-			lex = raptor.NewLexer(string(file), 1, 1)
+			lex = raptor.NewLexer(string(file), raptor.NewPosition(1, 1, ScriptPath))
 		}
 
 		for {
 			lex.Advance()
 			fmt.Println(lex.CurrentTkn(), lex.CurrentTkn().Lexeme)
-			if lex.CheckLookAhead(raptor.TknINVALID) {
+			if raptor.CheckLookAhead(lex, raptor.TknINVALID) {
 				return
 			}
 		}
@@ -165,7 +147,7 @@ func main() {
 			return
 		}
 		
-		err = raptor.LoadFile(file, script)
+		err = raptor.LoadFile(ScriptPath, file, script)
 		if err != nil {
 			fmt.Println("Validate Error:", err)
 			return
@@ -206,13 +188,13 @@ func main() {
 	// Load predefs if desired.
 	if !NoPredefs {
 		fmt.Println("Loading Predefined User Commands...")
-		script.Code.AddCodeSource(raptor.NewLexer(preDefs, 64, 1))
+		script.Code.Add(raptor.NewLexer(preDefs, preDefPos))
 		rtn, err := state.RunShell(script)
 		if err != nil {
 			fmt.Println("Predefine Error:", err)
 			fmt.Println("Predefine Ret:", rtn)
 		}
-		script.RetVal = nil
+		script.RetVal = raptor.NewValue()
 	}
 
 	if Validate && ValidateAll {
@@ -228,7 +210,7 @@ func main() {
 			return
 		}
 		
-		err = raptor.LoadFile(file, script)
+		err = raptor.LoadFile(ScriptPath, file, script)
 		if err != nil {
 			fmt.Println("Validate Error:", err)
 			return
@@ -256,7 +238,7 @@ func main() {
 			return
 		}
 
-		in := raptor.Compile(string(file), raptor.NewPositionInfo(0, -1))
+		in := raptor.NewCode(raptor.NewLexer(string(file), raptor.NewPosition(0, -1, "")))
 
 		// Small binaries can fail to compile because of the string size restrictions,
 		// so we fall through and try to compile a normal one in that case.
@@ -321,7 +303,7 @@ func main() {
 			return
 		}
 
-		err = raptor.LoadFile(file, script)
+		err = raptor.LoadFile(ScriptPath, file, script)
 		if err != nil {
 			fmt.Println("Error:", err)
 			return
@@ -365,7 +347,7 @@ func main() {
 		}
 
 		if curchar[0] == byte('\n') && !escape {
-			script.Code.Add(string(line))
+			script.Code.AddString(string(line), raptor.NewPosition(1, 1, ""))
 			rtn, err := state.RunShell(script)
 			if err != nil {
 				fmt.Println("Error:", err)

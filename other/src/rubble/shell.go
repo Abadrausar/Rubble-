@@ -1,5 +1,5 @@
 /*
-Copyright 2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -33,20 +33,20 @@ func ShellModeRun() {
 
 	// Lexer test
 	if LexTest {
-		lex := raptor.NewLexer(preDefs, 64, 1)
+		lex := raptor.NewLexer(preDefs, preDefPos)
 		if ScriptPath != "" {
 			file, err := ioutil.ReadFile(ScriptPath)
 			if err != nil {
 				LogPrintln("Error:", err)
 				return
 			}
-			lex = raptor.NewLexer(string(file), 1, 1)
+			lex = raptor.NewLexer(string(file), raptor.NewPosition(1, 1, ScriptPath))
 		}
 
 		for {
 			lex.Advance()
 			LogPrintln(lex.CurrentTkn(), lex.CurrentTkn().Lexeme)
-			if lex.CheckLookAhead(raptor.TknINVALID) {
+			if raptor.CheckLookAhead(lex, raptor.TknINVALID) {
 				return
 			}
 		}
@@ -67,7 +67,7 @@ func ShellModeRun() {
 			return
 		}
 		
-		err = raptor.LoadFile(file, script)
+		err = raptor.LoadFile(ScriptPath, file, script)
 		if err != nil {
 			LogPrintln("Validate Error:", err)
 			return
@@ -88,7 +88,7 @@ func ShellModeRun() {
 	// Load predefs if desired.
 	if !NoPredefs {
 		LogPrintln("Loading Predefined User Commands...")
-		script.Code.AddCodeSource(raptor.NewLexer(preDefs, 275, 1))
+		script.Code.Add(raptor.NewLexer(preDefs, preDefPos))
 		rtn, err := GlobalRaptorState.RunShell(script)
 		if err != nil {
 			LogPrintln("Predefine Error:", err)
@@ -110,7 +110,7 @@ func ShellModeRun() {
 			return
 		}
 		
-		err = raptor.LoadFile(file, script)
+		err = raptor.LoadFile(ScriptPath, file, script)
 		if err != nil {
 			LogPrintln("Validate Error:", err)
 			return
@@ -138,9 +138,9 @@ func ShellModeRun() {
 			return
 		}
 
-		in := raptor.Compile(string(file), raptor.NewPositionInfo(0, -1))
+		in := raptor.NewCode(raptor.NewLexer(string(file), raptor.NewPosition(0, -1, "")))
 
-		// Small binaries can fail to compile because of the string size restrictions,
+		// Small binaries may fail to compile because of the string size restrictions,
 		// so we fall through and try to compile a normal one in that case.
 
 		var out []byte
@@ -203,7 +203,7 @@ func ShellModeRun() {
 			return
 		}
 
-		err = raptor.LoadFile(file, script)
+		err = raptor.LoadFile(ScriptPath, file, script)
 		if err != nil {
 			LogPrintln("Error:", err)
 			return
@@ -247,7 +247,7 @@ func ShellModeRun() {
 		}
 
 		if curchar[0] == byte('\n') && !escape {
-			script.Code.Add(string(line))
+			script.Code.AddString(string(line), raptor.NewPosition(1, 1, ""))
 			rtn, err := GlobalRaptorState.RunShell(script)
 			if err != nil {
 				LogPrintln("Error:", err)
@@ -272,6 +272,7 @@ func ShellModeRun() {
 	}
 }
 
+var preDefPos = raptor.NewPosition(275, 1, "rubble/shell.go")
 var preDefs = `
 	# increment variable
 	(command ++ __name__ {

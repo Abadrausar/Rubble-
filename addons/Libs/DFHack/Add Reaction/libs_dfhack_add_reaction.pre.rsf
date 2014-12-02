@@ -1,0 +1,47 @@
+
+(rubble:requireaddon "Libs/DFHack/Add Reaction" "Base/Templates")
+
+(rubble:dfhackinit_add libs_dfhack_add_reaction libs_dfhack_add_reaction)
+
+(namespace rubble:libs_dfhack_add_reaction)
+(var rubble:libs_dfhack_add_reaction:reactions <array>)
+(var rubble:libs_dfhack_add_reaction:buildings <array>)
+
+(command rubble:libs_dfhack_add_reaction:add reaction building {
+	(set [rubble:libs_dfhack_add_reaction:reactions] (len [rubble:libs_dfhack_add_reaction:reactions]) 
+		(str:add "\"" [reaction] "\", \"" [building] "\""))
+})
+
+(command rubble:libs_dfhack_add_reaction:clear building {
+	(set [rubble:libs_dfhack_add_reaction:buildings] (len [rubble:libs_dfhack_add_reaction:buildings]) [building])
+})
+
+(command rubble:libs_dfhack_add_reaction:write {
+	(var base "\n-- Rubble \"Libs/DFHack/Add Reaction\" script file\n-- Automatically generated, DO NOT EDIT!\n\n")
+	
+	(set base (str:add [base] "event=require \"plugins.eventful\"\n\n"))
+	
+	(set base (str:add [base] "-- Remove reactions from shops\n"))
+	(foreach [rubble:libs_dfhack_add_reaction:buildings] {
+		(set base (str:add [base] "event.removeNative(\"" [params 1] "\")\n"))
+		(break true)
+	})
+	
+	(set base (str:add [base] "\n-- Add reactions to shops\n"))
+	(foreach [rubble:libs_dfhack_add_reaction:reactions] {
+		(set base (str:add [base] "event.addReactionToShop(" [params 1] ")\n"))
+		(break true)
+	})
+	
+	(fileio:write (str:add [rubble:dfdir] "dfhack/scripts/libs_dfhack_add_reaction.lua") [base])
+})
+
+(rubble:template "REACTION_ADD" reaction building {
+	(rubble:libs_dfhack_add_reaction:add [reaction] [building])
+})
+
+(rubble:template "REACTION_CLEAR_LIST" building {
+	(rubble:libs_dfhack_add_reaction:clear [building])
+})
+
+(ret "")

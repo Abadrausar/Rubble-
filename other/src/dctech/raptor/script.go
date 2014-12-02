@@ -1,23 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
-
-This software is provided 'as-is', without any express or implied warranty. In
-no event will the authors be held liable for any damages arising from the use of
-this software.
-
-Permission is granted to anyone to use this software for any purpose, including
-commercial applications, and to alter it and redistribute it freely, subject to
-the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim
-that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not
-required.
-
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
+For copyright/license see header in file "doc.go"
 */
 
 package raptor
@@ -167,6 +149,7 @@ func (this *Script) AddParamsValue(params ...*Value) {
 // Namespaces
 
 // NewNameSpace creates a new namespace.
+// May only be called with a valid Host.
 func (this *Script) NewNameSpace(name string) {
 	if this.Host == nil {
 		panic("Script.Host == nil: This function should not be called here!")
@@ -175,6 +158,7 @@ func (this *Script) NewNameSpace(name string) {
 }
 
 // DeleteNameSpace deletes a namespace.
+// May only be called with a valid Host.
 func (this *Script) DeleteNameSpace(name string) {
 	if this.Host == nil {
 		panic("Script.Host == nil: This function should not be called here!")
@@ -185,6 +169,7 @@ func (this *Script) DeleteNameSpace(name string) {
 // Commands
 
 // NewNativeCommand adds a new native command.
+// May only be called with a valid Host.
 func (this *Script) NewNativeCommand(name string, handler NativeCommand) {
 	if this.Host == nil {
 		panic("Script.Host == nil: This function should not be called here!")
@@ -193,6 +178,7 @@ func (this *Script) NewNativeCommand(name string, handler NativeCommand) {
 }
 
 // NewUserCommand adds a new user command (what else would it do?).
+// May only be called with a valid Host.
 func (this *Script) NewUserCommand(name string, code *Value, params []*Value) {
 	if this.Host == nil {
 		panic("Script.Host == nil: This function should not be called here!")
@@ -201,6 +187,7 @@ func (this *Script) NewUserCommand(name string, code *Value, params []*Value) {
 }
 
 // GetCommand fetches a command by it's name.
+// May only be called with a valid Host.
 func (this *Script) GetCommand(name string) *Command {
 	if this.Host == nil {
 		panic("Script.Host == nil: This function should not be called here!")
@@ -209,6 +196,7 @@ func (this *Script) GetCommand(name string) *Command {
 }
 
 // DeleteCommand removes a command.
+// May only be called with a valid Host.
 func (this *Script) DeleteCommand(name string) {
 	if this.Host == nil {
 		panic("Script.Host == nil: This function should not be called here!")
@@ -220,6 +208,7 @@ func (this *Script) DeleteCommand(name string) {
 
 // RegisterType registers a new Indexable or the like with a specific name.
 // Registering a type allows it to be created with an object literal.
+// May only be called with a valid Host.
 func (this *Script) RegisterType(name string, handler ObjectFactory) {
 	if this.Host == nil {
 		panic("Script.Host == nil: This function should not be called here!")
@@ -228,6 +217,7 @@ func (this *Script) RegisterType(name string, handler ObjectFactory) {
 }
 
 // GetType retrieves a named types ObjectFactory.
+// May only be called with a valid Host.
 func (this *Script) GetType(name string) ObjectFactory {
 	if this.Host == nil {
 		panic("Script.Host == nil: This function should not be called here!")
@@ -250,6 +240,7 @@ func (this *Script) ParseName(name string) (*NameSpace, string) {
 }
 
 // ParseNameSpaceName is just like ParseName but for just the name of a namespace.
+// May only be called with a valid Host.
 func (this *Script) ParseNameSpaceName(name string) *NameSpace {
 	if this.Host == nil {
 		panic("Script.Host == nil: This function should not be called here!")
@@ -314,7 +305,7 @@ func (this *Script) ExitFlags() bool {
 // Exec is exported for the use of commands ONLY!
 // Exec is a subset of Run() and so it must be called from a command handler or the like.
 func (this *Script) Exec() {
-	for !this.Code.Last().CheckLookAhead(TknINVALID) {
+	for !CheckLookAhead(this.Code.Last(), TknINVALID) {
 		this.RetVal = this.fetchValue()
 		if this.ExitFlags() {
 			this.Break = false
@@ -349,7 +340,7 @@ func (this *Script) SafeExec() (err error) {
 			case error:
 				err = i
 			case string:
-				err = fmt.Errorf("%v Near %v", i, this.Code.Last().Position())
+				err = fmt.Errorf("%v Near %v", i, this.Code.Last().CurrentTkn().Pos)
 			default:
 				err = errors.New(fmt.Sprint(i))
 			}
@@ -361,8 +352,7 @@ func (this *Script) SafeExec() (err error) {
 }
 
 func (this *Script) execCommand() {
-	this.Host.DbgCallback(DbgrAdvanceTkn)
-	this.Code.Last().GetToken(TknCmdBegin)
+	GetToken(this.Code.Last(), TknCmdBegin)
 
 	// Get the command's name
 	name := this.fetchValue()
@@ -372,22 +362,20 @@ func (this *Script) execCommand() {
 
 	// Read the commands parameters if any
 	params := make([]*Value, 0, 5)
-	for !this.Code.Last().CheckLookAhead(TknCmdEnd) {
+	for !CheckLookAhead(this.Code.Last(), TknCmdEnd) {
 		params = append(params, this.fetchValue())
 		if this.ExitFlags() {
 			return
 		}
 	}
 
-	this.Host.DbgCallback(DbgrAdvanceTkn)
-	this.Code.Last().GetToken(TknCmdEnd)
+	GetToken(this.Code.Last(), TknCmdEnd)
 
 	this.GetCommand(name.String()).Call(this, params)
 }
 
 func (this *Script) derefVar() {
-	this.Host.DbgCallback(DbgrAdvanceTkn)
-	this.Code.Last().GetToken(TknDerefBegin)
+	GetToken(this.Code.Last(), TknDerefBegin)
 
 	// Get the name or value to opperate on
 	name := this.fetchValue()
@@ -397,15 +385,14 @@ func (this *Script) derefVar() {
 
 	// Read any index parameters
 	params := make([]*Value, 0, 5)
-	for !this.Code.Last().CheckLookAhead(TknDerefEnd) {
+	for !CheckLookAhead(this.Code.Last(), TknDerefEnd) {
 		params = append(params, this.fetchValue())
 		if this.ExitFlags() {
 			return
 		}
 	}
 
-	this.Host.DbgCallback(DbgrAdvanceTkn)
-	this.Code.Last().GetToken(TknDerefEnd)
+	GetToken(this.Code.Last(), TknDerefEnd)
 
 	// simple name deref
 	if len(params) == 0 {
@@ -441,8 +428,7 @@ func (this *Script) derefVar() {
 }
 
 func (this *Script) readObjLit() {
-	this.Host.DbgCallback(DbgrAdvanceTkn)
-	this.Code.Last().GetToken(TknObjLitBegin)
+	GetToken(this.Code.Last(), TknObjLitBegin)
 
 	// Get the type name
 	name := this.fetchValue().String()
@@ -456,16 +442,15 @@ func (this *Script) readObjLit() {
 	keys := make([]string, 0, 10)
 	hasKeys := false
 
-	if !this.Code.Last().CheckLookAhead(TknObjLitEnd) {
+	if !CheckLookAhead(this.Code.Last(), TknObjLitEnd) {
 		ret := this.fetchValue()
 		if this.ExitFlags() {
 			return
 		}
-		if this.Code.Last().CheckLookAhead(TknObjLitSplit) {
+		if CheckLookAhead(this.Code.Last(), TknObjLitSplit) {
 			hasKeys = true
 			keys = append(keys, ret.String())
-			this.Host.DbgCallback(DbgrAdvanceTkn)
-			this.Code.Last().GetToken(TknObjLitSplit)
+			GetToken(this.Code.Last(), TknObjLitSplit)
 			values = append(values, this.fetchValue())
 			if this.ExitFlags() {
 				return
@@ -474,15 +459,14 @@ func (this *Script) readObjLit() {
 			values = append(values, ret)
 		}
 	}
-	for !this.Code.Last().CheckLookAhead(TknObjLitEnd) {
+	for !CheckLookAhead(this.Code.Last(), TknObjLitEnd) {
 		ret := this.fetchValue()
 		if this.ExitFlags() {
 			return
 		}
 		if hasKeys {
 			keys = append(keys, ret.String())
-			this.Host.DbgCallback(DbgrAdvanceTkn)
-			this.Code.Last().GetToken(TknObjLitSplit)
+			GetToken(this.Code.Last(), TknObjLitSplit)
 			values = append(values, this.fetchValue())
 			if this.ExitFlags() {
 				return
@@ -492,8 +476,7 @@ func (this *Script) readObjLit() {
 		}
 	}
 
-	this.Host.DbgCallback(DbgrAdvanceTkn)
-	this.Code.Last().GetToken(TknObjLitEnd)
+	GetToken(this.Code.Last(), TknObjLitEnd)
 
 	if hasKeys {
 		this.RetVal = this.GetType(name)(this, keys, values)
@@ -504,41 +487,30 @@ func (this *Script) readObjLit() {
 }
 
 func (this *Script) readCodeBlock() {
-	this.Host.DbgCallback(DbgrAdvanceTkn)
-	this.Code.Last().GetToken(TknCodeBegin)
-
-	this.RetVal = NewValueCode(CompileBlock(this.Code.Last()))
+	GetToken(this.Code.Last(), TknCodeBegin)
+	this.RetVal = NewValueCode(NewCodeBlock(this.Code.Last()))
 }
 
 func (this *Script) fetchValue() *Value {
 	switch this.Code.Last().LookAhead().Type {
 	case TknString:
-		this.Host.DbgCallback(DbgrAdvanceTkn)
-		this.Code.Last().GetToken(TknString)
+		GetToken(this.Code.Last(), TknString)
 		return TokenToValue(this.Code.Last().CurrentTkn())
 
 	case TknCmdBegin:
-		this.Host.DbgCallback(DbgrEnterCmd)
 		this.execCommand()
-		this.Host.DbgCallback(DbgrLeaveCmd)
 		return this.RetVal
 
 	case TknDerefBegin:
-		this.Host.DbgCallback(DbgrEnterDeref)
 		this.derefVar()
-		this.Host.DbgCallback(DbgrLeaveDeref)
 		return this.RetVal
 
 	case TknObjLitBegin:
-		this.Host.DbgCallback(DbgrEnterObjLit)
 		this.readObjLit()
-		this.Host.DbgCallback(DbgrLeaveObjLit)
 		return this.RetVal
 
 	case TknCodeBegin:
-		this.Host.DbgCallback(DbgrEnterCodeBlock)
 		this.readCodeBlock()
-		this.Host.DbgCallback(DbgrLeaveCodeBlock)
 		return this.RetVal
 
 	default:
@@ -564,7 +536,7 @@ func (this *Script) Validate() (err error) {
 			case error:
 				err = i
 			case string:
-				err = fmt.Errorf("%v Near %v", i, this.Code.Last().Position())
+				err = fmt.Errorf("%v Near %v", i, this.Code.Last().CurrentTkn().Pos)
 			default:
 				err = errors.New(fmt.Sprint(i))
 			}
@@ -578,7 +550,7 @@ func (this *Script) Validate() (err error) {
 }
 
 func (this *Script) validate() {
-	for !this.Code.Last().CheckLookAhead(TknINVALID) {
+	for !CheckLookAhead(this.Code.Last(), TknINVALID) {
 		this.RetVal = this.validateValue()
 	}
 	this.Code.Remove()
@@ -586,7 +558,7 @@ func (this *Script) validate() {
 }
 
 func (this *Script) validateCommand() {
-	this.Code.Last().GetToken(TknCmdBegin)
+	GetToken(this.Code.Last(), TknCmdBegin)
 	
 	// Get the command's name
 	name := this.validateValue()
@@ -602,7 +574,7 @@ func (this *Script) validateCommand() {
 	}
 	
 	// Read the commands parameters if any
-	for !this.Code.Last().CheckLookAhead(TknCmdEnd) {
+	for !CheckLookAhead(this.Code.Last(), TknCmdEnd) {
 		this.validateValue()
 		params++
 	}
@@ -613,24 +585,24 @@ func (this *Script) validateCommand() {
 		}
 	}
 	
-	this.Code.Last().GetToken(TknCmdEnd)
+	GetToken(this.Code.Last(), TknCmdEnd)
 }
 
 func (this *Script) validateDeref() {
-	this.Code.Last().GetToken(TknDerefBegin)
+	GetToken(this.Code.Last(), TknDerefBegin)
 
 	this.validateValue()
 
 	// Read any index parameters
-	for !this.Code.Last().CheckLookAhead(TknDerefEnd) {
+	for !CheckLookAhead(this.Code.Last(), TknDerefEnd) {
 		this.validateValue()
 	}
 
-	this.Code.Last().GetToken(TknDerefEnd)
+	GetToken(this.Code.Last(), TknDerefEnd)
 }
 
 func (this *Script) validateObjLit() {
-	this.Code.Last().GetToken(TknObjLitBegin)
+	GetToken(this.Code.Last(), TknObjLitBegin)
 
 	name := this.validateValue()
 	
@@ -638,44 +610,44 @@ func (this *Script) validateObjLit() {
 		this.GetType(name.String())
 	}
 
-	for !this.Code.Last().CheckLookAhead(TknObjLitEnd) {
+	for !CheckLookAhead(this.Code.Last(), TknObjLitEnd) {
 		this.validateValue()
-		if this.Code.Last().CheckLookAhead(TknObjLitSplit) {
-			this.Code.Last().GetToken(TknObjLitSplit)
+		if CheckLookAhead(this.Code.Last(), TknObjLitSplit) {
+			GetToken(this.Code.Last(), TknObjLitSplit)
 			this.validateValue()
 		}
 	}
 	
-	this.Code.Last().GetToken(TknObjLitEnd)
+	GetToken(this.Code.Last(), TknObjLitEnd)
 }
 
 func (this *Script) validateCodeBlock() {
-	this.Code.Last().GetToken(TknCodeBegin)
-	this.Code.AddCompiledScript(CompileBlock(this.Code.Last()))
+	GetToken(this.Code.Last(), TknCodeBegin)
+	this.Code.AddCode(NewCodeBlock(this.Code.Last()))
 	this.validate()
 }
 
 func (this *Script) validateValue() *Value {
 	switch this.Code.Last().LookAhead().Type {
 	case TknString:
-		this.Code.Last().GetToken(TknString)
+		GetToken(this.Code.Last(), TknString)
 		return TokenToValue(this.Code.Last().CurrentTkn())
 
 	case TknCmdBegin:
 		this.validateCommand()
-		return this.RetVal
+		return NewValue()
 
 	case TknDerefBegin:
 		this.validateDeref()
-		return this.RetVal
+		return NewValue()
 
 	case TknObjLitBegin:
 		this.validateObjLit()
-		return this.RetVal
+		return NewValue()
 
 	case TknCodeBegin:
 		this.validateCodeBlock()
-		return this.RetVal
+		return NewValue()
 
 	default:
 		ExitOnTokenExpected(this.Code.Last().LookAhead(), TknString, TknCmdBegin,

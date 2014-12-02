@@ -1,23 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
-
-This software is provided 'as-is', without any express or implied warranty. In
-no event will the authors be held liable for any damages arising from the use of
-this software.
-
-Permission is granted to anyone to use this software for any purpose, including
-commercial applications, and to alter it and redistribute it freely, subject to
-the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim
-that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not
-required.
-
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
+For copyright/license see header in file "doc.go"
 */
 
 package raptor
@@ -36,7 +18,6 @@ type State struct {
 	NameSpaces *NameSpaceStore
 	Types      *TypeStore
 	NoRecover  bool         // Do not recover errors, this makes it easier to debug the parser.
-	Debug      []DbgHandler // This stores the debug handlers, normally nil unless a debugger is installed.
 	Output     io.Writer    // Normally set to os.Stdout, this can be changed to redirect to a log file or the like.
 }
 
@@ -46,7 +27,6 @@ func NewState() *State {
 	rtn.Commands = NewCommandStore()
 	rtn.NameSpaces = NewNameSpaceStore()
 	rtn.Types = NewTypeStore()
-	rtn.Debug = nil
 	rtn.Output = os.Stdout
 	return rtn
 }
@@ -118,7 +98,7 @@ func (this *State) NewNativeCommand(name string, handler NativeCommand) {
 func (this *State) NewUserCommand(name string, code *Value, params []*Value) {
 	rtn := new(Command)
 
-	rtn.Code = code.CompiledScript()
+	rtn.Code = code.Code()
 
 	if params == nil {
 		rtn.VarParams = true
@@ -239,32 +219,6 @@ func (this *State) fetchNameSpaceName(names []string, namespace *NameSpace) *Nam
 	return this.fetchNameSpaceName(names[1:], namespace.NameSpaces.Fetch(names[0]))
 }
 
-// Debugger
-
-func (this *State) RegisterDbgCallback(typ int, handler DbgHandler) {
-	if this.Debug == nil {
-		this.Debug = make([]DbgHandler, dbgrMaxType)
-	}
-	if typ >= dbgrMaxType || typ < 0 {
-		panic("Callback type out of range.")
-	}
-	this.Debug[typ] = handler
-}
-
-func (this *State) DbgCallback(typ int) {
-	if this.Debug == nil {
-		return
-	}
-	if typ >= dbgrMaxType || typ < 0 {
-		panic("Callback type out of range.")
-	}
-    
-	if this.Debug[typ] == nil {
-		return
-	}
-	this.Debug[typ](this)
-}
-
 // Output
 
 func (this *State) Printf(format string, msg ...interface{}) {
@@ -300,7 +254,7 @@ func (this *State) RunCommand(script *Script, command string, params ...*Value) 
 				case error:
 					err = i
 				case string:
-					err = fmt.Errorf("%v Near %v", i, script.Code.Last().Position())
+					err = fmt.Errorf("%v Near %v", i, script.Code.Last().CurrentTkn().Pos)
 				default:
 					err = errors.New(fmt.Sprint(i))
 				}
@@ -342,7 +296,7 @@ func (this *State) Run(script *Script) (ret *Value, err error) {
 				case error:
 					err = i
 				case string:
-					err = fmt.Errorf("%v Near %v", i, script.Code.Last().Position())
+					err = fmt.Errorf("%v Near %v", i, script.Code.Last().CurrentTkn().Pos)
 				default:
 					err = errors.New(fmt.Sprint(i))
 				}
@@ -384,7 +338,7 @@ func (this *State) RunShell(script *Script) (ret *Value, err error) {
 				case error:
 					err = i
 				case string:
-					err = fmt.Errorf("%v Near %v", i, script.Code.Last().Position())
+					err = fmt.Errorf("%v Near %v", i, script.Code.Last().CurrentTkn().Pos)
 				default:
 					err = errors.New(fmt.Sprint(i))
 				}
@@ -421,7 +375,7 @@ func (this *State) Validate(script *Script) (err error) {
 			case error:
 				err = i
 			case string:
-				err = fmt.Errorf("%v Near %v", i, script.Code.Last().Position())
+				err = fmt.Errorf("%v Near %v", i, script.Code.Last().CurrentTkn().Pos)
 			default:
 				err = errors.New(fmt.Sprint(i))
 			}

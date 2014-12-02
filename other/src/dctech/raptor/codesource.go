@@ -1,35 +1,39 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
-
-This software is provided 'as-is', without any express or implied warranty. In
-no event will the authors be held liable for any damages arising from the use of
-this software.
-
-Permission is granted to anyone to use this software for any purpose, including
-commercial applications, and to alter it and redistribute it freely, subject to
-the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim
-that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not
-required.
-
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
+For copyright/license see header in file "doc.go"
 */
 
 package raptor
 
 //import "fmt"
 
-// A CodeSource represents a token stream, ether directly from the lexer or from a compiled script.
+// A CodeSource represents a token stream.
 type CodeSource interface {
-	Position() *PositionInfo
 	CurrentTkn() *Token
 	LookAhead() *Token
 	Advance()
-	GetToken(...int)
-	CheckLookAhead(...int) bool
+}
+
+// GetToken gets the next token, and panics with an error if it's not of type tokenType.
+// May cause a panic if the lexer encounters an error
+// Used as a type checked Advance
+func GetToken(code CodeSource, tokenTypes ...int) {
+	code.Advance()
+
+	for _, val := range tokenTypes {
+		if code.CurrentTkn().Type == val {
+			return
+		}
+	}
+
+	ExitOnTokenExpected(code.CurrentTkn(), tokenTypes...)
+}
+
+// CheckLookAhead checks to see if the look ahead is one of tokenTypes and if so returns true
+func CheckLookAhead(code CodeSource, tokenTypes ...int) bool {
+	for _, val := range tokenTypes {
+		if code.LookAhead().Type == val {
+			return true
+		}
+	}
+	return false
 }

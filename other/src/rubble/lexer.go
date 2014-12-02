@@ -1,5 +1,5 @@
 /*
-Copyright 2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -31,8 +31,8 @@ type Lexer struct {
 
 	source []byte
 
-	line      int
-	tokenline int
+	pos      *Position
+	tokenpos *Position
 
 	index int
 
@@ -46,16 +46,16 @@ type Lexer struct {
 }
 
 // Returns a new Lexer.
-func NewLexer(dat []byte) *Lexer {
+func NewLexer(dat []byte, pos *Position) *Lexer {
 	this := new(Lexer)
 
-	this.Look = &Token{"INVALID", tknINVALID, -1}
-	this.Current = &Token{"INVALID", tknINVALID, -1}
+	this.Look = NewToken("INVALID", tknINVALID, pos)
+	this.Current = &Token{"INVALID", tknINVALID, pos}
 
 	this.source = dat
 
-	this.line = 1
-	this.tokenline = 1
+	this.pos = pos.Copy()
+	this.tokenpos = pos.Copy()
 
 	this.index = 0
 
@@ -77,8 +77,8 @@ func NewLexer(dat []byte) *Lexer {
 func (this *Lexer) Advance() {
 	if this.index > len(this.source) {
 		this.Current = this.Look
-		LastLine = this.Current.Line
-		this.Look = &Token{"INVALID", tknINVALID, this.tokenline}
+		LastLine = this.Current.Pos
+		this.Look = NewToken("INVALID", tknINVALID, this.tokenpos)
 		return
 	}
 
@@ -88,7 +88,7 @@ func (this *Lexer) Advance() {
 		lookok := len(this.source) - this.index
 
 		if dat[i] == '\n' {
-			this.line++
+			this.pos.Line++
 		}
 
 		if this.depth < 0 {
@@ -105,10 +105,10 @@ func (this *Lexer) Advance() {
 
 			if len(this.lexeme) > 0 && this.depth == 0 {
 				this.Current = this.Look
-				LastLine = this.Current.Line
-				this.Look = &Token{string(this.lexeme), tknString, this.tokenline}
+				LastLine = this.Current.Pos
+				this.Look = NewToken(string(this.lexeme), tknString, this.tokenpos)
 
-				this.tokenline = -1
+				this.tokenpos = this.pos.Copy()
 				this.lexeme = this.lexeme[0:0]
 				return
 			}
@@ -117,10 +117,10 @@ func (this *Lexer) Advance() {
 		if dat[i] == ';' || dat[i] == '}' {
 			if len(this.lexeme) > 0 && this.depth == 1 {
 				this.Current = this.Look
-				LastLine = this.Current.Line
-				this.Look = &Token{string(this.lexeme), tknString, this.tokenline}
+				LastLine = this.Current.Pos
+				this.Look = NewToken(string(this.lexeme), tknString, this.tokenpos)
 
-				this.tokenline = -1
+				this.tokenpos = this.pos.Copy()
 				this.lexeme = this.lexeme[0:0]
 				return
 			}
@@ -133,9 +133,9 @@ func (this *Lexer) Advance() {
 			}
 
 			this.Current = this.Look
-			LastLine = this.Current.Line
-			this.Look = &Token{";", tknDelimiter, this.line}
-			this.tokenline = this.line
+			LastLine = this.Current.Pos
+			this.Look = NewToken(";", tknDelimiter, this.tokenpos)
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:0]
 			this.index++
 			return
@@ -149,9 +149,9 @@ func (this *Lexer) Advance() {
 			}
 
 			this.Current = this.Look
-			LastLine = this.Current.Line
-			this.Look = &Token{"{", tknTagBegin, this.line}
-			this.tokenline = this.line
+			LastLine = this.Current.Pos
+			this.Look = NewToken("{", tknTagBegin, this.tokenpos)
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:0]
 			this.index++
 			return
@@ -165,9 +165,9 @@ func (this *Lexer) Advance() {
 			}
 
 			this.Current = this.Look
-			LastLine = this.Current.Line
-			this.Look = &Token{"}", tknTagEnd, this.line}
-			this.tokenline = this.line
+			LastLine = this.Current.Pos
+			this.Look = NewToken("}", tknTagEnd, this.tokenpos)
+			this.tokenpos = this.pos.Copy()
 			this.lexeme = this.lexeme[0:0]
 			this.index++
 			return
@@ -178,8 +178,8 @@ func (this *Lexer) Advance() {
 
 	if this.index == len(this.source) {
 		this.Current = this.Look
-		LastLine = this.Current.Line
-		this.Look = &Token{string(this.lexeme), tknString, this.tokenline}
+		LastLine = this.Current.Pos
+		this.Look = NewToken(string(this.lexeme), tknString, this.tokenpos)
 		this.index++
 		return
 	}

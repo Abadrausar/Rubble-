@@ -276,3 +276,8 @@ User Templates defined in the "Base/Templates" addon.
 		ADDON_HOOK_<ID>
 	If <PLAYABLE> is true then the following hooks are also installed:
 		ADDON_HOOK_PLAYABLE
+
+==============================================
+{DFHACKINIT_ADD;<ID>;<CONTENT>}
+	Adds <CONTENT> to the rubble dfhack init script. <ID> is strictly to allow overriding.
+	(This requires "script rubble.dfhack" to be added to your dfhack.init file)

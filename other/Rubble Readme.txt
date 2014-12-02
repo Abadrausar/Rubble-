@@ -31,6 +31,7 @@ Install:
 Backup your "raw/objects" folder! Rubble will delete all your existing raw files!
 Extract Rubble to "<DF Directory>/rubble".
 Install your addons to "<DF Directory>/rubble/addons"
+(If you use DFHack) add "script rubble.dfhack" to your dfhack.init file
 Run "rubble -addonlist" OR run "Rubble GUI.exe"
 
 Now you are good to go! Documentation (as you have obviously discovered) is in the "rubble/other" folder as is source code and OSX/Linux binaries.
@@ -136,6 +137,11 @@ Generic Animal Mats:
 	Make animal mats such as meat and leather generic. This is mostly for those who have FPS issues.
 	This addon is packed as a zip to demo how that is done.
 
+Libs/DFHack/Add Reaction:
+	Allows you to add reactions to buildings that are normally not possible to add reactions to, also allows you to remove all hardcoded reactions from a building.
+	Requires the "Base/Templates" addon.
+	WARNING! Largely untested!
+
 Libs/DFHack/Announcement:
 	This addon is a modders resource for displaying announcements to the player.
 	Requires "Libs/DFHack/Command".
@@ -181,11 +187,33 @@ Known Issues (non-bug):
 		See "Rubble Addons.txt" for more details.
 
 When making an error report please post the FULL log file! Posting just a few line tells me almost nothing about the problem, after all I made Rubble write all that stuff for a reason :)
-If you really want to be helpful run "rubble -norecover" and post that log as well as the normal log. To do this from the GUI just add "-norecover" to the "Extra options" box at the bottom.
+If you really want to be helpful run "rubble -norecover" and post that log IN ADDITION TO the normal log. To do this from the GUI just add "-norecover" to the "Extra options" box at the bottom.
 
 ==============================================
 Changelog:
 ==============================================
+v3.8
+	Updated to Raptor 3.0
+		This update is strictly an internal refactoring, no commands have changed.
+		The internal API is much better now.
+		Error messages (on the Raptor side of things) should be much better.
+	Changed LOTS of stuff internally to get better error messages.
+		(I REALLY need to refactor the Rubble internals sometime...)
+	Fixed Rubble reporting that reading addonlist.ini failed when in shell mode even if the read succeeded.
+		(it would also update the addon list twice when this happened)
+	Init scripts may now override each other.
+		The only reason they couldn't before was oversight, init scripts are handled separate from 
+		other addon files, and I forgot to allow overriding.
+	Added rubble:compat, an indexable of version compatibility information.
+		Index with a version string, returns true if the current version is backwards compatible with the requested version.
+		If a version is not listed it will return nil (which will act like false in most cases).
+		Obviously always reports nil for versions newer than the current version.
+		Versions start with "3.8" (so [rubble:compat "3.7"] will return nil)
+	Removed command "panic", use rubble:abort.
+	Added template DFHACKINIT_ADD to "Base/Templates", allows automatic customization of dfhack.init by addons.
+		To activate this feature you need to add "script rubble.dfhack" to your dfhack.init file.
+	Added experimental "Libs/DFHack/Add Reaction" addon, manipulate hardcoded buildings/reactions.
+
 v3.7
 	Made some template changes to "Base/Templates":
 		Added @IF_ACTIVE

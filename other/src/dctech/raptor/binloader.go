@@ -1,23 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
-
-This software is provided 'as-is', without any express or implied warranty. In
-no event will the authors be held liable for any damages arising from the use of
-this software.
-
-Permission is granted to anyone to use this software for any purpose, including
-commercial applications, and to alter it and redistribute it freely, subject to
-the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim
-that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not
-required.
-
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
+For copyright/license see header in file "doc.go"
 */
 
 package raptor
@@ -32,21 +14,21 @@ import "compress/flate"
 
 // LoadFile will load a file and add its code to a script. Automatically handles both source and binary files.
 // The error is the result from LoadBinary if it is called and fails.
-func LoadFile(code []byte, script *Script) error {
+func LoadFile(filename string, code []byte, script *Script) error {
 	if ValidateBinary(code) {
 		bin, err := LoadBinary(code)
 		if err != nil {
 			return err
 		}
-		script.Code.AddCodeSource(NewCompiledLexer(bin))
+		script.Code.AddCode(bin)
 		return nil
 	}
-	script.Code.Add(string(code))
+	script.Code.Add(NewLexer(string(code), NewPosition(1, 1, filename)))
 	return nil
 }
 
-// LoadBinary reads the file signature and calls the propper loader function.
-func LoadBinary(code []byte) (*CompiledScript, error) {
+// LoadBinary reads the file signature and calls the proper loader function.
+func LoadBinary(code []byte) (*Code, error) {
 	sig := string(code[0:8])
 
 	switch sig {
@@ -81,7 +63,7 @@ func ValidateBinary(code []byte) bool {
 
 // LoadBinaryV1 loads version 1 Raptor binaries ("normal" binaries).
 // See WriteBinaryV1 for format spec.
-func LoadBinaryV1(code []byte) (script *CompiledScript, oops error) {
+func LoadBinaryV1(code []byte) (script *Code, oops error) {
 	defer func() {
 		if x := recover(); x != nil {
 			switch i := x.(type) {
@@ -146,8 +128,8 @@ func LoadBinaryV1(code []byte) (script *CompiledScript, oops error) {
 		stringtbl = append(stringtbl, string(str))
 	}
 
-	// Generate CompiledScript
-	this := new(CompiledScript)
+	// Generate *Code
+	this := new(Code)
 	this.Code = make([]uint32, tokens)
 	this.StringTable = stringtbl
 
@@ -173,7 +155,7 @@ func LoadBinaryV1(code []byte) (script *CompiledScript, oops error) {
 // Max string size is 65535 bytes.
 // Max unique string count is 65525.
 // Max token count is 65535.
-func WriteBinaryV1(script *CompiledScript) (code []byte, oops error) {
+func WriteBinaryV1(script *Code) (code []byte, oops error) {
 	defer func() {
 		if x := recover(); x != nil {
 			switch i := x.(type) {
@@ -235,7 +217,7 @@ func WriteBinaryV1(script *CompiledScript) (code []byte, oops error) {
 
 // LoadBinaryV2 loads version 2 Raptor binaries ("small" binaries).
 // See WriteBinaryV2 for format spec.
-func LoadBinaryV2(code []byte) (script *CompiledScript, oops error) {
+func LoadBinaryV2(code []byte) (script *Code, oops error) {
 	defer func() {
 		if x := recover(); x != nil {
 			switch i := x.(type) {
@@ -301,8 +283,8 @@ func LoadBinaryV2(code []byte) (script *CompiledScript, oops error) {
 		stringtbl = append(stringtbl, string(str))
 	}
 
-	// Generate CompiledScript
-	this := new(CompiledScript)
+	// Generate *Code
+	this := new(Code)
 	this.Code = make([]uint32, tokens)
 	this.StringTable = stringtbl
 
@@ -328,7 +310,7 @@ func LoadBinaryV2(code []byte) (script *CompiledScript, oops error) {
 // Max string size is 65535 bytes.
 // Max unique string count is 245.
 // Max token count is 65535.
-func WriteBinaryV2(script *CompiledScript) (code []byte, oops error) {
+func WriteBinaryV2(script *Code) (code []byte, oops error) {
 	defer func() {
 		if x := recover(); x != nil {
 			switch i := x.(type) {
@@ -389,7 +371,7 @@ func WriteBinaryV2(script *CompiledScript) (code []byte, oops error) {
 
 // LoadBinaryV3 loads version 3 Raptor binaries ("normal" binaries with compressed string table).
 // See WriteBinaryV3 for format spec.
-func LoadBinaryV3(code []byte) (script *CompiledScript, oops error) {
+func LoadBinaryV3(code []byte) (script *Code, oops error) {
 	defer func() {
 		if x := recover(); x != nil {
 			switch i := x.(type) {
@@ -455,8 +437,8 @@ func LoadBinaryV3(code []byte) (script *CompiledScript, oops error) {
 	}
 	stringsec.Close()
 
-	// Generate CompiledScript
-	this := new(CompiledScript)
+	// Generate *Code
+	this := new(Code)
 	this.Code = make([]uint32, tokens)
 	this.StringTable = stringtbl
 
@@ -471,7 +453,7 @@ func LoadBinaryV3(code []byte) (script *CompiledScript, oops error) {
 // 
 // Format:
 // Version 3, is just version 1 with a DEFLATE compressed string table.
-func WriteBinaryV3(script *CompiledScript) (code []byte, oops error) {
+func WriteBinaryV3(script *Code) (code []byte, oops error) {
 	defer func() {
 		if x := recover(); x != nil {
 			switch i := x.(type) {
@@ -539,7 +521,7 @@ func WriteBinaryV3(script *CompiledScript) (code []byte, oops error) {
 
 // LoadBinaryV4 loads version 4 Raptor binaries ("small" binaries).
 // See WriteBinaryV4 for format spec.
-func LoadBinaryV4(code []byte) (script *CompiledScript, oops error) {
+func LoadBinaryV4(code []byte) (script *Code, oops error) {
 	defer func() {
 		if x := recover(); x != nil {
 			switch i := x.(type) {
@@ -606,8 +588,8 @@ func LoadBinaryV4(code []byte) (script *CompiledScript, oops error) {
 	}
 	stringsec.Close()
 
-	// Generate CompiledScript
-	this := new(CompiledScript)
+	// Generate *Code
+	this := new(Code)
 	this.Code = make([]uint32, tokens)
 	this.StringTable = stringtbl
 
@@ -622,7 +604,7 @@ func LoadBinaryV4(code []byte) (script *CompiledScript, oops error) {
 // 
 // Format:
 // Version 4, is just version 2 with a DEFLATE compressed string table.
-func WriteBinaryV4(script *CompiledScript) (code []byte, oops error) {
+func WriteBinaryV4(script *Code) (code []byte, oops error) {
 	defer func() {
 		if x := recover(); x != nil {
 			switch i := x.(type) {

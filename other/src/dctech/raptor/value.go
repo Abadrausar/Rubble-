@@ -1,23 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
-
-This software is provided 'as-is', without any express or implied warranty. In
-no event will the authors be held liable for any damages arising from the use of
-this software.
-
-Permission is granted to anyone to use this software for any purpose, including
-commercial applications, and to alter it and redistribute it freely, subject to
-the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim
-that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not
-required.
-
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
+For copyright/license see header in file "doc.go"
 */
 
 package raptor
@@ -32,7 +14,7 @@ const (
 	TypInt         // An int64
 	TypFloat       // A float64
 	TypBool        // A boolean
-	TypCode        // A *CompiledScript
+	TypCode        // A Code object
 	TypCommand     // A command reference, basically a string with a special type value.
 )
 
@@ -43,7 +25,7 @@ type EmptyInterface interface{}
 type Value struct {
 	Type int
 	Data EmptyInterface
-	Pos  *PositionInfo
+	Pos  *Position
 }
 
 // NewValue creates a new nil Value.
@@ -51,7 +33,7 @@ func NewValue() *Value {
 	this := new(Value)
 	this.Type = TypNil
 	this.Data = nil
-	this.Pos = NewPositionInfo(0, -1)
+	this.Pos = NewPosition(0, -1, "")
 	return this
 }
 
@@ -60,7 +42,7 @@ func NewValueString(val string) *Value {
 	this := new(Value)
 	this.Type = TypString
 	this.Data = val
-	this.Pos = NewPositionInfo(0, -1)
+	this.Pos = NewPosition(0, -1, "")
 	return this
 }
 
@@ -69,7 +51,7 @@ func NewValueInt64(val int64) *Value {
 	this := new(Value)
 	this.Type = TypInt
 	this.Data = val
-	this.Pos = NewPositionInfo(0, -1)
+	this.Pos = NewPosition(0, -1, "")
 	return this
 }
 
@@ -78,7 +60,7 @@ func NewValueFloat64(val float64) *Value {
 	this := new(Value)
 	this.Type = TypFloat
 	this.Data = val
-	this.Pos = NewPositionInfo(0, -1)
+	this.Pos = NewPosition(0, -1, "")
 	return this
 }
 
@@ -87,16 +69,16 @@ func NewValueBool(val bool) *Value {
 	this := new(Value)
 	this.Type = TypBool
 	this.Data = val
-	this.Pos = NewPositionInfo(0, -1)
+	this.Pos = NewPosition(0, -1, "")
 	return this
 }
 
-// NewValueCode creates a new Value from a *CompiledScript.
-func NewValueCode(val *CompiledScript) *Value {
+// NewValueCode creates a new Value from a *Code.
+func NewValueCode(val *Code) *Value {
 	this := new(Value)
 	this.Type = TypCode
 	this.Data = val
-	this.Pos = NewPositionInfo(0, -1)
+	this.Pos = NewPosition(0, -1, "")
 	return this
 }
 
@@ -105,7 +87,7 @@ func NewValueObject(val EmptyInterface) *Value {
 	this := new(Value)
 	this.Type = TypObject
 	this.Data = val
-	this.Pos = NewPositionInfo(0, -1)
+	this.Pos = NewPosition(0, -1, "")
 	return this
 }
 
@@ -114,14 +96,13 @@ func NewValueCommand(val string) *Value {
 	this := new(Value)
 	this.Type = TypCommand
 	this.Data = val
-	this.Pos = NewPositionInfo(0, -1)
+	this.Pos = NewPosition(0, -1, "")
 	return this
 }
 
 // TokenToValue turns a lexer token into a script value using the following rules.
 // 	if lexeme is "true" or "false" type is bool
 //	if lexeme can be converted into an int without error type is int
-//	if lexeme can be converted into a float without error type is float
 //	else type is string
 func TokenToValue(tok *Token) *Value {
 	this := new(Value)
@@ -150,13 +131,6 @@ func TokenToValue(tok *Token) *Value {
 		this.Data = intval
 		return this
 	}
-
-	//fltval, err := strconv.ParseFloat(tok.Lexeme, 64)
-	//if err == nil {
-	//	this.Type = TypFloat
-	//	this.Data = fltval
-	//	return this
-	//}
 
 	this.Type = TypString
 	this.Data = tok.Lexeme
@@ -187,7 +161,7 @@ func (this *Value) CodeString() string {
 		return "false"
 
 	case TypCode:
-		return this.CompiledScript().String()
+		return this.Code().String()
 
 	case TypCommand:
 		return "(getcommand \"" + this.Data.(string) + "\")"
@@ -226,7 +200,7 @@ func (this *Value) String() string {
 		return "false"
 
 	case TypCode:
-		return this.CompiledScript().String()
+		return this.Code().String()
 
 	case TypCommand:
 		return this.Data.(string)
@@ -327,6 +301,7 @@ func (this *Value) Float64() float64 {
 // Floats are converted to ints and then converted to bool by the int rules.
 // Code and commands are always true
 // Objects are false if the value's data is nil.
+// Nil is always false
 func (this *Value) Bool() bool {
 	switch this.Type {
 	case TypString:
@@ -356,15 +331,15 @@ func (this *Value) Bool() bool {
 	panic("Bool: Script Value has invalid Type.")
 }
 
-// CompiledScript converts a Value to a *CompiledScript.
-func (this *Value) CompiledScript() *CompiledScript {
+// Code converts a Value to a Code object.
+func (this *Value) Code() *Code {
 	switch this.Type {
 	case TypString:
-		return Compile(this.Data.(string), this.Pos)
+		return NewCode(NewLexer(this.Data.(string), this.Pos))
 	case TypCode:
-		return this.Data.(*CompiledScript)
+		return this.Data.(*Code)
 	default:
-		return Compile(this.String(), this.Pos)
+		return NewCode(NewLexer(this.String(), this.Pos))
 	}
 	panic("UNREACHABLE")
 }
@@ -373,11 +348,11 @@ func (this *Value) CompiledScript() *CompiledScript {
 func (this *Value) CodeSource() CodeSource {
 	switch this.Type {
 	case TypString:
-		return NewLexer(this.Data.(string), this.Pos.Line, this.Pos.Column)
+		return NewLexer(this.Data.(string), this.Pos)
 	case TypCode:
-		return NewCompiledLexer(this.Data.(*CompiledScript))
+		return NewCodeReader(this.Data.(*Code))
 	default:
-		return NewLexer(this.String(), this.Pos.Line, this.Pos.Column)
+		return NewLexer(this.String(), this.Pos)
 	}
 	panic("UNREACHABLE")
 }
@@ -397,6 +372,37 @@ func (this *Value) EditIndexable() EditIndexable {
 	}
 	return ToEditIndexable(this.Data)
 }
+
+// TypeString will return the string name of a value's type.
+func (this *Value) TypeString() string {
+	switch this.Type {
+	case TypString:
+		return "string"
+
+	case TypInt:
+		return "int"
+
+	case TypFloat:
+		return "float"
+
+	case TypBool:
+		return "bool"
+
+	case TypCode:
+		return "code"
+
+	case TypCommand:
+		return "command"
+
+	case TypObject:
+		return "object"
+		
+	case TypNil:
+		return "nil"
+	}
+	panic("Type: Script Value has invalid Type.")
+}
+
 
 // Formatting Functions
 

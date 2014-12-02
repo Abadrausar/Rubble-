@@ -1,5 +1,5 @@
 /*
-Copyright 2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -25,7 +25,10 @@ package main
 import "sort"
 
 // Update this!
-var RubbleVersion = "3.7"
+var RubbleVersion = "3.8"
+var RubbleCompat = map[string]bool{
+	"3.8": true,
+}
 
 // All the addons are loaded to here.
 var Addons []*Addon
@@ -35,7 +38,8 @@ var Addons []*Addon
 var Files *FileList
 
 // Force initialization scripts, there should never be very many.
-var ForcedInit = make([][]byte, 0, 5)
+var ForcedInit = make(map[string][]byte, 5)
+var ForcedInitOrder = make([]string, 0, 5)
 
 // Parse stage constants
 const (
@@ -56,10 +60,10 @@ var ParseStage = stgLoadAndInit
 var VariableData = make(map[string]string)
 
 // The parameters of the last called template.
-var PrevParams = make([]string, 0)
+var PrevParams = make([]*Value, 0)
 
 // Used by the error handler and lexer.
-var LastLine = 1
+var LastLine = NewPosition(-1, "bad_position")
 
 // AddonFile represents any file in an addon.
 type AddonFile struct {

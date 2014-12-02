@@ -1,23 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
-
-This software is provided 'as-is', without any express or implied warranty. In
-no event will the authors be held liable for any damages arising from the use of
-this software.
-
-Permission is granted to anyone to use this software for any purpose, including
-commercial applications, and to alter it and redistribute it freely, subject to
-the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim
-that you wrote the original software. If you use this software in a product, an
-acknowledgment in the product documentation would be appreciated but is not
-required.
-
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
+For copyright/license see header in file "doc.go"
 */
 
 package raptor
@@ -36,6 +18,7 @@ type Environment struct {
 	Vars map[string]*Value
 }
 
+// NewEnvironment creates a new empty environment.
 func NewEnvironment() *Environment {
 	rtn := new(Environment)
 	rtn.Vars = make(map[string]*Value)
@@ -52,6 +35,7 @@ type NameSpace struct {
 	Vars       *ValueStore
 }
 
+// NewNameSpace will create a new empty namespace.
 func NewNameSpace() *NameSpace {
 	rtn := new(NameSpace)
 	rtn.Vars = NewValueStore()
@@ -65,6 +49,7 @@ func NewNameSpace() *NameSpace {
 // Touch only if you know what you are doing!
 type EnvStore []*Environment
 
+// NewEnvStore will create a new EnvStore with one empty environment.
 func NewEnvStore() *EnvStore {
 	rtn := new(EnvStore)
 	*rtn = make([]*Environment, 0, 20)
@@ -72,10 +57,12 @@ func NewEnvStore() *EnvStore {
 	return rtn
 }
 
+// Add an Environment to the EnvStore
 func (this *EnvStore) Add(val *Environment) {
 	*this = append(*this, val)
 }
 
+// Remove an Environment from the EnvStore, if the last environment is removed a new empty one will be added.
 func (this *EnvStore) Remove() *Environment {
 	rtn := (*this)[len(*this)-1]
 	(*this)[len(*this)-1] = nil
@@ -87,15 +74,18 @@ func (this *EnvStore) Remove() *Environment {
 	return rtn
 }
 
+// Clear removes all Environments then adds one new empty one.
 func (this *EnvStore) Clear() {
 	*this = (*this)[0:0]
 	this.Add(NewEnvironment())
 }
 
+// ClearAllButRoot removes all but the first Environment from the EnvStore.
 func (this *EnvStore) ClearAllButRoot() {
 	*this = (*this)[0:1]
 }
 
+// Last returns the last Environment in the EnvStore.
 func (this *EnvStore) Last() *Environment {
 	return (*this)[len(*this)-1]
 }
@@ -111,21 +101,18 @@ func NewBlockStore() *BlockStore {
 }
 
 // Add is an exception to the hands-off rule, use this to add more code to a state.
-// This creates a new lexer.
-func (this *BlockStore) Add(input string) {
-	*this = append(*this, NewLexer(input, 1, 0))
-}
-
-// AddCodeSource is an exception to the hands-off rule, use this to add more code to a state.
-// Use if you already have a Lexer or CompiledLexer.
-func (this *BlockStore) AddCodeSource(val CodeSource) {
+func (this *BlockStore) Add(val CodeSource) {
 	*this = append(*this, val)
 }
 
-// AddCompiledScript is an exception to the hands-off rule, use this to add more code to a state.
-// Use if you already have a CompiledScript.
-func (this *BlockStore) AddCompiledScript(val *CompiledScript) {
-	*this = append(*this, NewCompiledLexer(val))
+// AddString is an exception to the hands-off rule, use this to add more code to a state.
+func (this *BlockStore) AddString(input string, pos *Position) {
+	*this = append(*this, NewLexer(input, pos))
+}
+
+// AddString is an exception to the hands-off rule, use this to add more code to a state.
+func (this *BlockStore) AddCode(val *Code) {
+	*this = append(*this, NewCodeReader(val))
 }
 
 func (this *BlockStore) Remove() CodeSource {

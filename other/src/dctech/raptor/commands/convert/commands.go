@@ -1,5 +1,5 @@
 /*
-Copyright 2012-2013 by Milo Christiansen
+Copyright 2012-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -27,6 +27,7 @@ import "dctech/raptor"
 
 // Adds the type conversion commands to the state.
 // The type conversion commands are:
+//	convert:type
 //	convert:int
 //	convert:float
 //	convert:bool
@@ -35,12 +36,24 @@ import "dctech/raptor"
 //	convert:escape
 func Setup(state *raptor.State) {
 	state.NewNameSpace("convert")
+	state.NewNativeCommand("convert:type", CommandConvert_Type)
 	state.NewNativeCommand("convert:int", CommandConvert_Int)
 	state.NewNativeCommand("convert:float", CommandConvert_Float)
 	state.NewNativeCommand("convert:bool", CommandConvert_Bool)
 	state.NewNativeCommand("convert:string", CommandConvert_String)
 	state.NewNativeCommand("convert:command", CommandConvert_Command)
 	state.NewNativeCommand("convert:escape", CommandConvert_Escape)
+}
+
+// Returns a values internal type.
+// 	convert:type value
+// Returns the values type.
+func CommandConvert_Type(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to convert:int.")
+	}
+
+	script.RetVal = raptor.NewValueString(params[0].TypeString())
 }
 
 // Forces a value to type int.

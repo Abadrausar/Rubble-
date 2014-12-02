@@ -41,7 +41,7 @@ Built-in Native Templates
 	
 	Example:
 		{!SCRIPT_TEMPLATE;FOO;(ret "bar")}
-		{!SCRIPT_TEMPLATE;GREET;__thing__;(str:add Hello [__thing__] !)}
+		{!SCRIPT_TEMPLATE;GREET;thing;(str:add Hello [thing] !)}
 		{!SCRIPT_TEMPLATE;LIST;...;
 			(var tmp)
 			(foreach params {

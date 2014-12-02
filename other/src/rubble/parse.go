@@ -1,5 +1,5 @@
 /*
-Copyright 2013 by Milo Christiansen
+Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -23,7 +23,7 @@ misrepresented as being the original software.
 package main
 
 // The parser
-func Parse(input []byte, stage int) []byte {
+func Parse(input []byte, stage int, pos *Position) []byte {
 	if stage == stgUseCurrent {
 		stage = ParseStage
 	}
@@ -34,7 +34,7 @@ func Parse(input []byte, stage int) []byte {
 	// 100k sounds like a lot, but there are vanilla raw files that are almost 400k
 	// Most seem to be around 50k-70k so 100k is not too high
 	out := make([]byte, 0, 102400)
-	lex := NewLexer(input)
+	lex := NewLexer(input, pos)
 
 loop:
 	for {
@@ -48,14 +48,14 @@ loop:
 
 			lex.GetToken(tknString)
 			name := lex.Current.Lexeme
-			params := make([]string, 0, 5)
+			params := make([]*Value, 0, 5)
 			for lex.CheckLookAhead(tknDelimiter) {
 				lex.GetToken(tknDelimiter)
 				if lex.CheckLookAhead(tknString) {
 					lex.GetToken(tknString)
-					params = append(params, lex.Current.Lexeme)
+					params = append(params, lex.Current.Value())
 				} else {
-					params = append(params, "")
+					params = append(params, NewValue(""))
 				}
 			}
 			lex.GetToken(tknTagEnd)
@@ -63,7 +63,7 @@ loop:
 			if _, ok := Templates[name]; !ok {
 				panic("Invalid template: " + name)
 			}
-			out = append(out, Templates[name].Call(params)...)
+			out = append(out, Templates[name].Call(params).Data...)
 
 		case tknINVALID:
 			break loop
