@@ -1,10 +1,8 @@
 package nca6
 
-import "fmt"
-import "os"
+//import "fmt"
 import "strconv"
 import "dctech/ncalex"
-import "text/tabwriter"
 
 const (
 	TypString = iota
@@ -21,6 +19,7 @@ type Indexable interface {
 	Exists(string) bool
 	Len() int64
 	Keys() []string
+	ReadOnly() bool
 }
 
 // ScriptObject is the interface that a Value's object data must impliment.
@@ -176,48 +175,3 @@ func (this *Value) IsIndexable() bool {
 	_, ok := this.Data.(Indexable)
 	return ok
 }
-
-// CommandValueInspect returns everything you ever wanted to know about a script value.
-// Mostly for the use of NCASH and debugging.
-//	// Register via: 
-//	state.NewNativeCommand("valueinspect", nca6.CommandValueInspect)
-func CommandValueInspect(state *State, params []*Value) {
-	if len(params) != 1 {
-		panic("Wrong number of params to valueinspect.")
-	}
-	
-	fmt.Println("=============================================")
-	fmt.Println("NCA Script Value Inspector")
-	fmt.Println("Data:", params[0].Data)
-	switch params[0].Type {
-	case TypString:
-		fmt.Println("Type: TypString")
-	case TypInt:
-		fmt.Println("Type: TypInt")
-	case TypFloat:
-		fmt.Println("Type: TypFloat")
-	case TypObject:
-		fmt.Println("Type: TypObject")
-	}
-	fmt.Println("Line: ", params[0].Line)
-	fmt.Println("Column: ", params[0].Column)
-	if params[0].IsIndexable() {
-		data := params[0].Data.(Indexable)
-		fmt.Println("Value Is Indexable")
-		fmt.Println("len: ", data.Len())
-		
-		w := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
-		fmt.Fprintf(w, "%v\t%v\n", "Key", "Value")
-		for _, key := range data.Keys() {
-			val := data.Get(key)
-			fmt.Fprintf(w, "%v\t%v\n", key, val.String())
-		}
-		w.Flush()
-	}
-	fmt.Println("=============================================")
-}
-
-
-
-
-

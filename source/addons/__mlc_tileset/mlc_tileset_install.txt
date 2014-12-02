@@ -1,10 +1,12 @@
 
-This is an example tileset addon
+This file uses Rubble, to install this tileset extract all files into a folder in the Rubble addons directory.
+For manual installation just copy the files in "img" to "data/art" and edit your init file to use the new tileset.
+All tile numbers/colors are the same as vanilla.
 
 {SCRIPT;
 	'Edit the init files.
 	Note that regex:replace is provided by Rubble, it is not avalible in NCASH or the like.
-	(note to self: add regex NCA commands to the NCA5 std lib)'
+	(note to self: add regex NCA commands to the NCA6 std lib)'
 	
 	(var init (fileio:read (append [rubble:dfdir] "/data/init/init.txt")))
 	(var d_init (fileio:read (append [rubble:dfdir] "/data/init/d_init.txt")))

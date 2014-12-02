@@ -1,5 +1,21 @@
 package ncalex
 
+//Copyright 2013 by Milo Christiansen
+//
+//DCTech Project License
+//	You may not modify the project without prior written permission.
+//	You may not redistribute the project without prior written permission.
+//	
+//	The project is provided 'as-is', without any express or implied warranty. 
+//	In no event will the author be held liable for any damages arising from the use of the project.
+//	
+//	In the event of a dispute about the interpretation of this license you agree that the 
+//	interpretation of the author is the correct one.
+// 
+// Permission is given to include this package in your projects so long as the above license 
+// and this exception are reproduced somewhere in your project.
+// 
+
 import "fmt"
 import "strconv"
 

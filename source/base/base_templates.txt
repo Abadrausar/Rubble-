@@ -669,5 +669,15 @@ May also be used to help control variable expansion.'
 	(trimspace [out])
 }
 
+{!SCRIPT_TEMPLATE;ADDON_HOOKS;id;playable=0;
+	(append
+		"{#USES_ITEMS;ADDON_HOOK_" [id] "}"
+		"{#USES_TECH;ADDON_HOOK_" [id] "}"
+		"{#USES_ITEMS;ADDON_HOOK_GENERIC}"
+		"{#USES_TECH;ADDON_HOOK_GENERIC}"
+		(if [playable] "{#USES_ITEMS;ADDON_HOOK_PLAYABLE}{#USES_TECH;ADDON_HOOK_PLAYABLE}" "")
+	)
+}
+
 'This tells Rubble to only read this file on the first pass and to not write it to disk.'
 {!SCRIPT;(rubble:skipfile "base_templates")}

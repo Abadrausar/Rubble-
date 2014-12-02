@@ -237,6 +237,9 @@ func CommandSet(state *nca6.State, params []*nca6.Value) {
 		panic("Non-Indexable object Param 0 passed to set.")
 	}
 	val := params[0].Data.(nca6.Indexable)
+	if val.ReadOnly() {
+		panic("Readonly indexable Param 0 passed to set.")
+	}
 	
 	val.Set(params[1].String(), params[2])
 	state.RetVal = params[2]

@@ -1,0 +1,23 @@
+
+==============================================
+LICENSE:
+==============================================
+
+NCA6, "dctech/ini", "dctech/ncalex", and Rubble are released under the following license:
+
+Rubble is copyright 2013 by Milo Christiansen
+NCA6 is copyright 2012-2013 by Milo Christiansen
+dctech/ncalex is copyright 2012-2013 by Milo Christiansen
+dctech/ini is copyright 2013 by Milo Christiansen
+
+DCTech Project License
+	You may not modify the project without prior written permission.
+	You may not redistribute the project without prior written permission.
+	
+	The project is provided 'as-is', without any express or implied warranty. In no event will the author be held liable for any damages arising from the use of the project.
+	
+	In the event of a dispute about the interpretation of this license you agree that the interpretation of the author is the correct one.
+
+Permission is given to modify Rubble for the purpose of linking in custom NCA commands and Rubble templates. Modified versions of Rubble may be redistributed in binary form only.
+
+Permission is given to include "dctech/nca6", "dctech/ncalex", and "dctech/ini" in your projects so long as the above license and this exception are reproduced somewhere in your project.

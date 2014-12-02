@@ -47,3 +47,7 @@ func (this *CSVFile) Keys() []string {
 	}
 	return rtn
 }
+
+func (this *CSVFile) ReadOnly() bool {
+	return true
+}

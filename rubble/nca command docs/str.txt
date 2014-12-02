@@ -12,7 +12,7 @@ func CommandAppend(state *nca6.State, params []*nca6.Value)
 
 	append a b [c...]
 
-    Returns "0" or "-1"
+    Returns the result of appending all parameters together.
 
 func CommandFmtStr(state *nca6.State, params []*nca6.Value)
     Formats a string.
@@ -27,7 +27,7 @@ func CommandFmtStr(state *nca6.State, params []*nca6.Value)
 	%x as a lowercase hexadecimal number
 	%X as an upercase hexadecimal number
 
-    Returns the formated string
+    Returns the formated string.
 
 func CommandStrChar(state *nca6.State, params []*nca6.Value)
     Gets char at pos.
@@ -36,21 +36,21 @@ func CommandStrChar(state *nca6.State, params []*nca6.Value)
 
     Opperand pos is converted to a 64 bit integer. Invalid strings are given
     the value "0" If the position is out of range returns unchanged and sets
-    the error flag. Returns the character
+    the error flag. Returns the character.
 
 func CommandStrCmp(state *nca6.State, params []*nca6.Value)
     Compair two strings.
 
 	strcmp a b
 
-    Returns 0 or -1
+    Returns 0 or -1.
 
 func CommandStrLen(state *nca6.State, params []*nca6.Value)
     Gets the length of a string.
 
 	strlen a
 
-    Returns the length
+    Returns the length.
 
 func CommandTrimSpace(state *nca6.State, params []*nca6.Value)
     Trims leading and trailing whitespace from a string.

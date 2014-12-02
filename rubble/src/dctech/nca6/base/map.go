@@ -35,3 +35,7 @@ func (this ScriptMap) Keys() []string {
 	}
 	return rtn
 }
+
+func (this ScriptMap) ReadOnly() bool {
+	return false
+}

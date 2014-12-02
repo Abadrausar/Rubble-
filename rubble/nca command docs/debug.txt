@@ -1,0 +1,64 @@
+PACKAGE
+
+package debug
+    import "dctech/nca6/debug"
+
+    NCA v6 Debug Command.
+
+FUNCTIONS
+
+func CommandDebug_ClrRet(state *nca6.State, params []*nca6.Value)
+    Set the return value to nil.
+
+	debug:clrret
+
+    Returns nil.
+
+func CommandDebug_Env(state *nca6.State, params []*nca6.Value)
+    List variables in all environments.
+
+	debug:env
+
+    Returns unchanged.
+
+func CommandDebug_List(state *nca6.State, params []*nca6.Value)
+    List all global data. This is mostly for use in interactive shells.
+
+	debug:list
+
+    Returns unchanged.
+
+func CommandDebug_NameSpace(state *nca6.State, params []*nca6.Value)
+    Print information about a namespace.
+
+	debug:namespace name
+
+    Returns unchanged.
+
+func CommandDebug_Shell(state *nca6.State, params []*nca6.Value)
+    Break into the debugging shell. This command will provide an interactive
+    shell until eof is reached, on windows this may be simulated by pressing
+    CTRL+Z followed by <ENTER>.
+
+	debug:shell
+
+    Returns the return value of the last command to be run.
+
+func CommandDebug_Value(state *nca6.State, params []*nca6.Value)
+    Print information about a script value.
+
+	debug:value value
+
+    Returns unchanged.
+
+func Setup(state *nca6.State)
+    Adds the debug commands to the state. The debug commands are:
+
+	debug:shell
+	debug:value
+	debug:list
+	debug:namespace
+	debug:env
+	debug:clrret
+
+

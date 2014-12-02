@@ -25,7 +25,7 @@ func Setup(state *nca6.State) {
 
 // Appends two or more strings together.
 // 	append a b [c...]
-// Returns "0" or "-1"
+// Returns the result of appending all parameters together.
 func CommandAppend(state *nca6.State, params []*nca6.Value) {
 	if len(params) <= 1 {
 		panic("append needs at least two params.")
@@ -54,7 +54,7 @@ func CommandTrimSpace(state *nca6.State, params []*nca6.Value) {
 
 // Gets the length of a string.
 // 	strlen a
-// Returns the length
+// Returns the length.
 func CommandStrLen(state *nca6.State, params []*nca6.Value) {
 	if len(params) != 1 {
 		panic("Wrong param count to strlen.")
@@ -68,7 +68,7 @@ func CommandStrLen(state *nca6.State, params []*nca6.Value) {
 // 	strchar a pos
 // Opperand pos is converted to a 64 bit integer. Invalid strings are given the value "0"
 // If the position is out of range returns unchanged and sets the error flag.
-// Returns the character
+// Returns the character.
 func CommandStrChar(state *nca6.State, params []*nca6.Value) {
 	if len(params) != 2 {
 		panic("Wrong param count to strchar.")
@@ -92,7 +92,7 @@ func CommandStrChar(state *nca6.State, params []*nca6.Value) {
 //	%d as a decimal number
 //	%x as a lowercase hexadecimal number
 //	%X as an upercase hexadecimal number
-// Returns the formated string
+// Returns the formated string.
 func CommandFmtStr(state *nca6.State, params []*nca6.Value) {
 	if len(params) < 2 {
 		panic("Wrong param count to fmtstr.")
@@ -171,7 +171,7 @@ func CommandFmtStr(state *nca6.State, params []*nca6.Value) {
 
 // Compair two strings.
 // 	strcmp a b
-// Returns 0 or -1
+// Returns 0 or -1.
 func CommandStrCmp(state *nca6.State, params []*nca6.Value) {
 	if len(params) != 2 {
 		panic("Wrong param count to strcmp.")

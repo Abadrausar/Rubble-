@@ -1,4 +1,4 @@
-// NCA v5 Stack Commands.
+// NCA v6 Stack Commands.
 package stack
 
 import "dctech/nca6"

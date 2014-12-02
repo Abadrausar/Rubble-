@@ -3,7 +3,7 @@ PACKAGE
 package csv
     import "dctech/nca6/csv"
 
-    NCA v5 CSV Commands.
+    NCA v6 CSV Commands.
 
 FUNCTIONS
 
@@ -21,9 +21,6 @@ func Setup(state *nca6.State)
     Adds the csv commands to the state. The csv commands are:
 
 	csv:parse
-	csv:getfield
-	csv:recordcount
-	csv:fieldcount
 
     Note that there is no support for writing csv files
 
@@ -39,6 +36,8 @@ func (this *CSVFile) Get(index string) *nca6.Value
 func (this *CSVFile) Keys() []string
 
 func (this *CSVFile) Len() int64
+
+func (this *CSVFile) ReadOnly() bool
 
 func (this *CSVFile) Set(index string, value *nca6.Value)
 

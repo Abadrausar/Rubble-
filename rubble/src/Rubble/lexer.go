@@ -1,3 +1,24 @@
+/*
+Copyright 2013 by Milo Christiansen
+
+This software is provided 'as-is', without any express or implied warranty. In
+no event will the authors be held liable for any damages arising from the use of
+this software.
+
+Permission is granted to anyone to use this software for any purpose, including
+commercial applications, and to redistribute it freely, subject to
+the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim
+that you wrote the original software. If you use this software in a product, an
+acknowledgment in the product documentation would be appreciated but is not
+required.
+
+2. You may not alter this software in any way.
+
+3. This notice may not be removed or altered from any source distribution.
+*/
+
 package main
 
 //import "fmt"
@@ -14,7 +35,7 @@ type Lexer struct {
 	// The next/current tokens
 	Look    *Token
 	Current *Token
-
+	
 	// The token stream
 	stream    <-chan *Token
 }
@@ -31,8 +52,15 @@ func NewLexer(input string) *Lexer {
 		
 		lexeme := make([]byte, 0, 20)
 		commandDepth := 0
+		
+		line := 1
+		tknline := 1
 
 		for i := 0; i < len(input); i++ {
+			if input[i] == '\n' {
+				line++
+			}
+			
 			if input[i] == ';' {
 				if state == stReadString || commandDepth > 0 {
 					lexeme = append(lexeme, input[i])
@@ -45,10 +73,11 @@ func NewLexer(input string) *Lexer {
 					}
 				}
 				
-				out <- &Token{string(lexeme), token}
-				out <- &Token{ ";", tknDelimiter}
+				out <- &Token{string(lexeme), token, tknline}
+				out <- &Token{ ";", tknDelimiter, tknline}
 				token = tknString
 				lexeme = lexeme[0:0]
+				tknline = line
 				continue
 			}
 			
@@ -61,10 +90,11 @@ func NewLexer(input string) *Lexer {
 				}
 				if state == stReadString {
 					state = stReadCommand
-					out <- &Token{string(lexeme), token}
-					out <- &Token{ "{", tknTagBegin}
+					out <- &Token{string(lexeme), token, tknline}
+					out <- &Token{ "{", tknTagBegin, tknline}
 					token = tknString
 					lexeme = lexeme[0:0]
+					tknline = line
 					continue
 				}
 				commandDepth++
@@ -80,10 +110,11 @@ func NewLexer(input string) *Lexer {
 				}
 				if state == stReadCommand && commandDepth == 0 {
 					state = stReadString
-					out <- &Token{string(lexeme), token}
-					out <- &Token{ "}", tknTagEnd}
+					out <- &Token{string(lexeme), token, tknline}
+					out <- &Token{ "}", tknTagEnd, tknline}
 					token = tknString
 					lexeme = lexeme[0:0]
+					tknline = line
 					continue
 				}
 				commandDepth--
@@ -94,7 +125,7 @@ func NewLexer(input string) *Lexer {
 			lexeme = append(lexeme, input[i])
 		}
 		
-		out <- &Token{string(lexeme), token}
+		out <- &Token{string(lexeme), token, tknline}
 		close(out)
 	}()
 	
@@ -111,6 +142,8 @@ func NewLexer(input string) *Lexer {
 func (this *Lexer) Advance() bool {
 	this.Current = this.Look
 	this.Look = <-this.stream
+	
+	LastLine = this.Current.Line
 	
 	if this.Look == nil {
 		this.Look = new(Token)

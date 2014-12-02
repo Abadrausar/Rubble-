@@ -188,3 +188,13 @@ User Templates in Standared Base
 ==============================================
 {#USES_ITEMS;<CLASS>}
 	Usable in entity definitions. Expands to a list of item permissions of the <CLASS>. When using multiple #USES_ITEMS calls make sure every item is returned by at most one #USES_ITEMS call.
+
+==============================================
+{ADDON_HOOKS;<ID>;[<PLAYABLE>=0]}
+	Usable in entity definitions, ADDON_HOOKS expands to a list of addon hooks for the entity. 
+	By default the hooks installed are:
+		ADDON_HOOK_GENERIC
+		ADDON_HOOK_<ID>
+	If <PLAYABLE> is true then the following hooks are also installed:
+		ADDON_HOOK_PLAYABLE
+	Addon hooks are tech/item classes.

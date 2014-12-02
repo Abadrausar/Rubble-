@@ -18,8 +18,8 @@ func Setup(state *nca6.State) {
 	state.NewNativeCommand("mul", CommandMul)
 }
 
-// Adds two nca6.Values.
-// Opperands are converted to 64 bit integers. Invalid strings are given the nca6.Value "0"
+// Adds two values.
+// Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
 // 	add a b
 // Returns a + b
 func CommandAdd(state *nca6.State, params []*nca6.Value) {
@@ -31,8 +31,8 @@ func CommandAdd(state *nca6.State, params []*nca6.Value) {
 	return
 }
 
-// Subtracts two nca6.Values.
-// Opperands are converted to 64 bit integers. Invalid strings are given the nca6.Value "0"
+// Subtracts two values.
+// Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
 // 	sub a b
 // Returns a - b
 func CommandSub(state *nca6.State, params []*nca6.Value) {
@@ -44,8 +44,8 @@ func CommandSub(state *nca6.State, params []*nca6.Value) {
 	return
 }
 
-// Divides two nca6.Values.
-// Opperands are converted to 64 bit integers. Invalid strings are given the nca6.Value "0"
+// Divides two values.
+// Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
 // 	div a b
 // Returns a / b
 func CommandDiv(state *nca6.State, params []*nca6.Value) {
@@ -57,8 +57,8 @@ func CommandDiv(state *nca6.State, params []*nca6.Value) {
 	return
 }
 
-// Gives the remainder of dividing two nca6.Values.
-// Opperands are converted to 64 bit integers. Invalid strings are given the nca6.Value "0"
+// Gives the remainder of dividing two values.
+// Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
 // 	mod a b
 // Returns a % b
 func CommandMod(state *nca6.State, params []*nca6.Value) {
@@ -70,8 +70,8 @@ func CommandMod(state *nca6.State, params []*nca6.Value) {
 	return
 }
 
-// Multiplies two nca6.Values.
-// Opperands are converted to 64 bit integers. Invalid strings are given the nca6.Value "0"
+// Multiplies two values.
+// Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
 // 	mul a b
 // Returns a * b
 func CommandMul(state *nca6.State, params []*nca6.Value) {

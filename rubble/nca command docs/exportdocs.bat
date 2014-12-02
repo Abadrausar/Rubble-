@@ -1,15 +1,19 @@
 
-@call gopath.bat
+@echo off
 
-go doc dctech/nca6/base >> base.txt
-go doc dctech/nca6/bit >> bit.txt
-go doc dctech/nca6/cmp >> cmp.txt
-go doc dctech/nca6/conio >> conio.txt
-go doc dctech/nca6/csv >> csv.txt
-go doc dctech/nca6/env >> env.txt
-go doc dctech/nca6/file >> file.txt
-go doc dctech/nca6/fileio >> fileio.txt
-go doc dctech/nca6/ini >> ini.txt
-go doc dctech/nca6/math >> math.txt
-go doc dctech/nca6/stack >> stack.txt
-go doc dctech/nca6/str >> str.txt
+call gopath.bat -quiet
+
+call export base
+call export bit
+call export cmp
+call export conio
+call export csv
+call export debug
+call export env
+call export file
+call export fileio
+call export ini
+call export math
+call export regex
+call export stack
+call export str

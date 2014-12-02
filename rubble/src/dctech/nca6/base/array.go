@@ -67,3 +67,7 @@ func (this *ScriptArray) Keys() []string {
 	}
 	return rtn
 }
+
+func (this *ScriptArray) ReadOnly() bool {
+	return false
+}

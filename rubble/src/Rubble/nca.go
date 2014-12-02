@@ -1,3 +1,24 @@
+/*
+Copyright 2013 by Milo Christiansen
+
+This software is provided 'as-is', without any express or implied warranty. In
+no event will the authors be held liable for any damages arising from the use of
+this software.
+
+Permission is granted to anyone to use this software for any purpose, including
+commercial applications, and to redistribute it freely, subject to
+the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim
+that you wrote the original software. If you use this software in a product, an
+acknowledgment in the product documentation would be appreciated but is not
+required.
+
+2. You may not alter this software in any way.
+
+3. This notice may not be removed or altered from any source distribution.
+*/
+
 package main
 
 import "dctech/nca6"
@@ -6,12 +27,13 @@ import "dctech/nca6/bit"
 import "dctech/nca6/cmp"
 import "dctech/nca6/conio"
 import "dctech/nca6/csv"
+import "dctech/nca6/debug"
 import "dctech/nca6/env"
 import "dctech/nca6/file"
 import "dctech/nca6/fileio"
 import "dctech/nca6/ini"
 import "dctech/nca6/math"
-import "dctech/nca6/ncash"
+import "dctech/nca6/regex"
 import "dctech/nca6/stack"
 import "dctech/nca6/str"
 
@@ -30,12 +52,13 @@ func InitNCA() {
 	cmp.Setup(state)
 	conio.Setup(state)
 	csv.Setup(state)
+	debug.Setup(state)
 	env.Setup(state)
 	file.Setup(state)
 	fileio.Setup(state)
 	ini.Setup(state)
 	math.Setup(state)
-	ncash.Setup(state)
+	regex.Setup(state)
 	stack.Setup(state)
 	str.Setup(state)
 	
@@ -47,11 +70,6 @@ func InitNCA() {
 	state.NewVar("rubble:addonsdir", nca6.NewValueString(AddonsDir))
 	
 	state.NewNativeCommand("panic", CommandPanic)
-	
-	state.NewNativeCommand("valueinspect", nca6.CommandValueInspect)
-	
-	state.NewNameSpace("regex")
-	state.NewNativeCommand("regex:replace", CommandRegEx_Replace)
 	
 	state.NewNativeCommand("rubble:skipfile", CommandRubble_SkipFile)
 	state.NewNativeCommand("rubble:setvar", CommandRubble_SetVar)
@@ -73,18 +91,6 @@ func CommandPanic(state *nca6.State, params []*nca6.Value) {
 	}
 
 	panic(params[0].String())
-}
-
-// Runs a regular expression search and replace.
-// 	regex:replace regex input replace
-// Returns input with all strings matching regex replaced with replace.
-func CommandRegEx_Replace(state *nca6.State, params []*nca6.Value) {
-	if len(params) != 3 {
-		panic("Wrong number of params to regex:replace.")
-	}
-
-	regEx := regexp.MustCompile(params[0].String())
-	state.RetVal = nca6.NewValueString(regEx.ReplaceAllString(params[1].String(), params[2].String()))
 }
 
 // Makes Rubble skip a file.

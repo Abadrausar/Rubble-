@@ -1,5 +1,5 @@
 <NotepadPlus>
-    <UserLang name="NCA5" ext="nca">
+    <UserLang name="NCA6" ext="nca">
         <Settings>
             <Global caseIgnored="no" escapeChar="\" />
             <TreatAsSymbol comment="no" commentLine="no" />
@@ -11,9 +11,9 @@
             <Keywords name="Folder-"></Keywords>
             <Keywords name="Operators">( ) , : [ ] { }</Keywords>
             <Keywords name="Comment">1 2 0</Keywords>
-            <Keywords name="Words1">nop ret exit break seterror geterror command namespace var array map delvar set exists run eval evalinparent evalinnew if loop foreach</Keywords>
-            <Keywords name="Words2">lshift rshift and or xor not gt lt eq print parse getfield recordcount fieldcount exec getvar setvar getwd setwd deldir deltree newdir del exists direxists walkfiles walkdirs read write create parse format getvalue setvalue add sub div mod mul new grow push pop top append strlen strchar fmtstr valueinspect</Keywords>
-            <Keywords name="Words3">params console csv env file fileio ini stack</Keywords>
+            <Keywords name="Words1">nop ret exit break seterror geterror command namespace var array map delvar set exists len run eval evalinparent evalinnew if loop foreach</Keywords>
+            <Keywords name="Words2">lshift rshift and or xor not gt lt eq print parse getfield recordcount fieldcount shell value list env clrret exec getvar setvar getwd setwd deldir deltree newdir del exists direxists walkfiles walkdirs read write create parse format getvalue setvalue add sub div mod mul replace new grow push pop top append strlen strchar fmtstr</Keywords>
+            <Keywords name="Words3">params console csv debug env file fileio ini regex stack</Keywords>
             <Keywords name="Words4"></Keywords>
         </KeywordLists>
         <Styles>
@@ -45,10 +45,10 @@
             <Keywords name="Folder-"></Keywords>
             <Keywords name="Operators">( ) , : ; [ ] { }</Keywords>
             <Keywords name="Comment">1 2 0</Keywords>
-            <Keywords name="Words1">nop ret exit break seterror geterror command namespace var array map delvar set exists run eval evalinparent evalinnew if loop foreach</Keywords>
-            <Keywords name="Words2">lshift rshift and or xor not gt lt eq print parse getfield recordcount fieldcount exec getvar setvar getwd setwd deldir deltree newdir del exists direxists walkfiles walkdirs read write create parse format getvalue setvalue add sub div mod mul new grow push pop top append trimspace strlen strchar fmtstr panic valueinspect replace skipfile setvar getvar stageparse calltemplate expandvars _&#x203C;_END_NATIVE_COMMANDS_&#x203C;_ ++ -- for while include</Keywords>
-            <Keywords name="Words3">params console csv env file fileio ini stack rubble dfdir outputdir configdir basedir addonsdir regex</Keywords>
-            <Keywords name="Words4">!TEMPLATE !SCRIPT_TEMPLATE !SCRIPT SCRIPT #SCRIPT _&#x203C;_END_NATIVE_TEMPLATES_&#x203C;_ COMMENT C VOID !PANIC PANIC #PANIC ECHO E SHARED_OBJECT IF ONCE STATIC SET #ADVENTURE_TIER !PRINT PRINT #PRINT SHARED_INORGANIC SHARED_MATERIAL_TEMPLATE REGISTER_ORE #_REGISTERED_ORES REGISTER_REACTION_CLASS #_REGISTERED_REACTION_CLASSES REGISTER_REACTION_PRODUCT #_REGISTERED_REACTION_PRODUCTS #AQUIFER SET_TILE #TILE BUILDING_WORKSHOP BUILDING_FURNACE #USES_BUILDINGS REACTION #USES_REACTIONS #USES_TECH ITEM ITEM_CLASS #USES_ITEMS</Keywords>
+            <Keywords name="Words1">nop ret exit break seterror geterror command namespace var array map delvar set exists len run eval evalinparent evalinnew if loop foreach</Keywords>
+            <Keywords name="Words2">lshift rshift and or xor not gt lt eq print parse getfield recordcount fieldcount shell value list env clrret exec getvar setvar getwd setwd deldir deltree newdir del exists direxists walkfiles walkdirs read write create parse format getvalue setvalue add sub div mod mul replace new grow push pop top append strlen strchar fmtstr panic skipfile setvar getvar stageparse calltemplate expandvars _&#x203C;_END_NATIVE_COMMANDS_&#x203C;_ ++ -- for while include</Keywords>
+            <Keywords name="Words3">params console csv debug env file fileio ini regex stack rubble dfdir outputdir configdir basedir addonsdir regex</Keywords>
+            <Keywords name="Words4">!TEMPLATE !SCRIPT_TEMPLATE !SCRIPT SCRIPT #SCRIPT _&#x203C;_END_NATIVE_TEMPLATES_&#x203C;_ COMMENT C VOID !PANIC PANIC #PANIC ECHO E SHARED_OBJECT IF ONCE STATIC SET #ADVENTURE_TIER !PRINT PRINT #PRINT SHARED_PLANT SHARED_INORGANIC SHARED_MATERIAL_TEMPLATE REGISTER_ORE #_REGISTERED_ORES REGISTER_REACTION_CLASS #_REGISTERED_REACTION_CLASSES REGISTER_REACTION_PRODUCT #_REGISTERED_REACTION_PRODUCTS #AQUIFER SET_TILE #TILE SET_COLOR #COLOR BUILDING_WORKSHOP BUILDING_FURNACE #USES_BUILDINGS REACTION #USES_REACTIONS #USES_TECH ITEM ITEM_CLASS #USES_ITEMS</Keywords>
         </KeywordLists>
         <Styles>
             <WordsStyle name="DEFAULT" styleID="11" fgColor="C0C0C0" bgColor="2A211C" fontName="" fontStyle="0" />

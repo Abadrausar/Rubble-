@@ -23,7 +23,6 @@ Cons:
 	No support for handling file name collisions in any way other than as an override
 	No support for Blast namespaces (@, @@, and @@@)
 	Variables are simple key:value pairs instead of Blasts more powerful system
-	NCA (the scripting language) only has minimal documentation
 
 Rubble comes prebuilt for 32 bit Windows, Linux, and OSX
 
@@ -51,8 +50,6 @@ To activate or deactivate a rubble addon you may remove or add double leading un
 
 If you use OSX or linux, 32 bit binarys for these OSes can be found in the "raw/rubble" directory. If you want 64 bit binarys you can compile them yourself.
 
-Documentation for all NCA4 script commands are in "raw/rubble/nca docs", the file "NCA4.nca" is syntax/code examples. You may also want to look at "raw/source/base/base_templates.txt" for more advanced examples.
-
 ==============================================
 Configure:
 ==============================================
@@ -61,38 +58,47 @@ Rubble allows you to change its directory settings via command line options. To 
 
 Rubble does not support a configuration file, if you want to use non-default settings more than once the best thing to do is make a batch file or shortcut. If you do not know how to use command line options, ask google.
 
+If you want to regenerate the raws for a save just run 'rubble -dfdir="./../../../.."' in the save's raw directory.
+	Keep in mind that using rubble will increase your save size by ~10MB (removing the two extra binarys will drop that amount by about half)
+
 All directorys used by Rubble must exist (if they do not exist nothing bad will happen, Rubble will just quietly fail).
-
-
-==============================================
-A Note About SCRIPT:
-==============================================
-
-The SCRIPT template (and its pre and post brothers) use a custom scripting language named NCA. The primary reason I used NCA in this program is that it is really easy to use, the main drawback is that I never got around to writing good documentation for the base language. I did write some documentation later but none of it is very complete or particularly good. On the bright side all of the commands are fully documented, and there is a good bit of code in "source/base/base_templates.txt" that you can use as an example.
-
-All the command documents are in the "raw/rubble/nca docs" directory as well as what language documentation exists. The command documentation is in the .txt files and the language documentation is in the .nca file.
 
 ==============================================
 BUGS:
 ==============================================
 
-None
+None known.
 
 ==============================================
 Changelog:
 ==============================================
+v1.7
+	Slight changes to NCA Indexables, nothing that effects user script code
+	The (much expanded) mess of debugging commands have all been moved to the debug namespace, some have new names
+		Old commands with new names are:
+			valueinspect	->	debug:value
+			ncash			->	debug:shell
+		New commands are:
+			debug:list		->	Lists all global data, including variables in the root environment
+			debug:namespace	->	Lists all variables, commands, and namespaces in a namespace
+			debug:env		->	Lists all variables in all environments, sorted by environment
+			debug:clrret	->	Clears the return value, useful for cleaning up after playing around in the shell
+	Notepad++ UDF updated
+	Error reporting now should display a line number for Rubble errors
+		Script error line numbers are still an offset from the start of the script
+		Errors in templates will refer to the place where the template was called
+
 v1.6
 	Updated script runtime to NCA6, this brings major improvements to the way script values are handled
 	Added new NCA command len, the old pre-v6 way of fetching an Indexable's element count will no longer work
 	Removed source for NCASH, this is now replaced with the ncash NCA command
 	Re-exported all of the NCA command documents
 	Fixed all the templates to work with NCA6
-	Removed the old item templates (the native ones from 1.1), this was supposed to happen in 1.5 but I forgot.
+	Removed the old item templates (the native ones from 1.1), this was supposed to happen in 1.5 but I forgot
 	Changed ITEM_CLASS to be more flexable
 	Changed SHARED_INORGANIC and SHARED_MATERIAL_TEMPLATE to automaticly support tilesets
 	Added template SHARED_PLANT, just like SHARED_INORGANIC but for plants
 	Added template #WRITE_TILESET to help modders make tileset addons
-	Fixed the generic animal mats addon
 
 v1.5
 	NCA variable dereference syntax now allows index dereferencing a value (eg. [value index])

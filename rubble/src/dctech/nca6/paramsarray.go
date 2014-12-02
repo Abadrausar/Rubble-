@@ -47,3 +47,7 @@ func (this *ParamsArray) Keys() []string {
 	}
 	return rtn
 }
+
+func (this *ParamsArray) ReadOnly() bool {
+	return true
+}

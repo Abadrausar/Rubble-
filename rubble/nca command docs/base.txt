@@ -243,6 +243,8 @@ func (this *ScriptArray) Keys() []string
 
 func (this *ScriptArray) Len() int64
 
+func (this *ScriptArray) ReadOnly() bool
+
 func (this *ScriptArray) Set(index string, value *nca6.Value)
 
 type ScriptMap map[string]*nca6.Value
@@ -254,6 +256,8 @@ func (this ScriptMap) Get(index string) *nca6.Value
 func (this ScriptMap) Keys() []string
 
 func (this ScriptMap) Len() int64
+
+func (this ScriptMap) ReadOnly() bool
 
 func (this ScriptMap) Set(index string, value *nca6.Value)
 
