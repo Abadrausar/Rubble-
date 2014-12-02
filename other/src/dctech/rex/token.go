@@ -72,14 +72,14 @@ func (tok *token) opCode() *opCode {
 		return &opCode{
 			Value: tokenToValue(tok),
 			Type:  opValue,
-			Pos:  tok.Pos,
+			Pos:  tok.Pos.Copy(),
 		}
 	}
 
 	// this should handle all the types that match up.
 	return &opCode{
 		Type: tok.Type,
-		Pos:  tok.Pos,
+		Pos:  tok.Pos.Copy(),
 	}
 }
 

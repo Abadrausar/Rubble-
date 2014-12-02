@@ -209,6 +209,42 @@ func (code *codeReader) checkLookAhead(types ...int) bool {
 	return false
 }
 
+// lookAhead returns the next opCode.
+func (code *codeReader) beginning(end *opCode) *opCode {
+	start := -1 
+	switch end.Type {
+	case opCmdEnd:
+		start = opCmdBegin
+	case opVarEnd:
+		start = opVarBegin
+	case opObjLitEnd:
+		start = opObjLitBegin
+	default:
+		return end
+	}
+	
+	if code.index >= code.length {
+		// Error, but we don't want to raise an error here
+		// as this is to be called from an error handler.
+		return end
+	}
+	
+	depth := 0
+	for i := code.index - 1; i >= 0; i-- {
+		if code.data.data[i].Type == end.Type {
+			depth++
+		}
+		if code.data.data[i].Type == start {
+			if depth > 0 {
+				depth--
+			} else {
+				return code.data.data[i]
+			}
+		}
+	}
+	return end
+}
+
 // Code Store
 
 // codeStore is a stack of codeReaders.

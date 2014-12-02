@@ -27,19 +27,20 @@ import "strings"
 // ParseINI is an extremely lazy INI parser.
 func ParseINI(input []string, handler func(key, value string)) {
 	for i := range input {
-		if strings.HasPrefix(strings.TrimSpace(input[i]), "#") {
+		line := strings.TrimSpace(input[i])
+		if line == "" {
 			continue
 		}
-		if strings.HasPrefix(strings.TrimSpace(input[i]), "[") {
+		if strings.HasPrefix(line, "#") {
 			continue
 		}
-		if strings.TrimSpace(input[i]) == "" {
+		if strings.HasPrefix(line, "[") {
 			continue
 		}
 
-		parts := strings.SplitN(input[i], "=", 2)
+		parts := strings.SplitN(line, "=", 2)
 		if len(parts) != 2 {
-			LogPrintln("  Malformed INI line: `" + input[i] + "` Skipping.")
+			LogPrintln("  Malformed INI line: `" + line + "` Skipping.")
 			continue
 		}
 

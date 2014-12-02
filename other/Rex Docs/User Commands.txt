@@ -42,7 +42,7 @@ Marks a file as a prep file.
 ============================================================
 Loaded by a loader script in the "Libs" addon:
 
-Retrives an addon by name.
+Retrieves an addon by name.
 	
 	rubble:fetchaddon
 	
@@ -60,6 +60,15 @@ Checks if a named addon is active.
 	name needs to be the FULL name of the addon! (for example "Base/Files")
 	The name check is case-sensitive!
 	Returns true or false.
+
+Conditionally activates an addon from a load script.
+	
+	rubble:activateaddon me addon
+	
+	me and addon both need to be the full addon names! 
+	me should be the addon doing the checking, addon should be the one checked.
+	If me is not active then addon is not activated.
+	If this is called from anything other than a loader script nothing will happen!
 
 Rubble version check, aborts if the current version is not the same as or newer than the requested version.
 	

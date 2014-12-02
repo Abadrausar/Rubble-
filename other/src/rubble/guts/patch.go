@@ -24,14 +24,9 @@ package guts
 
 import "dctech/rex"
 import "dctech/patch"
+import "rubble/rblutil"
 
 import "fmt"
-import "strings"
-import "bytes"
-import "io/ioutil"
-
-import "compress/flate"
-import "encoding/base64"
 
 // Script commands related to patching and loading addons from scripts.
 
@@ -73,53 +68,46 @@ func Command_Patch(script *rex.Script, params []*rex.Value) {
 
 // Decompresses a Rubble encoded string.
 // 	rubble:decompress string
-// Returns the decoded text.
+// Returns the decoded and decompressed text.
 func Command_Decompress(script *rex.Script, params []*rex.Value) {
 	if len(params) != 1 {
 		rex.ErrorParamCount("rubble:decompress", "1")
 	}
-
-	a := strings.NewReader(params[0].String())
-	ac := base64.NewDecoder(base64.StdEncoding, a)
-	datac, err := ioutil.ReadAll(ac)
-	if err != nil {
-		rex.ErrorGeneralCmd("rubble:decompress", err.Error())
-	}
 	
-	b := bytes.NewReader(datac)
-	bc := flate.NewReader(b)
-	data, err := ioutil.ReadAll(bc)
-	if err != nil {
-		rex.ErrorGeneralCmd("rubble:decompress", err.Error())
-	}
-	bc.Close()
+	defer func() {
+		if x := recover(); x != nil {
+			if a, ok := x.(error); ok {
+				rex.ErrorGeneralCmd("rubble:decompress", a.Error())
+			}
+			if a, ok := x.(string); ok {
+				rex.ErrorGeneralCmd("rubble:decompress", a)
+			}
+		}
+	}()
 	
-	script.RetVal = rex.NewValueString(string(data))
+	data := string(rblutil.Decompress(rblutil.Decode(rblutil.StripWS([]byte(params[0].String())))))
+	script.RetVal = rex.NewValueString(data)
 }
 
-// Compresses a string.
+// Compresses a string using the Rubble encoding.
 // 	rubble:compress string
-// Returns the encoded text.
+// Returns the encoded and compressed text.
 func Command_Compress(script *rex.Script, params []*rex.Value) {
 	if len(params) != 1 {
 		rex.ErrorParamCount("rubble:compress", "1")
 	}
+	
+	defer func() {
+		if x := recover(); x != nil {
+			if a, ok := x.(error); ok {
+				rex.ErrorGeneralCmd("rubble:compress", a.Error())
+			}
+			if a, ok := x.(string); ok {
+				rex.ErrorGeneralCmd("rubble:compress", a)
+			}
+		}
+	}()
 
-	a := new(bytes.Buffer)
-	ac, _ := flate.NewWriter(a, 9)
-	_, err := ac.Write([]byte(params[0].String()))
-	if err != nil {
-		rex.ErrorGeneralCmd("rubble:compress", err.Error())
-	}
-	ac.Close()
-	
-	b := new(bytes.Buffer)
-	bc := base64.NewEncoder(base64.StdEncoding, b)
-	_, err = bc.Write(a.Bytes())
-	if err != nil {
-		rex.ErrorGeneralCmd("rubble:compress", err.Error())
-	}
-	bc.Close()
-	
-	script.RetVal = rex.NewValueString(b.String())
+	data := string(rblutil.Split(rblutil.Encode(rblutil.Compress([]byte(params[0].String())))))
+	script.RetVal = rex.NewValueString(data)
 }

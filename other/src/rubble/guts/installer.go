@@ -25,10 +25,11 @@ package guts
 import "dctech/axis"
 import "dctech/axis/axiszip"
 import "path/filepath"
+import "rubble/rblutil"
 
 func InstallModeRun(pack string) {
 	path := pack
-	pack = StripExt(filepath.Base(pack))
+	pack = rblutil.StripExt(filepath.Base(pack))
 	
 	LogPrintln("=============================================")
 	LogPrintln("Installing Package: ", pack)

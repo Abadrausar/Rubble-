@@ -1,14 +1,17 @@
 #AutoIt3Wrapper_Icon=..\..\Rubble.ico
 #AutoIt3Wrapper_UseX64=n
 #AutoIt3Wrapper_Res_Description=Rubble GUI Launcher
-#AutoIt3Wrapper_Res_Fileversion=2.0
+#AutoIt3Wrapper_Res_Fileversion=2.1
 #AutoIt3Wrapper_Res_LegalCopyright=Copyright 2013-2014 Milo Christiansen
 #AutoIt3Wrapper_Res_Language=1033
-#AutoIt3Wrapper_Res_Comment=Rubble Version (at last GUI build): pre4
+#AutoIt3Wrapper_Res_Comment=Rubble Version (at last GUI build): 4.6
 
+#include <Constants.au3>
 #include <GUIConstantsEx.au3>
 #include <TreeViewConstants.au3>
+#include <EditConstants.au3>
 #include <WindowsConstants.au3>
+#include <GuiEdit.au3>
 
 #include <File.au3>
 #include <Array.au3>
@@ -32,7 +35,7 @@ Else
 EndIf
 
 ; Create Main Window
-Global $MainWindow = GUICreate("Rubble GUI v2", 430, 430, -1, -1, BitOR($GUI_SS_DEFAULT_GUI,$WS_MAXIMIZEBOX,$WS_SIZEBOX,$WS_THICKFRAME,$WS_TABSTOP))
+Global $MainWindow = GUICreate("Rubble GUI v2.1", 430, 430, -1, -1, BitOR($GUI_SS_DEFAULT_GUI,$WS_MAXIMIZEBOX,$WS_SIZEBOX,$WS_THICKFRAME,$WS_TABSTOP))
 
 Global $TabMain = GUICtrlCreateTab(5, 5, 420, 420)
 GUICtrlSetResizing(-1, $GUI_DOCKBORDERS)
@@ -74,6 +77,11 @@ If Not $Minimal Then
 	GUICtrlSetResizing(-1, $GUI_DOCKLEFT+$GUI_DOCKRIGHT+$GUI_DOCKBOTTOM+$GUI_DOCKHEIGHT)
 EndIf
 
+; Log Tab
+Global $TabLog = GUICtrlCreateTabItem("Log")
+Global $Log = GUICtrlCreateEdit("", 14, 35, 400, 380, BitOR($ES_AUTOVSCROLL, $WS_VSCROLL, $WS_HSCROLL, $ES_READONLY))
+GUICtrlSetResizing(-1, $GUI_DOCKBORDERS)
+
 ; Misc. Tab
 Global $TabOther = GUICtrlCreateTabItem("Other")
 
@@ -89,28 +97,23 @@ GUICtrlCreateTabItem("")
 Dim $RubbleBin = IniRead(@ScriptDir & "\gui.ini", "general", "rubble_bin", "rubble.exe")
 Dim $RubbleWd = IniRead(@ScriptDir & "\gui.ini", "general", "rubble_cwd", ".")
 
-Dim $DFDir = ".."
+; AXIS VFS path support
+Dim $DFDir = "./.."
 $DFDir = IniRead($RubbleWd & "/rubble.ini", "rubble", "dfdir", $DFDir)
-StringReplace($DFDir, "rubble:", "./")
+$DFDir = StringReplace($DFDir, "rubble:", "./")
 
 Dim $OutDir = "df:raw"
 $OutDir = IniRead($RubbleWd & "/rubble.ini", "rubble", "outputdir", $OutDir)
-StringReplace($OutDir, "rubble:", "./")
-StringReplace($OutDir, "df:", $DFDir & "/")
+$OutDir = StringReplace($OutDir, "rubble:", "./")
+$OutDir = StringReplace($OutDir, "df:", $DFDir & "/")
 
-Dim $AddonDir = ".\addons"
+Dim $AddonDir = "rubble:addons"
 $AddonDir = IniRead($RubbleWd & "/rubble.ini", "rubble", "addonsdir", $AddonDir)
-StringReplace($AddonDir, "rubble:", "./")
-StringReplace($AddonDir, "df:", $DFDir & "/")
-StringReplace($AddonDir, "out:", $OutDir & "/")
+$AddonDir = StringReplace($AddonDir, "rubble:", "./")
+$AddonDir = StringReplace($AddonDir, "df:", $DFDir & "/")
+$AddonDir = StringReplace($AddonDir, "out:", $OutDir & "/")
 
 Dim $AddonListOverride = IniRead(@ScriptDir & "\gui.ini", "general", "addonlist", "")
-
-; Install Mode
-If $CmdLineRaw <> "" Then
-	Run(@ComSpec & ' /k ""./' & $RubbleBin & '" -install=' & $CmdLineRaw & '"', $RubbleWd)
-	Exit
-EndIf
 
 ; Handle writing settings
 Func OnExit()
@@ -127,30 +130,27 @@ Func OnExit()
 	IniWrite(@ScriptDir & "\gui.ini", "general", "otheroptions", GUICtrlRead($OtherOptions))
 	IniWrite(@ScriptDir & "\gui.ini", "general", "rubble_bin", $RubbleBin)
 	IniWrite(@ScriptDir & "\gui.ini", "general", "rubble_cwd", $RubbleWd)
-	IniWrite(@ScriptDir & "\gui.ini", "general", "addonsdir", $AddonDir)
-	IniWrite(@ScriptDir & "\gui.ini", "general", "dfdir", $DFDir)
-	IniWrite(@ScriptDir & "\gui.ini", "general", "addonlist", $AddonListOverride)
 EndFunc
 OnAutoItExitRegister("OnExit")
 
 ; Update Addonlist
 If $AddonListOverride == "" Then
-	RunWait($RubbleWd & "/" & $RubbleBin & ' -addonlist', $RubbleWd , @SW_HIDE)
+	RunRubble('-addonlist', False)
 
-	If Not FileExists($AddonDir & "\addonlist.ini") Then
-		MsgBox(16, "Loading Error", "Rubble failed to generate/update the addonlist.ini, please fix the gui.ini file and try again.")
+	If Not FileExists($AddonDir & "/addonlist.ini") Then
+		MsgBox(16, "Error", "Rubble failed to generate/update the addonlist.ini for unspecified reasons, make sure the paths in gui.ini are valid and try again.")
 		Exit 1
 	EndIf
 Else
 	If Not FileExists($AddonListOverride) Then
-		MsgBox(16, "Loading Error", "Rubble GUI failed to find the addon list override file, please fix the gui.ini file and try again.")
+		MsgBox(16, "Error", "Rubble GUI failed to find the specified addon list override file, please fix gui.ini and try again.")
 		Exit 1
 	EndIf
 EndIf
 
 ; Load Addonlist
 If Not FileExists($AddonListOverride) Then
-	Dim $section = IniReadSection($AddonDir & "\addonlist.ini", "addons")
+	Dim $section = IniReadSection($AddonDir & "/addonlist.ini", "addons")
 Else
 	Dim $section = IniReadSection($AddonListOverride, "addons")
 EndIf
@@ -166,31 +166,30 @@ If Not  @error Then
 		EndIf
 	Next
 Else
-	MsgBox(16, "Loading Error", "Rubble GUI failed to read the addon list (this is probably bad).")
+	MsgBox(16, "Error", "Rubble GUI failed to read the addon list (this is probably bad).")
 EndIf
 
 ; Load other command line options
-GUICtrlSetData($OtherOptions, IniRead(@ScriptDir & "\gui.ini", "general", "otheroptions", ""))
+GUICtrlSetData($OtherOptions, IniRead(@ScriptDir & "/gui.ini", "general", "otheroptions", ""))
 
 If Not $Minimal Then
 	Dim $Regions = _FileListToArray($DFDir & "/data/save", "*", 2)
 	If @error Then
-		MsgBox(16, "Error", "Rubble GUI failed to find your saves directory, please fix the gui.ini file and try again.")
-		Exit 1
+		MsgBox(48, "Warning", "Rubble GUI failed to find your saves directory, the regen and prep tabs were not populated.")
+	Else
+		; Populate region lists
+		GUICtrlSetData($PrepRegions, "raw")
+
+		For $X = 1 To $Regions[0]
+			; "current" is not a region
+			If $Regions[$X] == "current" Then
+				ContinueLoop
+			EndIf
+
+			GUICtrlSetData($PrepRegions, $Regions[$X])
+			GUICtrlSetData($RegenRegions, $Regions[$X])
+		Next
 	EndIf
-
-	; Populate region lists
-	GUICtrlSetData($PrepRegions, "raw")
-
-	For $X = 1 To $Regions[0]
-		; "current" is not a region
-		If $Regions[$X] == "current" Then
-			ContinueLoop
-		EndIf
-
-		GUICtrlSetData($PrepRegions, $Regions[$X])
-		GUICtrlSetData($RegenRegions, $Regions[$X])
-	Next
 
 	GUICtrlSetData($PrepRegions, "raw")
 EndIf
@@ -213,8 +212,7 @@ While 1
 					EndIf
 				Next
 				$addons = StringTrimLeft($addons,1)
-				Run(@ComSpec & ' /k ""./' & $RubbleBin & '" -addons="' & $addons & '" ' & GUICtrlRead($OtherOptions) & '"', $RubbleWd)
-				Exit
+				RunRubble('-addons="' & $addons & '" ' & GUICtrlRead($OtherOptions) & '"', True)
 		EndSwitch
 		ContinueLoop
 	EndIf
@@ -231,11 +229,12 @@ While 1
 				EndIf
 			Next
 			$addons = StringTrimLeft($addons,1)
-			Run(@ComSpec & ' /k ""./' & $RubbleBin & '" -addons="' & $addons & '" ' & GUICtrlRead($OtherOptions) & '"', $RubbleWd)
-			Exit
+			RunRubble('-addons="' & $addons & '" ' & GUICtrlRead($OtherOptions) & '"', True)
 
 	Case $RunPrep
-			Run(@ComSpec & ' /k ""./' & $RubbleBin & '" -prep="' & GUICtrlRead($PrepRegions) & '"', $RubbleWd)
+			If GUICtrlRead($PrepRegions) <> "" Then
+				RunRubble('-prep="' & GUICtrlRead($PrepRegions) & '"', True)
+			EndIf
 
 	Case $RegenRegions
 			If FileExists($DFDir & '/data/save/' & GUICtrlRead($RegenRegions) & "/raw/addonlist.ini") Then
@@ -259,12 +258,12 @@ While 1
 								EndIf
 							Next
 							If Not $found Then
-								MsgBox(16, "Warning!", "You do not have all the addons needed to regenerate this world! Depending on the nature of the missing addons this may cause the world to be corrupted! It is HIGHLY recommended that you make a backup before proceeding." & @CRLF & "Missing Addon: " & $section[$X][0])
+								MsgBox(16, "Warning", "You do not have all the addons needed to regenerate this world! Depending on the nature of the missing addons this may cause the world to be corrupted! It is HIGHLY recommended that you make a backup before proceeding." & @CRLF & "Missing Addon: " & $section[$X][0])
 							EndIf
 						EndIf
 					Next
 				Else
-					MsgBox(16, "Loading Error", "Rubble GUI failed to read the addon list (this is probably bad).")
+					MsgBox(16, "Error", "Rubble GUI failed to read the region addon list (this means that the region does not have Rubble raws).")
 				EndIf
 			EndIf
 
@@ -281,8 +280,28 @@ While 1
 			local $rtn = MsgBox(52, "Warning!", "Regenerating a world only works correctly in some cases, it is recommended that this be used ONLY for changing tilesets and the like! As world corruption is a possibility, it is HIGHLY recommended that you make a backup before proceeding." & @CRLF & "Do you wish to continue?")
 			If $rtn <> 7 Then
 				Local $save = 'df:data/save/' & GUICtrlRead($RegenRegions)
-				Run(@ComSpec & ' /k ""./' & $RubbleBin & '" -zapaddons -zapconfig -addons="' & $addons & '" -config="' & $save & '/raw/genconfig.ini" -outputdir="' & $save & '/raw"', $RubbleWd)
+				RunRubble('-zapaddons -zapconfig -addons="' & $addons & '" -config="' & $save & '/raw/genconfig.ini" -outputdir="' & $save & '/raw"', True)
 			EndIf
 		EndIf
 	EndSwitch
 WEnd
+
+Func RunRubble($options, $switchtab)
+	GUICtrlSetData($Log, "")
+	If $switchtab Then GUICtrlSetState($TabLog, $GUI_SHOW)
+
+	Local $pid = Run('"./' & $RubbleBin & '" ' & $options, $RubbleWd, @SW_HIDE, $STDERR_MERGED)
+	If @error Then
+		MsgBox(16, "Error", "Rubble GUI could not start Rubble, make sure the paths in gui.ini are valid and try again.")
+		Exit 1
+	EndIf
+
+	Local $line
+	While 1
+		$line = StdoutRead($pid)
+		If @error Then ExitLoop
+		$line = StringReplace($line, @LF, @CRLF)
+		GUICtrlSetData($Log, GUICtrlRead($Log) & $line)
+		_GUICtrlEdit_LineScroll($Log, 0, _GUICtrlEdit_GetLineCount($Log))
+	WEnd
+EndFunc

@@ -84,19 +84,11 @@ command rubble:echo params {
 	(ret "")
 })
 
-(rubble:template "@SCRIPT" block code {
-	(eval [code])
-})
+(rubble:template "@SCRIPT" [global:eval])
 
 (rubble:template "@SET" block name value {
 	(rubble:setvar [name] [value])
 	(ret "")
-})
-
-var rubble:adventure_tier_data = 0
-(rubble:template "#ADVENTURE_TIER" {
-	[rubble:adventure_tier_data = (int:add [rubble:adventure_tier_data] 1)]
-	(str:add "[ADVENTURE_TIER:" [rubble:adventure_tier_data] "]")
 })
 
 command rubble:print params {

@@ -1,4 +1,11 @@
 
+v1.2
+	The command call syntax now has a by-value version.
+	Removed the run command, it is obsolete with by-value command calls.
+	Non-module commands are now stored in a predefined module named "global".
+	Fixed a long standing issue that cased bad positions to be printed for runtime errors.
+	Most error positions now point to the first token of the problem statement instead of the last.
+
 v1.1
 	It should now be possible to replace GenII objects with others of exactly the same type that are stored in user values.
 	GenII now comes with a simple command to create a byte slice from a string.

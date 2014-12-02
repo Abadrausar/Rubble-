@@ -89,19 +89,12 @@ func (this *Template) Call(params []*Value) *Value {
 	// Script template
 	if this.Script {
 		script := rex.NewScript()
-		block := this.Code.Data.(*rex.Code)
-		script.Locals.Add(block)
-
 		tmp := make([]*rex.Value, len(params))
 		for i := range params {
 			tmp[i] = params[i].Script()
 		}
-		err := script.SetParams(block, tmp)
-		if err != nil {
-			panic("Script Error: " + err.Error())
-		}
-
-		rtn, err := GlobalScriptState.RunPreped(script, block)
+		
+		rtn, err := GlobalScriptState.RunCommand(script, this.Code, tmp)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}

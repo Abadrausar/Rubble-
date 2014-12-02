@@ -2,6 +2,24 @@
 ==============================================
 Changelog:
 ==============================================
+v4.6 (for DF 40.10)
+	Updated the "Base" addon to DF 40.10
+	Changed the way the encoder is handled internally, this should not effect the user in any way.
+	It is now legal to have embedded spaces and tabs in base 64 encoded text.
+	Added new templates: !DECOMPRESS and !PATCH (simple template interfaces to preexisting script commands).
+	The GUI now hides the Rubble console window at all times and displays the log in its own tab.
+		This makes it a little easier to use, also makes finding startup errors simpler.
+	Updated Rex: By-value command calls are now possible and the error position bug is fixed.
+	Somehow I forgot to add the caste templates to the dwarves, so obviously none of the dwarf caste stuff worked.
+	Added several new templates for setting entity playability (with script support for advanced users of course).
+	Removed the #ADVENTURE_TIER template as the new templates make it obsolete.
+	Significantly revised ADDON_HOOKS to interface with the new entity playability templates.
+	Expanded the tech class templates a good bit, you can now remove and add classes from tech after registration.
+	Expanded the shared item templates to (mostly) match the tech class templates.
+	Changed all vanilla reactions and buildings in the "Base" addon to use addon hooks.
+	Revised many of the User addons to use the new templates.
+	It is now possible to use type command script values as template bodies in addition to type code script values.
+
 v4.5 (for DF 40.8)
 	Fixed DFHACK_REACTION, it should now work as expected.
 	Added the ability to add custom stuff to the init.lua and onLoad.init files (via scripts).

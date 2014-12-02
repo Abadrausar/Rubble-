@@ -28,6 +28,8 @@ import "os"
 import "runtime/pprof"
 import "time"
 
+import "rubble/rblutil"
+
 func Main() {
 	timeStart := time.Now()
 
@@ -323,7 +325,7 @@ func Main() {
 
 		LogPrintln("  " + Files.Data[i].Name)
 
-		file := []byte(StripExt(Files.Data[i].Name) + "\n\n# Automatically generated, do not edit!\n# Source: " +
+		file := []byte(rblutil.StripExt(Files.Data[i].Name) + "\n\n# Automatically generated, do not edit!\n# Source: " +
 			Files.Data[i].Source + "/" + Files.Data[i].Name + "\n\n" + string(Files.Data[i].Content))
 		WriteFile("out:objects/" + Files.Data[i].Name, file)
 	}
@@ -336,7 +338,7 @@ func Main() {
 
 		LogPrintln("  " + Files.Data[i].Name)
 
-		file := []byte(StripExt(Files.Data[i].Name) + "\n\n# Automatically generated, do not edit!\n# Source: " +
+		file := []byte(rblutil.StripExt(Files.Data[i].Name) + "\n\n# Automatically generated, do not edit!\n# Source: " +
 			Files.Data[i].Source + "/" + Files.Data[i].Name + "\n\n" + string(Files.Data[i].Content))
 		WriteFile("out:graphics/" + Files.Data[i].Name, file)
 	}

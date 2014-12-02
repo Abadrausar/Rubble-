@@ -30,6 +30,7 @@ import "os"
 import "runtime"
 import "dctech/axis"
 import "dctech/axis/axiszip"
+import "rubble/rblutil"
 
 // Getting usage info and flag parse errors into the log file is a pain in the a**
 var Flags *flag.FlagSet
@@ -214,14 +215,14 @@ func ParseCommandLine() {
 				if err != nil {
 					panic(err)
 				}
-				zipFS.Mount(StripExt(file.Name()), fs)
+				zipFS.Mount(rblutil.StripExt(file.Name()), fs)
 			}
 			if strings.HasSuffix(file.Name(), ".zip.b64") {
 				fs, err := axiszip.NewFile64(AddonsDir + "/" + file.Name())
 				if err != nil {
 					panic(err)
 				}
-				zipFS.Mount(StripExt(file.Name()), fs)
+				zipFS.Mount(rblutil.StripExt(rblutil.StripExt(file.Name())), fs)
 			}
 		}
 	}

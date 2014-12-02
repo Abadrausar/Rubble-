@@ -149,13 +149,4 @@ func Command_Ret(script *rex.Script, params []*rex.Value)
     from inside a loop will not return from the loop, it will return from
     the command that called loop. See break. Returns value or unchanged.
 
-func Command_Run(script *rex.Script, params []*rex.Value)
-    Runs a code block as a command, use for emulating anonymous local
-    commands.
-
-	run code [parameters...]
-
-    code MUST be a block created via a block declaration! Does not halt any
-    exit states except break and return. Returns result of running code.
-
 

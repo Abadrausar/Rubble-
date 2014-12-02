@@ -450,11 +450,16 @@ To regen a world open the "Regen" tab, select the region to regenerate, then cha
 
 The last tab is the "Other" tab, which at the time I am writing this only allows you to set extra command line switches to pass to Rubble (advanced users only!).
 
+The GUI has a configuration file that allows you to set some simple option to tell it how to interact with Rubble and to give it a place to store settings. Most of the keys in this file are self explanatory, but two of them need some introduction.
+
+minimal: If this key is set to "true" then the GUI will not have the prep and regen tabs.
+addonlist: If this key is set to point to a valid ini file then that file will be used to populate that addon lists.
+
 The only things you cannot do from the GUI (without manually specifying extra flags) are:
 	Update the addon list (the GUI does this automatically)
 	Print debug and performance information (why would you want to?)
 	Manage config variables
-	Change the default paths
+	Change the default paths (this is done with the rubble.ini file)
 
 ========================================================
 
@@ -467,7 +472,7 @@ Rubble comes with two, slightly different, raw parsers that are made available t
 The first parser is provided by the df:raw:walk command. This is the parser that is generally used, as it is much faster and a little easier to use at the cost of being slightly less flexible.
 The primary issue with using this parser is the fact that you can only look at one tag at a time, and you can only move forward from the first tag to the last (it is possible to abort early if you wish), still this is just fine for the vast majority of tasks.
 
-To use this raw parser you pass in a string containing the raws you wish to parse as well as a block of code to run for each tag, the command the returns a string with the raws plus any changes you may have made.
+To use this raw parser you pass in a string containing the raws you wish to parse as well as a block of code to run for each tag, the command then returns a string with the raws plus any changes you may have made.
 
 Example:
 [code]
@@ -579,9 +584,6 @@ Now start the GUI, it will complain about not finding the "saves" directory and 
 otheroptions=
 rubble_bin=rubble.exe
 rubble_cwd=.
-addonsdir=.\addons
-dfdir=..
-addonlist=
 [/code]
 Add "minimal=true" at the bottom of the file.
 

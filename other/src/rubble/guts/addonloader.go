@@ -182,14 +182,3 @@ func UpdateAddonList(dest string, addons []*Addon) {
 
 	WriteFile(dest, out)
 }
-
-func StripExt(name string) string {
-	i := len(name) - 1
-	for i >= 0 {
-		if name[i] == '.' {
-			return name[:i]
-		}
-		i--
-	}
-	return name
-}

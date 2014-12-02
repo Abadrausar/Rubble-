@@ -63,9 +63,9 @@ Rubble provides (very) basic support for applying diff patches to files (or any 
 
 This ability is primarily for use by bugfixes and minor updates and is not meant as a general modding tool, but there may be a few case where it will come in handy. The primary problem with Rubble's patch support is that it is fragile, eg even relatively small changes can stop the patch from applying. This behavior is intended.
 
-In general it is better not to use patches, save them for use in loader scripts and even their only use them to apply small changes.
+In general it is better not to use patches, save them for use in loader scripts and even there only use them to apply small changes.
 
-(see the rubble:patch script command)
+(see the rubble:patch script command and the !PATCH base template)
 
 ==============================================
 Tweak Scripts:
@@ -93,8 +93,6 @@ Use init scripts to do setup that may be shared by multiple addons and HAS to be
 Another fine use of init scripts is "always active" templates, basically you add a template stub in an init script an the override it with a full version in a pre tweak script. This way clients of your addon can just assume that your addon's template are present allowing you to skip checking to see if it is active. 
 (please note that you really only want to do this within an addon pack so that you can be sure the other addon is installed)
 
-Init scripts also work well for automatic dependency management. If your addon requires a library addon you can add an init script that checks if your addon is active and forces your dependencies active if so. 
-
 Init scripts have a very narrow use-case and should be used with care.
 
 Init scripts are still loaded as "user data" if their containing addon contains any parseables!
@@ -110,7 +108,7 @@ Loader scripts only do one thing that init scripts can't do better: they can mod
 Like init scripts, loader scripts are global and pay no attention to their containing addon.
 Loader scripts are only run during normal generation cycles.
 
-Loader scripts make a great place to apply patches and force activate dependencies.
+Loader scripts make a great place to apply patches and force activate dependencies, for most other uses init scripts are better.
 
 ==============================================
 File Tags:
@@ -132,6 +130,7 @@ Hard Coded File Tags:
 	PostScript		Marks the file as a post script.
 	PrepFile		The file should be written to the prep addon, or (during prep mode) the file is a prep script.
 	InstScript		Marks the file as an install script, only useful during install mode.
+	GraphicsFile	The file should be written to "out:graphics".
 	RawFile			Marks the file as parseable raw text.
 	NoWrite			Used with RawFile, marks the file as not to be written to the objects folder.
 	Skip			The file is to be ignored.
@@ -167,6 +166,8 @@ There are two basic ways this encoded text can be used:
 Encoded zip files (.zip.b64) can be read directly by Rubble, use them exactly like normal zip files (just put them in your addons folder).
 
 Other encoded files need to be uncompressed by a load script before use, most of the time the encoded file is packaged into a simple script as a string. To decode a string use the rubble:decompress script command, this will decode and uncompress the string, if the file was not stored in the script as a string then you will need to load the file first.
+
+There is another, easier, way to decompress a encoded file, just use the !DECOMPRESS template. Sadly this template is far less flexible that using load scripts, but if you would rather not use scripts see the base template docs.
 
 Loading then decompressing a file can be done like this:
 	var content = (genii:bytes_string [(rubble:fetchaddon "Addon/Name") Files "file.name.b64" Content])
@@ -211,7 +212,7 @@ To install a package:
 
 <package> should be a (non-AXIS!) path to a zip file.
 
-Windows users can simply drag and drop an installer package onto the Rubble GUI icon, this will automatically launch Rubble to install the package.
+This operating mode is kind of useless right now, but I may revisit it in the future.
 
 ==============================================
 AXIS VFS:
@@ -269,7 +270,8 @@ The following rules determine how addons are loaded:
 	Zip files and directories are identical as far as the loader is concerned except as otherwise specified.
 	If an addon contains one or more directories, the directories are loaded as child addons.
 	An addon without parseable files (.txt, .rbl, .rex) is not loaded (but any child addons are).
-		An init script (.init.rex) is not considered a paresable file. (but such a script will still run)
+		An init script (.init.rex) is not considered a paresable file (but such a script will still run), and the same goes for load scripts (.load.rex).
+		
 
 The following rules determine how addon files override each other (if there is a name collision):
 	Addons in zip files will always override addons in directories.

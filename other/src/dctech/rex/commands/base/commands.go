@@ -33,7 +33,6 @@ import "dctech/rex"
 //	break
 //	breakloop
 //	eval
-//	run
 //	error
 //	onerror
 //	copy
@@ -64,7 +63,6 @@ func Setup(state *rex.State) (err error) {
 	state.RegisterCommand("break", Command_Break)
 	state.RegisterCommand("breakloop", Command_BreakLoop)
 	state.RegisterCommand("eval", Command_Eval)
-	state.RegisterCommand("run", Command_Run)
 	state.RegisterCommand("error", Command_Error)
 	state.RegisterCommand("onerror", Command_OnError)
 	state.RegisterCommand("copy", Command_Copy)
@@ -168,33 +166,6 @@ func Command_Eval(script *rex.Script, params []*rex.Value) {
 	
 	script.Locals.Add(block)
 	script.Exec(block)
-	script.Return = false
-	script.Locals.Remove()
-}
-
-// Runs a code block as a command, use for emulating anonymous local commands.
-// 	run code [parameters...]
-// code MUST be a block created via a block declaration!
-// Does not halt any exit states except break and return.
-// Returns result of running code.
-func Command_Run(script *rex.Script, params []*rex.Value) {
-	if len(params) < 1 {
-		rex.ErrorParamCount("run", ">0")
-	}
-
-	if params[0].Type != rex.TypCode {
-		rex.ErrorGeneralCmd("run", "Attempt to run non-executable Value.")
-	}
-
-	block := params[0].Data.(*rex.Code)
-	script.Locals.Add(block)
-	
-	err := script.SetParams(block, params[1:])
-	if err != nil {
-		rex.ErrorGeneralCmd("run", err.Error())
-	}
-	script.Exec(block)
-	
 	script.Return = false
 	script.Locals.Remove()
 }

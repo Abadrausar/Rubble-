@@ -151,7 +151,7 @@ func (lvs *LocalValueStore) lookup(name string) int {
 	panic("UNREACHABLE")
 }
 
-// add a new environment using the meta-data and defaults from code.
+// Add a new environment using the meta-data and defaults from code.
 // This assumes that the meta-data in code is well formed!
 func (lvs *LocalValueStore) Add(code *Code) {
 	// calculate bounds

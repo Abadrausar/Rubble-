@@ -32,7 +32,7 @@ command rubble:macro:setcursor mak x y z {
 	var move = block cur dest curO destO dir1 dir2 actions {
 		(if (int:eq [cur] [dest]) {}{
 			(loop {
-				(if (int:eq (run [abs] (int:sub [dest] [cur])) (run [abs] (int:sub [destO] [curO]))) {
+				(if (int:eq ([abs] (int:sub [dest] [cur])) ([abs] (int:sub [destO] [curO]))) {
 					(ret [cur])
 				})
 				
@@ -50,7 +50,7 @@ command rubble:macro:setcursor mak x y z {
 				})
 			})
 			(loop {
-				(if (int:eq (run [abs] (int:sub [dest] [cur])) (run [abs] (int:sub [destO] [curO]))) {
+				(if (int:eq ([abs] (int:sub [dest] [cur])) ([abs] (int:sub [destO] [curO]))) {
 					(ret [cur])
 				})
 				
@@ -97,18 +97,18 @@ command rubble:macro:setcursor mak x y z {
 	# Now we move along whichever axis has the largest total movement
 	# until both axises have the same number of tiles to go
 	# (or we have moved as far as needed on this axis)
-	(if (int:gt (run [abs] (int:sub [y] [mak y])) (run [abs] (int:sub [x] [mak x]))) {
-		[mak y = (run [move] [mak y] [y] [mak x] [x] "UP" "DOWN" [mak actions])]
+	(if (int:gt ([abs] (int:sub [y] [mak y])) ([abs] (int:sub [x] [mak x]))) {
+		[mak y = ([move] [mak y] [y] [mak x] [x] "UP" "DOWN" [mak actions])]
 	}{
-		[mak x = (run [move] [mak x] [x] [mak y] [y] "LEFT" "RIGHT" [mak actions])]
+		[mak x = ([move] [mak x] [x] [mak y] [y] "LEFT" "RIGHT" [mak actions])]
 	})
 	
 	# As fast movements may have caused us to overshoot the point where diagonal movements will
 	# put us on our target we may need to correct a little bit
-	(if (int:gt (run [abs] (int:sub [y] [mak y])) (run [abs] (int:sub [x] [mak x]))) {
-		[mak y = (run [move] [mak y] [y] [mak x] [x] "UP" "DOWN" [mak actions])]
+	(if (int:gt ([abs] (int:sub [y] [mak y])) ([abs] (int:sub [x] [mak x]))) {
+		[mak y = ([move] [mak y] [y] [mak x] [x] "UP" "DOWN" [mak actions])]
 	}{
-		[mak x = (run [move] [mak x] [x] [mak y] [y] "LEFT" "RIGHT" [mak actions])]
+		[mak x = ([move] [mak x] [x] [mak y] [y] "LEFT" "RIGHT" [mak actions])]
 	})
 	
 	# Then we move diagonally to our destination (if we are not already there from the previous step)

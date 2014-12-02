@@ -30,7 +30,7 @@ import "os"
 // The majority of the fields are exported for the use of commands only.
 type State struct {
 	modules   *moduleStore
-	vars      *valueStore
+	global    *Module
 	types     *typeStore
 	NoRecover bool      // Do not recover errors, this makes it easier to debug internal errors.
 	Output    io.Writer // Normally set to os.Stdout, this can be changed to redirect to a log file or the like.
@@ -38,9 +38,13 @@ type State struct {
 
 // NewState creates (and initializes) a new state.
 func NewState() *State {
+	mod := newModuleStore()
+	globals := newModule()
+	mod.add("global", globals)
+	
 	return &State{
-		modules: newModuleStore(),
-		vars: newValueStore(),
+		modules: mod,
+		global: globals,
 		types: newTypeStore(),
 		Output: os.Stdout,
 	}
@@ -51,7 +55,7 @@ func NewState() *State {
 // RegisterCommand registers a new native command.
 // WARNING! If you try to redeclare a command this function will case a panic!
 func (state *State) RegisterCommand(name string, handler NativeCommand) {
-	state.vars.addAndSet(name, NewValueCommand(handler))
+	state.global.RegisterCommand(name, handler)
 }
 
 // RegisterType registers a new global indexable type.
@@ -108,18 +112,18 @@ func (state *State) trapErrorRuntime(script *Script, err *error, clean func()) {
 		if x := recover(); x != nil {
 			if y, ok := x.(ScriptError); ok {
 				if !script.code.empty() {
-					y.Pos = script.code.last().current().Pos
+					y.Pos = script.code.last().beginning(script.code.last().current()).Pos.Copy()
 				}
 				*err = y
 			} else if y, ok := x.(error); ok {
 				if !script.code.empty() {
-					*err = InternalError{Err: y, Pos: script.code.last().current().Pos}
+					*err = InternalError{Err: y, Pos: script.code.last().beginning(script.code.last().current()).Pos.Copy()}
 				} else {
 					*err = InternalError{Err: y}
 				}
 			} else {
 				if !script.code.empty() {
-					*err = InternalError{Err: fmt.Errorf("%v", x), Pos: script.code.last().current().Pos}
+					*err = InternalError{Err: fmt.Errorf("%v", x), Pos: script.code.last().beginning(script.code.last().current()).Pos.Copy()}
 				} else {
 					*err = InternalError{Err: fmt.Errorf("%v", x)}
 				}
@@ -134,12 +138,12 @@ func (state *State) trapErrorCompile(lex *Lexer, err *error) {
 	if !state.NoRecover {
 		if x := recover(); x != nil {
 			if y, ok := x.(ScriptError); ok {
-				y.Pos = lex.current.Pos
+				y.Pos = lex.current.Pos.Copy()
 				*err = y
 			} else if y, ok := x.(error); ok {
-				*err = InternalError{Err: y, Pos: lex.current.Pos}
+				*err = InternalError{Err: y, Pos: lex.current.Pos.Copy()}
 			} else {
-				*err = InternalError{Err: fmt.Errorf("%v", x), Pos: lex.current.Pos}
+				*err = InternalError{Err: fmt.Errorf("%v", x), Pos: lex.current.Pos.Copy()}
 			}
 		}
 	}
@@ -211,6 +215,22 @@ func (state *State) RunPreped(script *Script, code *Code) (ret *Value, err error
 	defer state.trapErrorRuntime(script, &err, script.ClearMost)
 	
 	script.Exec(code)
+	ret = script.RetVal
+	return
+}
+
+// RunCommand runs a script value as a command.
+// Does all the normal cleanup, just like Run.
+func (state *State) RunCommand(script *Script, code *Value, params []*Value) (ret *Value, err error) {
+	script.Host = state
+
+	err = nil
+	defer state.trapErrorRuntime(script, &err, script.ClearMost)
+	
+	if code.Type != TypCode && code.Type != TypCommand {
+		RaiseError("Attempt to run non-executable Value.")
+	}
+	code.call(script, params)
 	ret = script.RetVal
 	return
 }

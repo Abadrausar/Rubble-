@@ -96,36 +96,37 @@ func (lex *Lexer) advance() {
 	}
 	
 	// We are at the beginning of a token
+	lex.tokenpos = lex.pos.Copy()
 	switch lex.char {
 	case '(':
-		lex.look = &token{"", tknCmdBegin, lex.pos}
+		lex.look = &token{"", tknCmdBegin, lex.tokenpos}
 		lex.nextchar()
 	case ')':
-		lex.look = &token{"", tknCmdEnd, lex.pos}
+		lex.look = &token{"", tknCmdEnd, lex.tokenpos}
 		lex.nextchar()
 	case '[':
-		lex.look = &token{"", tknVarBegin, lex.pos}
+		lex.look = &token{"", tknVarBegin, lex.tokenpos}
 		lex.nextchar()
 	case ']':
-		lex.look = &token{"", tknVarEnd, lex.pos}
+		lex.look = &token{"", tknVarEnd, lex.tokenpos}
 		lex.nextchar()
 	case '<':
-		lex.look = &token{"", tknObjLitBegin, lex.pos}
+		lex.look = &token{"", tknObjLitBegin, lex.tokenpos}
 		lex.nextchar()
 	case '>':
-		lex.look = &token{"", tknObjLitEnd, lex.pos}
+		lex.look = &token{"", tknObjLitEnd, lex.tokenpos}
 		lex.nextchar()
 	case '{':
-		lex.look = &token{"", tknCodeBegin, lex.pos}
+		lex.look = &token{"", tknCodeBegin, lex.tokenpos}
 		lex.nextchar()
 	case '}':
-		lex.look = &token{"", tknCodeEnd, lex.pos}
+		lex.look = &token{"", tknCodeEnd, lex.tokenpos}
 		lex.nextchar()
 	case ':':
-		lex.look = &token{"", tknNameSplit, lex.pos}
+		lex.look = &token{"", tknNameSplit, lex.tokenpos}
 		lex.nextchar()
 	case '=':
-		lex.look = &token{"", tknAssignment, lex.pos}
+		lex.look = &token{"", tknAssignment,lex.tokenpos}
 		lex.nextchar()
 	case 'n':
 		lex.matchKeyword("nil", tknNil)
@@ -243,14 +244,12 @@ func (lex *Lexer) eatWS() {
 
 // Try to match a key word, fails to matching a raw string.
 func (lex *Lexer) matchKeyword(str string, typ int) {
-	pos := lex.pos.Copy()
-	
 	for _, char := range str {
 		if lex.char == char {
 			lex.addLexeme()
 			lex.nextchar()
 			if lex.eof {
-				lex.look = &token{string(lex.lexeme), tknRawString, pos}
+				lex.look = &token{string(lex.lexeme), tknRawString, lex.tokenpos}
 				return
 			}
 		} else {
@@ -260,7 +259,7 @@ func (lex *Lexer) matchKeyword(str string, typ int) {
 	}
 	
 	if lex.match(delimiters) {
-		lex.look = &token{"", typ, pos}
+		lex.look = &token{"", typ, lex.tokenpos}
 		return
 	} else {
 		lex.matchRawString()
@@ -270,11 +269,9 @@ func (lex *Lexer) matchKeyword(str string, typ int) {
 
 // Match a delimited string, reads to end delimiter or EOF
 func (lex *Lexer) matchString(delim rune) {
-	pos := lex.pos.Copy()
-	
 	lex.nextchar()
 	if lex.eof || lex.char == delim {
-		lex.look = &token{"", tknString, pos}
+		lex.look = &token{"", tknString, lex.tokenpos}
 		lex.nextchar()
 		return
 	}
@@ -344,13 +341,11 @@ func (lex *Lexer) matchString(delim rune) {
 	if lex.char == delim {
 		lex.nextchar()
 	}
-	lex.look = &token{string(lex.lexeme), tknString, pos}
+	lex.look = &token{string(lex.lexeme), tknString, lex.tokenpos}
 }
 
 // Match a raw string.
 func (lex *Lexer) matchRawString() {
-	pos := lex.pos.Copy()
-	
 	for !lex.match(delimiters) {
 		lex.addLexeme()
 		lex.nextchar()
@@ -358,5 +353,5 @@ func (lex *Lexer) matchRawString() {
 			break
 		}
 	}
-	lex.look = &token{string(lex.lexeme), tknRawString, pos}
+	lex.look = &token{string(lex.lexeme), tknRawString, lex.tokenpos}
 }

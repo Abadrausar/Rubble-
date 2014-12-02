@@ -276,7 +276,7 @@ func (script *Script) execCommand() {
 
 		if module == nil {
 			// Global
-			command = script.Host.vars.get(script.code.last().current().Index)
+			command = script.Host.global.vars.get(script.code.last().current().Index)
 			break
 		}
 		// Module

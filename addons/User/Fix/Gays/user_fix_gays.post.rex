@@ -32,11 +32,11 @@ var foundgay = false
 			})
 			
 			(if (bool:and (str:cmp [tag id] "MALE") [foundgay]) {
-				[tag replace = "[MALE]\n\t\t[ORIENTATION:MALE:100:0:0]\n\t\t[ORIENTATION:FEMALE:0:50:100]"]
+				[tag replace = "[MALE]\n\t\t[ORIENTATION:MALE:100:0:0]\n\t\t[ORIENTATION:FEMALE:0:25:100]"]
 			})
 			
 			(if (bool:and (str:cmp [tag id] "FEMALE") [foundgay]) {
-				[tag replace = "[FEMALE]\n\t\t[ORIENTATION:MALE:0:50:100]\n\t\t[ORIENTATION:FEMALE:100:0:0]"]
+				[tag replace = "[FEMALE]\n\t\t[ORIENTATION:MALE:0:25:100]\n\t\t[ORIENTATION:FEMALE:100:0:0]"]
 			})
 			
 			(break true)

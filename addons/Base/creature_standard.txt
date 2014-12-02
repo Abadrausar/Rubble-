@@ -309,16 +309,17 @@
 	
 	Now we'll declare the specific castes.
 
-	[CASTE:FEMALE]
-		The gender tag lets it know how breeding works.
+	{!REGISTER_CREATURE;DWARF;A short, sturdy creature fond of drink and industry.;
+		[MALE]
+		[BODY_DETAIL_PLAN:FACIAL_HAIR_TISSUE_LAYERS]
+	;
 		[FEMALE]
 		[MULTIPLE_LITTER_RARE]
 		To add beards, put square brackets around the following:
 		BODY_DETAIL_PLAN:FACIAL_HAIR_TISSUE_LAYERS
-	[CASTE:MALE]
-		[MALE]
-		[BODY_DETAIL_PLAN:FACIAL_HAIR_TISSUE_LAYERS]
-
+	;dwarven}
+	{#CASTE_INSERT;DWARF}{!DEFAULT_CASTE;DWARF;NORMAL;;dwarf;dwarves;100;100;;# Nothing special}
+	
 	This command lets you select all of the castes again.
 
 	[SELECT_CASTE:ALL]

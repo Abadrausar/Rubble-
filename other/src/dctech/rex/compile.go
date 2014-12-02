@@ -146,7 +146,7 @@ func (state *State) compileObjLit(lex *Lexer, code *Code) {
 func (state *State) compileCodeBlock(lex *Lexer, code *Code) {
 	block := NewCode(code)
 	lex.getcurrent(tknCodeBegin)
-	pos := lex.current.Pos
+	pos := lex.current.Pos.Copy()
 
 	// Nesting is handled automatically, three cheers for recursive decent!
 	for !lex.checkLook(tknCodeEnd) {
@@ -159,14 +159,14 @@ func (state *State) compileCodeBlock(lex *Lexer, code *Code) {
 	code.addOp(&opCode{
 		Value: val,
 		Type:  opValue,
-		Pos:  lex.current.Pos,
+		Pos:  lex.current.Pos.Copy(),
 	})
 	return
 }
 
 func (state *State) compileCommandBody(lex *Lexer, code *Code) *Value {
 	lex.getcurrent(tknCodeBegin)
-	pos := lex.current.Pos
+	pos := lex.current.Pos.Copy()
 
 	// Nesting is handled automatically, three cheers for recursive decent!
 	for !lex.checkLook(tknCodeEnd) {
@@ -218,7 +218,7 @@ func (state *State) compileBlockDeclare(lex *Lexer, code *Code) *Code {
 }
 
 func (state *State) compileName(lex *Lexer, code *Code, typ int) {
-	var Module *Module = nil
+	var module *Module = nil
 	
 	for {
 		lex.getcurrent(tknRawString)
@@ -226,23 +226,23 @@ func (state *State) compileName(lex *Lexer, code *Code, typ int) {
 		if lex.checkLook(tknNameSplit) {
 			// It's a Module name.
 			index := -1
-			if Module == nil {
+			if module == nil {
 				index = state.modules.lookup(lex.current.Lexeme)
-				Module = state.modules.get(index)
+				module = state.modules.get(index)
 			} else {
-				index = Module.modules.lookup(lex.current.Lexeme)
-				Module = Module.modules.get(index)
+				index = module.modules.lookup(lex.current.Lexeme)
+				module = module.modules.get(index)
 			}
 
 			code.addOp(&opCode{
 				Index: index,
 				Type:  opName,
-				Pos:   lex.current.Pos,
+				Pos:   lex.current.Pos.Copy(),
 			})
 			lex.getcurrent(tknNameSplit)
 			code.addOp(&opCode{
 				Type: opNameSplit,
-				Pos:  lex.current.Pos,
+				Pos:  lex.current.Pos.Copy(),
 			})
 			continue
 		}
@@ -253,42 +253,42 @@ func (state *State) compileName(lex *Lexer, code *Code, typ int) {
 		switch typ {
 		case tknCmdBegin:
 			// Command name
-			if Module == nil {
+			if module == nil {
 				// Global
-				index = state.vars.lookup(lex.current.Lexeme)
+				index = state.global.vars.lookup(lex.current.Lexeme)
 				break
 			}
 			// Module
-			index = Module.vars.lookup(lex.current.Lexeme)
+			index = module.vars.lookup(lex.current.Lexeme)
 			break
 
 		case tknVarBegin:
 			// Variable name
-			if Module == nil {
+			if module == nil {
 				// Local
 				index = code.lookup(lex.current.Lexeme)
 				break
 			}
 			// Module
-			index = Module.vars.lookup(lex.current.Lexeme)
+			index = module.vars.lookup(lex.current.Lexeme)
 			break
 
 		case tknObjLitBegin:
 			// Type name
-			if Module == nil {
+			if module == nil {
 				// Global
 				index = state.types.lookup(lex.current.Lexeme)
 				break
 			}
 			// Module
-			index = Module.types.lookup(lex.current.Lexeme)
+			index = module.types.lookup(lex.current.Lexeme)
 			break
 		}
 
 		code.addOp(&opCode{
 			Index: index,
 			Type:  opName,
-			Pos:   lex.current.Pos,
+			Pos:   lex.current.Pos.Copy(),
 		})
 		return
 	}
@@ -297,32 +297,32 @@ func (state *State) compileName(lex *Lexer, code *Code, typ int) {
 func (state *State) compileDeclModule(lex *Lexer, code *Code) {
 	lex.getcurrent(tknDeclModule)
 
-	var Module *Module = nil
+	var module *Module = nil
 	for {
 		lex.getcurrent(tknRawString)
 
 		if lex.checkLook(tknNameSplit) {
 			// It's a Module name.
 			index := 0
-			if Module == nil {
+			if module == nil {
 				index = state.modules.lookup(lex.current.Lexeme)
-				Module = state.modules.get(index)
+				module = state.modules.get(index)
 			} else {
-				index = Module.modules.lookup(lex.current.Lexeme)
-				Module = Module.modules.get(index)
+				index = module.modules.lookup(lex.current.Lexeme)
+				module = module.modules.get(index)
 			}
 			lex.getcurrent(tknNameSplit)
 			continue
 		}
 
 		// We have found the name we are declaring
-		if Module == nil {
+		if module == nil {
 			if !state.modules.exists(lex.current.Lexeme) {
 				state.modules.add(lex.current.Lexeme, newModule())
 			}
 		} else {
-			if !Module.modules.exists(lex.current.Lexeme) {
-				Module.modules.add(lex.current.Lexeme, newModule())
+			if !module.modules.exists(lex.current.Lexeme) {
+				module.modules.add(lex.current.Lexeme, newModule())
 			}
 		}
 		return
@@ -332,19 +332,19 @@ func (state *State) compileDeclModule(lex *Lexer, code *Code) {
 func (state *State) compileDeclCommand(lex *Lexer, code *Code) {
 	lex.getcurrent(tknDeclCommand)
 
-	var Module *Module = nil
+	var module *Module = nil
 	for {
 		lex.getcurrent(tknRawString)
 
 		if lex.checkLook(tknNameSplit) {
 			// It's a Module name.
 			index := 0
-			if Module == nil {
+			if module == nil {
 				index = state.modules.lookup(lex.current.Lexeme)
-				Module = state.modules.get(index)
+				module = state.modules.get(index)
 			} else {
-				index = Module.modules.lookup(lex.current.Lexeme)
-				Module = Module.modules.get(index)
+				index = module.modules.lookup(lex.current.Lexeme)
+				module = module.modules.get(index)
 			}
 			lex.getcurrent(tknNameSplit)
 			continue
@@ -357,11 +357,11 @@ func (state *State) compileDeclCommand(lex *Lexer, code *Code) {
 		block := state.compileBlockDeclare(lex, code)
 		body := state.compileCommandBody(lex, block)
 		
-		if Module == nil {
-			state.vars.addAndSet(name, body)
+		if module == nil {
+			state.global.vars.addAndSet(name, body)
 			return
 		}
-		Module.vars.addAndSet(name, body)
+		module.vars.addAndSet(name, body)
 		return
 	}
 }
@@ -375,7 +375,7 @@ func (state *State) compileDeclBlock(lex *Lexer, code *Code) {
 	code.addOp(&opCode{
 		Value: body,
 		Type:  opValue,
-		Pos:   lex.current.Pos,
+		Pos:   lex.current.Pos.Copy(),
 	})
 }
 
@@ -383,10 +383,10 @@ func (state *State) compileDeclVar(lex *Lexer, code *Code) {
 	lex.getcurrent(tknDeclVar)
 
 	// This generates a set expression for the variable.
-	var Module *Module = nil
+	var module *Module = nil
 	code.addOp(&opCode{
 		Type: opVarBegin,
-		Pos: lex.current.Pos,
+		Pos: lex.current.Pos.Copy(),
 	})
 	for {
 		lex.getcurrent(tknRawString)
@@ -394,17 +394,17 @@ func (state *State) compileDeclVar(lex *Lexer, code *Code) {
 		if lex.checkLook(tknNameSplit) {
 			// It's a Module name.
 			index := 0
-			if Module == nil {
+			if module == nil {
 				index = state.modules.lookup(lex.current.Lexeme)
-				Module = state.modules.get(index)
+				module = state.modules.get(index)
 			} else {
-				index = Module.modules.lookup(lex.current.Lexeme)
-				Module = Module.modules.get(index)
+				index = module.modules.lookup(lex.current.Lexeme)
+				module = module.modules.get(index)
 			}
 			code.addOp(&opCode{
 				Type:  opName,
 				Index: index,
-				Pos:   lex.current.Pos,
+				Pos:   lex.current.Pos.Copy(),
 			})
 			lex.getcurrent(tknNameSplit)
 			code.addOp(lex.current.opCode())
@@ -413,18 +413,18 @@ func (state *State) compileDeclVar(lex *Lexer, code *Code) {
 
 		// We have found the name we are declaring
 		index := 0
-		if Module == nil {
+		if module == nil {
 			// it's a local!
 			index = code.add(lex.current.Lexeme)
 		} else {
 			// it's a Module variable
-			index = Module.vars.add(lex.current.Lexeme)
+			index = module.vars.add(lex.current.Lexeme)
 		}
 
 		code.addOp(&opCode{
 			Type: opName,
 			Index: index,
-			Pos: lex.current.Pos,
+			Pos: lex.current.Pos.Copy(),
 		})
 		if lex.checkLook(tknAssignment) {
 			lex.getcurrent(tknAssignment)
@@ -433,17 +433,17 @@ func (state *State) compileDeclVar(lex *Lexer, code *Code) {
 		} else {
 			code.addOp(&opCode{
 				Type: opAssignment,
-				Pos:  lex.current.Pos,
+				Pos:  lex.current.Pos.Copy(),
 			})
 			code.addOp(&opCode{
 				Type:  opValue,
 				Value: NewValue(),
-				Pos:  lex.current.Pos,
+				Pos:  lex.current.Pos.Copy(),
 			})
 		}
 		code.addOp(&opCode{
 			Type: opVarEnd,
-			Pos:  lex.current.Pos,
+			Pos:  lex.current.Pos.Copy(),
 		})
 		return
 	}

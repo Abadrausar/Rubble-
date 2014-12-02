@@ -4,6 +4,7 @@
 var rubble:item_current_id = ""
 var rubble:item_current_type = ""
 var rubble:item_data = <map>
+var rubble:item_ban_data = <map>
 
 # Set to true if item type allows rarity
 var rubble:item_types = <map
@@ -93,38 +94,76 @@ var rubble:item_rarities = <map
 	})
 	
 	(if (exists [rubble:item_data] [class]){
-		(if (exists [rubble:item_data [class]] [rubble:item_current_id]) {
+		(if (exists [rubble:item_data [class]] [id]) {
 		}{
-			[rubble:item_data [class] [rubble:item_current_id] = <map
-				"rarity"=[rarity]
-				"type"=[rubble:item_current_type]
+			[rubble:item_data [class] [id] = <map
+				rarity=[rarity]
+				type=[type]
 			>]
 		})
 	}{
 		[rubble:item_data [class] = <map
-			[rubble:item_current_id]=<map
-				"rarity"=[rarity]
-				"type"=[rubble:item_current_type]
+			[id]=<map
+				rarity=[rarity]
+				type=[type]
 			>
 		>]
 	})
 	(ret "")
 })
-(rubble:template "#USES_ITEMS" block class {
+(rubble:template "REMOVE_ITEM" block id class {
+	(if (exists [rubble:item_ban_data] [class]){
+		[rubble:item_ban_data [class] [id] = true]
+	}{
+		[rubble:item_ban_data [class] = <map [id]=true>]
+	})
+	(ret "")
+})
+(rubble:template "REMOVE_ITEM_FROM_PLAYABLES" block id {
+	(foreach [rubble:entity_playability] block ent flags {
+		(if [flags fort] {}{
+			(breakloop true)
+		})
+		
+		var class = (str:add "ADDON_HOOK_" [ent])
+		(if (exists [rubble:item_ban_data] [class]){
+			[rubble:item_ban_data [class] [id] = true]
+		}{
+			[rubble:item_ban_data [class] = <map [id]=true>]
+		})
+		
+		(break true)
+	})
+	
+	(if (exists [rubble:item_ban_data] ADDON_HOOK_PLAYABLE){
+		[rubble:item_ban_data ADDON_HOOK_PLAYABLE [id] = true]
+	}{
+		[rubble:item_ban_data ADDON_HOOK_PLAYABLE = <map [id]=true>]
+	})
+	(ret "")
+})
+command rubble:uses_items class {
 	var out = ""
 	(if (exists [rubble:item_data] [class]){
-		(foreach [rubble:item_data [class]] block key value {
-			var type = [rubble:item_data [class] [key] "type"]
-			var rarity = [rubble:item_data [class] [key] "rarity"]
+		(foreach [rubble:item_data [class]] block id _ {
+			(if (exists [rubble:item_ban_data] [class]) {
+				(if [rubble:item_ban_data [class] [id]] {
+					(breakloop true)
+				})
+			})
+			
+			var type = [rubble:item_data [class] [id] type]
+			var rarity = [rubble:item_data [class] [id] rarity]
 			(if [rubble:item_types [type]] {
 				# Has rarity
-				[out = (str:add [out] "\n\t[" [type] ":" [key] ":" [rarity] "]")]
+				[out = (str:add [out] "\n\t[" [type] ":" [id] ":" [rarity] "]")]
 			}{
 				# Does not have rarity
-				[out = (str:add [out] "\n\t[" [type] ":" [key] "]")]
+				[out = (str:add [out] "\n\t[" [type] ":" [id] "]")]
 			})
 			(break true)
 		})
 	})
 	(str:trimspace [out])
-})
+}
+(rubble:template "#USES_ITEMS" [rubble:uses_items])

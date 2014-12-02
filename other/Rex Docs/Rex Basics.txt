@@ -92,7 +92,7 @@ Example command declarations:
 	command test2 a=5 {[a]}
 	command test3 ... {[params 0]}
 
-Commands are always globally available, even outside the defining script.
+Commands are always globally available, just like module variables.
 
 ==============================================
 Blocks
@@ -188,9 +188,11 @@ For example '1.0' will have type float, but if you need an int you can use '(con
 Values and Commands
 ==============================================
 
-Internally all commands are values, and (in some cases) a command may be used like a variable or a variable like a command.
+Internally all commands are values of type code or command, so a command may be used like a variable or a variable (of the proper type) like a command.
 
-The main issue with using variables as commands is caused by the way Rex handles global variables. The command call operator always expects to be fed the name of a global variable, but the variable operator alway expects a local variable. If the variable/command is in a module there is not a problem, but for non-module variables/commands things will not work as expected.
+Please keep in mind that using a variable that is not type code or type command as a command is an error!
+
+The main issue with using variables as commands is caused by the way Rex handles global variables. The by-name version of the command call operator always expects to be fed the name of a global variable, but the variable operator alway expects a local variable. If the variable/command is in a module there is not a problem, but for non-module variables/commands things will not work as expected.
 
 For example the following will not work:
 	[ret]
@@ -199,6 +201,11 @@ But this will:
 The first one will complain about not finding a local variable named "ret" (because the variable operator assumes that if it does not have a module name it is local).
 
 The same problem happens when you try to use a local variable with the command call operator, it assumes that the name describes a global variable no matter what.
+This issue can be avoided by using the by-value version of the command call:
+	([console:print] "Yep, it sure does work...\n")
+
+Non-module commands are actually stored in the "global" module, so they can be retrieved like so:
+	[global:ret]
 
 Most of the time it is fine to just pretend that variables and commands have nothing in common, but sometimes it is nice to be able to treat one as the other.
 
@@ -282,3 +289,26 @@ If a client provides GenII values they act like indexables, but they have their 
 How exactly you use a GenII value depends very much on how the underlying data is structured. Generally GenII values are for advanced use only! Careful reading of the GenII documentation and the documentation for the exported data is required to make good use of GenII values.
 
 Depending on the client, GenII can be a major source of race conditions unless special precautions are taken. See the GenII documentation for more details.
+
+==============================================
+Debugging
+==============================================
+
+This section has a few tips for debugging, including some common/odd errors that have bitten me at one time or another.
+
+First off: there is no debugger. Sorry but I have no idea what would be required to make one and I have little inclination to try.
+
+Currently debugging is best accomplished by using console:print, debug:value, and debug:shell.
+
+console:print can be used to show state and checkpoint your code (so you can see where it starts to go wrong).
+debug:value prints detailed information about a script value, perfect for seeing how something differs from the expected.
+debug:shell breaks into an interactive debugging shell, from this shell you can do literally anything, perfect for in-depth examination of a problem.
+
+Some common/odd errors:
+
+A loop (examples: foreach, for, or loop) exits early for no reason:
+	There is a reason, you simple forgot to (break true) at the end of the loop. This particular issue happens to me all the time (albeit far less often than it used to).
+
+You get the error message "Local variable: varname Not found in block chain." and the position given seems to have nothing to do with the error:
+	This is caused by trying to use an undeclared variable, the position given points to where the code was when the runtime tried to load the block. Most likely the position points to a user command call, the undeclared variable is in that command's body.
+	Unfortunately it is impossible to point the error directly at the variable in question without a complete re-write of all error handling code, which is far too much work to make this one error more clear.
