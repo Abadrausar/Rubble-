@@ -1,0 +1,14 @@
+
+{!TEMPLATE;CONFIG;name;value;{SETVAR;CONFIG_%(name);%(value)}%(value)}
+
+{!TEMPLATE;REACTION;id;class;
+[REACTION:%(id)]
+	{TECH_CLASS;REACTION;%(id);%(class)}}
+
+{!TEMPLATE;BUILDING_WORKSHOP;id;class;
+[BUILDING_WORKSHOP:%(id)]
+	{TECH_CLASS;BUILDING;%(id);%(class)}}
+
+{!TEMPLATE;BUILDING_FURNACE;id;class;
+[BUILDING_FURNACE:%(id)]
+	{TECH_CLASS;BUILDING;%(id);%(class)}}

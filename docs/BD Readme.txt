@@ -20,7 +20,9 @@ Install:
 		If the last little bit is an error message instead something went wrong and your raws are unchanged, please post the contents of the console as an error report.
 		You could just doulble click on the goblast program but then you would not be able to see if anything went wrong.
 	Go generate a world and have fun!
-
+	
+	Linux and OSX users can find GoBlast binaries in the "other" folder.
+	
 ==============================================
 Plants:
 ==============================================
