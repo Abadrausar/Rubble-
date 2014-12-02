@@ -152,3 +152,271 @@ One thing sharp-eyed readers may have noticed is that there was never a value de
 There are a few more interesting things that standard templates like this can do, but most of them have been replaced by the much more flexible !SCRIPT_TEMPLATE (which is too advanced to detail here). For more on how templates work, and how they interact with other parts of Rubble, see "Rubble Addons.txt" and the last section of "Rubble Process.txt".
 
 (The templates/items/materials used in this tutorial come from the "Better Dorfs/Saurian/Warcrafter" addon)
+
+========================================================
+
+Tutorial 3: Raptor Script, Some Basic Commands
+
+This tutorial introduces some basic Raptor scripting commands.
+WARNING! This tutorial assumes you have read the "Raptor Basics" document that comes with Rubble!
+WARNING! The following information is very spotty, hey it's a lot of stuff to cover, let's see you do better ;)
+
+Raptor is a custom scripting language I use for various projects, but the only thing that matters is that if you really want to get the most out of Rubble you need Raptor. Raptor scripts are used to make advanced templates and tweak scripts as well as a few other small things.
+
+This tutorial will not try to teach you to program (that would take far too much time), nor will it try to teach you the Raptor syntax (that's what "Raptor Basics" is for), I will merely try to present some important commands that everyone should know.
+
+Types:
+There are three main "kinds" of types in Raptor, built-in types, indexable types, and user data. 
+The built-in types are integer, string, float, bool, command, and code. All built-in types can be converted to any other built-in type seamlessly, these types are purely internal.
+Indexable types are defined by the same external packages as commands, there is only one indexable type built into Raptor (the type used by the "params" array). The version of Raptor used by Rubble has several indexable types, but they all act like map or array. map and array are the only two types that can be created by the user (outside of some commands), map is an associative array (you can use any string as the key) and array is a traditional linear array (you can only use integers as keys). I will talk more about indexables later.
+User data is a catch-all term for anything a command wants to stuff into a value that is not an indexable or built-in type. Most of the time user data is only useful to commands from the same package as the one that created it in the first place.
+
+len
+len is very simple, just pass it an indexable value and it returns how many keys it has.
+
+set and var
+var is used to create new variables, very simple.
+set allows you to change the value of a variable, also very simple, at least until you get to indexables... 
+set is used to add new keys to an indexable, for map all you need to do is set a non-existent key, for array the only key you can add is the one just passed the end, eg if len returns "10" for an array indexable that means that the existing keys are 0-9 and if you set key 10 you will be appending to the array.
+
+exists
+exists checks if a key exists in an indexable, invaluable when working with indexables
+
+foreach
+foreach is the first of the two native loop commands provided by Raptor (Rubble comes with some user command loops as well). foreach will iterate over all key/value pairs in an indexable until it gets to the end or you tell it to stop (by using breakloop or returning false)
+
+loop and if
+Raptor, unlike most programming languages, has no key words, so if and loop are commands like any other. This can lead to some odd issues for those used to the usual way of doing things. 
+if is simple, except for one thing: it returns a value just like every other command. if will return unchanged so whatever the last command is in the block if runs is what if returns.
+loop is more complicated. loop will continuously run a block of code until the return value is "false" (for strings: "", for integers: 0, for booleans: false, for the other types: it's complicated, don't ask) or the BreakLoop, Exit, or Return exit state is set (eg you call exit, ret, or breakloop) This property is why most calls to loop either contain nothing but a call to if that wraps the whole loop body or the loop body ends in "(break true)" ("(break true)" is the Raptor equivalent of most language's "continue" keyword, sort-of, its complicated).
+Most of the time you do not need to use the raw loop commands as Rubble comes with some predefined user commands that wrap loop into more familiar for and while commands.
+[code]
+# prints the numbers 0-9
+(var count 0)
+(loop {
+	(if (int:lt [count] 10) {
+		(console:print [count] "\n")
+		(break true)
+	}{
+		(break false)
+	})
+})
+[/code]
+
+breakloop
+breakloop is a relatively new command that make loop and foreach interaction MUCH easier than it used to be. To put it simply (breakloop false) is like most languages "break" keyword and (breakloop true) is like "continue".
+
+console:print
+console:print will write data to the Rubble log and to the screen, good for status messages in tweak scripts.
+
+I have only skimmed over the top of the most important commands, to find out more read the Raptor command documentation (in the "other/raptor command docs" directory in the Rubble download). How and where you can use Raptor scripts will be covered in later tutorials (there is also some information on the subject in the "Rubble Addons" document)
+
+========================================================
+
+Tutorial 4: Tileset Addons
+
+This tutorial will show you how to build tileset support into your mod, as well as explain some simple procedures for porting existing tilesets to Rubble.
+
+For details on how to use the templates mentioned here see the "Base Templates" documentation that comes with Rubble.
+
+So you want your cool new mod to support tilesets other than the default? Good thing Rubble goes out of its way to make that easy.
+
+There are 4 core templates that provide support for tilesets:
+	{#TILE;<ID>;<DEFAULT>}
+	{SET_TILE;<ID>;<TILE>}
+	{#COLOR;<ID>;<DEFAULT>}
+	{SET_COLOR;<ID>;<COLOR>}
+
+(The SET_XXX templates insert a entry in the tile or color dictionary that is later retrieved by the #TILE or #COLOR template with the same <ID>, if no entry for <ID> is present in the dictionary <DEFAULT> is used.)
+
+These templates are a little cumbersome to use but you don't have to. All the specialized SHARED_OBJECT templates will detect tile and color information in their contents and automatically inserts calls to #TILE and #COLOR.
+This means that you do not need explicit calls to #TILE or #COLOR as plants, inorganics, tools, and material definitions are handled automatically (while creatures have some tile information included, no tileset that I know of modifies this data).
+
+With #TILE and #COLOR handled, all you really need to worry about is SET_TILE and SET_COLOR. If you are adding support for a brand new tileset, the easiest way is to use #WRITE_TILESET. #WRITE_TILESET is a developer template that makes a list of all calls to #TILE and #COLOR and generates a file containing the corresponding calls to SET_TILE and SET_COLOR.
+You would then edit the file generated by #WRITE_TILESET to change the tile numbers and colors to match what you tileset needs.
+
+If you already have raws there is a shortcut you can use that will cut the time needed by a considerable amount. To put it simply you do a quick hack job of inserting the SHARED_OBJECT templates, then generate a temporary addon consisting of the edited raws with the last file containing a call to our friend #WRITE_TILESET.
+THIS PROCEDURE IS ONLY FOR CASES WHERE YOU ALREADY HAVE A FULL SET OF RAWS FOR YOUR TILESET! It is, IMHO, much easier to generate a default tileset addon and then edit that than it is to edit the full raws.
+
+These instructions are written with the assumption that you are using Notepad++, if you are using another editor you will have to make sure it is capable of regular expression search and replace operations.
+
+First make a new folder in you addons directory, this will be temporary, so name it anything you want.
+Now copy all the raw files that your tileset modified to your new temporary addon, you want only the changed files.
+Next add a file named something like "zzz_write_tileset.rbl" and add this line to that file: {#WRITE_TILESET;./tileset.rbl}
+Now open all the inorganic material files, to speed things up it's best to have them all open at once.
+Open the search/replace dialog and make sure the "Regular expression" radio button is checked.
+Then enter the following search text: "\[INORGANIC:([^:\]]+)\]"
+And this a the replacement: "}{SHARED_INORGANIC;$1;"
+Now go ahead and hit "Replace All in All Opened Documents".
+One last step: go through each file and remove the first '}' and add a '}' to the end of the file.
+
+Now follow the above steps for plant, item, and material template files using the following search/replace pairs:
+	"\[PLANT:([^:\]]+)\]" -> "}{SHARED_PLANT;$1;"
+	"\[ITEM_([^:\]]+):([^:\]]+)\]" -> "}{SHARED_ITEM;$1;$2;"
+	"\[MATERIAL_TEMPLATE:([^:\]]+)\]" -> "}{SHARED_MATERIAL_TEMPLATE;$1;"
+
+Now generate the raws, activating ONLY your temporary addon, "Base/Templates", and "Base/Clear", the generated raws are useless, what you want is the file "tileset.rbl" that should be in your current working directory (generally the directory containing "rubble.exe").
+
+Once you have your tileset.rbl file ready to go (however you got it) create a new addon and add the tileset.rbl file as well as your tileset's font image.
+
+To install you tileset image all you need to do is add a call to INSTALL_TILESHEET to the top of you tileset.rbl file, for example:
+[code]
+{INSTALL_TILESHEET;test_16x16.png}
+[/code]
+
+Now for editing the init files. Rubble provides a set of templates specifically for editing the tileset related init settings found in "d_init.txt". 
+To set the "font" (eg the tilesheet) you use the SET_FULLSCREEN_TILESHEET and SET_WINDOWED_TILESHEET templates. (Both templates also set the font to be used in graphical mode)
+To set things like track tiles you use OPEN_D_INIT, EDIT_D_INIT, CLOSE_D_INIT, and D_INIT_TO_DEFAULTS. The following example makes pillars look like smooth floors ;)
+[code]
+{OPEN_D_INIT}
+{EDIT_D_INIT;PILLAR_TILE;'+'}
+{CLOSE_D_INIT}
+[/code]
+Note that CLOSE_D_INIT will set ALL tileset related init settings to their defaults unless a call to EDIT_D_INIT has explicitly set that value! This is so that it is easy to reset values changed by other tilesets you may have installed before. 
+If you use all default init settings all you need to do is call D_INIT_TO_DEFAULTS to make sure an different tileset didn't clobber your settings.
+
+========================================================
+
+Tutorial 5: Basic Tweak Scripts
+
+This tutorial will introduce tweak scripts and attempt to show some uses for them.
+
+I personally use tweak scripts all over the place in my Rubble addons, as (by design) tweak scripts are incredibly flexible.
+
+The original use I had in mind for tweak scripts was allowing you to "tweak" the raws after generation in ways that are hard for templates to do.
+For example, the Rubble addon "Zap Aquifers", this addon consists of a single "post script" (a tweak script that runs after generation) that disables all AQUIFER tags in inorganic materials.
+Here is the whole script that I will be dissecting:
+[code]
+(var aquifercount 0)
+(var aquifercounttotal 0)
+
+(foreach [rubble:raws] {
+	(if (str:cmp "inorganic_" (str:left [params 0] 10)) {
+		(var file (raw:init [params 1]))
+		(var tag (raw:current))
+		
+		(console:print "    " [params 0] "\n")
+		
+		(loop {
+			(raw:advance)
+			
+			(if (raw:valid){}{(breakloop false)})
+			
+			(if (str:cmp [tag id] "AQUIFER") {
+				(raw:disable)
+				(++ aquifercount)
+			})
+			
+			(break true)
+		})
+		(console:print "      Found Aquifers : " [aquifercount] "\n")
+		(set aquifercounttotal (int:add [aquifercounttotal] [aquifercount]))
+		(set aquifercount 0)
+		
+		(set [rubble:raws] [params 0] (raw:dump))
+	})
+	(break true)
+})
+(console:print "    Found Aquifers Total : " [aquifercounttotal] "\n")
+[/code]
+
+First we will start with the top:
+[code]
+(var aquifercount 0)
+(var aquifercounttotal 0)
+
+(foreach [rubble:raws] {
+	...
+})
+[/code]
+The two variables are for logging, they keep track of how many aquifer tags we found in the current file and in all the files together.
+rubble:raws is an indexable that contains all the files in all the addons indexable by name.
+
+Now for the body of the foreach loop:
+[code]
+...
+
+(foreach [rubble:raws] {
+	(if (str:cmp "inorganic_" (str:left [params 0] 10)) {
+		(var file (raw:init [params 1]))
+		(var tag (raw:current))
+		
+		(console:print "    " [params 0] "\n")
+		
+		(loop {
+			(raw:advance)
+			
+			(if (raw:valid){}{(breakloop false)})
+			
+			...
+			
+			(break true)
+		})
+		(console:print "      Found Aquifers : " [aquifercount] "\n")
+		(set aquifercounttotal (int:add [aquifercounttotal] [aquifercount]))
+		(set aquifercount 0)
+		
+		(set [rubble:raws] [params 0] (raw:dump))
+	})
+	(break true)
+})
+...
+[/code]
+First we have an if command to check if the file contains inorganics, if not we just go on to the next file, simple.
+If the file does contain inorganics we setup a few temporary variables, initalize raw parsing for the file, and print the file name (in params 0). Raw parsing is provided by commands in the "raw" namespace, and is rather simple as all you can do is step through the file one tag at a time modifying the current tag if you wish.
+The loop command steps through the file one tag at a time checking if the tag is "valid" (eg EOF has not been reached) and breaking out of the loop if it is not.
+After all tags have been processed it prints a message to say how many aquifers it has found, adds the current count to the total, and resets the current count.
+Finally the modified raws are dumped to a string and that string is used to replace the old file contents.
+
+Now for the meat of the script, the few lines that actually DO something.
+[code]
+...
+
+(foreach [rubble:raws] {
+	(if (str:cmp "inorganic_" (str:left [params 0] 10)) {
+		...
+		
+		(loop {
+			(raw:advance)
+			
+			(if (raw:valid){}{(breakloop false)})
+			
+			(if (str:cmp [tag id] "AQUIFER") {
+				(raw:disable)
+				(++ aquifercount)
+			})
+			
+			(break true)
+		})
+		...
+	})
+	(break true)
+})
+(console:print "    Found Aquifers Total : " [aquifercounttotal] "\n")
+[/code]
+Right after we check for EOF we check if the tag id equals "AQUIFER" and call raw:disable if so (raw:disable just removes the square brackets around the tag). Also we increment the current aquifer count.
+Finally at the end, after all files are processed we print a message saying how many aquifers we found total in all files.
+
+As you can see there is a lot of stuff in a script of this type that will change but little for other scripts that walk the raws like this, unfortunately most of these scripts differ just enough to make some kind of universal raw walker command impractical :(
+
+One of the other big uses for tweak scripts is checking dependencies, for example:
+[code]
+(rubble:requireaddon "Some/Addon" "Some/Other/Addon")
+[/code]
+Will abort generation with the message:
+[code]
+The "Some/Addon" addon requires that the "Some/Other/Addon" addon be active!
+Please activate that addon and try again.
+[/code]
+(There is also a command for specifying incompatible addons)
+Most of the time you would want your dependency checks to be in prescripts, so as to abort as soon as possible.
+
+"So how does Rubble know what is a postscript and what is a prescript" you ask? Simple, the file extension. Rubble "knows" a file ending in .pre.rsf i a prescript and a file ending in .post.rsf is a post script.
+
+There are many, many things that you can do with tweak scripts, for more examples see the addons that come with Rubble.
+
+========================================================
+
+Tutorial 6: Not Sure Yet
+
+This tutorial will provide useful instruction, I am just not sure what kind as of yet :)

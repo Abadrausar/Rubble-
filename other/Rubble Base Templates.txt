@@ -8,11 +8,16 @@ User Templates defined in the base/templates addon.
 	Doesn't parse or return anything.
 
 ==============================================
+{!VOID;<PRERAWS>...}
 {VOID;<PRERAWS>...}
-	Parses <PRERAWS>, but doesn't return anything.
+{#VOID;<PRERAWS>...}
+{V;<PRERAWS>...}
+	Parses <PRERAWS>, but doesn't return anything. Useful for suppressing the normal output of a template.
 
 ==============================================
+{!ECHO;<PRERAWS>...}
 {ECHO;<PRERAWS>...}
+{#ECHO;<PRERAWS>...}
 {E;<PRERAWS>...}
 	Returns <PRERAWS>. Used to strip leading and trailing whitespace for better formatting of output and to delay variable expansion.
 
@@ -36,7 +41,7 @@ User Templates defined in the base/templates addon.
 
 ==============================================
 {SHARED_OBJECT_ADD;<ID>;<PRERAWS>}
-	Appends the result of parsing <PRERAWS> to the end of SHARED_OBJECT <ID>. If that shared object does not exist it still parses <PRERAWS> but nothing is done with the result.
+	Appends the result of parsing <PRERAWS> to the end of SHARED_OBJECT <ID>. If that shared object does not exist it saves the result to append to any definition that may come later.
 
 ==============================================
 {IF;<STRING1>;<STRING2>;<THEN_PRERAWS>}
@@ -45,14 +50,6 @@ User Templates defined in the base/templates addon.
 	
 	Example:
 		{IF;$TEST_VAR;YES;[FOO];[BAR]}
-
-==============================================
-{ONCE;<KEY>;<PRERAWS>}
-	Parses and returns <PRERAWS> unless a ONCE block with the same <KEY> has been parsed earlier.
-
-==============================================
-{STATIC;<KEY>;<PRERAWS>}
-	If this template is the first to be evaluated with key <KEY>, then <PRERAWS> are parsed and returned. Subsequent STATIC calls with the same <KEY> will return the result of the first parse instead without parsing anything else before that.
 
 ==============================================
 {SET;<NAME>;<VALUE>}
@@ -104,10 +101,6 @@ User Templates defined in the base/templates addon.
 	SHARED_MATERIAL_TEMPLATE is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS and SHARED_OBJECT_ADD as an id.
 
 ==============================================
-{REGISTER_ORE;<INORGANIC>;<METAL>;<AMOUNT>}
-	Adds a [METAL_ORE:<METAL>:<AMOUNT>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC or SHARED_MATERIAL_TEMPLATE. If this is called multiple times with the same <INORGANIC> and <METAL>, the highest <AMOUNT> is used.
-
-==============================================
 {REGISTER_REACTION_CLASS;<INORGANIC>;<CLASS>}
 	Adds a [REACTION_CLASS:<CLASS>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC or SHARED_MATERIAL_TEMPLATE.
 
@@ -124,6 +117,7 @@ User Templates defined in the base/templates addon.
 {#TILE;<ID>;<DEFAULT>}
 	If a tile entry for <ID> exists return it else return <DEFAULT>.
 	Use everywhere a tile number is required.
+	In most cases you will not need to use this template as the SHARED_OBJECT templates handles insertion of this template automatically.
 
 ==============================================
 {SET_COLOR;<ID>;<COLOR>}
@@ -134,6 +128,7 @@ User Templates defined in the base/templates addon.
 {#COLOR;<ID>;<DEFAULT>}
 	If a color entry for <ID> exists return it else return <DEFAULT>.
 	Use everywhere a color is required.
+	In most cases you will not need to use this template as the SHARED_OBJECT templates handles insertion of this template automatically.
 
 ==============================================
 {#WRITE_TILESET;<PATH>}
@@ -141,6 +136,64 @@ User Templates defined in the base/templates addon.
 	This should only be used once to get a template for making a tileset addon, it has no other use. The average user should never need this template, it is strictly for porting tilesets!
 	Note that for this to work #WRITE_TILESET MUST be called AFTER every call to #TILE or #COLOR!
 	(Not after each one, but after they have all run, eg #WRITE_TILESET should be near the end of the last file processed.)
+
+==============================================
+{INSTALL_TILESHEET;<TILESHEET>}
+	Copies the specified tilesheet image from you addon into the data/art directory.
+
+==============================================
+{SET_FULLSCREEN_TILESHEET;<TILESHEET>}
+	Sets the tilesheet used in fullscreen mode, both with graphics enabled and with them disabled.
+
+==============================================
+{SET_WINDOWED_TILESHEET;<TILESHEET>}
+	Sets the tilesheet used in windowed mode, both with graphics enabled and with them disabled.
+
+==============================================
+{OPEN_D_INIT}
+	Opens "d_init.txt" for editing.
+
+==============================================
+{EDIT_D_INIT;<SETTING>;<VALUE>}
+	Edit a setting in "d_init.txt".
+	<SETTING> must be one of:
+		SKY
+		CHASM
+		PILLAR_TILE
+		TRACK_N
+		TRACK_S
+		TRACK_E
+		TRACK_W
+		TRACK_NS
+		TRACK_NE
+		TRACK_NW
+		TRACK_SE
+		TRACK_SW
+		TRACK_EW
+		TRACK_NSE
+		TRACK_NSW
+		TRACK_NEW
+		TRACK_SEW
+		TRACK_NSEW
+		TRACK_RAMP_N
+		TRACK_RAMP_S
+		TRACK_RAMP_E
+		TRACK_RAMP_W
+		TRACK_RAMP_NS
+		TRACK_RAMP_NE
+		TRACK_RAMP_NW
+		TRACK_RAMP_SE
+		TRACK_RAMP_SW
+		TRACK_RAMP_EW
+		TRACK_RAMP_NSE
+		TRACK_RAMP_NSW
+		TRACK_RAMP_NEW
+		TRACK_RAMP_SEW
+		TRACK_RAMP_NSEW
+
+==============================================
+{CLOSE_D_INIT}
+	Writes all changes to "d_init.txt", any value that was not set by a call to EDIT_D_INIT will have the vanilla default written.
 
 ==============================================
 {BUILDING_WORKSHOP;<TECH>;<CLASS>}
@@ -170,13 +223,16 @@ User Templates defined in the base/templates addon.
 	Combo of #USES_BUILDINGS and #USES_REACTIONS
 
 ==============================================
-{ITEM;<TYPE>;<ITEM>;<DEFINITION>}
+{SHARED_ITEM;<TYPE>;<ITEM>;<DEFINITION>}
 	Registers an item <ITEM> of type <TYPE>. Used later with #USES_ITEMS and ITEM_CLASS. 
 	Returns [ITEM_<TYPE>:<ITEM>]
 	
-	<TYPE> must be one of AMMO, ARMOR, DIGGER, GLOVES, HELM, INSTRUMENT, PANTS, SHIELD, SHOES, SIEGEAMMO, TOOL, TOY, TRAPCOMP or WEAPON.
+	SHARED_ITEM, like the other shared definition templates, will extract tile numbers used in tool definitions and wrap them in calls to #TILE.
 	
-	ITEM is based on SHARED_OBJECT, so <ITEM> can be passed to SHARED_OBJECT_EXISTS as an id.
+	<TYPE> must be one of AMMO, ARMOR, DIGGER, FOOD, GLOVES, HELM, INSTRUMENT, PANTS, SHIELD, SHOES, SIEGEAMMO, TOOL, TOY, TRAPCOMP or WEAPON.
+	For type FOOD SHARED_ITEM just translates directly to a call to SHARED_OBJECT, no support for items classes is initiated (as foods do not need to be registered). The only reason SHARED_ITEM supports FOOD at all is for consistency.
+	
+	SHARED_ITEM is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS and SHARED_OBJECT_ADD as an id.
 
 ==============================================
 {ITEM_CLASS;<CLASS>;<RARITY>=COMMON}

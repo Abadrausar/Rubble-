@@ -31,7 +31,7 @@ import "os"
 func main() {
 	// init logging
 	InitLogging()
-
+	
 	// Init crash handler
 	defer func() {
 		if NoRecover {
@@ -45,7 +45,7 @@ func main() {
 		}
 	}()
 
-	LogPrintln("Rubble v3.2")
+	LogPrintln("Rubble v3.3")
 	LogPrintln("After Blast comes Rubble.")
 	LogPrintln("=============================================")
 
@@ -134,7 +134,7 @@ func main() {
 	}
 
 	// Test lexer
-	if LexTest {
+	if LexTest && !ShellMode {
 		for _, i := range Files.Order {
 			lex := NewLexer(Files.Files[i].Content)
 			for {
@@ -175,23 +175,33 @@ func main() {
 	LogPrintln("Initializing Scripting Subsystem.")
 	InitScripting()
 	
-	LogPrintln("Running Forced Init Scripts.")
-	for i := range ForcedInit {
-		script := raptor.NewScript()
-		err := raptor.LoadFile(ForcedInit[i], script)
-		if err != nil {
-			panic("Script Error: " + err.Error())
+	if !ShellMode || RunForcedInit {
+		LogPrintln("Running Forced Init Scripts.")
+		for i := range ForcedInit {
+			script := raptor.NewScript()
+			err := raptor.LoadFile(ForcedInit[i], script)
+			if err != nil {
+				panic("Script Error: " + err.Error())
+			}
+	
+			_, err = GlobalRaptorState.Run(script)
+			if err != nil {
+				panic("Script Error: " + err.Error())
+			}
 		}
-
-		_, err = GlobalRaptorState.Run(script)
-		if err != nil {
-			panic("Script Error: " + err.Error())
-		}
+	} else {
+		LogPrintln("Skipping Forced Init Scripts.")
 	}
 	
 	LogPrintln("Adding Builtins.")
 	SetupBuiltins()
-
+	
+	// Embedded Raptor Shell
+	if ShellMode {
+		ShellModeRun()
+		os.Exit(0)
+	}
+	
 	LogPrintln("=============================================")
 	LogPrintln("Running Prescripts...")
 	ParseStage = stgPreScripts

@@ -41,6 +41,15 @@ var LexTest bool
 var NoRecover bool
 var ExitAfterUpdate bool
 
+var ShellMode bool
+var ScriptPath string
+var Compile string
+var BinVersion int
+var Validate bool
+var NoExit bool
+var NoPredefs bool
+var RunForcedInit bool
+
 func ParseCommandLine() {
 	Flags.SetOutput(logFile)
 
@@ -101,6 +110,15 @@ func ParseCommandLine() {
 
 	Flags.BoolVar(&LexTest, "lextest", false, "Run a Rubble lexer test. No files will be written.")
 	Flags.BoolVar(&NoRecover, "norecover", false, "Should Rubble not recover errors? Useful for debugging.")
-
+	
+	Flags.BoolVar(&ShellMode, "shell", false, "Enter Shell Mode. Shell Mode is a full-up version of the Raptor Shell.")
+	Flags.StringVar(&ScriptPath, "script", "", "Shell Mode: Path to the input script, if any. Changes to batch mode. Needed for -compile")
+	Flags.StringVar(&Compile, "compile", "", "Shell Mode: Path to the output file. Changes to compile mode. Needs -script to be set.")
+	Flags.IntVar(&BinVersion, "binversion", 4, "Shell Mode: Force a specific binary version. Fallback rules still apply.")
+	Flags.BoolVar(&Validate, "validate", false, "Shell Mode: Run script through the syntax checker and exit. Use with -script.")
+	Flags.BoolVar(&NoExit, "noexit", false, "Shell Mode: If set changes from batch mode to interactive mode. Use with -script.")
+	Flags.BoolVar(&NoPredefs, "nopredefs", false, "Shell Mode: If set disables the shell predefs.")
+	Flags.BoolVar(&RunForcedInit, "forcedinit", false, "Shell Mode: Run the Rubble forced init scripts before entering shell mode.")
+	
 	Flags.Parse(os.Args[1:])
 }

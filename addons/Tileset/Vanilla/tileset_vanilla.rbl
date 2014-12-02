@@ -1,0 +1,8 @@
+
+{D_INIT_TO_DEFAULTS}
+
+# not exactly vanilla values, but as close as you can get with the default templates
+{SET_FULLSCREEN_TILESHEET;curses_square_16x16.png}
+{SET_WINDOWED_TILESHEET;curses_square_16x16.png}
+
+# In a non-ASCII tileset there would be a long list of calls to SET_TILE and SET_COLOR here.

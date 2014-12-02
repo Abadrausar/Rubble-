@@ -45,7 +45,7 @@
 (command rubble:requireaddon me addon {
 	(if (rubble:addonactive [addon]) {
 	}{
-		(rubble:abort (str:add "The \"" [me] "\" addon requires that the \"" [addon] "\" addon to be active!\n"
+		(rubble:abort (str:add "The \"" [me] "\" addon requires that the \"" [addon] "\" addon be active!\n"
 		"Please activate that addon and try again."))
 	})
 })

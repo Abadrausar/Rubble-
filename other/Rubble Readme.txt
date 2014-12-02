@@ -18,7 +18,7 @@ Pros:
 	Many templates for registering objects and the like are replacements for vanilla raw tags allowing better formatting
 	Some files may be parsed but not included in the generated raws
 	Support for easily and quickly installing tilesets as addons
-	Allows you to run "tweak scripts" before or after generation to allow fine-tuning the results
+	Allows you to run "tweak scripts" before or after generation for fine-tuning the results
 	Support for external launchers via the command line
 	Easy to use GUI to enable and disable addons (it's windows only, sorry)
 	Addons can be grouped into directories to make relations clear (and to make addon packs easy to distribute)
@@ -31,7 +31,7 @@ Cons:
 	No support for Blast namespaces (eg. @, @@, and @@@)
 	Variables are simple key:value pairs instead of Blast's more powerful system
 	No built-in pretty printer (unless, like me, you think of this as a pro :) )
-	No per-addon configuration file
+	No per-addon configuration file (unless you script in support for one)
 	The scripting language isn't exactly mainstream
 
 Required Reading for Modders (in most-important-first order):
@@ -56,7 +56,7 @@ Of course if you know Perl and don't want to learn Raptor (Rubble's scripting la
 
 I have put a huge amount of effort into making Rubble as flexible and powerful as possible, so newer features like tweak scripts and the new addon loader make Blast look like a toy, a cool, powerful toy, but a toy nonetheless.
 
-Blast is still a good utility, but if you don't mind learning a new scripting language Rubble is far more powerful.
+Blast is still a good utility, but if you don't mind learning a new scripting language (and even if you do) Rubble is far more powerful.
 
 ==============================================
 Install:
@@ -96,7 +96,7 @@ Rubble supports external launchers via the -config and -addons command line opti
 -addons allows you to override the default rules for loading addons by explicitly listing which ones you want to load.
 	Usage: -addons="addon1;addon2;addon3;ect"
 		(the same note about ';' applies here as well)
-These two options are more for use by external launchers but may be useful for if you want to generate two or more mods from the same base and would rather not mess around with renaming addon folders
+These two options are mostly for use by external launchers.
 
 If you want to regenerate the raws for a save just run 'rubble -outputdir="../data/save/<savename>/raw/objects"'
 
@@ -106,7 +106,7 @@ All directories used by Rubble must exist.
 Included Addons:
 ==============================================
 
-I include addons in the base Rubble install that fix bugs, demo something useful, or are just to useful to leave out. 
+I include addons in the base Rubble install that fix bugs, demo something useful, or are just too useful to leave out. 
 Needless to say these addons make a good place to look for info on how to do something. Sorry about the lack of comments in the addon files, I need to fix that sometime.
 
 If you like the addons that come with Rubble you may also want to get Better Dorfs: <BD URL here>
@@ -179,12 +179,12 @@ Nerf/Whips:
 
 Tileset/MLC:
 	A simple addon that installs my custom ASCII-like tileset.
-	This addon is stand-alone, as it uses no outside templates.
+	This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
 	Demos tileset addons.
 
 Tileset/Vanilla:
 	Restores the vanilla tileset related init options.
-	This addon is stand-alone, as it uses no outside templates.
+	This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
 
 Zap Aquifers:
 	Disables all AQUIFER tags.
@@ -205,6 +205,33 @@ If you really want to be helpful run "rubble -norecover" and post that log as we
 ==============================================
 Changelog:
 ==============================================
+v3.3
+	Added the following templates to help streamline tileset support:
+		INSTALL_TILESHEET
+		SET_FULLSCREEN_TILESHEET
+		SET_WINDOWED_TILESHEET
+		OPEN_D_INIT
+		EDIT_D_INIT
+		CLOSE_D_INIT
+	Changed the default tileset addons to use the new templates.
+	Renamed ITEM to SHARED_ITEM (to be consistent with the other SHARED_OBJECT templates)
+	Added ITEM as an alias for SHARED_ITEM, this will be removed in a future version
+	The SHARED_ITEM template is now tileset aware (for tools)
+	SHARED_ITEM now properly handles type DIGGER
+	Updated SHARED_ITEM to handle type FOOD
+	Updated the "Base/Files" addon to reflect the changes to SHARED_ITEM
+	Removed REGISTER_ORE, I never used it and you can just use SHARED_OBJECT_ADD instead
+	Made SHARED_OBJECT_ADD able to add to shared objects that are not yet defined as well as those already defined
+		Code added by SHARED_OBJECT_ADD will always come at the end of the definition
+	Removed ONCE and STATIC, as they were just Blast holdovers that have no real use as far as I could see
+	Added !ECHO, #ECHO, !VOID, #VOID, and V (all are aliases of existing templates)
+	Rubble now includes an embedded copy of the full-up Raptor shell!
+		Use "-shell" to enter shell mode, all normal Raptor shell command-line arguments work :)
+		The shell is entered just before generation would have started.
+		See "Rubble Addons.txt" for details.
+	Fixed bug in script command rubble:calltemplate.
+	Updated the Notepad++ UDL
+
 v3.2
 	Added forced initialization scripts, special scripts named "forced_init.rsf" (or .rbf) that ALWAYS run
 		Forced init scripts will run for any addon, even addons that are not active or addons that have no parseables

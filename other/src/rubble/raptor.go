@@ -45,7 +45,6 @@ import "strings"
 import "os"
 
 var GlobalRaptorState *raptor.State
-var GlobalRaptorScript *raptor.Script
 
 func InitScripting() {
 	state := raptor.NewState()
@@ -196,7 +195,7 @@ func CommandRubble_Parse(script *raptor.Script, params []*raptor.Value) {
 // 	rubble:calltemplate name [params...]
 // Returns the templates return value.
 func CommandRubble_CallTemplate(script *raptor.Script, params []*raptor.Value) {
-	if len(params) > 1 {
+	if len(params) < 1 {
 		panic("Wrong number of params to rubble:calltemplate.")
 	}
 	name := params[0].String()

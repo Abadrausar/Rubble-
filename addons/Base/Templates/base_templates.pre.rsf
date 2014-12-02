@@ -7,13 +7,24 @@
 (rubble:template "COMMENT" {(ret "")})
 (rubble:template "C" {(ret "")})
 
-(rubble:template "VOID" ... {
+(command rubble:void params {
 	(foreach [params] {
-		# Note that params here is NOT the same array as the one passed to foreach
 		(rubble:stageparse [params 1])
 		(break true)
 	})
 	(ret "")
+})
+(rubble:template "!VOID" ... {
+	(rubble:void [params])
+})
+(rubble:template "VOID" ... {
+	(rubble:void [params])
+})
+(rubble:template "#VOID" ... {
+	(rubble:void [params])
+})
+(rubble:template "V" ... {
+	(rubble:void [params])
 })
 
 # ABORT, cause Rubble to exit with an error, not used in the base.
@@ -21,26 +32,32 @@
 (rubble:template "ABORT" msg {(rubble:abort [msg])})
 (rubble:template "#ABORT" msg {(rubble:abort [msg])})
 
-# The next two templates are for stripping leading/trailing whitespace from a string.
+# The next templates are for stripping leading/trailing whitespace from a string.
 # A formatting tool mostly, helps keep whitespace under control in generated files.
 # May also be used to help control variable expansion.
-(rubble:template "ECHO" ... {
+(command rubble:echo params {
 	(var tmp)
 	(foreach [params] {
 		(set tmp (str:add [tmp] [params 1]))
 	})
 	(rubble:stageparse [tmp])
+})
+(rubble:template "!ECHO" ... {
+	(rubble:echo [params])
+})
+(rubble:template "ECHO" ... {
+	(rubble:echo [params])
+})
+(rubble:template "#ECHO" ... {
+	(rubble:echo [params])
 })
 (rubble:template "E" ... {
-	(var tmp)
-	(foreach [params] {
-		(set tmp (str:add [tmp] [params 1]))
-	})
-	(rubble:stageparse [tmp])
+	(rubble:echo [params])
 })
 
-# Shared Object, the single most important template in all of Rubble
+# SHARED_OBJECT, the single most important template in all of Rubble
 (var rubble:shared_object_data <map>)
+(var rubble:shared_object_add_data <map>)
 (rubble:template "SHARED_OBJECT" id raws {
 	(if (exists [rubble:shared_object_data] [id]){
 		(rubble:stageparse [raws])
@@ -58,18 +75,16 @@
 	})
 })
 (rubble:template "SHARED_OBJECT_ADD" id raws {
-	(if (exists [rubble:shared_object_data] [id]){
-		(set [rubble:shared_object_data] [id] 
-			(str:add [rubble:shared_object_data [id]] "\n\t" (rubble:stageparse [raws]))
-		)
-	}{
-		(rubble:stageparse [raws])
-	})
+	(set [rubble:shared_object_add_data] [id] (rubble:stageparse [raws]))
 	(ret "")
 })
 (rubble:template "#_INSERT_SHARED_OBJECT" id {
-	(if (exists [rubble:shared_object_data] [id]){
-		(rubble:stageparse [rubble:shared_object_data [id]])
+	(if (exists [rubble:shared_object_data] [id]) {
+		(var out (rubble:stageparse [rubble:shared_object_data [id]]))
+		(if (exists [rubble:shared_object_add_data] [id]) {
+			(set out (str:add [out] "\n" (rubble:stageparse [rubble:shared_object_add_data [id]])))
+		})
+		(ret [out])
 	}{
 		(ret "")
 	})
@@ -80,25 +95,6 @@
 		(rubble:stageparse [then])
 	}{
 		(rubble:stageparse [else])
-	})
-})
-
-(var rubble:once_data <map>)
-(rubble:template "ONCE" id raws {
-	(if (exists [rubble:once_data] [id]){
-		(ret "")
-	}{
-		(set [rubble:once_data] [id] true)
-		(rubble:stageparse [raws])
-	})
-})
-
-(var rubble:static_data <map>)
-(rubble:template "STATIC" id raws {
-	(if (exists [rubble:static_data] [id]){
-		(ret [rubble:static_data [id]])
-	}{
-		(set [rubble:static_data] [id] (rubble:stageparse [raws]))
 	})
 })
 
@@ -113,7 +109,6 @@
 	(ret (str:add "[ADVENTURE_TIER:" [rubble:adventure_tier_data] "]"))
 })
 
-# This refactoring made possible by NCA5
 (command rubble:print params {
 	(foreach [params] {
 		(console:print "    " (rubble:expandvars [params 1]) "\n")
@@ -200,7 +195,6 @@
 		"{SHARED_OBJECT;" [id] ";\n"
 		"[INORGANIC:" [id] "]\n\t"
 		[raws]
-		"{#_REGISTERED_ORES;" [id] "}"
 		"{#_REGISTERED_REACTION_CLASSES;" [id] "}"
 		"{#_REGISTERED_REACTION_PRODUCTS;" [id] "}"
 		"\n}"
@@ -223,45 +217,11 @@
 		"{SHARED_OBJECT;" [id] ";\n"
 		"[MATERIAL_TEMPLATE:" [id] "]\n\t"
 		[raws]
-		"{#_REGISTERED_ORES;" [id] "}"
 		"{#_REGISTERED_REACTION_CLASSES;" [id] "}"
 		"{#_REGISTERED_REACTION_PRODUCTS;" [id] "}"
 		"\n}"
 	)
 	(rubble:stageparse (nop))
-})
-
-(var rubble:ore_data <map>)
-(rubble:template "REGISTER_ORE" id metal amount {
-	(if (exists [rubble:ore_data] [id]){
-	}{
-		(set [rubble:ore_data] [id] <map>)
-	})
-	
-	(if (exists [rubble:ore_data [id]] [metal]){
-	}{
-		(set [rubble:ore_data [id]] [metal] [amount])
-		(ret "")
-	})
-	
-	(if (int:lt [rubble:ore_data [id] [metal]] [amount]){
-		(set [rubble:ore_data [id]] [metal] [amount])
-	})
-	(ret "")
-})
-(rubble:template "#_REGISTERED_ORES" id {
-	(var out)
-	
-	(if (exists [rubble:ore_data] [id]){
-	}{
-		(ret "")
-	})
-	
-	(foreach [rubble:ore_data [id]] {
-		(set out (str:add [out] "\n\t[METAL_ORE:" [params 0] ":" [params 1] "]"))
-		(break true)
-	})
-	(ret [out])
 })
 
 (var rubble:reaction_class_data <map>)
@@ -320,49 +280,6 @@
 		(break true)
 	})
 	(ret [out])
-})
-
-(var rubble:tile_data <map>)
-(var rubble:color_data <map>)
-(var rubble:tileset <array>)
-(rubble:template "SET_TILE" id tile {
-	(if (exists [rubble:tile_data] [id]){
-	}{
-		(set [rubble:tile_data] [id] [tile])
-	})
-	(ret "")
-})
-(rubble:template "#TILE" id default {
-	(set [rubble:tileset] (len [rubble:tileset]) (str:add "{SET_TILE;" [id] ";" [default] "}"))
-	(if (exists [rubble:tile_data] [id]){
-		(ret [rubble:tile_data [id]])
-	}{
-		(ret [default])
-	})
-})
-(rubble:template "SET_COLOR" id color {
-	(if (exists [rubble:color_data] [id]){
-	}{
-		(set [rubble:color_data] [id] [color])
-	})
-	(ret "")
-})
-(rubble:template "#COLOR" id default {
-	(set [rubble:tileset] (len [rubble:tileset]) (str:add "{SET_COLOR;" [id] ";" [default] "}"))
-	(if (exists [rubble:color_data] [id]){
-		(ret [rubble:color_data [id]])
-	}{
-		(ret [default])
-	})
-})
-(rubble:template "#WRITE_TILESET" path {
-	(var out "\n")
-	(foreach [rubble:tileset] {
-		(set out (str:add [out] [params 1] "\n"))
-		(break true)
-	})
-	(fileio:write [path] [out])
-	(ret "")
 })
 
 # Tech Templates
@@ -550,16 +467,33 @@
 >)
 
 (var rubble:item_data <map>)
-(rubble:template "ITEM" type id def {
+(rubble:template "SHARED_ITEM" type id def {
+	(if (str:cmp [type] "FOOD") {
+		# FOOD doesn't need to be registered in an entity, so translate it directly to a SHARED_OBJECT call.
+		(ret (rubble:stageparse (str:add "{SHARED_OBJECT;" [id] ";\n[ITEM_" [type] ":" [id] "]\n\t" [def] "\n}")))
+	})
+	
 	(set rubble:item_current_id [id])
 	(set rubble:item_current_type [type])
 	
 	(if (exists [rubble:item_types] [type]){
 	}{
-		(panic "Invalid item type passed to ITEM.")
+		(panic "Invalid item type passed to SHARED_ITEM.")
+	})
+	
+	(regex:replace "\\[TILE:([0-9]+|'.')\\]" [def] (str:add "[TILE:{#TILE;" [id] ";$1}]"))
+	(set def (nop))
+	
+	(if (str:cmp [type] "DIGGER") {
+		(set type "WEAPON")
 	})
 	
 	(rubble:stageparse (str:add "{SHARED_OBJECT;" [id] ";\n[ITEM_" [type] ":" [id] "]\n\t" [def] "\n}"))
+})
+(rubble:template "ITEM" type id def {
+	(console:print "    WARNING template ITEM is depreciated and will be removed soon.\n"
+	"      Replace with SHARED_ITEM.")
+	(rubble:calltemplate "SHARED_ITEM" [type] [id] [def])
 })
 (rubble:template "ITEM_CLASS" ... {
 	(var type [rubble:item_current_type])
