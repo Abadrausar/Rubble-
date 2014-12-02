@@ -20,6 +20,7 @@ command rubble:addonactive name {
 	})
 }
 
+# You should generally use addon.meta instead, but just in case...
 command rubble:activateaddon me addon {
 	(if (rubble:addonactive [me]) {
 		var addonref = (rubble:fetchaddon [addon])

@@ -1,0 +1,15 @@
+<rubble:addonmeta
+	lib=true
+	
+	header=`Modify the reaction list of hard coded buildings.`
+	
+	description=`
+Allows you to add reactions to buildings that are normally not possible to add reactions to, also 
+allows you to remove all hardcoded reactions from a building.
+WARNING! Largely untested!
+`
+	
+	activates=""
+	
+	vars=""
+>

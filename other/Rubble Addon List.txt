@@ -5,14 +5,16 @@ Included Addons:
 
 Rubble includes all kinds of useful addons, some for developers and some for end users. These addons are included in an attempt to ensure that Rubble has something for everyone, and to provide a broad base of examples for aspiring addon developers.
 
-If you want to generate the Rubble version of "vanilla DF" you will need to activate the "Base" addon, this addon is already active in the default addonlist.ini ("Libs/Base" and "Libs/Castes" are also required, but those addons are forced active so you do not need to worry about them).
+If you want to generate the Rubble version of "vanilla DF" you will need to activate the "Base" addon, this addon is already active by default.
 
-Some addons have unlisted dependencies, in this case they will activate their dependencies automatically so you do not need to worry about them.
+All addons will automatically activate any dependencies, so don't worry if the addon list that is generated is a little different from what you selected.
 
 All of the DFHack stuff is made under the assumption that what worked with 34.11 and DFHack r5e1 will work with the 40.x DFHack when it is available.
 If this is not true some or all of the DFHack related addons will not work.
 
-A few of the addons allow you to make gloves via reactions, unfortunately these gloves will be unusable (it's a vanilla bug). To make these gloves usable you need a DFHack script to set the glove handedness.
+A few of the addons allow you to make gloves via reactions, unfortunately these gloves will be unusable (it's a vanilla bug). If you have DFHack this will be fixed automatically.
+
+This list is not perfect, it may be slightly out of date and/or be slightly wrong about something. For the latest information on each addon see its description page in the Web UI.
 
 Base:
 	The standard base addon. Contains Rubblized versions of the vanilla raw files. 
@@ -57,7 +59,8 @@ Dev:
 Libs:
 	The addons in this group are libraries, eg they provide functionality used by other addons.
 	Any templates added by these addons are fully documented, see "Rubble Libs Templates.txt" and "Rubble Base Templates.txt".
-	All of the addons in this group are forced active if they are needed, so there is no need to activate them manually.
+	All of the addons in this group are automatically managed. They do not show as options to choose when generating as they are activated and deactivated automatically.
+	The Libs addons are only listed here for the edification of modders.
 
 	Libs/Base:
 		All the base templates and other such stuff, critical to normal operation.
@@ -123,10 +126,7 @@ User:
 		Adds the archers workshop, a building where you can make all types of ranged weapons and their ammo.
 		The only thing you cannot do (yet) is make ranged weapons from metal, you will have to use bone or wood for now.
 		To keep the ammo reaction count under control ammo creation is done in two steps, first you make "shafts" out of the desired material, then you turn the shafts into ammo of the desired type.
-	
-	User/Block:
-		This addon provides materials used by the other addons in this group, you do not need to worry about it, if it is needed it will be activated automatically.
-	
+
 	User/Block/Boulder:
 		For the OCD among us, I present the boulder press. The boulder press allows you to recolor boulders via the wonders of dwarven masonry. 
 		How does it work? I have no idea, but dwarven masons are renowned for their ability to do strange things with stone :)
@@ -460,12 +460,6 @@ User:
 	User/Tileset/MLC/Pure ASCII:
 		A simple addon that installs my custom ASCII-like tileset.
 		This version has absolutely no graphical tiles.
-		Comes in two sizes, a 16x16 for fullscreen mode and a 10x10 for windowed mode.
-		This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
-	
-	User/Tileset/MLC/Tracks:
-		A simple addon that installs my custom ASCII-like tileset.
-		This version has really nice track graphics. There are a bunch of things that will look a little funny, but tracks look great (tile layout was sub-optimal even for 34.11, now with multi-tile trees it is rather bad).
 		Comes in two sizes, a 16x16 for fullscreen mode and a 10x10 for windowed mode.
 		This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
 	

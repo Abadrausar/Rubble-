@@ -15,7 +15,7 @@
 
 (rubble:template "DFHACK_ANNOUNCE" block text color="COLOR_WHITE" id="" {
 	(if (str:cmp [id] "") {
-		(if (isnil [rubble:reaction_data [rubble:reaction_last]]) {
+		(if (str:cmp [rubble:reaction_last] "") {
 			(rubble:abort "Error: rubble:reaction_last is invalid in call to DFHACK_ANNOUNCE.")
 		})
 		

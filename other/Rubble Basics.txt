@@ -36,6 +36,74 @@ Duplicate keys are just fine, they will act pretty much exactly like duplicate o
 Most users will never need the configuration file.
 
 ==============================================
+Rubble Web UI Customization:
+==============================================
+
+When the web UI server is run it tries to load HTML templates and CSS files from "./other/webUI/", if it does not find the file it is looking for it tries to write the default version of the file out to that directory.
+
+If you want to customize the look of the UI create the "./other/webUI" directory then run the server once to create these files. You can then modify them, and from then on the server will use your files.
+
+Each page template receives raw data about whatever it is supposed to do, in the default templates this data is formatted as JSON and most of the page content is generated client-side by JavaScript, but it is possible to generate the page directly on the server by using the template system for everything. In some cases doing so will cut the page size considerably as some pages receive the parsed version of the entire addons directory! (that's over 7mb of data!)
+
+Keep in mind that the way the server interacts with these files is hardcoded! Each template receives a specific set of data, and must act a certain way (as observed by the server).
+
+If you wish to use files beyond the default templates (for example images or extra HTML and CSS) the contents of the "./other/webUI/extras" directory is served as "/extras/<filename>". None of the default templates make use of this capability.
+
+For more details on how these templates work see "golang.org/pkg/html/template/".
+For details about exactly what Rubble passes each page you will have to look at the source code ("./other/src/rubble" and "./other/src/rubble/interface/web", specifically the files "meta.go", "addon.go", and "main.go" will be the most helpful).
+
+If anybody comes up with a nicer set of templates (or some better CSS) I want to see them!
+The current look isn't all that great, so this is your chance to get listed in the credits and on the about page :p
+
+==============================================
+addon.meta:
+==============================================
+
+Addons may now include a special file named addon.meta that contains extra information about the addon. This file is optional but recommended.
+
+The meta file is actually a Rex script, but please don't abuse this by running arbitrary code as this script MUST return a special value (and load scripts are more flexible). The only reason a Rex script is used is so that I can get complex parsing for "free".
+
+Example addon.meta file:
+	# Missing fields are set to their defaults.
+	# If the addon does not have a meta file then all fields will be default.
+	
+	# This file MUST return a rubble:addonmeta indexable.
+	
+	# String fields generally have leading and trailing white space stripped.
+	
+	<rubble:addonmeta
+		lib=false
+		
+		header=`An example addon, nothing special about it.`
+		
+		description=`
+This addon does little of interest,
+Actually it is totally made up.
+`
+		
+		activates="Libs/Example;Some/Addon"
+		
+		vars=<map
+			CONFIG_VAR="default value"
+			OTHER_CONFIGVAR=<rubble:addonmetavar name="Use some option?" val="YES" choices="YES" choices="NO">
+		>
+	>
+
+Most of the fields are not used directly by Rubble, but may be used by various interfaces.
+
+The most important field by far is the "activates" field. This field specifies addons that are required for this addon to function. Addons listed in the activates field are activated automatically if this addon is active, basically an easier to use version of rubble:activateaddon.
+
+The "libs" field is also very important. Any addon that has lib set to true will not allow activation in the normal manner eg it will ignore activation by the -addons command line option, the addons config file key, and any entries in addon list files (when an addon list is generated lib addons will not even be listed). Such "lib" addons may only be activated by a load script or by having an entry in the "activates" meta key of an active addon.
+Lib addons are good for libraries and other addons that do not directly effect the user, as they are generally hidden from view and managed automatically.
+
+The "vars" field is a special case in many ways, first it needs to be an indexable mapping variable names to default values, second it may take a special kind of default value that gives you more control over possible values.
+Most of the time the default value is interpreted as a string, but if you pass an indexable with the special rubble:addonmetavar type it will allow you to specify how the var is used. For now you can limit the possible choices to a specific set and/or specify a user friendly name.
+
+"header" and "description" are descriptions and documentation for the edification of the user. "header" is a one line description of the addon, it should be short and to the point. "description" may be as long as you wish, put everything a user will need to know to use an addon here, if header already provides sufficient description leave this field empty.
+
+"activates" and "lib" are the only fields that are used directly by Rubble, all of the other fields are provided for use by interfaces. Current the only interface that uses the meta data is the web UI.
+
+==============================================
 Tileset Addons:
 ==============================================
 
@@ -77,7 +145,7 @@ Pseudo modules consist of three parts:
 	Client scripts
 
 The module file is almost exactly like a standard Lua module, the only difference is the prefix and suffix
-At the top of the script where you would have some thing like this:
+At the top of the script where you would have something like this:
 	local _ENV = mkmodule("example")
 You have this instead:
 	local _ENV = rubble.mkmodule("example")
@@ -105,6 +173,8 @@ Rubble provides (very) basic support for applying diff patches to files (or any 
 This ability is primarily for use by bugfixes and minor updates and is not meant as a general modding tool, but there may be a few case where it will come in handy. The primary problem with Rubble's patch support is that it is fragile, eg even relatively small changes can stop the patch from applying. This behavior is intended.
 
 In general it is better not to use patches, save them for use in loader scripts and even there only use them to apply small changes.
+
+Keep in mind that when applying a patch from a loader script you need to make sure the script only runs once! See the section on loader scripts for details.
 
 (see the rubble:patch script command and the !PATCH base template)
 
@@ -149,7 +219,14 @@ Loader scripts only do one thing that init scripts can't do better: they can mod
 Like init scripts, loader scripts are global and pay no attention to their containing addon.
 Loader scripts are only run during normal generation cycles.
 
-Loader scripts make a great place to apply patches and force activate dependencies, for most other uses init scripts are better.
+Loader scripts make a great place to apply patches and force activate dependencies, for most other uses init scripts are better (for a better way to force dependencies see the section on addon.meta).
+
+One potential problem is that loader scripts can (and will) be called more than once per session (depending on the Rubble interface used).
+This can be a BIG problem if you are doing something that may only be done once. If this is a problem put all such items into a separate file and add `(rubble:gfiletag (rubble:curentfile) Skip true)` somewhere in the file.
+
+Remember: The loader scripts are run more than once for a reason! Addon state may change significantly between runs, so do not skip any script that you do not absolutely have to.
+
+Luckily these problems are really rare in practice (none of the default addons had any trouble), as there are very few things that NEED to be done from a loader script that cannot be done multiple times. About the only thing that can cause problems is applying patches.
 
 ==============================================
 File Tags:
@@ -167,16 +244,17 @@ To modify and/or read file tags the rubble:filetag command is used:
 
 Hard Coded File Tags:
 	Tag ID			Use
+	LoadScript		Marks the file as a loader script.
+	InitScript		Marks the file as a init script.
 	PreScript		Marks the file as a pre script.
 	PostScript		Marks the file as a post script.
 	PrepFile		The file should be written to the prep addon, or (during prep mode) the file is a prep script.
-	InstScript		Marks the file as an install script, only useful during install mode.
 	GraphicsFile	The file should be written to "out:graphics".
 	RawFile			Marks the file as parseable raw text.
 	NoWrite			Used with RawFile, marks the file as not to be written to the objects folder.
-	Skip			The file is to be ignored.
+	Skip			The file is to be ignored in any future passes.
 
-There are a few additional hard coded tags, but they are only used on global script files (load and init scripts) and as such they are never visible to the user.
+LoadScript and InitScript are only used with certain global files, you will never see these tags when using rubble:filetag, only rubble:gfiletag will show these tags.
 
 ==============================================
 The Rubble File Encoder:
@@ -192,17 +270,17 @@ The encoder will examine the file extension to decide what to do:
 	.zip			Base 64 encode
 	.b64			Base 64 decode and DEFLATE uncompress
 	anything else	DEFLATE compress and base 64 encode
-The output file will have ".b64" added or removed from it's extension as appropriate.
+The output file will have ".b64" added/removed to/from it's extension as appropriate.
 
 Encoded zip files can be decoded by any base 64 decoder (base 64 is used for many things so it is not hard to find decoders), but other encoded files will also need to be decompressed (they are raw DEFLATE compressed blocks, so it may be a little hard to find a ready made tool for processing them). While it is possible to decode one of these files using third party utilities, there is no real need as the encoder application can both decode and encode files without issues.
 
 In any case Rubble can read these files natively, so there is no need for users to decode them before use (but there is no reason why you can't, after all this utility could be very useful for non-Rubble applications).
 
-Please note that for files that are already compressed (for example zip files and most images) the encoder will inflate the file size, this is because base 64 encoding adds 2 bits per byte. In most cases this is fine as this encoding is designed for use with ASCII text and other uncompressed data, but don't be surprised when your zip file gets ~25% larger (it would be exactly 25%, but I add a newline every 80 characters to enhance clarity).
+Please note that for files that are already compressed (for example zip files and most images) the encoder will inflate the file size, this is because base 64 encoding adds 2 bits per byte. In most cases this is fine as this encoding is designed for use with ASCII text and other uncompressed data, but don't be surprised when your zip file gets ~25% larger (it would be exactly 25%, but I add a newline every 80 characters to enhance clarity, so it's a bit more).
 
 There are two basic ways this encoded text can be used:
 	As encoded zip files.
-	As encoded files uncompressed by a load script.
+	As encoded files uncompressed by a load script or the !DECOMPRESS template.
 
 Encoded zip files (.zip.b64) can be read directly by Rubble, use them exactly like normal zip files (just put them in your addons folder).
 
@@ -239,27 +317,10 @@ If you want to revert to the setting used by the main raw folder (if you want to
 Most addons do not need to worry about supporting prep, it is only needed for addons that make changes to files outside the raw folder.
 
 ==============================================
-Install Mode:
-==============================================
-
-Install mode is a simple operating mode in which files are loaded from a single zip and any ".inst.rex" scripts are run. This mode is intended for installing non-raw mods (for example DFHack plugins or utilities).
-
-To use install mode just create a zip containing the files you want to install and a script that has the commands required to install them.
-
-Install scripts can do anything that any other script can do.
-
-To install a package:
-	rubble -install=<package>
-
-<package> should be a (non-AXIS!) path to a zip file.
-
-This operating mode is kind of useless right now, but I may revisit it in the future.
-
-==============================================
 AXIS VFS:
 ==============================================
 
-For a variety of reasons newer versions of Rubble use AXIS VFS (Absurdly eXtremely Incredibly Simple Virtual File System, the lengths I go to for cool acronyms :p) for (almost) all file access.
+For a variety of reasons newer versions of Rubble use AXIS VFS for (almost) all file access.
 For most users this will make absolutely no difference, but if you need to pass a path to Rubble for some reason you will need to know at least a little.
 
 AXIS uses special (OS-independent) multi-part paths. The first part is the colon separated location ID(s). You can think of location IDs as drive letters, they each specify a different location on the file system. The second part is the traditional slash separated path.
@@ -294,8 +355,6 @@ out					The output directory, by default "df:raw"
 addons:dir			The addons directory, by default "rubble:addons"
 addons:zip			A composite, read-only, directory made up of the contents of all the zip files in the addons directory
 prep				The prep directory, only valid when a prep cycle is running.
-install:raw			The install package file, only valid when an install cycle is running.
-install:files		The install package file contents, only valid when an install cycle is running.
 
 ==============================================
 The Addon Loader:
@@ -305,20 +364,19 @@ Rubble has a recursive addon loader that can read addons from zip files or direc
 What this means is that you can group addons in directories to have something like an addon tree.
 
 The following rules determine how addons are loaded:
-	Zip files may only be used in the root addon folder.
+	Zip files may only be used in a root addon folder.
 	Addons in a zip always override addons in a directory.
 	Addons are loaded in alphabetical order except as otherwise specified.
 	Zip files and directories are identical as far as the loader is concerned except as otherwise specified.
 	If an addon contains one or more directories, the directories are loaded as child addons.
 	An addon without parseable files (.txt, .rbl, .rex) is not loaded (but any child addons are).
 		An init script (.init.rex) is not considered a paresable file (but such a script will still run), and the same goes for load scripts (.load.rex).
-		
 
 The following rules determine how addon files override each other (if there is a name collision):
 	Addons in zip files will always override addons in directories.
 	Addons are loaded in alphabetical order, addon "aaa/zzz" will override "aaa/hhh" but not "bbb/aaa"
 
-If you have readmes or the like in an otherwise empty addon it is recommended that you do not give them a file extension. In any case you do not want such an addon appearing in addonlist.ini, so do not use any of the "parseable" extensions (.txt, .rbl, .rex).
+If you have readmes or the like in an otherwise empty addon it is recommended that you do not give them a file extension. In any case you do not want such an addon appearing in the addon list, so do not use any of the "parseable" extensions (.txt, .rbl, .rex).
 A good alternative extension is .text or maybe .me (as in "read.me"), but I prefer no extension at all.
 
 All addons are loaded into memory, but only the active addons are processed.
@@ -336,6 +394,8 @@ Do you want to use multiple small addons or just one large one? Do you want all 
 Other Random Information:
 ==============================================
 
+If your addon name starts with "__CONFIG_VAR_" or it is named "__EditConfig__" or "__Generate__" then it will break the web UI. Do not use these names! (stupid HTML forms...)
+
 If you want to allow an item, reaction, or building with a minimum of fuss, register it as class "ADDON_HOOK_MOUNTAIN" or "ADDON_HOOK_PLAYABLE". Specific addon hooks also exist for the other entities as well as an ADDON_HOOK_GENERIC that every entity has.
 
 If you are making a template that takes a variable number of params and you want to implement it via a different template you may need the ... param.
@@ -346,7 +406,7 @@ Example:
 If Rubble finds a template call where the last param is ... it appends the params from the previous template call to the current template's params. This trick is good for aliases and the like.
 
 There is no check for infinite recursion, so make sure you never recurse without breaking out at some point (unless you want to cause an infinite loop and eat all your memory until Rubble crashes). 
-The reason there is no recursion check is that there are valid reasons to have deep recursion, and any infinite loops created by recursion like this are errors that should caught in testing. If you are too lazy to do proper testing it is not my job to hold your hand, plus just how many programming languages have you used that had such a check? 
+The reason there is no recursion check is that there are valid reasons to have deep recursion, and any infinite loops created by recursion like this are errors that should be caught in testing. If you are too lazy to do proper testing it is not my job to hold your hand, plus just how many programming languages have you used that had such a check? 
 
 The Rex command documentation is automatically generated every time I build Rubble, this make it easy for me to keep everything up to date, but the formatting leaves much to be desired.
 The problem is that the app that generates the docs is made for go programmers, not Rex programmers, so a lot of information that has nothing to do with the commands makes it's way to these docs.

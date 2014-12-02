@@ -1,0 +1,10 @@
+
+Web UI:
+	The server should manage the state better:
+		The server should support multiple users.
+			This will require tracking users and keeping a separate state for each transaction.
+	
+Make a "package server", where raws are served to the world and generating makes (or fetches from a cache) a zipped version of the generated raws.
+	Would require some fancy footwork where AXIS is concerned.
+	Could run more-or-less in batch mode, as there would be no need to support anything other than simple generation.
+	Not a high priority unless there is a place to host it (app engine?).

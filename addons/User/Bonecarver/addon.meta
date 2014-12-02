@@ -1,0 +1,13 @@
+<rubble:addonmeta
+	header=`Adds a workshop for advanced shaping of bone.`
+	
+	description=`
+Allows you to make basic furniture and some items from your choice of bone or a fake "bone" stone
+(to allow better stockpiling).
+
+Blocks may also be made from a fire safe "treated bone" material, this makes item-less embarks
+a little less dependent upon caravans.
+`
+	
+	activates="Libs/Base"
+>

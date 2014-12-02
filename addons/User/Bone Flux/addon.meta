@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`Bake bones at the kiln to make calcite, a flux stone.`
+	
+	description=`
+Very useful for steel making in flux-poor locations.
+`
+	
+	activates="Libs/Base"
+>

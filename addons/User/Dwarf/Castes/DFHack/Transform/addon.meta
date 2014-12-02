@@ -1,0 +1,10 @@
+<rubble:addonmeta
+	header=`Allows you to change the caste of your dwarves at the guild hall for a nominal fee.`
+	
+	description=`
+Most caste changes cost 500 gold, but warriors and priests cost more.
+See "User/Dwarf/Castes" for more details.
+`
+	
+	activates="Libs/Base;User/Dwarf/Castes"
+>

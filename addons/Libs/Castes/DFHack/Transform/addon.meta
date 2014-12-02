@@ -1,0 +1,15 @@
+<rubble:addonmeta
+	lib=true
+	
+	header=`Adds support for transforming castes.`
+	
+	description=`
+Basically just a gender aware and pared down version of "modtools/transform-unit" (with specialized 
+versions of DFHACK_REACTION and DFHACK_REACTION_BIND for easy use).
+Does not require "Libs/Castes", but it is designed to work with it.
+`
+	
+	activates="Libs/Base"
+	
+	vars=""
+>

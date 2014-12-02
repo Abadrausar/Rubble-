@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`Allows you to dig slade, once you get past it's guardians that is...`
+	
+	description=`
+Digging slade may lead to bugs, so be careful.
+`
+	
+	activates="Libs/Base"
+>

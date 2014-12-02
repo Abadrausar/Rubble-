@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Glue wooden planks together to make laminated logs, which are more valuable than most wood.`
+	
+	activates="Libs/Base"
+>

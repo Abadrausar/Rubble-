@@ -1,0 +1,12 @@
+<rubble:addonmeta
+	header=`Allows creatures to give more than one skin based on size.`
+	
+	description=`
+Makes creatures give skin "globs" instead of "skins" when butchered, this allows large animals to
+produce more than one piece of leather once tanned.
+If "User/Fix/Usable Scale" is activated then scale is changed as well.
+Based on a mod/modders resource by sackhead.
+`
+	
+	activates="Libs/Base"
+>

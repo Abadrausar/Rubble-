@@ -1,0 +1,14 @@
+<rubble:addonmeta
+	header=`Makes giant and animal man vermin show up properly.`
+	
+	description=`
+This adds two fixes:
+	Forces all giant animals to have a life span of at least 10 years.
+	Replaces all pool biome tags in giant and animal-man creatures with the correct lake biome.
+
+This is useful to make variations on vermin appear in game and to help them live long enough
+to be interesting.
+`
+	
+	activates="Libs/Base"
+>

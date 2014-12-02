@@ -1,0 +1,34 @@
+#include <windows.h>
+#include "../../version.h"
+
+IDI_ICON1               ICON    DISCARDABLE     "./../Rubble.ico"
+
+1 VERSIONINFO
+    FILEVERSION     1,0,0,0
+    PRODUCTVERSION  RBL_VERSION_B
+    FILEOS          VOS_NT
+    FILETYPE        VFT_APP
+    FILESUBTYPE     VFT2_UNKNOWN
+    FILEFLAGSMASK   0x00000000
+    FILEFLAGS       0x00000000
+{
+    BLOCK "StringFileInfo"
+    {
+        BLOCK "04090025"
+        {
+			// Don't forget to change the version number in the header!
+            VALUE "CompanyName", "Double Click Technologies"
+            VALUE "FileDescription", "Rubble Web UI"
+            VALUE "FileVersion", "1.0"
+            VALUE "InternalName", "Rubble"
+            VALUE "LegalCopyright", "2013-2014 Milo Christiansen"
+            VALUE "OriginalFilename", "rubble_web.exe"
+            VALUE "ProductName", "Rubble v" RBL_VERSION
+            VALUE "ProductVersion", RBL_VERSION
+        }
+    }
+    BLOCK "VarFileInfo"
+    {
+        VALUE "Translation", 0x0409, 0x0025
+    }
+}

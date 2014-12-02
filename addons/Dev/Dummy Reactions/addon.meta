@@ -1,0 +1,13 @@
+<rubble:addonmeta
+	header=`This addon adds "dummy reactions" eg. empty reactions registered to "ADDON_HOOK_PLAYABLE".`
+	
+	description=`
+By default 15 reactions are created, if you want a different number of reactions to be generated pass 
+'-config="DEV_DUMMY_REACTION_COUNT=count"' to Rubble when generating.
+These reactions are empty by default, use if you want to add new content after worldgen.
+`
+	
+	activates="Libs/Base"
+	
+	vars=<map DEV_DUMMY_REACTION_COUNT=<rubble:addonmetavar name='How many dummy reactions should be generated?' val="15">>
+>

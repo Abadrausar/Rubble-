@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Nerfs whips and scourges so they are not deadly anti-armor weapons.`
+	
+	activates="Libs/Base"
+>

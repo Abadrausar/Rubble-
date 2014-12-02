@@ -8,7 +8,7 @@
 module rubble:dev_tileset_insert
 
 var export = false
-(if (rubble:getvar "DEV_TILESET_INSERT_EXPORT") {
+(if (rubble:configvar "DEV_TILESET_INSERT_EXPORT") {
 	[export = true]
 })
 

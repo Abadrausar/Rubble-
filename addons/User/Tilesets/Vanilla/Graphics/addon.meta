@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`The vanilla creature graphics, mostly just a demo.`
+	
+	activates="Libs/Base"
+>

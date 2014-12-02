@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`Allows you to butcher creatures made from (some) inorganics, FB stone walls anyone?`
+	
+	description=`
+(Not 100% sure this works, copied from Modest Mod)
+`
+	
+	activates="Libs/Base"
+>

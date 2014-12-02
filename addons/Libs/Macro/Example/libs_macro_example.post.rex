@@ -1,6 +1,4 @@
 
-(rubble:requireaddon "Libs/Macro/Example" "Libs/Macro")
-
 # A cool fortress entrance, better have a bunch of miners...
 # I usually section this up and only dig the core passage to the central stairwell at first,
 # else you will spend far too much time digging things that you don't need until much later.

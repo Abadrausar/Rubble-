@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`Allows you to change the caste of your saurians at the new meditation circle workshop.`
+	
+	description=`
+Meditating takes from 1/2 to 3 seasons (depending on what the result caste is).
+`
+	
+	activates="Libs/Base;User/Saurian/Castes;Libs/Castes/DFHack/Transform;Libs/Castes;User/Saurian"
+>

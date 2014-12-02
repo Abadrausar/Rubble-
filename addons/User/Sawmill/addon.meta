@@ -1,0 +1,16 @@
+<rubble:addonmeta
+	header=`Farmable wood plants and advanced wood processing, makes aboveground and/or treeless forts a lot easier.`
+	
+	description=`
+If you wish you can scrap most wooden items (at a small loss), good for getting rid of all that
+elf crap you took from the last caravan :)
+The sawmill uses the carpentry and wood burning skills for its reactions.
+Don't forget a serrated disk!
+There are two kinds of farmable wood plants:
+    Name           Biome          Growth Time  Log Color  Notes
+    lumber bamboo  non freezing   1/2 year     Brown      Edible seeds
+    stalkshroom    caves lvl 1-2  1 year       Dark Gray  Heavy and slightly more valuable
+`
+	
+	activates="Libs/Base"
+>

@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Generic animal blood and pus.`
+	
+	activates="Libs/Base;User/Generic Animal Mats"
+>

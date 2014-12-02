@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Adds trade representatives and diplomats to the humans.`
+	
+	activates="Libs/Base"
+>

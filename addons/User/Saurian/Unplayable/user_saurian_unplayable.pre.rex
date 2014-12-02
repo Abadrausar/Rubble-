@@ -1,4 +1,2 @@
 
-(rubble:requireaddon "User/Saurian/Unplayable" "User/Saurian")
-
-(rubble:setvar "SAURIAN_PLAYABLE" false)
+(rubble:configvar "SAURIAN_PLAYABLE" false)

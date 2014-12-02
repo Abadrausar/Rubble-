@@ -1,0 +1,18 @@
+<rubble:addonmeta
+	header=`This addon adds the SHARED_OBJECT templates to all the tileset sensitive objects.`
+	
+	description=`
+Advanced users may want to set the config var "DEV_TILESET_INSERT_EXPORT=true" in order to get the 
+resulting files output to the current working directory, this is a great help when porting a mod to 
+Rubble.
+Use with "Dev/Tileset/Export" to export tile/color info from non-Rubble raws.
+This addon also handles vermin creature tile numbers and colors.
+`
+	
+	activates="Libs/Base"
+	
+	vars="DEV_TILESET_INSERT_EXPORT=false"
+	vars=<map
+		DEV_TILESET_INSERT_EXPORT=<rubble:addonmetavar name="Export output from \"Dev/Tileset/Insert\"?" val=false choices=true choices=false>
+	>
+>

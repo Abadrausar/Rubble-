@@ -25,6 +25,7 @@ package rex
 import "fmt"
 import "io"
 import "os"
+import "strings"
 
 // State handles all global script data and settings.
 // The majority of the fields are exported for the use of commands only.
@@ -53,20 +54,17 @@ func NewState() *State {
 // Host API
 
 // RegisterCommand registers a new native command.
-// WARNING! If you try to redeclare a command this function will case a panic!
 func (state *State) RegisterCommand(name string, handler NativeCommand) {
 	state.global.RegisterCommand(name, handler)
 }
 
 // RegisterType registers a new global indexable type.
-// WARNING! If you try to redeclare a type this function will case a panic!
 func (state *State) RegisterType(name string, typ ObjectFactory) {
 	state.types.add(name, typ)
 }
 
 // RegisterModule creates a new global module.
 // The module is returned so that it can be immediately used to register global data.
-// WARNING! If you try to redeclare a module this function will case a panic!
 func (state *State) RegisterModule(name string) *Module {
 	index := state.modules.add(name, newModule())
 	return state.modules.get(index)
@@ -79,6 +77,31 @@ func (state *State) FetchModule(name string) *Module {
 		return nil
 	}
 	return state.modules.get(state.modules.lookup(name))
+}
+
+// FetchVariable will retrieve a module variable or command by name.
+// Returns nil if the variable does not exist.
+// For convenience this function may take a fully qualified name.
+func (state *State) FetchVariable(name string) (val *Value) {
+	defer func(){
+		if x := recover(); x != nil {
+			val = nil
+		}
+	}()
+	
+	parts := strings.Split(name, ":")
+	if len(parts) < 2 {
+		return nil
+	}
+	mod := state.FetchModule(parts[0])
+	for i := range parts[1:len(parts) - 1] {
+		mod = mod.FetchModule(parts[i+1])
+	}
+	if mod == nil {
+		return nil
+	}
+	valI := mod.vars.lookup(parts[len(parts) - 1])
+	return mod.vars.get(valI)
 }
 
 // Output

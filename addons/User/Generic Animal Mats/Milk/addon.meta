@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Generic animal milk and cheese.`
+	
+	activates="Libs/Base;User/Generic Animal Mats"
+>

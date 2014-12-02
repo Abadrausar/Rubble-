@@ -10,7 +10,7 @@
 
 (rubble:template "DFHACK_CASTE_TRANSFORM" block race caste delay=0 id="" {
 	(if (str:cmp [id] "") {
-		(if (isnil [rubble:reaction_data [rubble:reaction_last]]) {
+		(if (str:cmp [rubble:reaction_last] "") {
 			(rubble:abort "Error: rubble:reaction_last is invalid in call to DFHACK_CASTE_TRANSFORM.")
 		})
 		

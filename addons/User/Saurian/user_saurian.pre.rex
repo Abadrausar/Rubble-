@@ -1,3 +1,2 @@
 
-(rubble:requireaddon "User/Saurian" "User/Glass Forge")
-(rubble:setvar "SAURIAN_PLAYABLE" true)
+(rubble:configvar "SAURIAN_PLAYABLE" true)

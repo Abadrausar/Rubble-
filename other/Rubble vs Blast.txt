@@ -15,7 +15,8 @@ Pros:
 	Support for easily and quickly installing tilesets from addons
 	Allows you to run "tweak scripts" before or after generation for fine-tuning the results
 	Support for external launchers via the command line
-	Easy to use GUI to enable and disable addons (it's windows only, sorry)
+	Easy to use HTML-based UI that supports all common actions
+	Support for detailed addon meta data, including dependencies and descriptions.
 	Addons can be grouped into directories to make relations clear (and to make addon packs easy to distribute)
 	Support for loading addons (and groups of addons) directly from zip files
 	Has an extra template prefix for greater flexibility

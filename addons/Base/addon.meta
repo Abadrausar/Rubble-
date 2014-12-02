@@ -1,0 +1,20 @@
+<rubble:addonmeta
+	header=`The standard base addon. Contains Rubblized versions of the vanilla raw files.`
+	
+	description=`
+The following changes have been made from vanilla:
+	Some of the files have been re-indented (tag order is not effected).
+	The dwarf creature has templates from the "Libs/Castes" addon installed.
+	Specialized SHARED_OBJECT templates have been inserted where appropriate.
+	REACTION and BUILDING_WORKSHOP templates have been inserted where appropriate.
+	@BUILD_KEY templates have been inserted where appropriate.
+	ADDON_HOOKS have been added to all entities.
+	!ENTITY_PLAYABLE templates have been added to all entities.
+	The dwarven outpost liaison has been modded to works as a trade rep if the dwarves are unplayable.
+	Dwarves have the alchemist labor permitted in their entity.
+	Vermin creatures have #TILE and #COLOR templates inserted.
+	All file IDs have been stripped.
+`
+	
+	activates="Libs/Base;Libs/Castes"
+>

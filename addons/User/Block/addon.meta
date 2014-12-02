@@ -1,0 +1,7 @@
+<rubble:addonmeta
+	lib=true
+	
+	header=`Support for the addons in the "Block" group.`
+	
+	activates="Libs/Base"
+>

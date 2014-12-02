@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Allows you to use scale like leather.`
+	
+	activates="Libs/Base"
+>

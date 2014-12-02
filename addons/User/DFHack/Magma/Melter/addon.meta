@@ -1,0 +1,18 @@
+<rubble:addonmeta
+	header=`Melt rocks into magma! `
+	
+	description=`
+The magma is put into an adjacent magma-safe minecart or an adjacent cistern.
+When using minecarts this works exactly like the magma cart filler, when using a cistern it will 
+attempt to spawn magma into any open space below an adjacent downward passable tile.
+
+DO NOT BUILD THIS BUILDING NEXT TO YOUR MAIN STAIRWELL!
+
+It is possible to enable magma workshops/furnaces here as well, so if you don't have a volcano there
+is no need to dig to the magma sea if you don't wish to.
+
+Uses the furnace operator skill.
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fluids"
+>

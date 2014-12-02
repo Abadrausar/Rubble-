@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Generic animal horn and hooves.`
+	
+	activates="Libs/Base;User/Generic Animal Mats"
+>

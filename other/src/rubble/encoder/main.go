@@ -3,10 +3,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"io/ioutil"
+	"os"
 	"strings"
-	
+
 	"rubble/rblutil"
 )
 
@@ -16,19 +16,19 @@ func main() {
 	}
 	name := os.Args[1]
 	content := ReadFile(name)
-	
+
 	switch {
 	case strings.HasSuffix(name, ".zip"):
-		WriteFile(name + ".b64", rblutil.Split(rblutil.Encode(content)))
-		
+		WriteFile(name+".b64", rblutil.Split(rblutil.Encode(content)))
+
 	case strings.HasSuffix(name, ".zip.b64"):
 		WriteFile(rblutil.StripExt(name), rblutil.Decode(rblutil.StripWS(content)))
-		
+
 	case strings.HasSuffix(name, ".b64"):
 		WriteFile(rblutil.StripExt(name), rblutil.Decompress(rblutil.Decode(rblutil.StripWS(content))))
-		
+
 	default:
-		WriteFile(name + ".b64", rblutil.Split(rblutil.Encode(rblutil.Compress(content))))
+		WriteFile(name+".b64", rblutil.Split(rblutil.Encode(rblutil.Compress(content))))
 	}
 }
 

@@ -1,0 +1,15 @@
+<rubble:addonmeta
+	header=`Adds a large factory building for making batches of cheap items (mostly from wood and stone).`
+	
+	description=`
+Allows you to make all kinds of furniture as well as sets of clothing, batches of weapons,
+and sets of armor.
+All factory reactions are just a little bit cheaper than the vanilla version.
+All factory items that can be made from stone and wood also have a version that can be made
+from blocks or planks, save even more resources!
+
+Uses various skills.
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fix Handedness"
+>

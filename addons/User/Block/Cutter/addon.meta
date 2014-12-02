@@ -1,0 +1,12 @@
+<rubble:addonmeta
+	header=`The block cutter allows you to harness the wonderful power of dwarven masonry to cut blocks of any color.`
+	
+	description=`
+Blocks are cut four at a time from any kind of hard non-economic boulder.
+If you want to make higher value constructions you can also cut a boulder into
+2 better quality blocks instead.
+Fine blocks are not only worth more, but magma safe as well.
+`
+	
+	activates="Libs/Base;User/Block"
+>

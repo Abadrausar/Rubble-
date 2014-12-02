@@ -1,0 +1,13 @@
+<rubble:addonmeta
+	lib=true
+	
+	header=`Adds support for dynamically adding castes to a creature.`
+	
+	description=`
+This is used by the standard base, so it is active most of the time.
+`
+	
+	activates="Libs/Base"
+	
+	vars=""
+>

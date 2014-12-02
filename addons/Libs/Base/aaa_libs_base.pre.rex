@@ -87,7 +87,7 @@ command rubble:echo params {
 (rubble:template "@SCRIPT" [global:eval])
 
 (rubble:template "@SET" block name value {
-	(rubble:setvar [name] [value])
+	(rubble:configvar [name] [value])
 	(ret "")
 })
 

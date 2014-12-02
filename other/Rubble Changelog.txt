@@ -2,6 +2,44 @@
 ==============================================
 Changelog:
 ==============================================
+v5.0 (for DF 40.12)
+	Rubble has been restructured as a library.
+		This change makes it possible (even easy) to make multiple different user interfaces.
+		In addition many parts of Rubble were refactored and error handling is much improved (in some ways).
+		Basic functionality should be (mostly) unaffected, some minor features may not work quite right yet,
+		but all the standard addons generate without errors.
+	New UI: A CLI front end.
+		This is mostly like the old interface, you can even use it with the old windows GUI.
+		Rubble comes with 32 bit Windows, Linux, and OSX versions of this UI.
+	New UI: A simple web UI.
+		This simple UI supports all normal operations, it's kinda ugly, but it gets the job done.
+		Rubble comes with 32 bit Windows, Linux, and OSX versions of this UI.
+	Updated the "Base" addon for DF 40.12 (no actual changes made).
+		Despite what the changelog says my diff program could find no raw changes from 40.11 to 40.12, odd...
+	Removed install mode, maybe later.
+	Rubble can now load addons from more than one directory at once! 
+		Duplicate addons will cause Rubble to abort, so don't do that.
+	Rubble now simply removes nonexistent templates and prints a warning (as opposed to aborting).
+	The old "After Blast comes Rubble." line in the log header is replaced with much cooler random lines.
+		Samples:
+			"Why do all of these end in exclamation points!"
+			"Unintentionally Ironic!"
+			"Why did I add this feature?"
+			(as well as many more)
+	Addon meta data support: Addons may now have a file named "addon.meta" that has information about the addon.
+		This information includes descriptions and information about how the addon should be loaded.
+	All default addons have complete addon.meta files:
+		Addons will now automatically activate ALL their dependencies.
+		Addons that do not directly effect the user (such as libraries) can no longer be directly activated.
+			If you look at the description page for such an addon it will note that it is "An automatically managed library".
+		Addons have at least some description.
+		Any config variables that the user should know about are listed with appropriate defaults (the web UI uses this).
+	Removed almost all the loader scripts that were made obsolete by addon.meta files (which was most of them).
+	Removed a bunch of obsolete pre scripts (another casualty of addon.meta).
+	Rex has been updated: It is possible to redeclare global data, and GenII now allows direct replacements for type index.
+	Removed "User/Tilesets/MLC/Tracks", the track tile mapping looked really, really, bad with the new trees.
+	Removed the GUI tutorial as the GUI will be removed shortly.
+
 v4.7 (for DF 40.11)
 	This is the first version of Rubble for DF 40.x that has all the DFHack stuff working!
 		Or at least everything *should* work, some stuff has less testing than I would like...

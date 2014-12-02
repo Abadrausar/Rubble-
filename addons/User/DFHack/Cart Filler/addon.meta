@@ -1,0 +1,18 @@
+<rubble:addonmeta
+	header=`Fill minecarts with water or magma (without big fancy mechanical contraptions).`
+	
+	description=`
+To access fluids the filler needs to be adjacent to a downward passable tile leading to a cistern!
+To fill a minecart it needs to be adjacent to or on top of the filler, the minecart is NOT
+used as a reagent in the reaction. The best way to use the filler is to place it next to a
+minecart stop (or stops) and a cistern, this allows you to fill minecarts and send them on
+their way with a minimum of fuss.
+
+The amount of liquid used is determined by the minecart capacity, but at least 4/7 fluid is
+needed for the filler to function at all.
+
+Uses the pump operator skill (to fill carts) and mechanics (to build the filler).
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fluids"
+>

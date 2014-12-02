@@ -1,0 +1,13 @@
+<rubble:addonmeta
+	header=`Train your dwarves by reading books.`
+	
+	description=`
+Make ink from ash, and paper from wood, then make a book from paper and ink and read it for exp in
+your chosen skill. Note that EVERY skill in the game can be trained this way, even the useless ones ;).
+Making books uses the Alchemy skill.
+Note that skills that do not have a labor appear to allow ANYONE to do the reaction,
+use workshop profiles.
+`
+	
+	activates="Libs/Base"
+>

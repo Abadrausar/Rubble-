@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Gives playable races a reaction to cast an iron anvil from 5 iron bars.`
+	
+	activates="Libs/Base"
+>

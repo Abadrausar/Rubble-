@@ -1,0 +1,11 @@
+<rubble:addonmeta
+	header=`Build a laboratory and research advanced workshops.`
+	
+	description=`
+Handles the research class "RESEARCH_GENERIC", which is used by many of the default addons.
+You may also copy any research discovery here (for free).
+Uses the alchemy skill.
+`
+	
+	activates="Libs/Base;Libs/Research"
+>

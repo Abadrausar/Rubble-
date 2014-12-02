@@ -1,4 +1,8 @@
 
+v1.3
+	GenII can now do direct replacements for type index values as well as user values.
+	All types of global data may now be redeclared.
+
 v1.2
 	The command call syntax now has a by-value version.
 	Removed the run command, it is obsolete with by-value command calls.

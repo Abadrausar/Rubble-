@@ -1,0 +1,10 @@
+<rubble:addonmeta
+	header=`Fixes bad temperature values in material_template_default.`
+	
+	description=`
+I think all bad values are fixed, but this addon has not received extensive testing!.
+In any case this should make it possible to melt undead with magma.
+`
+	
+	activates="Libs/Base"
+>

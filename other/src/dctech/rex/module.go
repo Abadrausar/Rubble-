@@ -42,26 +42,22 @@ func newModule() *Module {
 }
 
 // RegisterVar will create a new Module variable.
-// WARNING! If you try to redeclare a variable this function will case a panic!
 func (mod *Module) RegisterVar(name string, val *Value) {
 	mod.vars.addAndSet(name, val)
 }
 
 // RegisterCommand will create a new Module native command.
-// WARNING! If you try to redeclare a command this function will case a panic!
 func (mod *Module) RegisterCommand(name string, handler NativeCommand) {
 	mod.vars.addAndSet(name, NewValueCommand(handler))
 }
 
 // RegisterType will create a new Module indexable type.
-// WARNING! If you try to redeclare a type this function will case a panic!
 func (mod *Module) RegisterType(name string, typ ObjectFactory) {
 	mod.types.add(name, typ)
 }
 
 // RegisterModule will create a new subModule.
 // The Module is returned so that it can be immediately used to register global data.
-// WARNING! If you try to redeclare a Module this function will case a panic!
 func (mod *Module) RegisterModule(name string) *Module {
 	index := mod.modules.add(name, newModule())
 	return mod.modules.get(index)
@@ -111,7 +107,8 @@ func (store *moduleStore) add(name string, mod *Module) int {
 	
 	slot := len(store.data)
 	if _, ok := store.ntoi[name]; ok {
-		RaiseError("Module slot already exists: " + name)
+		//RaiseError("Module slot already exists: " + name)
+		return store.ntoi[name]
 	}
 	store.ntoi[name] = slot
 	store.iton = append(store.iton, name)

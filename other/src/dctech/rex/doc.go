@@ -57,7 +57,6 @@ Of course NoRecover is only useful for debugging internal errors, script errors 
 setting (and it can actually make things harder, as then the state never gets a chance to fill in position information).
 
 All panics are recovered and turned into errors before they reach user code except in a few cases:
-	If you call the register functions (from the State or a module) and try to redeclare an existing item.
 	Command package Setup(state) functions only recover panics caused by Rex.
 
 Send patches (*snort*) and bug reports (probably) to: milo.christiansen (at) gmail (dot) com
@@ -92,6 +91,5 @@ package rex
 	
 	Port the following Raptor command packages (low priority):
 		bit
-		env
 
 */

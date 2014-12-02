@@ -1,0 +1,12 @@
+<rubble:addonmeta
+	header=`Extract minerals from magma, get all kinds of rare and valuable metals! (but only rarely)`
+	
+	description=`
+A magma extractor can be very profitable, provided you can feed it enough magma.
+Each cycle uses 2/7 magma and at least 4/7 magma needs to be available.
+
+Uses the furnace operator skill.
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fluids"
+>

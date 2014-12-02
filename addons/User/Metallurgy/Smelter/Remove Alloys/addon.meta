@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Removes all the vanilla alloy reactions, it is not a good idea to use this without "User/Metallurgy"!`
+	
+	activates="Libs/Base"
+>

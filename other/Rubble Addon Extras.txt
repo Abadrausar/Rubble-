@@ -1,4 +1,6 @@
 
+This information may be out of date relative to information in the addon's addon.meta file!
+
 ---------------------------------------------------
 User/Dwarf/Castes
 
@@ -142,7 +144,6 @@ Saurians have very little in the way of built-in industries, so you will want to
 Here is a list of the ones I think most important:
 	User/Bonecarver
 	User/Block/Kiln
-	User/Bone Flux
 	User/Fix/Fish Pops
 	User/Glass Forge
 	User/Lamination

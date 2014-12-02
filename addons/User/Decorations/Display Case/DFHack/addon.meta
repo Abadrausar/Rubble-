@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`Gives the display case a pretty custom sidebar menu that displays the contained item.`
+	
+	description=`
+The script used is a direct, unchanged, copy of the one from the DFHack r5 mini-mod pack.
+`
+	
+	activates="Libs/Base"
+>

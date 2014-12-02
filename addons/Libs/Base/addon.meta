@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	lib=true
+	header=`All the base templates and other such stuff, critical to normal operation.`
+	
+	description=`
+Almost all the other addons require this one, so it is almost always active.
+See "Rubble Base Template" for documentation.
+`
+>

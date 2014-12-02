@@ -1,0 +1,11 @@
+<rubble:addonmeta
+	header=`The obsidian caster makes obsidian boulders directly from adjacent water and magma.`
+	
+	description=`
+The fluids need to be on the level below and accessible via downward passable tiles.
+4/7 water and magma are used for every boulder (so clever engineers can still be more efficient).
+Uses the pump operator skill (to operate) and mechanics (to build the caster).
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fluids"
+>

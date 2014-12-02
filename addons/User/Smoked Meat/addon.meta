@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Allows you to smoke meat at the kitchen to preserve it (inedible to vermin and will not rot).`
+	
+	activates="Libs/Base"
+>

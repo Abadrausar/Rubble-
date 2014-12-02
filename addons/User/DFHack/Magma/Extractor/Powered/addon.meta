@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`An automatic powered version of the "DFHack/Magma/Extractor" addon.`
+	
+	description=`
+This addon works exactly the same as "DFHack/Magma/Extractor", just without dwarf labor.
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fluids"
+>

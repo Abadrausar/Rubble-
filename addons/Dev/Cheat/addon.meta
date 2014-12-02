@@ -1,0 +1,10 @@
+<rubble:addonmeta
+	header=`A bunch of cheat reactions to allow for fast setup of testing forts.`
+	
+	description=`
+Build a "Heavy Supply Wagon" workshop, both the building and all reactions are free.
+Uses animal caretaker skill (the most useless skill I could think of :p)
+`
+	
+	activates="Libs/Base"
+>

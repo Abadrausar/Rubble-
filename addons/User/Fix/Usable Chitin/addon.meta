@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Allows you to use chitin as shell.`
+	
+	activates="Libs/Base"
+>

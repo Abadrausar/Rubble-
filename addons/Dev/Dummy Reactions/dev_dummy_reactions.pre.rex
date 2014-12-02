@@ -1,5 +1,5 @@
 
-var howmany = (rubble:getvar "DEV_DUMMY_REACTION_COUNT")
+var howmany = (rubble:configvar "DEV_DUMMY_REACTION_COUNT")
 (if (str:cmp [howmany] "") {
 	[howmany = 15]
 })

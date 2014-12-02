@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	lib=true
+	
+	header=`Adds DFHack Lua support for persistent time delays (eg they survive a save/load).`
+>

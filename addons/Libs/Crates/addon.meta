@@ -1,0 +1,13 @@
+<rubble:addonmeta
+	lib=true
+	
+	header=`Adds infrastructure for "crates", eg bars that can be bought from caravans and then "unpacked" into items.`
+	
+	description=`
+Most of the templates added by this addon are always available (even when the addon is not active).
+`
+	
+	activates="Libs/Base"
+	
+	vars=""
+>

@@ -23,12 +23,13 @@ misrepresented as being the original software.
 package rblutil
 
 import (
-	"compress/flate"
-	"io/ioutil"
 	"bytes"
+	"compress/flate"
 	"encoding/base64"
+	"io/ioutil"
 )
 
+// Remove all white space from a byte slice.
 func StripWS(content []byte) []byte {
 	return bytes.Map(func(in rune) rune {
 		if in == ' ' || in == '\t' || in == '\n' || in == '\r' {
@@ -38,9 +39,10 @@ func StripWS(content []byte) []byte {
 	}, content)
 }
 
+// Split a byte slice with a newline every 80 characters.
 func Split(content []byte) []byte {
-	out := make([]byte, 0, len(content) + len(content) / 80)
-	
+	out := make([]byte, 0, len(content)+len(content)/80)
+
 	x := 0
 	for i := range content {
 		if x >= 80 {
@@ -50,10 +52,12 @@ func Split(content []byte) []byte {
 		out = append(out, content[i])
 		x++
 	}
-	
+
 	return out
 }
 
+// Base 64 encode a byte slice.
+// Panics on error.
 func Encode(content []byte) []byte {
 	b := new(bytes.Buffer)
 	bc := base64.NewEncoder(base64.StdEncoding, b)
@@ -65,6 +69,8 @@ func Encode(content []byte) []byte {
 	return b.Bytes()
 }
 
+// Base 64 decode a byte slice.
+// Panics on error.
 func Decode(content []byte) []byte {
 	a := bytes.NewReader(content)
 	ac := base64.NewDecoder(base64.StdEncoding, a)
@@ -75,6 +81,8 @@ func Decode(content []byte) []byte {
 	return data
 }
 
+// DEFLATE compress a byte slice.
+// Panics on error.
 func Compress(content []byte) []byte {
 	b := new(bytes.Buffer)
 	bc, _ := flate.NewWriter(b, 9)
@@ -86,6 +94,8 @@ func Compress(content []byte) []byte {
 	return b.Bytes()
 }
 
+// Decompress a DEFLATE compressed byte slice.
+// Panics on error.
 func Decompress(content []byte) []byte {
 	a := bytes.NewReader(content)
 	ac := flate.NewReader(a)

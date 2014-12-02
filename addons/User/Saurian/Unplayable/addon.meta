@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`If you just want saurians as an extra race to trade with the dwarves, activate this addon.`
+	
+	activates="Libs/Base;User/Saurian"
+>

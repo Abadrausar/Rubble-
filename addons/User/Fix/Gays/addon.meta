@@ -1,0 +1,11 @@
+<rubble:addonmeta
+	header=`Makes humans and dwarves have a strictly straight orientation.`
+	
+	description=`
+It is possible to change the list of creatures to fix, use the config var USER_FIX_GAYS.
+`
+	
+	vars=<map
+		USER_FIX_GAYS=<rubble:addonmetavar name='"User/Fix/Gays" creature fix list' val="<map DWARF=true HUMAN=true>">
+	>
+>

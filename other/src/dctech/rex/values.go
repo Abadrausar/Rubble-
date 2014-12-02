@@ -53,7 +53,8 @@ func (store *valueStore) add(name string) int {
 	
 	slot := len(store.data)
 	if _, ok := store.ntoi[name]; ok {
-		RaiseError("Value slot already exists: " + name)
+		//RaiseError("Value slot already exists: " + name)
+		return store.ntoi[name]
 	}
 	store.ntoi[name] = slot
 	store.iton = append(store.iton, name)
@@ -79,7 +80,9 @@ func (store *valueStore) addAndSet(name string, val *Value) int {
 	
 	slot := len(store.data)
 	if _, ok := store.ntoi[name]; ok {
-		RaiseError("Value slot already exists.")
+		//RaiseError("Value slot already exists.")
+		store.data[store.ntoi[name]] = val
+		return store.ntoi[name]
 	}
 	store.ntoi[name] = slot
 	store.iton = append(store.iton, name)

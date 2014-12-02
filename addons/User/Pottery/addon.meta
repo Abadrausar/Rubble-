@@ -1,0 +1,11 @@
+<rubble:addonmeta
+	header=`Replace the vanilla pottery system with a much expanded version.`
+	
+	description=`
+Glazing is still done the same basic way as vanilla (unless "User/Pottery/Glaze" is installed, then it 
+is MUCH better). Unlike vanilla there is not a glazing reaction for each item type, use stockpiles to 
+restrict item usage.
+`
+	
+	activates="Libs/Base"
+>

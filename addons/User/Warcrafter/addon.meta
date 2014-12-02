@@ -1,0 +1,14 @@
+<rubble:addonmeta
+	header=`A special workshop for all your early game armor and ammo needs.`
+	
+	description=`
+The warcrafter allows you to make:
+	Scalemail armor from leather, bone, and shell
+	Bolts and arrows from bone and shell
+	Heavy cloaks from leather
+	Green glass weapons and armor (if the "User/Glass Forge" addon is active)
+Making bone and shell items requires you to cut them into "scales" first.
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fix Handedness"
+>

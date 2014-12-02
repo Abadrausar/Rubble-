@@ -3,9 +3,9 @@
 LICENSE:
 ==============================================
 
-Rex, AXIS VFS, "dctech/dfrex/dfraw", "dctech/iconsole", and Rubble are released under the following license:
+Rex, AXIS VFS, "dctech/rexdfraw", "dctech/iconsole", and Rubble are released under the following license:
 
-Rex, "dctech/dfrex/dfraw", and "dctech/iconsole" are Copyright 2014 by Milo Christiansen
+Rex, "dctech/rexdfraw", and "dctech/iconsole" are Copyright 2014 by Milo Christiansen
 AXIS VFS and Rubble are Copyright 2013-2014 by Milo Christiansen
 
 This software is provided 'as-is', without any express or implied warranty. In

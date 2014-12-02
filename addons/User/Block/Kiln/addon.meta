@@ -1,0 +1,10 @@
+<rubble:addonmeta
+	header=`Fire blocks of any color from clay.`
+	
+	description=`
+5 clay gets you 10 normal blocks or 5 fine blocks.
+Fine blocks are not only worth more, but magma safe as well.
+`
+	
+	activates="Libs/Base;User/Block"
+>

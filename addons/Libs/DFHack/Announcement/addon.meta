@@ -1,0 +1,14 @@
+<rubble:addonmeta
+	lib=true
+	
+	header=`This addon provides templates for displaying announcements to the player.`
+	
+	description=`
+The announcements work via specialized variants of the DFHACK_REACTION and DFHACK_REACTION_BIND templates.
+The templates added by this addon are always available (even when the addon is not active).
+`
+	
+	activates="Libs/Base"
+	
+	vars=""
+>

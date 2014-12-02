@@ -74,8 +74,6 @@ To add items to a module just prefix the name with the module name like so:
 
 Once a module is created it may be added to freely and accessed globally, this is the only way to create global variables.
 
-Modules are the only global declaration that may be repeated, if a module of that name already exists any redeclaration silently does nothing.
-
 ==============================================
 Commands
 ==============================================

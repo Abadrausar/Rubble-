@@ -427,43 +427,7 @@ There are many, many things that you can do with tweak scripts, for more example
 
 ========================================================
 
-Tutorial 6: The Rubble GUI
-
-This tutorial introduces the Rubble GUI and explains all of it's functions.
-
-The Rubble GUI automates all the common Rubble tasks, but you still need to know what these tasks are and when to use them to make full use of it.
-Unfortunately the GUI is Windows only.
-
-The first and simplest thing you can do is a normal generation cycle. This is done from the "Addons" tab, simply select the addons you want in the list then click "Generate Raws with Selected Addons", quick and easy.
-
-The second major task is running prep cycles. 
-Prep is Rubble's answer to the problem of sharing worlds with radically different settings. For example you download a succession world that has a different tileset from the one you normally use, without Rubble you would have to replace the raws with the ones for a tileset you prefer (hard to do if the raws are modded), install the same tile set on your copy of DF, or just deal with "funny" looking walls and such. With Rubble there are two, much easier, ways to deal with this problem, the first and easiest way being prep. To put it simply prep will update your DF install to roughly match the one used to generate the world. Only things changed/controlled by addons are handled, so, for example, a custom DFHack plugin that is not controlled by a Rubble addon would not be included.
-In most cases prep handles everything need to run a world without issues, including installing the same tileset the world was generated with and installing the necessary DFhack scripts.
-To run a prep cycle simply open the "Prep" tab, select the region you want to prep and click "Run Prep for Selected Region".
-
-Third is regenerating a world.
-Regeneration is a slightly dangerous, but very useful action that is mostly used to change tilesets. Regen is, along with prep, the primary method for dealing with shared worlds. While prep makes your install mirror the one used when the world was generated, regen make the world mirror your install.
-Regen can totally ruin your world if it is misused! As long as you regenerate with the same exact addons used to create the world in the first place nothing bad should happen (but regenerating with the same addons is pointless).
-Generally regen should only be used for changing tilesets, as most if not all tileset addons are safe to switch on worlds in progress. Note that this in not the case with the vast majority of other addons!
-Before using regen make a backup of your world!
-To regen a world open the "Regen" tab, select the region to regenerate, then change the addon list below. Once you have the addons setup the way you want them simply click "Regen Selected Region with Selected Addons".
-
-The last tab is the "Other" tab, which at the time I am writing this only allows you to set extra command line switches to pass to Rubble (advanced users only!).
-
-The GUI has a configuration file that allows you to set some simple option to tell it how to interact with Rubble and to give it a place to store settings. Most of the keys in this file are self explanatory, but two of them need some introduction.
-
-minimal: If this key is set to "true" then the GUI will not have the prep and regen tabs.
-addonlist: If this key is set to point to a valid ini file then that file will be used to populate that addon lists.
-
-The only things you cannot do from the GUI (without manually specifying extra flags) are:
-	Update the addon list (the GUI does this automatically)
-	Print debug and performance information (why would you want to?)
-	Manage config variables
-	Change the default paths (this is done with the rubble.ini file)
-
-========================================================
-
-Tutorial 7: The raw Parsers
+Tutorial 6: The raw Parsers
 
 This tutorial will teach you how to use the script raw parsers.
 
@@ -564,7 +528,7 @@ While I have been calling them the "fast" and "slow" parsers, this is not necess
 
 ========================================================
 
-Tutorial 8: Setting up a Development Rubble Install
+Tutorial 7: Setting up a Development Rubble Install
 
 Rubble is a great tool for transforming raws and doing other repetitive development tasks of that sort, this tutorial aims to show you how to setup a minimal environment for when you don't need to have DF available.
 

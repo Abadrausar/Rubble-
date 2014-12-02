@@ -1,0 +1,13 @@
+<rubble:addonmeta
+	header=`Adds the archers workshop, a building where you can make all types of ranged weapons and their ammo.`
+	
+	description=`
+The only thing you cannot do (yet) is make ranged weapons from metal, you will have to use
+bone or wood for now.
+
+To keep the ammo reaction count under control ammo creation is done in two steps, first you make
+"shafts" out of the desired material, then you turn the shafts into ammo of the desired type.
+`
+	
+	activates="Libs/Base"
+>

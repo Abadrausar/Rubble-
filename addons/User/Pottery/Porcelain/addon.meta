@@ -1,0 +1,10 @@
+<rubble:addonmeta
+	header=`Allows you to use orthoclase and microcline to make porcelain (in addition to kaolinite).`
+	
+	description=`
+I am not sure how realistic this is, orthoclase and microcline are used to make porcelain, but it may 
+only be as an additive, not the main ingredient.
+`
+	
+	activates="Libs/Base"
+>

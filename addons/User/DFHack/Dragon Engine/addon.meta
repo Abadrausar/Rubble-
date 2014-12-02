@@ -1,0 +1,10 @@
+<rubble:addonmeta
+	header=`A direct port of the dragon engines from the DFHack r5 mini-mod pack.`
+	
+	description=`
+Dragon engines are basically machines that take magma and spit it out as dragon fire,
+very deadly short range siege engines.
+`
+	
+	activates="Libs/Base"
+>

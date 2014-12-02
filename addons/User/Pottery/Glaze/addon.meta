@@ -1,0 +1,40 @@
+<rubble:addonmeta
+	header=`Greatly expands the glazing system.`
+	
+	description=`
+Allows you to grind minerals and ores into glaze powders of various colors and then use these powders 
+to glaze various items. Unlike vanilla there is not a glazing reaction for each item type, use 
+stockpiles to restrict item usage.
+Each mineral or ore boulder is ground into 10 units of glaze powder, ash bars only produce 3 units.
+There are four different kinds of glazing you may do:
+	Ash glazing uses one unit of ash to glaze an item, simple and cheap.
+	Monochrome glazing uses two units of any color glaze to glaze an item.
+	Dichrome glazing uses one unit of white glaze and one unit of any other color to glaze an item, 
+	this is more valuable than monochrome and has an additional chance of having bands on the item
+	for even more value.
+	Polychrome glazing uses one unit of white and one unit each of blue, red, and yellow glaze to glaze 
+	an item, like dichrome this adds lots of value and each non-white color has a chance of adding 
+	bands. If you get lucky your simple pot could become very valuable!
+Glaze List:
+	Name									Color Class		Value
+	olive ash glaze							ash				3
+	cream white tin glaze					white			10
+	pearl white zinc glaze					white			10
+	silver glaze							white			15
+	gold glaze								yellow			20
+	turquoise green copper glaze			blue			10
+	rust red iron glaze						red				15
+	chartreuse green nickel glaze			blue			10
+	scarlet red lead glaze					red				10
+	vermilion cinnabar glaze				red				6
+	cobalt blue glaze						blue			6
+	saffron yellow orpiment glaze			yellow			6
+	lemon yellow antimony glaze				yellow			6
+	dark indigo manganese glaze				blue			6
+	orange radiant pitchblende glaze		red				6
+This addon is a polished and Rubblized port of the old "Expanded Glazes" mod by "NW_Kohaku". This 
+version has had the reactions completely reworked as well as a few other balancing changes.
+`
+	
+	activates="Libs/Base"
+>

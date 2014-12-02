@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`Raises fish vermin populations to the max.`
+	
+	description=`
+This should stop you from fishing out a lake or ocean ever again! (unless you catch ~30,000 fish...)
+`
+	
+	activates="Libs/Base"
+>

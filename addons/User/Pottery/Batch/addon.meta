@@ -1,0 +1,11 @@
+<rubble:addonmeta
+	header=`Adds a batch kiln that can make 5x the stuff with 4x the material and 1x the fuel.`
+	
+	description=`
+Like the "User/Pottery" addon you can make many, many, more things from clay than you can make
+in vanilla.
+Glazing and collecting clay can only be done at the normal kiln.
+`
+	
+	activates="Libs/Base"
+>

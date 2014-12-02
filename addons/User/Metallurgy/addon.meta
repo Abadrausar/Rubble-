@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`Adds an "Alloy Furnace" that can be used to make alloys.`
+	
+	description=`
+All alloys are made from bars using the smelting skill. Does not effect the smelter in any way.
+`
+	
+	activates="Libs/Base"
+>

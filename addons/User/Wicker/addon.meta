@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`Make all sorts of stuff from woven plants.`
+	
+	description=`
+Uses the process plants skill (for bundling) and weaving (for making stuff).
+`
+	
+	activates="Libs/Base"
+>

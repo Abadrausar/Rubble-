@@ -1,0 +1,11 @@
+<rubble:addonmeta
+	header=`Restores the vanilla tileset related init options.`
+	
+	description=`
+It is a very good idea to use this addon whenever you are using the vanilla tileset, as otherwise 
+prepping worlds generated from those raws may not work quite right.
+This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
+`
+	
+	activates="Libs/Base"
+>

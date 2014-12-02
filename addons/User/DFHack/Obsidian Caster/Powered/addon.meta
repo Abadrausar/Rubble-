@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`An automatic powered version of the "DFHack/Obsidian Caster" addon.`
+	
+	description=`
+This addon works exactly the same as "DFHack/Obsidian Caster", just without dwarf labor.
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fluids"
+>

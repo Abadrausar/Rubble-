@@ -54,7 +54,8 @@ func (store *typeStore) add(name string, typ ObjectFactory) int {
 	
 	slot := len(store.data)
 	if _, ok := store.ntoi[name]; ok {
-		RaiseError("Type slot already exists: " + name)
+		//RaiseError("Type slot already exists: " + name)
+		return store.ntoi[name]
 	}
 	store.ntoi[name] = slot
 	store.iton = append(store.iton, name)

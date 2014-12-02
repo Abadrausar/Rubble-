@@ -82,7 +82,7 @@ func SValueToRValue(sval *rex.Value, rval reflect.Value) {
 		rex.RaiseError("GenII: Value passed to SValueToRValue is not settable.")
 	}
 	
-	if sval.Type == rex.TypUser {
+	if sval.Type == rex.TypUser || sval.Type == rex.TypIndex {
 		if reflect.TypeOf(sval.Data) == rval.Type() {
 			rval.Set(reflect.ValueOf(sval.Data))
 			return

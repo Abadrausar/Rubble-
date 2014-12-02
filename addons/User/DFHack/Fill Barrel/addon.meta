@@ -1,0 +1,15 @@
+<rubble:addonmeta
+	header=`Fill barrels from nearby water at the still.`
+	
+	description=`
+Works like the cart filler as far as finding the water goes.
+Also allows you to fill water buckets for use in the hospital.
+This addon is most for use in biomes where water freezes in the winter (so you can have water reserves).
+Please note that AFAIK water barrels are not stockpilable.
+Note that unlike most DFHack addons this one will still work without DFHack, it just won't
+require/use water.
+Why the still? Well the water needs to be purified somewhere right?
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fluids"
+>

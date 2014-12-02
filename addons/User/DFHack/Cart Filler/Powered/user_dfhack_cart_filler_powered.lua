@@ -31,10 +31,10 @@ function makeFillCart()
 			elseif water and cart then
 				fluid = false
 			elseif magma and cart then
-				dfhack.gui.showAnnouncement("Your Powered Cart Filler cannot find an empty magma-safe minecart!", COLOR_LIGHTRED)
+				--dfhack.gui.showAnnouncement("Your Powered Cart Filler cannot find an empty magma-safe minecart!", COLOR_LIGHTRED)
 				return
 			elseif cart then
-				dfhack.gui.showAnnouncement("Your Powered Cart Filler has no nearby fluids!", COLOR_LIGHTRED)
+				--dfhack.gui.showAnnouncement("Your Powered Cart Filler has no nearby fluids!", COLOR_LIGHTRED)
 				return
 			else
 				-- No minecart, just do nothing to stop message spam

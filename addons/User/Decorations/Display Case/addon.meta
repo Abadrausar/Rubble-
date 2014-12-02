@@ -1,0 +1,10 @@
+<rubble:addonmeta
+	header=`Adds a workshop for displaying items.`
+	
+	description=`
+Display cases can be built with 1 block and any 1 other item, build with an artifact to make room
+value skyrocket or just use to keep things out of reach of those pesky thieves.
+`
+	
+	activates="Libs/Base"
+>

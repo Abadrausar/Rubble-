@@ -1,0 +1,5 @@
+<rubble:addonmeta
+	header=`Allows you to use feathers as "soft" pearls (you can use them to make crafts).`
+	
+	activates="Libs/Base"
+>

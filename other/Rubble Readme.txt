@@ -1,5 +1,5 @@
 
-Rubble: After Blast comes Rubble
+Rubble: Modding Made Easy!
 
 ==============================================
 Overview:
@@ -52,22 +52,48 @@ Now you are good to go!
 If you use OSX or Linux, 32 bit binaries for these OSes can be found in the "rubble/other" directory. If you want 64 bit binaries you can compile them yourself, source code is in "rubble/other/src" (along with basic build instructions).
 
 ==============================================
-Running Rubble (GUI, Windows):
+Running Rubble (GUI, Windows, Depreciated!):
 ==============================================
 
-Unfortunately as things stand the GUI is Windows only and this is unlikely to change anytime soon (I have no idea if the GUI will run under Wine, if anyone tries please tell me how it turned out).
+The GUI is Windows only.
 
-All common Rubble tasks have a tab in the GUI, in most cases what each thing does is self explanatory, but if you have trouble there is a tutorial in "How To Rubble.txt" that explains everything in detail.
+This UI is depreciated and will be removed in the near future.
+
+All common Rubble tasks have a tab in the GUI, in most cases what each thing does is self explanatory.
+
+This GUI does not interface with Rubble in the same way as the others (it is a layer on to of the CLI interface), so things tend to not work quite as well. For example support for the Rubble config file is spotty and the GUI needs it's own custom config file to handle things that Rubble native interfaces don't need to worry about.
 
 ==============================================
-Running Rubble (Manually, all OSes):
+Running Rubble (Web UI, all OSes):
 ==============================================
 
-Windows users can skip this section, just run the GUI, it does all this (mostly) automatically.
+The web UI is kinda ugly, but simple, functional, and easy to use.
 
-Rubble is a command line application, therefore at least some knowledge of how to use a command prompt will be very helpful.
+This interface is the new recommended way of running Rubble, as it always has full support for the latest ways of doing things.
 
-If you can (eg. you are running on windows) it is HIGHLY recommended to use the GUI. The GUI automates the process of updating and editing the addon list and is generally much faster then doing everything by hand (plus you don't have to mess around with the command prompt, if you dislike that kind of thing)
+To use the web UI all you need to do is start the server (rubble_web) and then point your browser to "127.0.0.1:1010" (by default), from there just follow the menus.
+
+To make things easy you can create a batch file or shell script named "./other/webUI/browser" that starts your web browser, the server will try to run this file when it starts.
+For example my browser file is named "browser.bat" and contains:
+	@"C:\Program Files (x86)\SRWare Iron\iron.exe" "%1"
+You will obviously need to use something different if you are not using a default SRWare Iron install on Windows x64 :)
+
+The web UI is the most advanced (functionality-wise) UI available. The command line UI can do most of the things the web UI can do, but it is limited by being non-interactive.
+
+So far this UI is the only one that fully supports addon meta data.
+A particularly visible example of this meta data in action is addon descriptions, if you click on an addon name (anywhere addon names are shown) it will take you to a small page with information about the addon! No more digging through a text file for addon details, you can even get a list of dependencies or look at the contents of individual files!
+
+The server supports the rubble config file and most of the command line options that the CLI version does, run "rubble_web -h" for a full list.
+
+The UI's look and feel can be customized, see the "Rubble Web UI Customization" section in "Rubble Basics".
+
+==============================================
+Running Rubble (CLI, all OSes):
+==============================================
+
+It is HIGHLY recommended that you use the Web UI. It is generally much faster then doing everything by hand (plus you don't have to mess around with the command prompt, if you dislike that kind of thing)
+
+The Rubble command line interface is fairly simple, doing non-interactive batch processing only.
 
 For basic documentation on each command line option run "rubble -h".
 
@@ -75,6 +101,7 @@ Common Tasks:
 
 To activate or deactivate a Rubble addon manually you may set it's entry in addons/addonlist.ini to "true" or "false". If you just installed an addon it will not have an entry until Rubble has run at least once (after the addon was installed). 
 If you want to run Rubble without generating anything so as to update the addon list file just run 'rubble -addonlist' (the GUI does this as part of it's startup process).
+It is possible to specify addons manually as well, just use -addons.
 
 Some addons may allow additional configuration via "config variables", these are generally for advanced users and may be specified with the -config command line option.
 

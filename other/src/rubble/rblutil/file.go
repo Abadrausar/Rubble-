@@ -22,6 +22,8 @@ misrepresented as being the original software.
 
 package rblutil
 
+// Strip the extension from a file name.
+// If a file has multiple extensions return only the last.
 func StripExt(name string) string {
 	i := len(name) - 1
 	for i >= 0 {

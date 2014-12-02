@@ -1,0 +1,17 @@
+<rubble:addonmeta
+	lib=true
+	
+	header=`This is the old research addon from Better Dorfs, reworked as a library.`
+	
+	description=`
+All templates now take a "class" (basically a group id) and the reaction generator takes a building 
+name, skill id, and reaction class. These changes allow modders to use the same framework for multiple 
+different research buildings.
+The templates for adding new research topics are always active, so optional support for addons that use 
+this library is easy to add to your industry mods.
+Many default addons register topics to the class "RESEARCH_GENERIC", so handle that class to if you 
+want to support these addon's topics (nothing bad will happen if you don't).
+`
+	
+	activates="Libs/Base"
+>
