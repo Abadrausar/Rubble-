@@ -56,7 +56,13 @@ Configure:
 
 Rubble allows you to change its directory settings via command line options. To see these options and their defaults run "rubble -h". 
 
-Rubble does not support a configuration file, if you want to use non-default settings more than once the best thing to do is make a batch file or shortcut. If you do not know how to use command line options, ask google.
+Rubble tries to read the file "./rubble.cfg", if this does not fail Rubble will load directory setting from here before processing command line options (command line options always take presidence).
+Example "rubble.cfg":
+	dfdir = ..
+	outputdir = ./objects
+	configdir = ./source
+	basedir = ./source/base
+	addonsdir = ./source/addons
 
 If you want to regenerate the raws for a save just run 'rubble -dfdir="./../../../.."' in the save's raw directory.
 	Keep in mind that using rubble will increase your save size by ~10MB (removing the two extra binarys will drop that amount by about half)
@@ -72,6 +78,15 @@ None known.
 ==============================================
 Changelog:
 ==============================================
+v1.8
+	Updated to NCA7, this includes many small (and a few large) script changes
+		If you wrote any script code check the command docs, 
+		a bunch of commands are now namespaced and/or have had their name changed.
+		For example add is now int:add and append is now str:add.
+	Notepad++ UDF updated
+	Added ADDON_HOOKS template to the base
+	Added optional config file, not sure why I didn't do it earlier after all GoBlast had one...
+	
 v1.7
 	Slight changes to NCA Indexables, nothing that effects user script code
 	The (much expanded) mess of debugging commands have all been moved to the debug namespace, some have new names

@@ -1,0 +1,78 @@
+PACKAGE
+
+package integer
+    import "dctech/nca7/commands/integer"
+
+    NCA v7 Integer Commands.
+
+FUNCTIONS
+
+func CommandInt_Add(state *nca7.State, params []*nca7.Value)
+    Adds two values.
+
+	int:add a b
+
+    Returns a + b
+
+func CommandInt_Div(state *nca7.State, params []*nca7.Value)
+    Divides two values.
+
+	int:div a b
+
+    Returns a / b
+
+func CommandInt_Eq(state *nca7.State, params []*nca7.Value)
+    Integer equal.
+
+	int:eq a b
+
+    Returns true or false.
+
+func CommandInt_Gt(state *nca7.State, params []*nca7.Value)
+    Integer greater than.
+
+	int:gt a b
+
+    Returns true or false.
+
+func CommandInt_Lt(state *nca7.State, params []*nca7.Value)
+    Integer less than.
+
+	int:lt a b
+
+    Returns true or false.
+
+func CommandInt_Mod(state *nca7.State, params []*nca7.Value)
+    Gives the remainder of dividing two values.
+
+	int:mod a b
+
+    Returns a % b
+
+func CommandInt_Mul(state *nca7.State, params []*nca7.Value)
+    Multiplies two values.
+
+	int:mul a b
+
+    Returns a * b
+
+func CommandInt_Sub(state *nca7.State, params []*nca7.Value)
+    Subtracts two values.
+
+	int:sub a b
+
+    Returns a - b
+
+func Setup(state *nca7.State)
+    Adds the integer commands to the state. The integer commands are:
+
+	int:add
+	int:sub
+	int:div
+	int:mod
+	int:mul
+	int:gt
+	int:lt
+	int:eq
+
+

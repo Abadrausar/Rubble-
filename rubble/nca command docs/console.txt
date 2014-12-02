@@ -1,0 +1,22 @@
+PACKAGE
+
+package console
+    import "dctech/nca7/commands/console"
+
+    NCA v7 Console IO Commands.
+
+FUNCTIONS
+
+func CommandConsole_Print(state *nca7.State, params []*nca7.Value)
+    Print a list of values.
+
+	print [value...]
+
+    Returns unchanged.
+
+func Setup(state *nca7.State)
+    Adds the console IO commands to the state. The console IO commands are:
+
+	console:print
+
+

@@ -1,23 +1,39 @@
 PACKAGE
 
 package str
-    import "dctech/nca6/str"
+    import "dctech/nca7/commands/str"
 
-    NCA v6 String Commands.
+    NCA v7 String Commands.
 
 FUNCTIONS
 
-func CommandAppend(state *nca6.State, params []*nca6.Value)
+func CommandStr_Add(state *nca7.State, params []*nca7.Value)
     Appends two or more strings together.
 
-	append a b [c...]
+	str:add a b [c...]
 
     Returns the result of appending all parameters together.
 
-func CommandFmtStr(state *nca6.State, params []*nca6.Value)
+func CommandStr_Char(state *nca7.State, params []*nca7.Value)
+    Gets char at pos.
+
+	str:char a pos
+
+    Opperand pos is converted to a 64 bit integer. Invalid strings are given
+    the value "0" If the position is out of range returns unchanged and sets
+    the error flag. Returns the character.
+
+func CommandStr_Cmp(state *nca7.State, params []*nca7.Value)
+    Compair two strings.
+
+	str:cmp a b
+
+    Returns true or false.
+
+func CommandStr_Fmt(state *nca7.State, params []*nca7.Value)
     Formats a string.
 
-	fmtstr format values...
+	str:fmt format values...
 
     valid format "verbs" for fmtstr:
 
@@ -29,44 +45,28 @@ func CommandFmtStr(state *nca6.State, params []*nca6.Value)
 
     Returns the formated string.
 
-func CommandStrChar(state *nca6.State, params []*nca6.Value)
-    Gets char at pos.
-
-	strchar a pos
-
-    Opperand pos is converted to a 64 bit integer. Invalid strings are given
-    the value "0" If the position is out of range returns unchanged and sets
-    the error flag. Returns the character.
-
-func CommandStrCmp(state *nca6.State, params []*nca6.Value)
-    Compair two strings.
-
-	strcmp a b
-
-    Returns 0 or -1.
-
-func CommandStrLen(state *nca6.State, params []*nca6.Value)
+func CommandStr_Len(state *nca7.State, params []*nca7.Value)
     Gets the length of a string.
 
-	strlen a
+	str:len a
 
     Returns the length.
 
-func CommandTrimSpace(state *nca6.State, params []*nca6.Value)
+func CommandStr_TrimSpace(state *nca7.State, params []*nca7.Value)
     Trims leading and trailing whitespace from a string.
 
-	trimspace str
+	str:trimspace str
 
     Returns str with leading and trailing whitespace removed.
 
-func Setup(state *nca6.State)
+func Setup(state *nca7.State)
     Adds the string commands to the state. The string commands are:
 
-	append
-	trimspace
-	strlen
-	strchar
-	fmtstr
-	strcmp
+	str:add
+	str:trimspace
+	str:len
+	str:char
+	str:fmt
+	str:cmp
 
 

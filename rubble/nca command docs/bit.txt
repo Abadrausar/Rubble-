@@ -1,62 +1,62 @@
 PACKAGE
 
 package bit
-    import "dctech/nca6/bit"
+    import "dctech/nca7/commands/bit"
 
-    NCA v6 Bitwise Commands.
+    NCA v7 Bitwise Commands.
 
 FUNCTIONS
 
-func CommandAnd(state *nca6.State, params []*nca6.Value)
+func CommandBit_And(state *nca7.State, params []*nca7.Value)
     Ands two values.
 
-	and a b
+	bit:and a b
 
     Returns a & b
 
-func CommandLShift(state *nca6.State, params []*nca6.Value)
+func CommandBit_LShift(state *nca7.State, params []*nca7.Value)
     Shifts the value left. Count values of 0 or less are given the value 1.
 
-	lshift a [count]
+	bit:lshift a [count]
 
     Returns the param shifted "count" places
 
-func CommandNot(state *nca6.State, params []*nca6.Value)
+func CommandBit_Not(state *nca7.State, params []*nca7.Value)
     Inverts a value.
 
-	not a
+	bit:not a
 
     Returns a ^ -1
 
-func CommandOr(state *nca6.State, params []*nca6.Value)
+func CommandBit_Or(state *nca7.State, params []*nca7.Value)
     Ors two values.
 
-	or a b
+	bit:or a b
 
     Returns a | b
 
-func CommandRShift(state *nca6.State, params []*nca6.Value)
+func CommandBit_RShift(state *nca7.State, params []*nca7.Value)
     Shifts the value right. Count values of 0 or less are given the value 1.
 
-	rshift a [count]
+	bit:rshift a [count]
 
     Returns the param shifted "count" places
 
-func CommandXor(state *nca6.State, params []*nca6.Value)
+func CommandBit_Xor(state *nca7.State, params []*nca7.Value)
     Xors two values.
 
-	xor a b
+	bit:xor a b
 
     Returns a ^ b
 
-func Setup(state *nca6.State)
+func Setup(state *nca7.State)
     Adds the bitwise commands to the state. The bitwise commands are:
 
-	lshift
-	rshift
-	and
-	or
-	xor
-	not
+	bit:lshift
+	bit:rshift
+	bit:and
+	bit:or
+	bit:xor
+	bit:not
 
 

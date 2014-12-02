@@ -4,12 +4,10 @@ For manual installation just copy the files in "img" to "data/art" and edit your
 All tile numbers/colors are the same as vanilla.
 
 {SCRIPT;
-	'Edit the init files.
-	Note that regex:replace is provided by Rubble, it is not avalible in NCASH or the like.
-	(note to self: add regex NCA commands to the NCA6 std lib)'
+	'Edit the init files.'
 	
-	(var init (fileio:read (append [rubble:dfdir] "/data/init/init.txt")))
-	(var d_init (fileio:read (append [rubble:dfdir] "/data/init/d_init.txt")))
+	(var init (fileio:read (str:add [rubble:dfdir] "/data/init/init.txt")))
+	(var d_init (fileio:read (str:add [rubble:dfdir] "/data/init/d_init.txt")))
 	
 	(set init (regex:replace "\\[FONT:[^]]+\\]" [init] "[FONT:MLC 10x10.png]"))
 	(set init (regex:replace "\\[FULLFONT:[^]]+\\]" [init] "[FULLFONT:MLC 16x16.png]"))
@@ -53,14 +51,14 @@ All tile numbers/colors are the same as vanilla.
 	(set d_init (regex:replace "\\[TRACK_RAMP_SEW:(?:[0-9]+|'.')I?\\]" [d_init] "[TRACK_RAMP_SEW:30I]"))
 	(set d_init (regex:replace "\\[TRACK_RAMP_NSEW:(?:[0-9]+|'.')I?\\]" [d_init] "[TRACK_RAMP_NSEW:30I]"))
 	
-	(fileio:write (append [rubble:dfdir] "/data/init/init.txt") [init])
-	(fileio:write (append [rubble:dfdir] "/data/init/d_init.txt") [d_init])
+	(fileio:write (str:add [rubble:dfdir] "/data/init/init.txt") [init])
+	(fileio:write (str:add [rubble:dfdir] "/data/init/d_init.txt") [d_init])
 	
 	
 	'An ugly hack, but I failed to find a copy file function in the go stdlib and this works fine.'
-	(fileio:write (append [rubble:dfdir] "/data/art/MLC 10x10.png") (fileio:read (append [rubble:addonsdir] "/mlc_tileset/img/MLC 10x10.png")))
+	(fileio:write (str:add [rubble:dfdir] "/data/art/MLC 10x10.png") (fileio:read (str:add [rubble:addonsdir] "/mlc_tileset/img/MLC 10x10.png")))
 	
-	(fileio:write (append [rubble:dfdir] "/data/art/MLC 16x16.png") (fileio:read (append [rubble:addonsdir] "/mlc_tileset/img/MLC 16x16.png")))
+	(fileio:write (str:add [rubble:dfdir] "/data/art/MLC 16x16.png") (fileio:read (str:add [rubble:addonsdir] "/mlc_tileset/img/MLC 16x16.png")))
 	
 	(ret "")
 }

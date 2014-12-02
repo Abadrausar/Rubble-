@@ -1,13 +1,13 @@
 PACKAGE
 
 package csv
-    import "dctech/nca6/csv"
+    import "dctech/nca7/commands/csv"
 
-    NCA v6 CSV Commands.
+    NCA v7 CSV Commands.
 
 FUNCTIONS
 
-func CommandCsv_Parse(state *nca6.State, params []*nca6.Value)
+func CommandCsv_Parse(state *nca7.State, params []*nca7.Value)
     Parse a csv file. The returned file is an Indexable of Indexables.
     Indexing rules are the same as for array.
 
@@ -15,9 +15,9 @@ func CommandCsv_Parse(state *nca6.State, params []*nca6.Value)
 
     Returns the csv file or an error message. May set the Error flag.
 
-func NewCSVFile() nca6.Indexable
+func NewCSVFile() nca7.Indexable
 
-func Setup(state *nca6.State)
+func Setup(state *nca7.State)
     Adds the csv commands to the state. The csv commands are:
 
 	csv:parse
@@ -27,18 +27,14 @@ func Setup(state *nca6.State)
 
 TYPES
 
-type CSVFile []*nca6.Value
+type CSVFile []*nca7.Value
 
 func (this *CSVFile) Exists(index string) bool
 
-func (this *CSVFile) Get(index string) *nca6.Value
+func (this *CSVFile) Get(index string) *nca7.Value
 
 func (this *CSVFile) Keys() []string
 
 func (this *CSVFile) Len() int64
-
-func (this *CSVFile) ReadOnly() bool
-
-func (this *CSVFile) Set(index string, value *nca6.Value)
 
 

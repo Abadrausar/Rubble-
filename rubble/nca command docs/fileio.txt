@@ -1,27 +1,27 @@
 PACKAGE
 
 package fileio
-    import "dctech/nca6/fileio"
+    import "dctech/nca7/commands/fileio"
 
-    NCA v6 File IO Commands.
+    NCA v7 File IO Commands.
 
 FUNCTIONS
 
-func CommandFileIO_Read(state *nca6.State, params []*nca6.Value)
+func CommandFileIO_Read(state *nca7.State, params []*nca7.Value)
     Read from file.
 
 	fileio:read path
 
     Returns file contents or an error message. May set the Error flag.
 
-func CommandFileIO_Write(state *nca6.State, params []*nca6.Value)
+func CommandFileIO_Write(state *nca7.State, params []*nca7.Value)
     Write to file.
 
 	fileio:write path contents
 
     Returns unchanged or an error message. May set the Error flag.
 
-func Setup(state *nca6.State)
+func Setup(state *nca7.State)
     Adds the file io commands to the state. The file io commands are:
 
 	fileio:read

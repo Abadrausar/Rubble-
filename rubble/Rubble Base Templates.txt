@@ -36,7 +36,6 @@ User Templates in Standared Base
 	Example:
 		{IF;$TEST_VAR;YES;[FOO];[BAR]}
 
-
 ==============================================
 {ONCE;<KEY>;<PRERAWS>}
 	Parses and returns <PRERAWS> unless a ONCE block with the same <KEY> has been parsed earlier.
@@ -150,7 +149,7 @@ User Templates in Standared Base
 {REACTION;<TECH>;<CLASS>}
 	Similar to ITEM_CLASS, this registers a reaction to class <CLASS>. Used with #USES_TECH or #USES_REACTIONS.
 	Returns [REACTION:<TECH>]
-	
+
 ==============================================
 {#USES_REACTIONS;<CLASSES>...}
 	Usable in entity definitions. Expands to a list of reaction permissions of all <CLASS>es combined.
@@ -190,11 +189,10 @@ User Templates in Standared Base
 	Usable in entity definitions. Expands to a list of item permissions of the <CLASS>. When using multiple #USES_ITEMS calls make sure every item is returned by at most one #USES_ITEMS call.
 
 ==============================================
-{ADDON_HOOKS;<ID>;[<PLAYABLE>=0]}
-	Usable in entity definitions, ADDON_HOOKS expands to a list of addon hooks for the entity. 
+{ADDON_HOOKS;<ID>;[<PLAYABLE>=false]}
+	Usable in entity definitions, ADDON_HOOKS expands to a list of addon hooks for the entity (Addon hooks are tech/item classes). 
 	By default the hooks installed are:
 		ADDON_HOOK_GENERIC
 		ADDON_HOOK_<ID>
 	If <PLAYABLE> is true then the following hooks are also installed:
 		ADDON_HOOK_PLAYABLE
-	Addon hooks are tech/item classes.

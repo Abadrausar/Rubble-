@@ -1,20 +1,13 @@
 PACKAGE
 
 package base
-    import "dctech/nca6/base"
+    import "dctech/nca7/commands/base"
 
-    NCA v6 Base Commands.
+    NCA v7 Base Commands.
 
 FUNCTIONS
 
-func CommandArray(state *nca6.State, params []*nca6.Value)
-    Creates a new array.
-
-	array [size]
-
-    Returns the new array
-
-func CommandBreak(state *nca6.State, params []*nca6.Value)
+func CommandBreak(state *nca7.State, params []*nca7.Value)
     A "soft" return, break will never return more than one level.
 
 	break [value]
@@ -24,58 +17,75 @@ func CommandBreak(state *nca6.State, params []*nca6.Value)
     returns a specific value and/or "returning" a value to loop. Returns
     value or unchanged.
 
-func CommandCommand(state *nca6.State, params []*nca6.Value)
+func CommandCommand(state *nca7.State, params []*nca7.Value)
     Creates a new user command.
 
 	command name code [paramName...]
 
     Returns unchanged.
 
-func CommandDelVar(state *nca6.State, params []*nca6.Value)
+func CommandDelCommand(state *nca7.State, params []*nca7.Value)
+    Deletes a command. Be careful with this one! Some actions are not
+    reversable from a script.
+
+	delcommand name
+
+    Returns unchanged.
+
+func CommandDelNamespace(state *nca7.State, params []*nca7.Value)
+    Deletes a namespace. Be careful with this one! Some actions are not
+    reversable from a script. For example it may be a very bad idea to
+    delete debug or int.
+
+	delnamespace name
+
+    Returns unchanged.
+
+func CommandDelVar(state *nca7.State, params []*nca7.Value)
     Deletes a variable.
 
 	delvar name
 
     Returns the deleted vars value.
 
-func CommandEval(state *nca6.State, params []*nca6.Value)
+func CommandEval(state *nca7.State, params []*nca7.Value)
     Evaluates code in the current environment.
 
 	eval code
 
     Returns the return value of the last command in the code it runs.
 
-func CommandEvalInNew(state *nca6.State, params []*nca6.Value)
+func CommandEvalInNew(state *nca7.State, params []*nca7.Value)
     Evaluates code in a new environment.
 
 	evalinnew code
 
     Returns the return value of the last command in the code it runs.
 
-func CommandEvalInParent(state *nca6.State, params []*nca6.Value)
+func CommandEvalInParent(state *nca7.State, params []*nca7.Value)
     Evaluates code in the current environment's parent.
 
 	evalinparent code
 
     Returns the return value of the last command in the code it runs.
 
-func CommandExists(state *nca6.State, params []*nca6.Value)
+func CommandExists(state *nca7.State, params []*nca7.Value)
     Returns true (-1) if variable exists or if a index exists in a map or
     array.
 
 	exists name
 	exists value index
 
-    Returns 0 or -1.
+    Returns true or false.
 
-func CommandExit(state *nca6.State, params []*nca6.Value)
+func CommandExit(state *nca7.State, params []*nca7.Value)
     Exit the script.
 
 	exit [value]
 
     Returns value or unchanged.
 
-func CommandForEach(state *nca6.State, params []*nca6.Value)
+func CommandForEach(state *nca7.State, params []*nca7.Value)
     Runs code as command for each entry in a map or array value.
 
 	foreach objectvalue code
@@ -87,14 +97,14 @@ func CommandForEach(state *nca6.State, params []*nca6.Value)
     If code returns false foreach aborts. Returns the return value of the
     last command in code.
 
-func CommandGetError(state *nca6.State, params []*nca6.Value)
+func CommandGetError(state *nca7.State, params []*nca7.Value)
     Gets the error flag.
 
 	geterror
 
-    Returns -1 or 0.
+    Returns true or false.
 
-func CommandIf(state *nca6.State, params []*nca6.Value)
+func CommandIf(state *nca7.State, params []*nca7.Value)
     If the condition is true run true code else if false code exists call
     false code.
 
@@ -103,21 +113,14 @@ func CommandIf(state *nca6.State, params []*nca6.Value)
     Returns the return value of the last command in the code it runs or
     unchanged.
 
-func CommandInt(state *nca6.State, params []*nca6.Value)
-    Forces a value's internal representation to be an integer.
-
-	int value
-
-    Returns the new value.
-
-func CommandLen(state *nca6.State, params []*nca6.Value)
+func CommandLen(state *nca7.State, params []*nca7.Value)
     Fetches the element count of an Indexable.
 
 	len value
 
     Returns the element count.
 
-func CommandLoop(state *nca6.State, params []*nca6.Value)
+func CommandLoop(state *nca7.State, params []*nca7.Value)
     Runs code for as long as the code returns true.
 
 	loop code
@@ -126,28 +129,21 @@ func CommandLoop(state *nca6.State, params []*nca6.Value)
     "0" or "" unless loop exited with ret (In which case the return value is
     unusable by the command calling loop anyway).
 
-func CommandMap(state *nca6.State, params []*nca6.Value)
-    Creates a new map.
-
-	map
-
-    Returns the new map
-
-func CommandNamespace(state *nca6.State, params []*nca6.Value)
+func CommandNamespace(state *nca7.State, params []*nca7.Value)
     Creates a new namespace.
 
 	namespace name
 
     Returns unchanged.
 
-func CommandNop(state *nca6.State, params []*nca6.Value)
+func CommandNop(state *nca7.State, params []*nca7.Value)
     Does nothing.
 
 	nop
 
     Returns unchanged.
 
-func CommandRet(state *nca6.State, params []*nca6.Value)
+func CommandRet(state *nca7.State, params []*nca7.Value)
     Return from current command.
 
 	ret [value]
@@ -156,14 +152,14 @@ func CommandRet(state *nca6.State, params []*nca6.Value)
     from inside a loop will not return from the loop, it will return from
     the command that called loop. See break. Returns value or unchanged.
 
-func CommandRun(state *nca6.State, params []*nca6.Value)
+func CommandRun(state *nca7.State, params []*nca7.Value)
     Runs code as a user command.
 
 	run code [params...]
 
     Returns the return value of the last command in the code it runs.
 
-func CommandSet(state *nca6.State, params []*nca6.Value)
+func CommandSet(state *nca7.State, params []*nca7.Value)
     Sets the value of variable "name" to value or sets the value of the map
     or array at index to value.
 
@@ -172,7 +168,7 @@ func CommandSet(state *nca6.State, params []*nca6.Value)
 
     Returns value.
 
-func CommandSetError(state *nca6.State, params []*nca6.Value)
+func CommandSetError(state *nca7.State, params []*nca7.Value)
     Sets (or unsets) the error flag.
 
 	seterror [value]
@@ -180,27 +176,24 @@ func CommandSetError(state *nca6.State, params []*nca6.Value)
     If you pass no params the error flag will be set, to unset pass a false
     value Returns unchanged.
 
-func CommandString(state *nca6.State, params []*nca6.Value)
-    Forces a value's internal representation to be a string.
-
-	string value
-
-    Returns 0 or -1.
-
-func CommandVar(state *nca6.State, params []*nca6.Value)
+func CommandVar(state *nca7.State, params []*nca7.Value)
     Creates a new variable setting the value to value if present.
 
 	var name [value]
 
     Returns value or unchanged.
 
-func NewScriptArray() nca6.Indexable
+func NewScriptArray() nca7.EditIndexable
 
-func NewScriptArraySized(size int) nca6.Indexable
+func NewScriptArrayFromLit(keys []string, values []*nca7.Value) *nca7.Value
 
-func NewScriptMap() nca6.Indexable
+func NewScriptArraySized(size int) nca7.EditIndexable
 
-func Setup(state *nca6.State)
+func NewScriptMap() nca7.EditIndexable
+
+func NewScriptMapFromLit(keys []string, values []*nca7.Value) *nca7.Value
+
+func Setup(state *nca7.State)
     Setup adds the base commands to the state. The base commands are:
 
 	nop
@@ -210,16 +203,14 @@ func Setup(state *nca6.State)
 	seterror
 	geterror
 	command
+	delcommand
 	namespace
+	delnamespace
 	var
-	map
-	array
 	delvar
 	set
 	exists
 	len
-	string
-	int
 	run
 	eval
 	evalinparent
@@ -228,37 +219,38 @@ func Setup(state *nca6.State)
 	loop
 	foreach
 
+    Also registers the following indexables:
+
+	map
+	array
+
     The base commands are more or less required.
 
 
 TYPES
 
-type ScriptArray []*nca6.Value
+type ScriptArray []*nca7.Value
 
 func (this *ScriptArray) Exists(index string) bool
 
-func (this *ScriptArray) Get(index string) *nca6.Value
+func (this *ScriptArray) Get(index string) *nca7.Value
 
 func (this *ScriptArray) Keys() []string
 
 func (this *ScriptArray) Len() int64
 
-func (this *ScriptArray) ReadOnly() bool
+func (this *ScriptArray) Set(index string, value *nca7.Value) bool
 
-func (this *ScriptArray) Set(index string, value *nca6.Value)
-
-type ScriptMap map[string]*nca6.Value
+type ScriptMap map[string]*nca7.Value
 
 func (this ScriptMap) Exists(index string) bool
 
-func (this ScriptMap) Get(index string) *nca6.Value
+func (this ScriptMap) Get(index string) *nca7.Value
 
 func (this ScriptMap) Keys() []string
 
 func (this ScriptMap) Len() int64
 
-func (this ScriptMap) ReadOnly() bool
-
-func (this ScriptMap) Set(index string, value *nca6.Value)
+func (this ScriptMap) Set(index string, value *nca7.Value) bool
 
 

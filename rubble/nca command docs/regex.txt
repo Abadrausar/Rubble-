@@ -1,20 +1,20 @@
 PACKAGE
 
 package regex
-    import "dctech/nca6/regex"
+    import "dctech/nca7/commands/regex"
 
-    NCA v6 Regular Expression Commands.
+    NCA v7 Regular Expression Commands.
 
 FUNCTIONS
 
-func CommandRegEx_Replace(state *nca6.State, params []*nca6.Value)
+func CommandRegEx_Replace(state *nca7.State, params []*nca7.Value)
     Runs a regular expression search and replace.
 
 	regex:replace regex input replace
 
     Returns input with all strings matching regex replaced with replace.
 
-func Setup(state *nca6.State)
+func Setup(state *nca7.State)
     Adds the regex commands to the state. The regex commands are:
 
 	regex:replace

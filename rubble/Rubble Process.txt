@@ -5,6 +5,7 @@ The Rubble Processing Pipeline
 Detailed Order of Execution
 ==============================================
 
+	Config file is loaded (if present)
 	Commandline options are processed
 	NCA is initalized
 	Builtin templates are loaded
