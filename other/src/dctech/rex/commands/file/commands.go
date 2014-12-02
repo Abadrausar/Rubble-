@@ -221,7 +221,7 @@ func Command_WalkFiles(script *rex.Script, params []*rex.Value) {
 	}
 	block := params[1].Data.(*rex.Code)
 	
-	script.Locals.Add(block)
+	script.Locals.Add(script.Host, block)
 	for _, file := range files {
 		if file.IsDir() {
 			continue
@@ -257,7 +257,7 @@ func Command_WalkDirs(script *rex.Script, params []*rex.Value) {
 	}
 	block := params[1].Data.(*rex.Code)
 	
-	script.Locals.Add(block)
+	script.Locals.Add(script.Host, block)
 	for _, file := range files {
 		if !file.IsDir() {
 			continue

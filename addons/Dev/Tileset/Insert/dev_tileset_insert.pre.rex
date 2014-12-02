@@ -167,7 +167,7 @@ var changedFile = false
 				# [COLOR:0:0:0]
 				(if (str:cmp [tag id] "COLOR") {
 					(if (int:eq (len [tag]) 3) {
-						[tag replace = (str:add "[COLOR:{#COLOR;" [curCreature] ";" [tag 0] ":" [tag 1] ":" [tag 2] "}]")]
+						[tag replace = (str:add "[COLOR:{#COLOR;" [curCreature] ";;" [tag 0] ":" [tag 1] ":" [tag 2] "}]")]
 						[changedFile = true]
 					}{
 						(rubble:abort "Error: invalid param count to COLOR raw tag in last file.")
@@ -177,7 +177,7 @@ var changedFile = false
 				# [CREATURE_TILE:'A']
 				(if (str:cmp [tag id] "CREATURE_TILE") {
 					(if (int:eq (len [tag]) 1) {
-						[tag replace = (str:add "[CREATURE_TILE:{#TILE;" [curCreature] ";" [tag 0] "}]")]
+						[tag replace = (str:add "[CREATURE_TILE:{#TILE;" [curCreature] ";;" [tag 0] "}]")]
 						[changedFile = true]
 					}{
 						(rubble:abort "Error: invalid param count to CREATURE_TILE raw tag in last file.")

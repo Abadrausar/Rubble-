@@ -57,6 +57,12 @@ a:hover
 	font-size: 10pt;
 }
 
+p.mono
+{
+	font-family: monospace;
+	font-size: 10pt;
+}
+
 pre
 {
 	border-style: none;

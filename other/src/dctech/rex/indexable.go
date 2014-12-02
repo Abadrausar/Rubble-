@@ -34,12 +34,6 @@ type Indexable interface {
 	// String should return the contents in the best format for humans to read.
 	// The output should resemble Rex code but it does not need to use things like proper types.
 	String() string
-
-	// Code should return the contents as valid Rex code, if this is impossible return a
-	// string that is descriptive of the type eg "<SomeUnconvertableType>".
-	// If the Indexable does not have a type name it is ok to use map or array if the data is written out in a form
-	// the map or array ObjectFactory can understand.
-	CodeString() string
 }
 
 // EditIndexable represents an object that may be used with the
@@ -68,30 +62,4 @@ func IndexableToString(typ string, data Indexable) string {
 		out += ", " + keys[i] + "=" + data.Get(keys[i]).String()
 	}
 	return out + ">"
-}
-
-// IndexableToCodeString is a helper function for implementing an Indexable's CodeString method.
-// If typ is empty the generic type Indexable is used and the result is a string not an object literal.
-// If haskeys is false the result does not have key data.
-func IndexableToCodeString(typ string, data Indexable, haskeys bool) string {
-	out := ""
-	if typ != "" {
-		out += "<" + typ
-	} else {
-		out += "\"<Indexable"
-	}
-	keys := data.Keys()
-	for i := range keys {
-		if haskeys {
-			out += ", " + keys[i] + "=" + data.Get(keys[i]).CodeString()
-		} else {
-			out += ", " + data.Get(keys[i]).CodeString()
-		}
-	}
-	if typ != "" {
-		out += ">"
-	} else {
-		out += ">\""
-	}
-	return out
 }

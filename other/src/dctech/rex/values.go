@@ -143,26 +143,28 @@ type env struct {
 }
 
 // lookup gets a global index by name, this searches up-chain and is for use in resolving external variable indexes.
-// (for use by the compiler only.)
-func (lvs *LocalValueStore) lookup(name string) int {
+// (only used in lvs.Add)
+func (lvs *LocalValueStore) lookup(state *State, name string) int {
 	for x := len(lvs.envs)-1; x >= 0; x-- {
-		if i, ok := lvs.envs[x].block.ntoi[name]; ok {
+		if i, ok := lvs.envs[x].block.meta.ntoi[name]; ok {
 			return lvs.envs[x].lOffsets[i]
 		}
 	}
-	RaiseError("Local variable: " + name + " Not found in block chain.")
-	panic("UNREACHABLE")
+	
+	// Not in local block chain, look for a global with the correct name
+	// (and then transform the index into a negative number)
+	return 0 - (state.global.vars.lookup(name) + 1)
 }
 
-// Add a new environment using the meta-data and defaults from code.
+// Add a new environment using the meta-data from code.
 // This assumes that the meta-data in code is well formed!
-func (lvs *LocalValueStore) Add(code *Code) {
+func (lvs *LocalValueStore) Add(state *State, code *Code) {
 	// calculate bounds
 	base := 0
 	if len(lvs.envs) > 0 {
 		base = lvs.envs[len(lvs.envs)-1].top
 	}
-	top := base + len(code.iton)
+	top := base + len(code.meta.iton)
 
 	// Extend the local store if needed
 	for top > len(lvs.data) {
@@ -170,18 +172,14 @@ func (lvs *LocalValueStore) Add(code *Code) {
 	}
 
 	// Create the offset tables
-	loff := make([]int, len(code.iton))
+	loff := make([]int, len(code.meta.iton))
 	for i := range loff {
 		loff[i] = i + base
-		// may as well handle the defaults here
-		if code.defaults[i] != nil {
-			lvs.data[i + base] = code.defaults[i]
-		}
 	}
 
-	eoff := make([]int, len(code.eiton))
+	eoff := make([]int, len(code.meta.eiton))
 	for i := range eoff {
-		eoff[i] = lvs.lookup(code.eiton[i])
+		eoff[i] = lvs.lookup(state, code.meta.eiton[i])
 	}
 	
 	// add the env
@@ -277,4 +275,23 @@ func (lvs *LocalValueStore) Get(index int) *Value {
 // Set a value by local index.
 func (lvs *LocalValueStore) Set(index int, val *Value) {
 	lvs.data[lvs.gIndex(index)] = val
+}
+
+// Returns a positive global index if the variable is actually a global.
+// If the variable is local -1 is returned.
+func (lvs *LocalValueStore) IsGlobal(index int) int {
+	if index > 0 {
+		return -1
+	}
+	index = 0 - (index + 1)
+	
+	env := lvs.envs[len(lvs.envs)-1]
+	
+	if index < 0 || index >= len(env.eOffsets) {
+		return -1
+	}
+	if env.eOffsets[index] > 0 {
+		return -1
+	}
+	return 0 - (env.eOffsets[index] + 1)
 }

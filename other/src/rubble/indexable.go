@@ -87,7 +87,3 @@ func (raws *IndexableRaws) Keys() []string {
 func (raws *IndexableRaws) String() string {
 	return rex.IndexableToString("rubble:raws", raws)
 }
-
-func (raws *IndexableRaws) CodeString() string {
-	return rex.IndexableToCodeString("map", raws, true)
-}

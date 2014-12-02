@@ -119,6 +119,13 @@ func Command_Template(script *rex.Script, params []*rex.Value)
     count, and default values is determined by the block meta-data. Returns
     unchanged.
 
+func Command_UserTemplate(script *rex.Script, params []*rex.Value)
+    Defines a Rubble user template.
+
+	rubble:usertemplate name [params...] code
+
+    Returns unchanged.
+
 
 SUBDIRECTORIES
 

@@ -35,6 +35,7 @@ type Meta struct {
 	Header string
 
 	// A longer addon description, may be as long as you like.
+	// If Header is an adequate description leave this empty.
 	Description string
 
 	// Addon names for addons that are automatically activated when this addon is active.
@@ -156,8 +157,4 @@ func (meta *Meta) Keys() []string {
 
 func (meta *Meta) String() string {
 	return rex.IndexableToString("rubble:addonmeta", meta)
-}
-
-func (meta *Meta) CodeString() string {
-	return rex.IndexableToCodeString("rubble:addonmeta", meta, true)
 }

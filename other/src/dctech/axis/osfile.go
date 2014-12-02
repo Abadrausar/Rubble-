@@ -35,24 +35,22 @@ type OSFile struct {
 
 // NewOSFile creates a new OS AXIS file interface.
 // rw controls if Delete, Write, and WriteAll work.
-func NewOSFile(path string, rw bool) (DataSource, error) {
+func NewOSFile(path string, rw bool) DataSource {
 	file := new(OSFile)
 	file.rw = rw
 	file.path = filepath.ToSlash(path)
-	if !file.Exists("") {
-		return nil, NewError(ErrNotFound, file.path)
-	}
-	return file, nil
+	return file
 }
 
-func (file *OSFile) IsDir(path string) bool {
+func (file *OSFile) IsDir(path *Path) bool {
 	return false
 }
 
-func (file *OSFile) Exists(path string) bool {
-	if path != "" {
+func (file *OSFile) Exists(path *Path) bool {
+	if !path.Done() {
 		return false
 	}
+	
 	info, err := os.Lstat(file.path)
 	if err != nil {
 		return false
@@ -63,22 +61,23 @@ func (file *OSFile) Exists(path string) bool {
 	return true
 }
 
-func (file *OSFile) Delete(path string) error {
-	if path != "" {
+func (file *OSFile) Delete(path *Path) error {
+	if !path.Done() {
 		return NewError(ErrNotFound, path)
 	}
+	
 	if !file.rw {
 		return NewError(ErrReadOnly, path)
 	}
-	
 	return os.Remove(file.path)
 }
 
-func (file *OSFile) Create(path string) error {
-	if path != "" {
+func (file *OSFile) Create(path *Path) error {
+	if !path.Done() {
 		return NewError(ErrNotFound, path)
 	}
-	if !file.Exists("") {
+	
+	if !file.Exists(path) {
 		f, err := os.Create(file.path)
 		if err != nil {
 			return err
@@ -88,24 +87,24 @@ func (file *OSFile) Create(path string) error {
 	return nil
 }
 
-func (file *OSFile) ListDir(path string) []string {
+func (file *OSFile) ListDir(path *Path) []string {
 	return []string{}
 }
 
-func (file *OSFile) ListFile(path string) []string {
+func (file *OSFile) ListFile(path *Path) []string {
 	return []string{}
 }
 
-func (file *OSFile) Read(path string) (io.ReadCloser, error) {
-	if path != "" {
+func (file *OSFile) Read(path *Path) (io.ReadCloser, error) {
+	if !path.Done() {
 		return nil, NewError(ErrNotFound, path)
 	}
 	
 	return os.Open(file.path)
 }
 
-func (file *OSFile) ReadAll(path string) ([]byte, error) {
-	if path != "" {
+func (file *OSFile) ReadAll(path *Path) ([]byte, error) {
+	if !path.Done() {
 		return nil, NewError(ErrNotFound, path)
 	}
 	
@@ -118,8 +117,8 @@ func (file *OSFile) ReadAll(path string) ([]byte, error) {
 	return content, err
 }
 
-func (file *OSFile) Write(path string) (io.WriteCloser, error) {
-	if path != "" {
+func (file *OSFile) Write(path *Path) (io.WriteCloser, error) {
+	if !path.Done() {
 		return nil, NewError(ErrNotFound, path)
 	}
 	if !file.rw {
@@ -129,8 +128,8 @@ func (file *OSFile) Write(path string) (io.WriteCloser, error) {
 	return os.Create(file.path)
 }
 
-func (file *OSFile) WriteAll(path string, content []byte) error {
-	if path != "" {
+func (file *OSFile) WriteAll(path *Path, content []byte) error {
+	if !path.Done() {
 		return NewError(ErrNotFound, path)
 	}
 	if !file.rw {

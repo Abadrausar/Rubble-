@@ -43,10 +43,12 @@ Some raw strings are reserved key words:
 	true
 	false
 	nil
+	...
 	module
 	command
 	block
 	var
+Some of the above can still be used as normal, but by default they will be translated into specific non-string types, useing them as a string will still work fine, the exceptions to this rule are: module, command, block, and var.
 
 ==============================================
 Compile-time declarations
@@ -83,14 +85,26 @@ Example:
 	(test_command 123 "a string")
 
 To declare a user command:
-	command name [params[=<const value>]...|...] {code}
+	command name [params[=<const value>]...] {code}
 
 Example command declarations:
 	command test1 {true}
-	command test2 a=5 {[a]}
-	command test3 ... {[params 0]}
+	command test2 a {[a]}
+	command test3 a=5 {[a]}
 
 Commands are always globally available, just like module variables.
+
+There is a special value that can be used as a default in command declarations. This special value is called "variadic" and is written "...", basically when used as the default value of the last parameter in the list it specifies that and extra values passed to this command will accumulate in a static array that is assigned to this parameter.
+
+Example usage for variadic:
+	command test a b=... {<array [a] [b]>}
+	(test 1 2 3 4 5) # returns <array 1 <sarray 2 3 4 5>>
+
+It is possible to specify values for optional params out of order. To do this simple specify the parameter name followed by an equals sign and then the value.
+
+Example out of order assignment:
+	command test a b c=3 d=4 {<array [a] [b] [c] [d]>}
+	(test 1 2 d=5) # returns <array 1 2 3 5>
 
 ==============================================
 Blocks
@@ -101,7 +115,9 @@ Block declarations are used when interacting with some native commands, basicall
 Variables defined by a block declaration are filled in by position, the names can be whatever you want, as long as you have enough of them. If you wish you can actually declare more than you need, this can be used instead of variable declarations (but it is generally not a good idea).
 
 Block declaration syntax:
-	block [params[=<const value>]...|...] {code}
+	block [params[=<const value>]...] {code}
+
+Block parameters use EXACTLY the same syntax as command declarations, this is because command declarations are really just a bit of syntactic sugar for a combination of a variable and a block declaration (more on this later).
 
 For example the "foreach" base command needs to pass in two variables, generally called "key" and "value" (you can actually name them anything you want, and naming them something else can be valuable for nesting foreach commands).
 
@@ -152,13 +168,14 @@ If you do run into a case where this causes problems, most of the basic types ma
 Values
 ==============================================
 
-Script values are stored internally as several types: nil, string, int, float, bool, code, command, index, and user.
+Script values are stored internally as several types: nil, string, int, float, bool, code, command, variadic, index, and user.
 
 The run-time knows how to convert between types automatically, though some types will not yield useful data if converted.
 
 There are some special values that can be used:
 	true and false are type bool
 	nil is the only value for type nil, this is the value used for undefined values
+	... is the only value for type variadic, this value is completely useless except as a marker in block and command declarations.
 
 Additionally there is a special syntax for "object literals". Object literals are used to create values for index types.
 
@@ -177,10 +194,12 @@ Type code is used internally for code blocks (sections of code contained in curl
 
 Type command is used internally for native commands.
 
+'(type value)' will return a string describing a value's type.
+
 If you need a value to be a specific type or you want to see what type a value has, there are some commands in the "convert" module that may prove useful.
 
 For example '1.0' will have type float, but if you need an int you can use '(convert:int 1.0)' and get the int value '1'.
-'(convert:type value)' will return a string describing a value's type. Please note that some types lack conversion commands, as those types cannot be converted to. For example it would be pretty silly to try to convert most of the types to an indexable, so there is no "convert to index" command.
+Please note that some types lack conversion commands, as those types cannot be converted to. For example it would be pretty silly to try to convert most of the types to an indexable, so there is no "convert to index" command.
 
 ==============================================
 Values and Commands
@@ -190,22 +209,38 @@ Internally all commands are values of type code or command, so a command may be 
 
 Please keep in mind that using a variable that is not type code or type command as a command is an error!
 
-The main issue with using variables as commands is caused by the way Rex handles global variables. The by-name version of the command call operator always expects to be fed the name of a global variable, but the variable operator alway expects a local variable. If the variable/command is in a module there is not a problem, but for non-module variables/commands things will not work as expected.
-
-For example the following will not work:
-	[ret]
-But this will:
-	[console:print]
-The first one will complain about not finding a local variable named "ret" (because the variable operator assumes that if it does not have a module name it is local).
-
-The same problem happens when you try to use a local variable with the command call operator, it assumes that the name describes a global variable no matter what.
-This issue can be avoided by using the by-value version of the command call:
-	([console:print] "Yep, it sure does work...\n")
-
-Non-module commands are actually stored in the "global" module, so they can be retrieved like so:
-	[global:ret]
+Keep in mind that variables created by command declarations are global, see the section on the "global" module for more information.
 
 Most of the time it is fine to just pretend that variables and commands have nothing in common, but sometimes it is nice to be able to treat one as the other.
+
+==============================================
+The "global" Module
+==============================================
+
+All global data (modules, types, and most commands) is stored in a special module named "global".
+
+Generally you never need to refer to the global module directly, as it is the default location for command, module, and type lookup, but if you are working with global variables (or a command in value form) you may need to refer directly to it.
+
+For example to create a global variable named "test" you would do this:
+	var global:test
+Which could then be used like this:
+	[test]
+But only if there is no local variable named test ANYWHERE in the block chain!
+
+Using global variables like this is a VERY bad idea most of the time, as it is very easy to end up shadowing a global without even realizing it. If a global is shadowed simply refer to it with it's complete name, eg with the "global:" prefix.
+
+The ONLY time global variables like this should be used is for commands, and even then it is a very good idea to use a different module most of the time.
+
+The "command" compile time declaration basically does this:
+	var global:<command name> block <command parameters> {
+		<command code...>
+	}
+
+Keep in mind that when doing a by-name command call the name is ALWAYS looked up in global, so you do not generally need to worry about local variables shadowing commands, hence why it is fine for command declarations to create globals.
+
+An interesting fact: the "global" you are referring to when creating a global variable is actually a self reference stored in the global module, so weird things like the following work fine:
+	var global:global:global:a
+Not that you should ever do something like that...
 
 ==============================================
 More Indexables
@@ -213,7 +248,7 @@ More Indexables
 
 There are many kinds of indexables but only two are common, the map and the array.
 
-Please note that while array and map are built into the language their availability is controlled by the client, not all users of Rex will have access to them (just like the library commands).
+Please note that while array and map are built into the language their availability is controlled by the client, not all users of Rex will have access to them (just like the library commands). Even if you cannot create some (or all) of these types with object literals in your current client the language may create a value with one of them for some internal purpose (mostly just the read-only versions). For example variadic block and command parameters use the static array type.
 
 Map indexables are simple, just an associative array with string keys, to add a new key just set a nonexistent key.
 Trying to read a nonexistent key will return nil.
@@ -294,7 +329,7 @@ Debugging
 
 This section has a few tips for debugging, including some common/odd errors that have bitten me at one time or another.
 
-First off: there is no debugger. Sorry but I have no idea what would be required to make one and I have little inclination to try.
+First off: There is no debugger. Sorry but I have no idea what would be required to make one and I have little inclination to try. Lucky you I have put a lot of time into making sure error position information is as accurate as possible, generally if a Rex script crashes the error will point you right to the spot where it all went wrong, if not it should at least point to the offending command.
 
 Currently debugging is best accomplished by using console:print, debug:value, and debug:shell.
 
@@ -307,6 +342,123 @@ Some common/odd errors:
 A loop (examples: foreach, for, or loop) exits early for no reason:
 	There is a reason, you simple forgot to (break true) at the end of the loop. This particular issue happens to me all the time (albeit far less often than it used to).
 
-You get the error message "Local variable: varname Not found in block chain." and the position given seems to have nothing to do with the error:
+You get the error message "No Value slot named: <varname> exists." and the position given seems to have nothing to do with the error:
 	This is caused by trying to use an undeclared variable, the position given points to where the code was when the runtime tried to load the block. Most likely the position points to a user command call, the undeclared variable is in that command's body.
 	Unfortunately it is impossible to point the error directly at the variable in question without a complete re-write of all error handling code, which is far too much work to make this one error more clear.
+
+==============================================
+Weird Stuff (that actually works!) and Other Code Examples
+==============================================
+
+What follows is some random code snippets demonstrating weird things you can do with Rex.
+
+Most of these are not generally a good idea (or even very useful) but are included here for interests sake.
+
+-------------------
+
+(block a b {<array [a] [b]>} 5 10)
+
+-------------------
+
+command test {[a = 10]}
+
+var a = 5
+
+(test)
+
+# a == 10
+
+-------------------
+
+var test = [<array> append = 1]
+
+# test == <array 1>
+
+-------------------
+
+var global:print = [console:print]
+(print 'Are you tired of typing "console:" over and over?')
+
+-------------------
+
+# Make your own control structures! Not really weird, but still not common.
+# This is actually really useful, but it may have slightly worse performance compared to nested ifs.
+
+var global:switch = block action condition other=... {
+	(if (int:eq (int:mod (len [other]) 2) 0) {}{
+		(console:print "switch: Bad argument count.")
+		(exit)
+	})
+	
+	var default = {}
+	var count = (int:sub (len [other]) 1)
+	var i = 0
+	(loop {
+		(if (int:lt [i] [count]) {
+			(if (str:cmp [other [i]] "default") {
+				[default = [other (int:add [i] 1)]]
+				[i = (int:add [i] 2)]
+				(breakloop true)
+			})
+			
+			(if ([action] [condition] [other [i]]) {
+				([other (int:add [i] 1)])
+				(ret)
+			})
+			
+			[i = (int:add [i] 2)]
+			(break true)
+		}{
+			(break false)
+		})
+	})
+	
+	([default])
+}
+
+var x = 20
+(switch [int:eq] [x]
+	1 {(console:print "x == 1")}
+	2 {(console:print "x == 2")}
+	3 {(console:print "x == 3")}
+	4 {(console:print "x == 4")}
+	5 {(console:print "x == 5")}
+	default {(console:print "x < 1 || x > 5")}
+)
+
+-------------------
+
+# This isn't really useful, for one thing it is slower than using the proper commands
+# plus it doesn't handle cases like `(int:eq 1 "1")`.
+# Anyway this makes a good demo of the type command.
+
+var global:eq = block a b {
+	(if (type [a] (type [b])) {}{
+		(console:print "eq: Arguments are not the same type.")
+		(exit)
+	})
+	
+	var op
+	(switch [str:cmp] (type [a])
+		int {[op = [int:eq]]}
+		float {[op = [float:eq]]}
+		string {[op = [str:cmp]]}
+		bool {[op = [int:eq]]}
+		default {
+			(console:print "eq: Invalid argument type.")
+			(exit)
+		}
+	)
+	([op] [a] [b])
+}
+
+(eq "test" "test")
+(eq 2 2)
+(eq 1.5 1.5)
+(eq true false)
+
+# error: not same type
+(eq 1 "1")
+
+# error: invalid type
+(eq <array> <array>)

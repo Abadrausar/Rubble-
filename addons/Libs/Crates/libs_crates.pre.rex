@@ -39,7 +39,7 @@ var rubble:libs_crates:last = ""
 # Add last defined crate to class.
 # Crates may have more than one class.
 # !CRATE_CLASS class | !CRATE_CLASS id class
-(rubble:template "!CRATE_CLASS" block ... {
+(rubble:template "!CRATE_CLASS" block params=... {
 	var id = [rubble:libs_crates:last]
 	var class = ""
 	

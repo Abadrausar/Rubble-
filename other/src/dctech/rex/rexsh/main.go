@@ -49,6 +49,8 @@ import "dctech/rex/commands/png"
 import "dctech/rex/commands/regex"
 import "dctech/rex/commands/sort"
 import "dctech/rex/commands/str"
+import "dctech/rex/commands/structure"
+import "dctech/rex/commands/thread"
 import "flag"
 import "runtime"
 import "runtime/pprof"
@@ -129,6 +131,8 @@ func main() {
 	regex.Setup(state)
 	sort.Setup(state)
 	str.Setup(state)
+	structure.Setup(state)
+	thread.Setup(state)
 
 	var code *rex.Code = nil
 	var val *rex.Value = nil

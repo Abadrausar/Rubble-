@@ -2,8 +2,8 @@
 # Templates used in the base
 
 # The comment templates, very simple, just do nothing.
-(rubble:template "COMMENT" block ... {(ret "")})
-(rubble:template "C" block ... {(ret "")})
+(rubble:template "COMMENT" block a=... {(ret "")})
+(rubble:template "C" block a=... {(ret "")})
 
 command rubble:void params {
 	(foreach [params] block _ raws {
@@ -12,16 +12,16 @@ command rubble:void params {
 	})
 	(ret "")
 }
-(rubble:template "!VOID" block ... {
+(rubble:template "!VOID" block params=... {
 	(rubble:void [params])
 })
-(rubble:template "VOID" block ... {
+(rubble:template "VOID" block params=... {
 	(rubble:void [params])
 })
-(rubble:template "#VOID" block ... {
+(rubble:template "#VOID" block params=... {
 	(rubble:void [params])
 })
-(rubble:template "V" block ... {
+(rubble:template "V" block params=... {
 	(rubble:void [params])
 })
 
@@ -40,16 +40,16 @@ command rubble:echo params {
 	})
 	(rubble:stageparse [out])
 }
-(rubble:template "!ECHO" block ... {
+(rubble:template "!ECHO" block params=... {
 	(rubble:echo [params])
 })
-(rubble:template "ECHO" block ... {
+(rubble:template "ECHO" block params=... {
 	(rubble:echo [params])
 })
-(rubble:template "#ECHO" block ... {
+(rubble:template "#ECHO" block params=... {
 	(rubble:echo [params])
 })
-(rubble:template "E" block ... {
+(rubble:template "E" block params=... {
 	(rubble:echo [params])
 })
 
@@ -98,6 +98,6 @@ command rubble:print params {
 	})
 	(ret "")
 }
-(rubble:template "!PRINT" block ... {(rubble:print [params])})
-(rubble:template "PRINT" block ... {(rubble:print [params])})
-(rubble:template "#PRINT" block ... {(rubble:print [params])})
+(rubble:template "!PRINT" block params=... {(rubble:print [params])})
+(rubble:template "PRINT" block params=... {(rubble:print [params])})
+(rubble:template "#PRINT" block params=... {(rubble:print [params])})

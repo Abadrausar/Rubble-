@@ -8,7 +8,7 @@ Geckos were sponsored by the generous contributions of the Bay 12 community.
 	[DESCRIPTION:A tiny, brightly-colored lizard with feet that can stick to branch and stone.]
 	[NAME:leopard gecko:leopard geckos:leopard gecko]
 	[CASTE_NAME:leopard gecko:leopard geckos:leopard gecko]
-	[CREATURE_TILE:{#TILE;GECKO_LEOPARD;249}][COLOR:{#COLOR;GECKO_LEOPARD;6:0:1}]
+	[CREATURE_TILE:{#TILE;GECKO_LEOPARD;;249}][COLOR:{#COLOR;GECKO_LEOPARD;;6:0:1}]
 	[PETVALUE:10]
 	[VERMIN_GROUNDER][FREQUENCY:100]
 	[SMALL_REMAINS]

@@ -20,22 +20,26 @@ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
 
-package rex_test
+// Rex "struct" Type.
+package structure
 
-import "testing"
+import "dctech/rex"
 
-//import "dctech/rex"
-import "rubble/guts"
-
-// Does a full Rubble run, use for coverage info and the like
-
-// To use:
-//	go test -c -covermode=count dctech/rex
-//	rex.test.exe -test.coverprofile=rex.cover
-// Just running go test causes weird errors (caused, I think, by running Rubble in a temp dir)
-
-// Commented out, due to the above issue (so normal test are not messed up)
-//func Test_Rubble(t *testing.T) {
-//	guts.ContinueOnBadFlag = true
-//	guts.Main()
-//}
+// Adds the struct type to the state.
+func Setup(state *rex.State) (err error) {
+	defer func() {
+		if !state.NoRecover {
+			if x := recover(); x != nil {
+				if y, ok := x.(rex.ScriptError); ok {
+					err = y
+					return
+				}
+				panic(x)
+			}
+		}
+	}()
+	
+	state.RegisterType("struct", NewStructureFromLit)
+	
+	return nil
+}

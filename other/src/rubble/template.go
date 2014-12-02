@@ -26,22 +26,17 @@ import "strings"
 import "regexp"
 import "dctech/rex"
 
-type NativeTemplate func(*State, []*Value) *Value
-
 type TemplateParam struct {
 	Name    string
 	Default string
 }
 
 type Template struct {
-	// The native template handler.
-	Handler NativeTemplate
-
-	// The script template code.
+	// The script template code (must be type code or type command).
 	Code *rex.Value
 
 	// The user template text.
-	Text *Value
+	Text *rex.Value
 
 	// Param names/defaults for user templates.
 	Params []*TemplateParam
@@ -52,80 +47,67 @@ var repTokenNameRegEx = regexp.MustCompile("%[a-zA-Z_]+")
 //var varNameRegEx = regexp.MustCompile("^\\$\\{?([a-zA-Z_][a-zA-Z0-9_]*)\\}?$")
 
 // Call runs a template. The output is run through the stage parser for (non script) user templates.
-func (this *Template) Call(state *State, params []*Value) *Value {
+func (temp *Template) Call(state *State, params []*rex.Value) *rex.Value {
 	// Handle the ... param.
 	if len(params) != 0 {
 		if params[len(params)-1].Data == "..." {
 			params = append(params[:len(params)-1], state.PrevParams...)
 		} else {
-			state.PrevParams = make([]*Value, len(params))
+			state.PrevParams = make([]*rex.Value, len(params))
 			copy(state.PrevParams, params)
 		}
 	} else {
-		state.PrevParams = make([]*Value, 0)
+		state.PrevParams = make([]*rex.Value, 0)
 	}
 
 	for i := range params {
-		params[i].Data = strings.TrimSpace(params[i].Data)
-
-		// just expand everything
-		params[i].Data = state.ExpandVars(params[i].Data)
-	}
-
-	// Native template
-	if this.Handler != nil {
-		return this.Handler(state, params)
+		if params[i].Type == rex.TypString {
+			// Setting the data field like this is kinda evil...
+			params[i].Data = strings.TrimSpace(params[i].String())
+			params[i].Data = state.ExpandVars(params[i].String())
+		}
 	}
 
 	// Script template
-	if this.Code != nil {
+	if temp.Code != nil {
 		script := rex.NewScript()
-		tmp := make([]*rex.Value, len(params))
-		for i := range params {
-			tmp[i] = params[i].Script()
-		}
-
-		rtn, err := state.ScriptState.RunCommand(script, this.Code, tmp)
+		rtn, err := state.ScriptState.RunCommand(script, temp.Code, params)
 		if err != nil {
-			panic(Abort("Script Error: " + err.Error()))
+			RaiseError("Script Error: " + err.Error())
 		}
-		return NewValueScript(rtn)
+		return rtn
 	}
 
 	// User template
-	out := state.ExpandVars(this.Text.Data)
+	out := state.ExpandVars(temp.Text.String())
 
 	// Named replacement tokens
-	for i := range this.Params {
+	for i := range temp.Params {
 		if len(params) <= i {
-			out = strings.Replace(out, "%{"+this.Params[i].Name+"}", this.Params[i].Default, -1)
+			out = strings.Replace(out, "%{" + temp.Params[i].Name + "}", temp.Params[i].Default, -1)
 		} else {
-			out = strings.Replace(out, "%{"+this.Params[i].Name+"}", params[i].Data, -1)
+			out = strings.Replace(out, "%{" + temp.Params[i].Name + "}", params[i].String(), -1)
 		}
 	}
 	out = repTokenNameRegEx.ReplaceAllStringFunc(out, func(in string) string {
 		in = strings.TrimLeft(in, "%")
-		for i := range this.Params {
-			if this.Params[i].Name == in {
+		for i := range temp.Params {
+			if temp.Params[i].Name == in {
 				if len(params) > i {
-					return params[i].Data
+					return params[i].String()
 				}
-				return this.Params[i].Default
+				return temp.Params[i].Default
 			}
 		}
 		return "%" + in
 	})
 
-	return NewValuePos(string(state.ParseFile([]byte(out), StgUseCurrent, this.Text.Pos)), this.Text.Pos)
+	rtn := rex.NewValueString(string(state.ParseFile([]byte(out), StgUseCurrent, temp.Text.Pos)))
+	rtn.Pos = temp.Text.Pos.Copy()
+	return rtn
 }
 
-func (state *State) NewNativeTemplate(name string, handler NativeTemplate) {
-	rtn := new(Template)
-	rtn.Handler = handler
-	state.Templates[name] = rtn
-}
-
-func (state *State) NewUserTemplate(name string, text *Value, params []*TemplateParam) {
+func (state *State) NewUserTemplate(name string, text *rex.Value, params []*TemplateParam) {
 	rtn := new(Template)
 	rtn.Text = text
 	rtn.Params = params
@@ -136,35 +118,4 @@ func (state *State) NewScriptTemplate(name string, code *rex.Value) {
 	rtn := new(Template)
 	rtn.Code = code
 	state.Templates[name] = rtn
-}
-
-// Built-in template
-
-func tempTemplate(state *State, params []*Value) *Value {
-	if len(params) < 2 {
-		panic(Abort("Wrong number of params to !TEMPLATE."))
-	}
-
-	name := params[0].Data
-	text := params[len(params)-1]
-	paramNames := params[1 : len(params)-1]
-
-	parsedParams := make([]*TemplateParam, 0, len(paramNames))
-
-	for _, val := range paramNames {
-		rtn := new(TemplateParam)
-		if strings.Contains(val.Data, "=") {
-			parts := strings.SplitN(val.Data, "=", 2)
-			rtn.Name = parts[0]
-			rtn.Default = parts[1]
-			parsedParams = append(parsedParams, rtn)
-			continue
-		}
-		rtn.Name = val.Data
-		parsedParams = append(parsedParams, rtn)
-	}
-
-	state.NewUserTemplate(name, text, parsedParams)
-
-	return NewValue("")
 }

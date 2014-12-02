@@ -14,13 +14,10 @@ Or:
 
 The more daring may try:
 	go build rubble/interface/gui
-For a kinda buggy and mostly non-working cross-platform native GUI.
+For a kinda buggy and mostly non-working cross-platform native GUI (this is almost certainly totally broken by now).
 
 To build the file encoder:
 	go build rubble/encoder
 
 When learning Rex it is very helpful to have the interactive shell available, to build the Rex shell:
 	go build dctech/rex/rexsh
-
-To build the Windows GUI you need AutoIt v3 (www.autoitscript.com).
-After installing AutoIt right click on the script and choose "Compile with Options", then click OK in the resulting dialog.

@@ -11,7 +11,8 @@ All addons will automatically activate any dependencies, so don't worry if the a
 
 A few of the addons allow you to make gloves via reactions, unfortunately these gloves will be unusable (it's a vanilla bug). If you have DFHack this will be fixed automatically.
 
-This list is not perfect, it may be slightly out of date and/or be slightly wrong about something. For the latest information on each addon see its description page in the Web UI (the description page includes more detail and is guaranteed to be up to date).
+This list is not in any way complete, for a full list see the addon list page in the web UI.
+Some of the addon description are shortened and/or out of date, the full up-to-date versions are always available through the web UI.
 
 Base:
 	The standard base addon. Contains Rubblized versions of the vanilla raw files. 
@@ -24,96 +25,13 @@ Base:
 		@BUILD_KEY templates have been inserted where appropriate.
 		ADDON_HOOKS have been added to all entities.
 		!ENTITY_PLAYABLE templates have been added to all entities.
-		The dwarven outpost liaison has been modded to works as a trade rep if the dwarves are unplayable.
+		The dwarven outpost liaison has been modded to work as a trade rep if the dwarves are unplayable.
 		Dwarves have the alchemist labor permitted in their entity.
 		Vermin creatures have #TILE and #COLOR templates inserted.
 		All file IDs have been stripped.
 
-Dev:
-	The addons in this group are for addon developers, most people may safely ignore them.
-	
-	Dev/Cheat:
-		A bunch of cheat reactions to allow for fast setup of testing forts.
-		Build a "Heavy Supply Wagon" workshop, both the building and all reactions are free.
-		Uses animal caretaker skill (the most useless skill I could think of :p)
-	
-	Dev/Dummy Reactions:
-		This addon adds "dummy reactions" eg. empty reactions registered to "ADDON_HOOK_PLAYABLE".
-		By default 15 reactions are created, if you want a different number of reactions to be generated pass '-config="DEV_DUMMY_REACTION_COUNT=count"' to Rubble when generating.
-		These reactions are empty by default, use if you want to add new content after worldgen.
-	
-	Dev/Tileset/Export:
-		This addon is a helper for extracting tileset information from raws that have the Rubble tileset templates added. See "Dev/Tileset/Insert".
-		The extracted tile numbers will be written to "./dev_export_tileset.tile_info.rbl".
-		Basically an automatic replacement for the old #WRITE_TILESET template.
-	
-	Dev/Tileset/Insert:
-		This addon adds the SHARED_OBJECT templates to all the tileset sensitive objects.
-		Advanced users may want to set the config var "DEV_TILESET_INSERT_EXPORT=true" in order to get the resulting files output to the current working directory, this is a great help when porting a mod to Rubble.
-		Use with "Dev/Tileset/Export" to export tile/color info from non-Rubble raws.
-		This addon also handles vermin creature tile numbers and colors.
-
-Libs:
-	The addons in this group are libraries, eg they provide functionality used by other addons.
-	Any templates added by these addons are fully documented, see "Rubble Libs Templates.txt" and "Rubble Base Templates.txt".
-	All of the addons in this group are automatically managed. They do not show as options to choose when generating as they are activated and deactivated automatically.
-	The Libs addons are only listed here for the edification of modders.
-
-	Libs/Base:
-		All the base templates and other such stuff, critical to normal operation.
-		This addon is a "critical addon" meaning that it is needed by the base for normal operation.
-	
-	Libs/Castes:
-		Adds support for dynamically adding castes to a creature.
-		This addon is a "critical addon" meaning that it is needed by the base for normal operation.
-	
-	Libs/Castes/DFHack/Transform:
-		Adds support for transforming castes.
-		Basically just a gender aware and pared down version of "modtools/transform-unit" (with specialized versions of DFHACK_REACTION and DFHACK_REACTION_BIND for easy use).
-		Does not require "Libs/Castes", but it is designed to work with it.
-	
-	Libs/Crates:
-		Adds infrastructure for "crates", eg bars that can be bought from caravans and then "unpacked" via special reactions into items.
-		Most of the templates added by this addon are always available (even when the addon is not active).
-	
-	Libs/DFHack/Add Reaction:
-		Allows you to add reactions to buildings that are normally not possible to add reactions to, also allows you to remove all hardcoded reactions from a building.
-		WARNING! Largely untested!
-	
-	Libs/DFHack/Announcement:
-		This addon provides templates for displaying announcements to the player.
-		The announcements work via specialized variants of the DFHACK_REACTION and DFHACK_REACTION_BIND templates.
-		The templates added by this addon are always available (even when the addon is not active).
-	
-	Libs/DFHack/Fix Handedness:
-		Automatically installs and activates a fix for making gloves in reactions.
-	
-	Libs/DFHack/Fluids:
-		Installs the extremely useful rubble.fluids Lua pseudo module and it's companion command rubble_fluids.
-		(adds no templates)
-	
-	Libs/DFHack/Timeout:
-		Adds a Lua pseudo module (rubble.timeout) that adds support for persistent time delays (eg they survive a save/load).
-		Includes a simple command for use with reaction trigger.
-		(adds no templates)
-	
-	Libs/Macro:
-		A modders resource for generating macros from scripts.
-		Adds no templates, only script commands.
-	
-	Libs/Macro/Example:
-		A simple addon that generates a large complicated macro from images, makes a good demo/test of "Libs/Macro".
-		This addon takes ~7-8 seconds to generate (the cursor movement generation command is kinda slow, it's a work in progress), in any case activating this addon more than triples normal run time.
-	
-	Libs/Research:
-		This is the old research addon from Better Dorfs, reworked as a library.
-		All templates now take a "class" (basically a group id) and the reaction generator takes a building name, skill id, and reaction class. These changes allow modders to use the same framework for multiple different research buildings.
-		The templates for adding new research topics are always active, so optional support for addons that use this library is easy to add to your industry mods.
-		Many default addons register topics to the class "RESEARCH_GENERIC", so handle that class to if you want to support these addon's topics (nothing bad will happen if you don't).
-
 User:
-	All the addons in this group are things that are of interest only to end users.
-	
+[spoiler]
 	User/Adv Reactions:
 		Adds some basic adventure mode crafting reactions, mostly useful to help jump-start use of advfort.
 		Allows you to make crude picks and axes from knapped stone, anvils from boulders, backpacks from bags (that you can find in any human hamlet), and "emergency" crutches from bone.
@@ -241,7 +159,7 @@ User:
 	
 	User/Dwarf/Castes:
 		Adds more dwarf castes.
-		See the entry in "Rubble Addon Extras.txt" for more details, including descriptions and detailed population ratios.
+		See the addon description in the web UI for more details, including descriptions and detailed population ratios.
 	
 	User/Dwarf/Castes/DFHack/Transform:
 		Allows you to change the caste of your dwarves at the guild hall for a nominal fee.
@@ -413,7 +331,7 @@ User:
 		You may also copy any research discovery here (for free). Uses the alchemy skill.
 	
 	User/Saurian:
-		A new race to play as, see the Saurian guide in "Rubble Addon Extras.txt" for more details.
+		A new race to play as, see the addon description in the web UI for more details.
 		This addon only includes the saurian creature and entity as well as saurian sized weapons and some basic reactions. Nothing else is included.
 		It is HIGHLY recommended to activate at least the "User/Quarry", "User/Glass Forge", "User/Sawmill", "User/Warcrafter" and "User/Pottery" addons.
 		To dig as saurians you need to buy a pick and resize it at the craftsaurian.
@@ -422,7 +340,7 @@ User:
 	
 	User/Saurian/Castes:
 		Adds some basic castes to the saurians.
-		See the saurian guide for details.
+		See the addon description in the web UI for details.
 		Requires the "User/Saurian" addon.
 	
 	User/Saurian/Castes/DFHack/Transform:
@@ -504,3 +422,4 @@ User:
 	
 	User/Zap Aquifers:
 		Disables all AQUIFER tags, very simple.
+[/spoiler]

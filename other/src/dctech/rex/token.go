@@ -45,6 +45,7 @@ const (
 	tknTrue                   // 'true'
 	tknFalse                  // 'false'
 	tknNil                    // 'nil'
+	tknVariadic               // '...'
 	
 	tknDeclModule             // 'module'
 	tknDeclCommand            // 'command'
@@ -68,7 +69,7 @@ func (this *token) String() string {
 // OpCode will convert a lexer token to an OpCode ready to insert into the code stream.
 // Will produce invalid OpCodes for some token types.
 func (tok *token) opCode() *opCode {
-	if tok.Type >= tknRawString && tok.Type <= tknNil {
+	if tok.Type >= tknRawString && tok.Type <= tknVariadic {
 		return &opCode{
 			Value: tokenToValue(tok),
 			Type:  opValue,
@@ -117,6 +118,8 @@ func tokenTypeToString(tokenType int) string {
 		return "tknFalse"
 	case tknNil:
 		return "tknNil"
+	case tknVariadic:
+		return "tknVariadic"
 	case tknDeclModule:
 		return "tknDeclModule"
 	case tknDeclCommand:
@@ -139,7 +142,7 @@ func tokenTypeToString(tokenType int) string {
 //	Invalid token: Found: thecurrenttoken (Lexeme: test). Expected: expected1 or expected2.
 //	Invalid token: Found: thecurrenttoken (Lexeme: test). Expected: expected.
 // If the lexeme is long it is truncated.
-func exitOntokenExpected(token *token, expected ...int) {
+func exitOnTokenExpected(token *token, expected ...int) {
 	expectedString := ""
 	expectedCount := len(expected) - 1
 	for i, val := range expected {

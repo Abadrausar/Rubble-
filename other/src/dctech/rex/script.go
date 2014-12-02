@@ -57,31 +57,76 @@ func NewScript() *Script {
 
 // Variables
 
-// SetParams reads the block meta-data and sets the parameter local variables.
+// SetParams is exactly like calling SetParamsAdv with a nil names.
+func (script *Script) SetParams(block *Code, vals []*Value) (err error) {
+	return script.SetParamsAdv(block, nil, vals)
+}
+
+// SetParamsAdv reads the block meta-data and sets the parameter local variables.
 // Values passed in are used first, then any default values defined.
 // If there is no default for a slot and all the passed in values are used then an error is generated.
 // It is OK to have more values passed in than declared parameters, the extras are ignored.
-func (script *Script) SetParams(code *Code, params []*Value) (err error) {
+// names is used for specifying param values by name, setting this to nil means that all params are by position.
+func (script *Script) SetParamsAdv(block *Code, names []string, vals []*Value) (err error) {
 	err = nil
 	defer script.trapErrorRuntime(&err, func(){})
 	
-	script.setParams(code, params)
+	if names != nil && len(names) != len(vals) {
+		RaiseError("Parameter name list and parameter value list are not the same length!")
+	}
+	
+	script.setParams(block, names, vals)
 	return
 }
 
-func (script *Script) setParams(code *Code, params []*Value) {
-	if code.params != -1 {
-		for i := 0; i < code.params; i++ {
-			if len(params) <= i {
-				if code.defaults[i] == nil {
-					RaiseError("Block declaration and param count do not match.")
+func (script *Script) setParams(block *Code, names []string, vals []*Value) {
+	if block.params == nil {
+		// The block has no parameters, so obviously nothing has to be done...
+		return
+	}
+	
+	// Handle any named params.
+	if names != nil {
+		tmp1 := make([]string, 0, len(names))
+		tmp2 := make([]*Value, 0, len(vals))
+		for i := range names {
+			if names[i] != "" {
+				k := block.params.itov[block.params.ntoi[names[i]]]
+				script.Locals.Set(k, vals[i])
+				continue
+			}
+			tmp1 = append(tmp1, names[i])
+			tmp2 = append(tmp2, vals[i])
+		}
+		names = tmp1
+		vals = tmp2
+	}
+	
+	// Now fill everything else by position.
+	for i, k := range block.params.itov {
+		if len(vals) <= i && block.params.defaults[i] == nil {
+			RaiseError("Block declaration and param count do not match.")
+		}
+		
+		// For the last parameter handle a variadic value if needed.
+		if i == len(block.params.itov) - 1 {
+			if block.params.defaults[i] != nil && block.params.defaults[i].Type == TypVariadic {
+				if len(vals) <= i {
+					if script.Locals.Get(k) == nil {
+						script.Locals.Set(k, NewValueIndex(NewStaticArray([]*Value{})))
+					}
+					continue
 				}
-			} else {
-				script.Locals.Set(i, params[i])
+				script.Locals.Set(k, NewValueIndex(NewStaticArray(vals[i:])))
+				continue
 			}
 		}
-	} else {
-		script.Locals.Set(0, NewValueIndex(NewStaticArray(params)))
+		
+		if len(vals) <= i {
+			script.Locals.Set(k, block.params.defaults[i])
+			continue
+		}
+		script.Locals.Set(k, vals[i])
 	}
 }
 
@@ -257,30 +302,18 @@ func (script *Script) execCommand() {
 	script.code.last().getOpCode(opCmdBegin)
 
 	// Read the command's name
-	var module *Module = nil
+	module := script.Host.global
 	var command *Value = nil
 	if script.code.last().checkLookAhead(opName) {
 		for {
 			script.code.last().getOpCode(opName)
 	
 			if script.code.last().checkLookAhead(opNameSplit) {
-				// It's a module name.
-				if module == nil {
-					module = script.Host.modules.get(script.code.last().current().Index)
-				} else {
-					module = module.modules.get(script.code.last().current().Index)
-				}
-	
+				module = module.modules.get(script.code.last().current().Index)
 				script.code.last().getOpCode(opNameSplit)
 				continue
 			}
-	
-			if module == nil {
-				// Global
-				command = script.Host.global.vars.get(script.code.last().current().Index)
-				break
-			}
-			// Module
+
 			command = module.vars.get(script.code.last().current().Index)
 			break
 		}
@@ -290,16 +323,35 @@ func (script *Script) execCommand() {
 
 	// Read the command's parameters if any
 	params := make([]*Value, 0, 5)
+	names := make([]string, 0, 5)
+	realname := false
 	for !script.code.last().checkLookAhead(opCmdEnd) {
-		params = append(params, script.execValue())
+		v := script.execValue()
 		if script.ExitFlags() {
 			return
 		}
+		
+		if script.code.last().checkLookAhead(opAssignment) {
+			script.code.last().getOpCode(opAssignment)
+			realname = true
+			names = append(names, v.String())
+			params = append(params, script.execValue())
+			if script.ExitFlags() {
+				return
+			}
+			continue
+		}
+		names = append(names, "")
+		params = append(params, v)
 	}
 
 	script.code.last().getOpCode(opCmdEnd)
 
-	command.call(script, params)
+	if !realname {
+		names = nil
+	}
+	
+	command.call(script, names, params)
 	return
 }
 
@@ -307,7 +359,8 @@ func (script *Script) execVar() {
 	script.code.last().getOpCode(opVarBegin)
 	
 	var val *Value = nil
-	var module *Module = nil
+	module := script.Host.global
+	ismod := false
 	if script.code.last().checkLookAhead(opName) {
 		// Handle the name form
 		index := 0
@@ -316,11 +369,8 @@ func (script *Script) execVar() {
 	
 			if script.code.last().checkLookAhead(opNameSplit) {
 				// It's a module name.
-				if module == nil {
-					module = script.Host.modules.get(script.code.last().current().Index)
-				} else {
-					module = module.modules.get(script.code.last().current().Index)
-				}
+				module = module.modules.get(script.code.last().current().Index)
+				ismod = true
 	
 				script.code.last().getOpCode(opNameSplit)
 				continue
@@ -337,35 +387,44 @@ func (script *Script) execVar() {
 			if script.ExitFlags() {
 				return
 			}
-			if module == nil {
-				// Local
-				script.Locals.Set(index, script.RetVal)
-			} else {
-				// Module
+			if ismod {
 				module.vars.set(index, script.RetVal)
+			} else {
+				i := script.Locals.IsGlobal(index)
+				if i > 0 {
+					module.vars.set(i, script.RetVal)
+				} else {
+					script.Locals.Set(index, script.RetVal)
+				}
 			}
 			script.code.last().getOpCode(opVarEnd)
 			return
 		}
 		if script.code.last().checkLookAhead(opVarEnd) {
-			if module == nil {
-				// Local
-				script.RetVal = script.Locals.Get(index)
-			} else {
-				// Module
+			if ismod {
 				script.RetVal = module.vars.get(index)
+			} else {
+				i := script.Locals.IsGlobal(index)
+				if i > 0 {
+					script.RetVal = module.vars.get(i)
+				} else {
+					script.RetVal = script.Locals.Get(index)
+				}
 			}
 			script.code.last().getOpCode(opVarEnd)
 			return
 		}
 		
 		// It's an indexing form, store the value
-		if module == nil {
-			// Local
-			val = script.Locals.Get(index)
-		} else {
-			// Module
+		if ismod {
 			val = module.vars.get(index)
+		} else {
+			i := script.Locals.IsGlobal(index)
+			if i > 0 {
+				val = module.vars.get(i)
+			} else {
+				val = script.Locals.Get(index)
+			}
 		}
 		
 	} else {
@@ -417,27 +476,17 @@ func (script *Script) execObjLit() {
 	script.code.last().getOpCode(opObjLitBegin)
 
 	// Read the type name
-	var module *Module = nil
+	module := script.Host.global
 	var typ ObjectFactory = nil
 	for {
 		script.code.last().getOpCode(opName)
 
 		if script.code.last().checkLookAhead(opNameSplit) {
-			// It's a module name.
-			if module == nil {
-				module = script.Host.modules.get(script.code.last().current().Index)
-			} else {
-				module = module.modules.get(script.code.last().current().Index)
-			}
-
+			module = module.modules.get(script.code.last().current().Index)
 			script.code.last().getOpCode(opNameSplit)
 			continue
 		}
 
-		if module == nil {
-			typ = script.Host.types.get(script.code.last().current().Index)
-			break
-		}
 		typ = module.types.get(script.code.last().current().Index)
 		break
 	}

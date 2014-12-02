@@ -40,6 +40,8 @@ import "flag"
 import "rubble"
 import "rubble/rblutil"
 
+import "dctech/axis"
+
 import "os/exec"
 import "path/filepath"
 
@@ -68,6 +70,20 @@ func main() {
 	flags.SetOutput(log)
 
 	log.Header(rubble.Versions[0])
+
+	defer func(){
+		err := recover()
+		if err != nil {
+			log.Println("Unrecovered Error:")
+			log.Println("  The following error was not properly recovered, please report this ASAP!")
+			log.Printf("  %#v\n", err)
+			log.Println("Stack Trace:")
+			buf := make([]byte, 4096)
+			buf = buf[:runtime.Stack(buf, true)]
+			log.Printf("%s\n", buf)
+			os.Exit(1)
+		}
+	}()
 
 	Addr = "127.0.0.1:1010"
 
@@ -338,13 +354,13 @@ func main() {
 	http.HandleFunc("/prep", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("UI Transition: \"/prep\"")
 
-		if !state.FS.Exists("df:data/save") {
+		if !axis.Exists(state.FS, "df:data/save") {
 			log.Println("Error: Cannot find save directory.")
 			http.Redirect(w, r, "./log", http.StatusFound)
 			return
 		}
 
-		regions := state.FS.ListDir("df:data/save")
+		regions := axis.ListDir(state.FS, "df:data/save")
 		for i := range regions {
 			if regions[i] == "current" {
 				regions = append(regions[:i], regions[i+1:]...)
@@ -389,13 +405,13 @@ func main() {
 	http.HandleFunc("/regenregion", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("UI Transition: \"/regenregion\"")
 
-		if !state.FS.Exists("df:data/save") {
+		if !axis.Exists(state.FS, "df:data/save") {
 			log.Println("Error: Cannot find save directory.")
 			http.Redirect(w, r, "./log", http.StatusFound)
 			return
 		}
 
-		regions := state.FS.ListDir("df:data/save")
+		regions := axis.ListDir(state.FS, "df:data/save")
 		for i := range regions {
 			if regions[i] == "current" {
 				regions = append(regions[:i], regions[i+1:]...)

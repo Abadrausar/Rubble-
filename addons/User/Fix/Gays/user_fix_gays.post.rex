@@ -3,7 +3,7 @@
 # Only set it to a map object literal.
 # Example: -config="USER_FIX_GAYS=<map DWARF=true HUMAN=true>"
 var gays = (eval (rubble:configvar "USER_FIX_GAYS"))
-(if (str:cmp (convert:type [gays]) "index") {}{
+(if (type [gays] index) {}{
 	[gays = <map 
 		DWARF=true
 		HUMAN=true

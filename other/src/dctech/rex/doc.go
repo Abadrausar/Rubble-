@@ -57,7 +57,7 @@ Of course NoRecover is only useful for debugging internal errors, script errors 
 setting (and it can actually make things harder, as then the state never gets a chance to fill in position information).
 
 All panics are recovered and turned into errors before they reach user code except in a few cases:
-	Command package Setup(state) functions only recover panics caused by Rex.
+	Command package Setup(state) functions only recover panics caused by Rex (type rex.ScriptError).
 
 Send patches (*snort*) and bug reports (probably) to: milo.christiansen (at) gmail (dot) com
 
@@ -69,19 +69,23 @@ package rex
 
 	The debug commands need expanding.
 	
+	Rewrite variable lookup.
+		All modules should be stored in the global module
+		failed external variable lookups should fail over to looking in the global module
+		Can modules contain references to themselves? If so it will be easy to allow either:
+			[ret] or [global:ret]
+	
 	Look for cases where the error flag should be used but is not.
 	
 	I should write a good set of tests.
 		Finish the base command tests.
 		The various indexables need to be tested to make sure they are fully thread safe.
 			I think there may be cases where I need to synchronize where I don't.
-			The read-only indexables are not synchronized at all, I think that's OK, test.
+				The read-only indexables are not synchronized at all!
+					As these are never written after creation thread safety should not be an issue.
+					In any case test this assumption.
 	
 	There is a long list of stuff-to-do in the GenII doc.go file.
-	
-	The Value CodeString method still does not generate parseable code for all types.
-		This will probably never be totally fixed.
-		(low priority)
 	
 	It should be possible to make a generic function-to-command interface via reflection.
 		Support for some complex types would be really hard to do, probably best to use the same rules as GenII.
@@ -89,7 +93,4 @@ package rex
 			(provided performance doesn't suffer too much, which is a possibility)
 		(low priority)
 	
-	Port the following Raptor command packages (low priority):
-		bit
-
 */

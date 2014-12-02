@@ -130,6 +130,8 @@ func (lex *Lexer) advance() {
 		lex.nextchar()
 	case 'n':
 		lex.matchKeyword("nil", tknNil)
+	case '.':
+		lex.matchKeyword("...", tknVariadic)
 	case 't':
 		lex.matchKeyword("true", tknTrue)
 	case 'f':
@@ -167,7 +169,7 @@ func (lex *Lexer) getcurrent(tokenTypes ...int) {
 		}
 	}
 
-	exitOntokenExpected(lex.current, tokenTypes...)
+	exitOnTokenExpected(lex.current, tokenTypes...)
 }
 
 // checkLook checks to see if the look ahead is one of tokenTypes and if so returns true.

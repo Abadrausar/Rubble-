@@ -105,10 +105,3 @@ func (this *rwMap) String() string {
 	
 	return IndexableToString("map", this)
 }
-
-func (this *rwMap) CodeString() string {
-	this.lock.RLock()
-	defer this.lock.RUnlock()
-	
-	return IndexableToCodeString("map", this, true)
-}

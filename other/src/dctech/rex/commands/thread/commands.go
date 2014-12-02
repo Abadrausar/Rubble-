@@ -64,7 +64,6 @@ func Setup(state *rex.State) (err error) {
 // code MUST be a block declaration!
 // The params for code must match the params you are passing in!
 // Each thread is run in it's own script, so it is not possible to access "up stream" variables.
-// WARNING! The base types map and array are NOT thread safe!
 // Returns unchanged.
 func Command_New(script *rex.Script, params []*rex.Value) {
 	if len(params) != 1 {
@@ -77,7 +76,7 @@ func Command_New(script *rex.Script, params []*rex.Value) {
 	block := params[0].Data.(*rex.Code)
 	
 	scr := rex.NewScript()
-	script.Locals.Add(block)
+	script.Locals.Add(script.Host, block)
 	
 	script.SetParams(block, params[1:])
 	

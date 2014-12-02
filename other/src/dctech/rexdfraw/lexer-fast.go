@@ -259,7 +259,3 @@ func (lex *rawlexer) Keys() []string {
 func (lex *rawlexer) String() string {
 	return rex.IndexableToString("raw:Lexer", lex)
 }
-
-func (lex *rawlexer) CodeString() string {
-	return rex.IndexableToCodeString("map", lex, true)
-}

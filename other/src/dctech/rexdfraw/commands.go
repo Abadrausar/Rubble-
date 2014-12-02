@@ -78,7 +78,7 @@ func Command_Walk(script *rex.Script, params []*rex.Value) {
 	}
 
 	block := params[1].Data.(*rex.Code)
-	script.Locals.Add(block)
+	script.Locals.Add(script.Host, block)
 	script.Locals.Set(0, rex.NewValueIndex(lex))
 	
 	for {

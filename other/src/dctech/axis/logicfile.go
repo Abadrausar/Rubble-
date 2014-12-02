@@ -41,12 +41,12 @@ func NewLogicalFile(data []byte, rw bool) DataSource {
 	}
 }
 
-func (file *LogicalFile) IsDir(path string) bool {
+func (file *LogicalFile) IsDir(path *Path) bool {
 	return false
 }
 
-func (file *LogicalFile) Exists(path string) bool {
-	if path == "" {
+func (file *LogicalFile) Exists(path *Path) bool {
+	if path.Done() {
 		return true
 	}
 	return false
@@ -54,8 +54,8 @@ func (file *LogicalFile) Exists(path string) bool {
 
 // Delete works a little differently from normal here, it blanks the files contents rather than deleting it entire
 // (which would be impossible).
-func (file *LogicalFile) Delete(path string) error {
-	if path != "" {
+func (file *LogicalFile) Delete(path *Path) error {
+	if !path.Done() {
 		return NewError(ErrNotFound, path)
 	}
 	
@@ -66,39 +66,39 @@ func (file *LogicalFile) Delete(path string) error {
 	return nil
 }
 
-func (file *LogicalFile) Create(path string) error {
-	if path != "" {
+func (file *LogicalFile) Create(path *Path) error {
+	if !path.Done() {
 		return NewError(ErrNotFound, path)
 	}
 	return nil
 }
 
-func (file *LogicalFile) ListDir(path string) []string {
+func (file *LogicalFile) ListDir(path *Path) []string {
 	return []string{}
 }
 
-func (file *LogicalFile) ListFile(path string) []string {
+func (file *LogicalFile) ListFile(path *Path) []string {
 	return []string{}
 }
 
-func (file *LogicalFile) Read(path string) (io.ReadCloser, error) {
-	if path != "" {
+func (file *LogicalFile) Read(path *Path) (io.ReadCloser, error) {
+	if !path.Done() {
 		return nil, NewError(ErrNotFound, path)
 	}
 	
 	return file.data, nil
 }
 
-func (file *LogicalFile) ReadAll(path string) ([]byte, error) {
-	if path != "" {
+func (file *LogicalFile) ReadAll(path *Path) ([]byte, error) {
+	if !path.Done() {
 		return nil, NewError(ErrNotFound, path)
 	}
 	
 	return file.data.Bytes(), nil
 }
 
-func (file *LogicalFile) Write(path string) (io.WriteCloser, error) {
-	if path != "" {
+func (file *LogicalFile) Write(path *Path) (io.WriteCloser, error) {
+	if !path.Done() {
 		return nil, NewError(ErrNotFound, path)
 	}
 	if !file.rw {
@@ -109,8 +109,8 @@ func (file *LogicalFile) Write(path string) (io.WriteCloser, error) {
 	return file.data, nil
 }
 
-func (file *LogicalFile) WriteAll(path string, content []byte) error {
-	if path != "" {
+func (file *LogicalFile) WriteAll(path *Path, content []byte) error {
+	if !path.Done() {
 		return NewError(ErrNotFound, path)
 	}
 	if !file.rw {

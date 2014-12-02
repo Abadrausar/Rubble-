@@ -166,7 +166,3 @@ func (t *Tag) String() string {
 	}
 	return out + e + t.Appended + t.Comments
 }
-
-func (t *Tag) CodeString() string {
-	return "\"" + t.String() + "\""
-}

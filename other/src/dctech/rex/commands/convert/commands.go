@@ -32,7 +32,6 @@ import "dctech/rex"
 //	convert:float
 //	convert:bool
 //	convert:string
-//	convert:escape
 func Setup(state *rex.State) (err error) {
 	defer func() {
 		if !state.NoRecover {
@@ -47,25 +46,12 @@ func Setup(state *rex.State) (err error) {
 	}()
 	
 	mod := state.RegisterModule("convert")
-	mod.RegisterCommand("type", Command_Type)
 	mod.RegisterCommand("int", Command_Int)
 	mod.RegisterCommand("float", Command_Float)
 	mod.RegisterCommand("bool", Command_Bool)
 	mod.RegisterCommand("string", Command_String)
-	mod.RegisterCommand("escape", Command_Escape)
 	
 	return nil
-}
-
-// Returns a values internal type.
-// 	convert:type value
-// Returns the values type.
-func Command_Type(script *rex.Script, params []*rex.Value) {
-	if len(params) != 1 {
-		rex.ErrorParamCount("convert:type", "1")
-	}
-
-	script.RetVal = rex.NewValueString(params[0].TypeString())
 }
 
 // Forces a value to type int.
@@ -114,16 +100,4 @@ func Command_String(script *rex.Script, params []*rex.Value) {
 	}
 
 	script.RetVal = rex.NewValueString(params[0].String())
-}
-
-// Converts a value into a string that you can write out for parsing later.
-// Not all values will produce useful results.
-// 	convert:escape value
-// Returns a properly escaped string representation of value.
-func Command_Escape(script *rex.Script, params []*rex.Value) {
-	if len(params) != 1 {
-		rex.ErrorParamCount("convert:escape", "1")
-	}
-
-	script.RetVal = rex.NewValueString(params[0].CodeString())
 }

@@ -74,7 +74,3 @@ func (this rMap) Keys() []string {
 func (this rMap) String() string {
 	return IndexableToString("map", this)
 }
-
-func (this rMap) CodeString() string {
-	return IndexableToCodeString("map", this, true)
-}

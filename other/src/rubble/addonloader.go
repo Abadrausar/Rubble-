@@ -26,16 +26,38 @@ import "strings"
 import "dctech/axis"
 import "sort"
 
+// ForEachAddon provides a generic API for running an action for each addon loaded.
+// Runs even for addons that have no parseable files (or even no files at all)!
+func (state *State) ForEachAddon(action func(addonname, path string)) {
+	state.forEachDir("", "addons:dir:", action)
+	
+	for _, dir := range axis.ListDir(state.FS, "addons:zip:") {
+		state.forEachDir(dir, "addons:zip:"+dir, action)
+	}
+}
+
+func (state *State) forEachDir(addonname, path string, action func(addonname, path string)) {
+	action(addonname, path)
+	
+	dirpath := path
+	if path != "" {
+		path += "/"
+	}
+	for _, dir := range axis.ListDir(state.FS, dirpath) {
+		state.forEachDir(addonname+"/"+dir, path+dir, action)
+	}
+}
+
 // TODO: Now that more than one addon dir is possible make sure duplicates are handled.
 //	Not sure how, maybe add them together, but what about my plans for addon.meta?
 
 func (state *State) LoadAddons() {
 	state.loadGlobals("addons:dir:")
-	for _, dir := range state.FS.ListDir("addons:dir:") {
+	for _, dir := range axis.ListDir(state.FS, "addons:dir:") {
 		state.loadDir(dir, "addons:dir:"+dir)
 	}
 
-	for _, dir := range state.FS.ListDir("addons:zip:") {
+	for _, dir := range axis.ListDir(state.FS, "addons:zip:") {
 		state.loadDir(dir, "addons:zip:"+dir)
 	}
 }
@@ -53,14 +75,14 @@ func (state *State) loadDir(addonname, path string) {
 		state.loadAddon(addonname, dirpath)
 	}
 
-	for _, dir := range state.FS.ListDir(dirpath) {
+	for _, dir := range axis.ListDir(state.FS, dirpath) {
 		state.loadDir(addonname+"/"+dir, path+dir)
 	}
 }
 
 func (state *State) loadAddon(addonname, path string) {
 	if _, ok := state.AddonsTbl[addonname]; ok {
-		panic(Abort("Duplicate addon: " + addonname))
+		RaiseError("Duplicate addon: " + addonname)
 	}
 
 	addon := NewAddon(addonname)
@@ -71,24 +93,24 @@ func (state *State) loadAddon(addonname, path string) {
 	}
 
 	// Load Meta File
-	content, err := state.FS.ReadAll(path + "addon.meta")
+	content, err := axis.ReadAll(state.FS, path + "addon.meta")
 	if err == nil {
 		rtn, err := state.ScriptState.CompileAndRun(string(content), path+"addon.meta")
 		if err != nil {
-			panic(Abort(err.Error()))
+			panic(err)
 		}
 		meta, ok := rtn.Data.(*Meta)
 		if !ok {
-			panic(Abort("Addon meta file for: " + addonname + " did not return a rubble:addonmeta value!"))
+			RaiseError("Addon meta file for: " + addonname + " did not return a rubble:addonmeta value!")
 		}
 		addon.Meta = meta
 	}
-
+	
 	// Load Files
-	for _, filepath := range state.FS.ListFile(dirpath) {
-		content, err := state.FS.ReadAll(path + filepath)
+	for _, filepath := range axis.ListFile(state.FS, dirpath) {
+		content, err := axis.ReadAll(state.FS, path + filepath)
 		if err != nil {
-			panic(Abort(err.Error()))
+			panic(err)
 		}
 
 		file := NewAddonFile(filepath, dirpath, content)
@@ -138,9 +160,9 @@ func (state State) loadGlobals(path string) {
 		path += "/"
 	}
 
-	for _, filepath := range state.FS.ListFile(dirpath) {
+	for _, filepath := range axis.ListFile(state.FS, dirpath) {
 		if strings.HasSuffix(filepath, ".init.rex") {
-			content, err := state.FS.ReadAll(path + filepath)
+			content, err := axis.ReadAll(state.FS, path + filepath)
 			if err != nil {
 				panic(err)
 			}
@@ -152,7 +174,7 @@ func (state State) loadGlobals(path string) {
 		}
 
 		if strings.HasSuffix(filepath, ".load.rex") {
-			content, err := state.FS.ReadAll(path + filepath)
+			content, err := axis.ReadAll(state.FS, path + filepath)
 			if err != nil {
 				panic(err)
 			}
@@ -169,7 +191,7 @@ func (state State) loadGlobals(path string) {
 }
 
 func containsParseable(source axis.DataSource, path string) bool {
-	for _, filename := range source.ListFile(path) {
+	for _, filename := range axis.ListFile(source, path) {
 		if strings.HasSuffix(filename, ".pre.rex") {
 			return true
 		}

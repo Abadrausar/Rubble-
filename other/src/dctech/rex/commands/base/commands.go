@@ -39,6 +39,7 @@ import "dctech/rex"
 //	exists
 //	len
 //	isnil
+//	type
 //	if
 //	loop
 //	for
@@ -69,6 +70,7 @@ func Setup(state *rex.State) (err error) {
 	state.RegisterCommand("exists", Command_Exists)
 	state.RegisterCommand("len", Command_Len)
 	state.RegisterCommand("isnil", Command_IsNil)
+	state.RegisterCommand("type", Command_Type)
 	state.RegisterCommand("if", Command_If)
 	state.RegisterCommand("loop", Command_Loop)
 	state.RegisterCommand("for", Command_For)
@@ -164,7 +166,7 @@ func Command_Eval(script *rex.Script, params []*rex.Value) {
 		block = val.Data.(*rex.Code)
 	}
 	
-	script.Locals.Add(block)
+	script.Locals.Add(script.Host, block)
 	script.Exec(block)
 	script.Return = false
 	script.Locals.Remove()
@@ -201,7 +203,7 @@ func Command_OnError(script *rex.Script, params []*rex.Value) {
 			rex.ErrorGeneralCmd("onerror", "Attempt to run non-executable Value.")
 		}
 		block := params[0].Data.(*rex.Code)
-		script.Locals.Add(block)
+		script.Locals.Add(script.Host, block)
 		script.Exec(block)
 		script.Locals.Remove()
 		return
@@ -291,6 +293,22 @@ func Command_IsNil(script *rex.Script, params []*rex.Value) {
 	script.RetVal = rex.NewValueBool(params[0].Type == rex.TypNil)
 }
 
+// Reads or checks value types.
+// 	type value [typ_string]
+// Returns the type as a string (if called without a type string) else returns true or false.
+func Command_Type(script *rex.Script, params []*rex.Value) {
+	if len(params) != 1 && len(params) != 2 {
+		rex.ErrorParamCount("type", "1 or 2")
+	}
+	
+	if len(params) == 1 {
+		script.RetVal = rex.NewValueString(params[0].TypeString())
+		return
+	}
+	
+	script.RetVal = rex.NewValueBool(params[0].TypeString() == params[1].String())
+}
+
 // If the condition is true run true code else if false code exists call false code.
 // 	if condition truecode [falsecode]
 // Returns the return value of the last command in the code it runs or unchanged.
@@ -304,7 +322,7 @@ func Command_If(script *rex.Script, params []*rex.Value) {
 			rex.ErrorGeneralCmd("if", "Attempt to run non-executable Value.")
 		}
 		block := params[1].Data.(*rex.Code)
-		script.Locals.Add(block)
+		script.Locals.Add(script.Host, block)
 		script.Exec(block)
 		script.Locals.Remove()
 		return
@@ -315,7 +333,7 @@ func Command_If(script *rex.Script, params []*rex.Value) {
 			rex.ErrorGeneralCmd("if", "Attempt to run non-executable Value.")
 		}
 		block := params[2].Data.(*rex.Code)
-		script.Locals.Add(block)
+		script.Locals.Add(script.Host, block)
 		script.Exec(block)
 		script.Locals.Remove()
 		return
@@ -335,7 +353,7 @@ func Command_Loop(script *rex.Script, params []*rex.Value) {
 		rex.ErrorGeneralCmd("loop", "Attempt to run non-executable Value.")
 	}
 	block := params[0].Data.(*rex.Code)
-	script.Locals.Add(block)
+	script.Locals.Add(script.Host, block)
 	for {
 		script.Exec(block)
 		script.BreakLoop = false
@@ -369,7 +387,7 @@ func Command_For(script *rex.Script, params []*rex.Value) {
 		rex.ErrorGeneralCmd("for", "Attempt to run non-executable Value.")
 	}
 	block := params[3].Data.(*rex.Code)
-	script.Locals.Add(block)
+	script.Locals.Add(script.Host, block)
 	
 	if step == 0 {
 		step = 1
@@ -420,7 +438,7 @@ func Command_ForEach(script *rex.Script, params []*rex.Value) {
 	}
 
 	block := params[1].Data.(*rex.Code)
-	script.Locals.Add(block)
+	script.Locals.Add(script.Host, block)
 	
 	for _, i := range params[0].Data.(rex.Indexable).Keys() {
 		script.Locals.Set(0, rex.NewValueString(i))

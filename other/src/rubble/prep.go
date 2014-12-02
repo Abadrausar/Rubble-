@@ -27,7 +27,7 @@ import "dctech/axis"
 // PrepModeRun runs prep mode for the specified region.
 // state.Load does NOT need to be run!
 func (state *State) PrepModeRun(region string) (err error) {
-	defer trapAbort(&err)
+	defer state.trapError(&err)
 
 	state.Log.Separator()
 	state.Log.Println("Entering Prep Mode for Region:", region)
@@ -40,10 +40,7 @@ func (state *State) PrepModeRun(region string) (err error) {
 		path += "/data/save/" + region + "/raw/prep"
 	}
 
-	fs, err := axis.NewOSDir(path)
-	if err != nil {
-		return err
-	}
+	fs := axis.NewOSDir(path)
 	state.FS.Mount("prep", fs)
 
 	state.Log.Println("  Loading Prep Files...")

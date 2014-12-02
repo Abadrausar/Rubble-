@@ -9,5 +9,5 @@ To keep the ammo reaction count under control ammo creation is done in two steps
 "shafts" out of the desired material, then you turn the shafts into ammo of the desired type.
 `
 	
-	activates="Libs/Base"
+	activates="Libs/Base;Libs/Wood Additions"
 >

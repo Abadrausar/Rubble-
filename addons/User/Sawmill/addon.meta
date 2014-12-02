@@ -12,5 +12,5 @@ There are two kinds of farmable wood plants:
     stalkshroom    caves lvl 1-2  1 year       Dark Gray  Heavy and slightly more valuable
 `
 	
-	activates="Libs/Base"
+	activates="Libs/Base;Libs/Wood Additions"
 >

@@ -108,7 +108,7 @@ func Command_Mount(script *rex.Script, params []*rex.Value) {
 		rex.ErrorGeneralCmd("axis:mount", "Param 2 is not an axis.DataSource")
 	}
 
-	col.Mount(params[1].String(), ds)
+	axis.Mount(col, params[1].String(), ds)
 }
 
 // Get an AXIS DataSource from an AXIS Collection by path.
@@ -124,7 +124,7 @@ func Command_GetChild(script *rex.Script, params []*rex.Value) {
 		rex.ErrorGeneralCmd("axis:getchild", "Param 0 is not an axis.Collection")
 	}
 	
-	ds, err := col.GetChild(params[1].String())
+	ds, err := axis.GetChild(col, params[1].String())
 	if err != nil {
 		script.Error = true
 		script.RetVal = rex.NewValueString(err.Error())
@@ -146,7 +146,7 @@ func Command_Read(script *rex.Script, params []*rex.Value) {
 		rex.ErrorGeneralCmd("axis:read", "Param 0 is not an axis.DataSource")
 	}
 
-	file, err := ds.ReadAll(params[1].String())
+	file, err := axis.ReadAll(ds, params[1].String())
 	if err != nil {
 		script.Error = true
 		script.RetVal = rex.NewValueString(err.Error())
@@ -169,13 +169,13 @@ func Command_Write(script *rex.Script, params []*rex.Value) {
 		rex.ErrorGeneralCmd("axis:write", "Param 0 is not an axis.DataSource")
 	}
 
-	err := ds.Create(params[1].String())
+	err := axis.Create(ds, params[1].String())
 	if err != nil {
 		script.Error = true
 		script.RetVal = rex.NewValueString(err.Error())
 		return
 	}
-	err = ds.WriteAll(params[1].String(), []byte(params[2].String()))
+	err = axis.WriteAll(ds, params[1].String(), []byte(params[2].String()))
 	if err != nil {
 		script.Error = true
 		script.RetVal = rex.NewValueString(err.Error())
@@ -196,7 +196,7 @@ func Command_Exists(script *rex.Script, params []*rex.Value) {
 		rex.ErrorGeneralCmd("axis:exists", "Param 0 is not an axis.DataSource")
 	}
 
-	script.RetVal = rex.NewValueBool(ds.Exists(params[1].String()))
+	script.RetVal = rex.NewValueBool(axis.Exists(ds, params[1].String()))
 }
 
 // Is a AXIS file a directory?
@@ -212,7 +212,7 @@ func Command_IsDir(script *rex.Script, params []*rex.Value) {
 		rex.ErrorGeneralCmd("axis:isdir", "Param 0 is not an axis.DataSource")
 	}
 
-	script.RetVal = rex.NewValueBool(ds.IsDir(params[1].String()))
+	script.RetVal = rex.NewValueBool(axis.IsDir(ds, params[1].String()))
 }
 
 // Delete a AXIS file or directory.
@@ -228,7 +228,7 @@ func Command_Del(script *rex.Script, params []*rex.Value) {
 		rex.ErrorGeneralCmd("axis:del", "Param 0 is not an axis.DataSource")
 	}
 
-	err := ds.Delete(params[1].String())
+	err := axis.Delete(ds, params[1].String())
 	if err != nil {
 		script.RetVal = rex.NewValueString(err.Error())
 		script.Error = true
@@ -256,9 +256,9 @@ func Command_WalkDirs(script *rex.Script, params []*rex.Value) {
 	}
 	block := params[2].Data.(*rex.Code)
 	
-	files := ds.ListDir(params[1].String())
+	files := axis.ListDir(ds, params[1].String())
 	
-	script.Locals.Add(block)
+	script.Locals.Add(script.Host, block)
 	for _, file := range files {
 		script.Locals.Set(0, rex.NewValueString(file))
 		script.Exec(block)
@@ -289,9 +289,9 @@ func Command_WalkFiles(script *rex.Script, params []*rex.Value) {
 	}
 	block := params[2].Data.(*rex.Code)
 	
-	files := ds.ListFile(params[1].String())
+	files := axis.ListFile(ds, params[1].String())
 	
-	script.Locals.Add(block)
+	script.Locals.Add(script.Host, block)
 	for _, file := range files {
 		script.Locals.Set(0, rex.NewValueString(file))
 		script.Exec(block)

@@ -149,4 +149,12 @@ func Command_Ret(script *rex.Script, params []*rex.Value)
     from inside a loop will not return from the loop, it will return from
     the command that called loop. See break. Returns value or unchanged.
 
+func Command_Type(script *rex.Script, params []*rex.Value)
+    Reads or checks value types.
+
+	type value [typ_string]
+
+    Returns the type as a string (if called without a type string) else
+    returns true or false.
+
 

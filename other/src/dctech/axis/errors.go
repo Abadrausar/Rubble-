@@ -31,9 +31,9 @@ const (
 	ErrReadOnly
 )
 
-func NewError(typ ErrTyp, path string) error {
+func NewError(typ ErrTyp, path *Path) error {
 	return &PathError{
-		Path: path,
+		Path: path.String(),
 		Typ: typ,
 	}
 }

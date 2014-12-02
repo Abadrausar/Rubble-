@@ -5,6 +5,8 @@ Despite the name this file deals with some very advanced topics! Basically anyth
 
 That said you should at least skim over everything so you have some idea what is possible.
 
+Note that some of the things described here are added by the "Libs/Base" addon and are not hard-coded parts of Rubble. "Libs/Base" is commonly assumed to be an integral part of Rubble, it is safe to assume that it's features are always available.
+
 ==============================================
 Template Prefixes Explained:
 ==============================================
@@ -39,7 +41,7 @@ The following details how templates created with the !TEMPLATE template are pars
 The Configuration File:
 ==============================================
 
-Rubble allows you to change its settings via command line options or a config file. To see these options and their defaults run "rubble -h".
+Rubble allows you to change its settings via command line options or a config file. To see these options and their defaults run "rubble -h" and "rubble_web -h" (each one has a different list).
 
 ALL command line options may also be specified in the config file.
 
@@ -61,7 +63,7 @@ When the web UI server is run it tries to load HTML templates and CSS files from
 
 If you want to customize the look of the UI create the "./other/webUI" directory then run the server once to create these files. You can then modify them, and from then on the server will use your files.
 
-Each page template receives raw data about whatever it is supposed to do, in the default templates this data is formatted as JSON and most of the page content is generated client-side by JavaScript, but it is possible to generate the page directly on the server by using the template system for everything. In some cases doing so will cut the page size considerably as some pages receive the parsed version of the entire addons directory! (that's over 7mb of data!)
+Each page template receives raw data about whatever it is supposed to do, in the default templates this data is formatted as JSON and most of the page content is generated client-side by JavaScript, but it is possible to generate the page directly on the server by using the template system for everything. In some cases doing so will cut the page size considerably as some pages receive the parsed version of the entire addons directory! (that's over 7mb of data as encoded!)
 
 Keep in mind that the way the server interacts with these files is hardcoded! Each template receives a specific set of data, and must act a certain way (as observed by the server).
 
@@ -72,6 +74,20 @@ For details about exactly what Rubble passes each page you will have to look at 
 
 If anybody comes up with a nicer set of templates (or some better CSS) I want to see them!
 The current look isn't all that great, so this is your chance to get listed in the credits and on the about page :p
+
+==============================================
+.webload files:
+==============================================
+
+It is possible to order Rubble to download a zipped addon from a web server when it is run, these addons are downloaded only if their size has changed from the last time they were downloaded (so auto-update for addon packs is a thing now!).
+
+AFAIK if you use the correct URL it should be possible for Rubble to read addons directly from DFFD!
+
+To make use of this ability simply create a file with the extension ".webload" (the file name is used as the addon name), the file's contents are stripped of whitespace and used as a download URL.
+
+URLs used for web loading MUST be complete, eg "www.example.com/somefile.zip" will not work, use "http://www.example.com/somefile.zip".
+
+.webload files are only allowed in the root of the addon tree (basically exactly the same rules as normal zipped addons).
 
 ==============================================
 addon.meta:
@@ -137,7 +153,7 @@ The only templates that are handled are the specialized "SHARED_OBJECT" template
 
 Most of the time the files processed by "Dev/Tileset/Insert" are not available to the modder, but if you set the config var "DEV_TILESET_INSERT_EXPORT" to "true" then every file it changes will be written to the current working directory. Just copy the files it writes to your addon and save yourself hours of work!
 
-Really advanced users may want to look at the tweak script that drives "Dev/Tileset/Insert" so that they can use it's example to write temporary addons/scripts to help with other, more specific, porting tasks. For example if you have lots of reactions it may be worth while to write a script to add the REACTION template to them all (using the reaction name to decide what class to register them as perhaps).
+Advanced users may want to look at the tweak script that drives "Dev/Tileset/Insert" so that they can use it's example to write temporary addons/scripts to help with other, more specific, porting tasks. For example if you have lots of reactions it may be worth while to write a script to add the REACTION template to them all (using the reaction name to decide what class to register them as perhaps).
 
 It is easy to forget that Rubble can be used for far more than just generating raws, it also works well for processing them.
 

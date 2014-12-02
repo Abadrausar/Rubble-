@@ -37,14 +37,12 @@ func (dir LogicalDir) Mount(loc string, ds DataSource) {
 	dir[loc] = append(dir[loc], ds)
 }
 
-func (dir LogicalDir) GetChild(path string) (DataSource, error) {
-	path, err := Sanitize(path)
-	if err != nil {
-		return nil, NewError(ErrBadPath, path)
-	}
-	
-	locID, path := StripDir(path)
+func (dir LogicalDir) GetChild(path *Path) (DataSource, error) {
+	locID := path.NextDir()
 	if locID == "" {
+		if path.Done() {
+			return dir, nil
+		}
 		return dir, nil
 	}
 	
@@ -57,20 +55,16 @@ func (dir LogicalDir) GetChild(path string) (DataSource, error) {
 	return nil, NewError(ErrNotFound, path)
 }
 
-func (dir LogicalDir) IsDir(path string) bool {
-	path, err := Sanitize(path)
-	if err != nil {
-		return false
-	}
-	
-	if path == "" {
+func (dir LogicalDir) IsDir(path *Path) bool {
+	if path.Done() {
 		return true
 	}
 	
-	locID, path := StripDir(path)
-	if path == "" {
+	locID := path.NextDir()
+	if locID == "" {
 		return true
 	}
+	defer path.RevertDir()
 	
 	for x := range dir[locID] {
 		ds := dir[locID][x]
@@ -81,24 +75,16 @@ func (dir LogicalDir) IsDir(path string) bool {
 	return false
 }
 
-func (dir LogicalDir) Exists(path string) bool {
-	path, err := Sanitize(path)
-	if err != nil {
-		return false
-	}
-	
-	if path == "" {
+func (dir LogicalDir) Exists(path *Path) bool {
+	if path.Done() {
 		return true
 	}
 	
-	if _, ok := dir[path]; ok {
-		return true
-	}
-	
-	locID, path := StripDir(path)
-	if path == "" {
+	locID := path.NextDir()
+	if locID == "" {
 		return false
 	}
+	defer path.RevertDir()
 	
 	for x := range dir[locID] {
 		ds := dir[locID][x]
@@ -109,15 +95,14 @@ func (dir LogicalDir) Exists(path string) bool {
 	return false
 }
 
-func (dir LogicalDir) Delete(path string) error {
-	path, err := Sanitize(path)
-	if err != nil {
-		return NewError(ErrBadPath, path)
-	}
-	
-	locID, path := StripDir(path)
+func (dir LogicalDir) Delete(path *Path) error {
+	locID := path.NextDir()
 	if locID == "" {
 		return NewError(ErrBadPath, path)
+	}
+	if path.Done() {
+		delete(dir, locID)
+		return nil
 	}
 	
 	for x := range dir[locID] {
@@ -129,33 +114,27 @@ func (dir LogicalDir) Delete(path string) error {
 	return NewError(ErrNotFound, path)
 }
 
-func (dir LogicalDir) Create(path string) error {
-	path, err := Sanitize(path)
-	if err != nil {
-		return NewError(ErrBadPath, path)
-	}
-	
-	locID, path := StripDir(path)
+func (dir LogicalDir) Create(path *Path) error {
+	locID := path.NextDir()
 	if locID == "" {
 		return NewError(ErrBadPath, path)
 	}
 	
-	// This should try all mounted locations.
+	// TODO: This should try all mounted locations.
 	if _, ok := dir[locID]; ok && len(dir[locID]) > 0 {
 		return dir[locID][0].Create(path)
 	}
 	return NewError(ErrReadOnly, path)
 }
 
-func (dir LogicalDir) ListDir(path string) []string {
-	path, err := Sanitize(path)
-	if err != nil {
-		return []string{}
-	}
-	
-	locID, path := StripDir(path)
+func (dir LogicalDir) ListDir(path *Path) []string {
+	locID := path.NextDir()
 	if locID == "" {
-		rtn := make([]string, 0, 25)
+		if !path.Done() {
+			return make([]string, 0)
+		}
+		
+		rtn := make([]string, 0, len(dir))
 		for item := range dir {
 			rtn = append(rtn, item)
 		}
@@ -185,13 +164,8 @@ func (dir LogicalDir) ListDir(path string) []string {
 	return rtn
 }
 
-func (dir LogicalDir) ListFile(path string) []string {
-	path, err := Sanitize(path)
-	if err != nil {
-		return []string{}
-	}
-	
-	locID, path := StripDir(path)
+func (dir LogicalDir) ListFile(path *Path) []string {
+	locID := path.NextDir()
 	if locID == "" {
 		return []string{}
 	}
@@ -217,14 +191,9 @@ func (dir LogicalDir) ListFile(path string) []string {
 	return rtn
 }
 
-func (dir LogicalDir) Read(path string) (io.ReadCloser, error) {
-	path, err := Sanitize(path)
-	if err != nil {
-		return nil, NewError(ErrBadPath, path)
-	}
-	
-	locID, path := StripDir(path)
-	if path == "" || locID == "" {
+func (dir LogicalDir) Read(path *Path) (io.ReadCloser, error) {
+	locID := path.NextDir()
+	if path.Done() || locID == "" {
 		return nil, NewError(ErrBadPath, path)
 	}
 	
@@ -237,14 +206,9 @@ func (dir LogicalDir) Read(path string) (io.ReadCloser, error) {
 	return nil, NewError(ErrNotFound, path)
 }
 
-func (dir LogicalDir) ReadAll(path string) ([]byte, error) {
-	path, err := Sanitize(path)
-	if err != nil {
-		return nil, NewError(ErrBadPath, path)
-	}
-	
-	locID, path := StripDir(path)
-	if path == "" || locID == "" {
+func (dir LogicalDir) ReadAll(path *Path) ([]byte, error) {
+	locID := path.NextDir()
+	if path.Done() || locID == "" {
 		return nil, NewError(ErrBadPath, path)
 	}
 	
@@ -257,14 +221,9 @@ func (dir LogicalDir) ReadAll(path string) ([]byte, error) {
 	return nil, NewError(ErrNotFound, path)
 }
 
-func (dir LogicalDir) Write(path string) (io.WriteCloser, error) {
-	path, err := Sanitize(path)
-	if err != nil {
-		return nil, NewError(ErrBadPath, path)
-	}
-	
-	locID, path := StripDir(path)
-	if path == "" || locID == "" {
+func (dir LogicalDir) Write(path *Path) (io.WriteCloser, error) {
+	locID := path.NextDir()
+	if path.Done() || locID == "" {
 		return nil, NewError(ErrBadPath, path)
 	}
 	
@@ -277,14 +236,9 @@ func (dir LogicalDir) Write(path string) (io.WriteCloser, error) {
 	return nil, NewError(ErrNotFound, path)
 }
 
-func (dir LogicalDir) WriteAll(path string, content []byte) error {
-	path, err := Sanitize(path)
-	if err != nil {
-		return NewError(ErrBadPath, path)
-	}
-	
-	locID, path := StripDir(path)
-	if path == "" || locID == "" {
+func (dir LogicalDir) WriteAll(path *Path, content []byte) error {
+	locID := path.NextDir()
+	if path.Done() || locID == "" {
 		return NewError(ErrBadPath, path)
 	}
 	

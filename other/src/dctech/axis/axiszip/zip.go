@@ -31,7 +31,6 @@ import "bytes"
 import "strings"
 import "archive/zip"
 import "path"
-import "path/filepath"
 import "encoding/base64"
 
 type Data struct {
@@ -107,56 +106,47 @@ func NewRaw64(content []byte) (axis.DataSource, error) {
 	return this, nil
 }
 
-func (this *Data) IsDir(path string) bool {
-	path = strings.TrimRight(path, "/")
-	if path == "" {
+func (this *Data) IsDir(path *axis.Path) bool {
+	if path.Done() {
 		return true
 	}
-	path = filepath.ToSlash(path)
 	
 	for _, f := range this.zip.File {
-		if strings.TrimRight(f.Name, "/") == path {
+		if strings.TrimRight(f.Name, "/") == path.Remainder() {
 			return f.FileInfo().IsDir()
 		}
 	}
 	return false
 }
 
-func (this *Data) Exists(path string) bool {
-	path = strings.TrimRight(path, "/")
-	if path == "" {
+func (this *Data) Exists(path *axis.Path) bool {
+	if path.Done() {
 		return true
 	}
-	path = filepath.ToSlash(path)
 	
 	for _, f := range this.zip.File {
-		if strings.TrimRight(f.Name, "/") == path {
+		if strings.TrimRight(f.Name, "/") == path.Remainder() {
 			return true
 		}
 	}
 	return false
 }
 
-func (this *Data) Delete(path string) error {
+func (this *Data) Delete(path *axis.Path) error {
 	return axis.NewError(axis.ErrReadOnly, path)
 }
 
-func (this *Data) Create(path string) error {
+func (this *Data) Create(path *axis.Path) error {
 	return axis.NewError(axis.ErrReadOnly, path)
 }
 
-func (this *Data) ListDir(dir string) []string {
-	dir = filepath.ToSlash(dir)
-	dir = strings.TrimRight(dir, "/")
-	if dir == "" {
-		dir = "."
-	}
+func (this *Data) ListDir(dir *axis.Path) []string {
 	rtn := make([]string, 0, 10)
 
 	for _, f := range this.zip.File {
 		if f.FileInfo().IsDir() {
 			name := strings.TrimRight(f.Name, "/")
-			if path.Dir(name) == dir {
+			if path.Dir(name) == dir.Remainder() {
 				rtn = append(rtn, path.Base(name))
 			}
 		}
@@ -164,17 +154,12 @@ func (this *Data) ListDir(dir string) []string {
 	return rtn
 }
 
-func (this *Data) ListFile(dir string) []string {
-	dir = filepath.ToSlash(dir)
-	dir = strings.TrimRight(dir, "/")
-	if dir == "" {
-		dir = "."
-	}
+func (this *Data) ListFile(dir *axis.Path) []string {
 	rtn := make([]string, 0, 20)
 
 	for _, f := range this.zip.File {
 		if !f.FileInfo().IsDir() {
-			if path.Dir(f.Name) == dir {
+			if path.Dir(f.Name) == dir.Remainder() {
 				rtn = append(rtn, path.Base(f.Name))
 			}
 		}
@@ -182,10 +167,9 @@ func (this *Data) ListFile(dir string) []string {
 	return rtn
 }
 
-func (this *Data) Read(path string) (io.ReadCloser, error) {
-	path = filepath.ToSlash(path)
+func (this *Data) Read(path *axis.Path) (io.ReadCloser, error) {
 	for _, f := range this.zip.File {
-		if f.Name == path {
+		if f.Name == path.Remainder() {
 			reader, err := f.Open()
 			if err != nil {
 				return nil, err
@@ -196,8 +180,7 @@ func (this *Data) Read(path string) (io.ReadCloser, error) {
 	return nil, axis.NewError(axis.ErrNotFound, path)
 }
 
-func (this *Data) ReadAll(path string) ([]byte, error) {
-	path = filepath.ToSlash(path)
+func (this *Data) ReadAll(path *axis.Path) ([]byte, error) {
 	reader, err := this.Read(path)
 	defer reader.Close()
 	if err != nil {
@@ -207,10 +190,10 @@ func (this *Data) ReadAll(path string) ([]byte, error) {
 	return content, err
 }
 
-func (this *Data) Write(path string) (io.WriteCloser, error) {
+func (this *Data) Write(path *axis.Path) (io.WriteCloser, error) {
 	return nil, axis.NewError(axis.ErrReadOnly, path)
 }
 
-func (this *Data) WriteAll(path string, content []byte) error {
+func (this *Data) WriteAll(path *axis.Path, content []byte) error {
 	return axis.NewError(axis.ErrReadOnly, path)
 }

@@ -85,7 +85,3 @@ func (this *rArray) Keys() []string {
 func (this *rArray) String() string {
 	return IndexableToString("sarray", this)
 }
-
-func (this *rArray) CodeString() string {
-	return IndexableToCodeString("sarray", this, false)
-}

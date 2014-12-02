@@ -45,7 +45,7 @@ var rubble:item_rarities = <map
 		(rubble:abort "Error: Invalid item type passed to SHARED_ITEM.")
 	})
 	
-	[def = (regex:replace "\\[TILE:([0-9]+|'.')\\]" [def] (str:add "[TILE:{#TILE;" [id] ";$1}]"))]
+	[def = (regex:replace "\\[TILE:([0-9]+|'.')\\]" [def] (str:add "[TILE:{#TILE;" [id] ";;$1}]"))]
 	
 	(if (str:cmp [type] "DIGGER") {
 		[type = "WEAPON"]
@@ -53,7 +53,7 @@ var rubble:item_rarities = <map
 	
 	(rubble:stageparse (str:add "{SHARED_OBJECT;" [id] ";\n[ITEM_" [type] ":" [id] "]\n\t" [def] "\n}"))
 })
-(rubble:template "ITEM_CLASS" block ... {
+(rubble:template "ITEM_CLASS" block params=... {
 	var type = [rubble:item_current_type]
 	var id = [rubble:item_current_id]
 	var class = ""

@@ -139,7 +139,7 @@ var addondataPage = template.Must(template.New("addondata").Parse(loadOr("addond
 			document.write("(An automatically managed library)")
 		}
 		if (meta.Header != "") {
-			document.write("<p>" + meta.Header)
+			document.write("<p class=\"mono\">" + meta.Header + "</p>")
 		}
 		
 		if (meta.Description != "") {

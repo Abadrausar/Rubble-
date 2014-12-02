@@ -117,7 +117,3 @@ func (this *OrderedMap) Keys() []string {
 func (this *OrderedMap) String() string {
 	return rex.IndexableToString("map", this)
 }
-
-func (this *OrderedMap) CodeString() string {
-	return rex.IndexableToCodeString("map", this, true)
-}

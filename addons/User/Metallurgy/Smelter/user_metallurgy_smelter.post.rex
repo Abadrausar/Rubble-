@@ -3,7 +3,7 @@ var ores = <map
 	IRON=true
 	NICKEL=true
 	GOLD=true
-	#SILVER=true # silver is a special case
+	SILVER=true
 	COPPER=true
 	LEAD=true
 	ZINC=true
@@ -20,22 +20,13 @@ var ores = <map
 		[rubble:raws [name] = (df:raw:walk [content] block tag {
 			(if (str:cmp [tag id] "METAL_ORE") {
 				(if [ores [tag 0]] {
-					[tag replace = (str:add "[REACTION_CLASS:" [tag 0] "_ORE]")]
-				})
-			})
-			
-			(if (str:cmp [tag id] "METAL_ORE") {
-				(if (str:cmp [tag 0] SILVER)  {
 					(if (int:lt [tag 1] 100) {
 						[tag replace = (str:add "[REACTION_CLASS:" [tag 0] "_ORE_POOR]")]
 					}{
 						[tag replace = (str:add "[REACTION_CLASS:" [tag 0] "_ORE]")]
 					})
-					
-					
 				})
 			})
-			
 			(break true)
 		})]
 	})

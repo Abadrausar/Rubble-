@@ -123,10 +123,3 @@ func (array *rwArray) String() string {
 	
 	return IndexableToString("array", array)
 }
-
-func (array *rwArray) CodeString() string {
-	array.lock.RLock()
-	defer array.lock.RUnlock()
-	
-	return IndexableToCodeString("array", array, false)
-}

@@ -22,49 +22,57 @@ misrepresented as being the original software.
 
 package rubble
 
+import "strings"
+
+import "dctech/rex"
+
 // ParseFile runs the Rubble stage parser on a single file.
-func (state *State) ParseFile(input []byte, stage ParseStage, pos *Position) []byte {
+func (state *State) ParseFile(input []byte, stage ParseStage, pos *rex.Position) []byte {
 	if stage == StgUseCurrent {
 		stage = state.Stage
 	}
 	if stage != StgPreParse && stage != StgParse && stage != StgPostParse {
-		panic("Parse called with invalid parse stage")
+		RaiseError("Stage parser called with invalid parse stage.")
 	}
 
 	// 100k sounds like a lot, but there are vanilla raw files that are almost 400k
 	// Most seem to be around 50k-70k so 100k is not too high
 	out := make([]byte, 0, 102400)
-	lex := NewLexer(input, pos)
+	lex := newLexer(input, pos)
 
 loop:
 	for {
 		lex.Advance()
+		
+		// Only set this here so it points to the first token of the current template only.
+		state.ErrPos = lex.Current.Pos.Copy()
+		
 		switch lex.Current.Type {
 		case tknTagBegin:
 			if !stageTemplate(lex.Look.Lexeme, stage) {
 				out = append(out, templateToString(lex)...)
 				continue
 			}
-			if _, ok := state.Templates[lex.Look.Lexeme]; !ok {
-				state.Log.Println("      Warning: Nonexistent Template Found: " + lex.Look.Lexeme)
-				continue
-			}
-
+			
 			lex.GetToken(tknString)
 			name := lex.Current.Lexeme
-			params := make([]*Value, 0, 5)
+			params := make([]*rex.Value, 0, 5)
 			for lex.CheckLookAhead(tknDelimiter) {
 				lex.GetToken(tknDelimiter)
 				if lex.CheckLookAhead(tknString) {
 					lex.GetToken(tknString)
 					params = append(params, lex.Current.Value())
 				} else {
-					params = append(params, NewValue(""))
+					params = append(params, rex.NewValueString(""))
 				}
 			}
 			lex.GetToken(tknTagEnd)
 
-			out = append(out, state.Templates[name].Call(state, params).Data...)
+			if _, ok := state.Templates[name]; !ok {
+				state.Log.Println("      Warning: Nonexistent Template Found: " + name)
+				continue
+			}
+			out = append(out, state.Templates[name].Call(state, params).String()...)
 
 		case tknINVALID:
 			break loop
@@ -78,33 +86,36 @@ loop:
 }
 
 func stageTemplate(name string, stage ParseStage) bool {
+	name = strings.TrimSpace(name)
 	if len(name) < 1 {
 		return false
 	}
+	
+	a := name[0]
 
-	if name[0] == '@' {
+	if a == '@' {
 		return true
 	}
 
 	switch stage {
 	case StgPreParse:
-		return name[0] == '!'
+		return a == '!'
 
 	case StgParse:
-		return !(name[0] == '#' || name[0] == '!')
+		return !(a == '#' || a == '!')
 
 	case StgPostParse:
-		return name[0] == '#'
+		return a == '#'
 
 	}
 	return false
 }
 
-func templateToString(lex *Lexer) string {
+func templateToString(lex *lexer) string {
 	out := "{"
 	for {
 		lex.Advance()
-
+		
 		if lex.Current.Type == tknTagEnd {
 			return out + "}"
 		}

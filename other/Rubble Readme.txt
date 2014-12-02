@@ -23,17 +23,16 @@ Where to Find Help:
 
 All documentation is in the "other" directory, this includes tutorials, template documentation, script documentation, and basic documentation of Rubble's internals.
 
-General users have no need to read ANYTHING except this readme and the addon list! Everything most users need to know (aside from things like how to install Rubble) can be found in the web UI addon description pages.
+General users have no need to read ANYTHING except this readme and the addon list! Everything most users need to know (aside from things like how to install Rubble, which can be found in this document) can be found in the web UI addon description pages.
 
 Most of the documentation assumes you know what you are doing as far as general DF modding goes, please do not read documentation that is above your level and then complain that "Rubble is too hard".
-I do assume that modders will have at least some knowledge of programming (I apologize for this, as I know that not everyone does). If you do not know anything about programming most of the scripting stuff will be hard (if not impossible) to follow, but if you stick to using templates you will be fine (scripting is only used for advanced stuff anyway, most people will never need it).
+I do assume that modders will have at least some knowledge of programming (I apologize for this, as I know that not everyone does). If you do not know anything about programming most of the scripting stuff will be hard (if not impossible) to follow, but if you stick to using templates you will be fine (scripting is only needed for advanced stuff anyway, most people will never need it).
 
 For examples of what all is possible with Rubble see the included addons, they cover a broad range of possibilities. Sadly comments explaining what is being done and why are often lacking, so if you cannot figure out why something was done a certain way just ask.
 
 Modders will want to read the following (in most-important-first order):
 	HowTo Rubble - Tutorials, read at least the first two! Feel free to skip the others.
-	Rubble Native Templates - The documentation for the built-in !TEMPLATE template
-	Rubble Base Templates - The template documentation for the "Base/Templates" addon, this stuff is VERY important!
+	Rubble Base Templates - The template documentation for the "Libs/Base" addon, this stuff is VERY important!
 	Rubble Libs Templates - The template documentation for the library addons
 	Rubble Basics - Lots of stuff about addons and Rubble in general, some of this stuff is really advanced!
 	Everything in "Rex Docs" - the Rex documentation, feel free to skip this if you are not interested in scripting
@@ -98,7 +97,7 @@ Some addons may allow additional configuration via "config variables", these are
 
 If you want to run multiple worlds with radically different addon sets it is a good idea to run "rubble -prep=<region name>" before switching worlds (this is mostly only for tilesets now days, other addons should be good to go unless they do something weird and non-standard).
 
-All the Rubble default addons are deterministic, meaning that it is possible to generate the raws twice and (as long as you use the same addons) each time the raws will be exactly the same. This makes it possible to regenerate the raws for a world to allow things like switching tilesets. Unfortunately this is a semi-complicated task to handle by hand, as there is a lot of overhead that the GUI would normally have handled that command line users will have to do manually.
+All the Rubble default addons are deterministic, meaning that it is possible to generate the raws twice and (as long as you use the same addons) each time the raws will be exactly the same. This makes it possible to regenerate the raws for a world to allow things like switching tilesets. Unfortunately this is a semi-complicated task to handle by hand, as there is a lot of overhead that the web UI would normally have handled that command line users will have to do manually.
 The first step is to change the "addonlist.ini" file that is in the worlds raw directory, make sure not to change it too much or you can mess up your world!
 If you wish you can change "genconfig.ini" as well, but that is usually a bad idea.
 Now for regenerating the raws, what follows is an example command line to do that for the save "region1":
@@ -131,6 +130,7 @@ Bugs:
 	There are no known (non-vanilla) bugs.
 
 When making an error report please post the FULL log file! Posting just a few lines tells me almost nothing about the problem, after all I made Rubble write all that stuff for a reason :)
+I cannot stress this enough! With Rubble the actual error message is only a small part of the information I need for tracking an error down! In particular the list of active addons is VERY important (and it tends to get cut from most reports because it is near the start of the log).
 
 If any of the documentation is not 100% clear just ask. 
 I know everything there is to know about how Rubble works and so I tend to forget to put 
@@ -138,4 +138,4 @@ I know everything there is to know about how Rubble works and so I tend to forge
 
 In the event that I cannot be contacted on the Bay12 forums (user name "milo christiansen"), my email address is:
 	milo.christiansen (at) gmail (dot) com
-Please wait 1-4 weeks before giving up hope, as my Internet access is VERY irregular (and I check my email even less often).
+Please wait 1-4 weeks before giving up hope, as my Internet access is VERY irregular (and I check my email less often then I check the forums).

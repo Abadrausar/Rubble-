@@ -1,0 +1,11 @@
+<rubble:addonmeta
+	lib=true
+	
+	header=`Adds several small tweaks to wood materials.`
+	
+	description=`
+Adds a better block name and a reaction class for more precise reaction targeting.
+`
+	
+	activates="Libs/Base"
+>

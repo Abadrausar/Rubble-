@@ -89,7 +89,7 @@ func Command_Shell(script *rex.Script, params []*rex.Value) {
 			break
 		}
 		
-		script.Locals.Add(code)
+		script.Locals.Add(script.Host, code)
 		err = script.SafeExec(code)
 		script.Locals.Remove()
 		if err != nil {

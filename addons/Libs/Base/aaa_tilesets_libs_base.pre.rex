@@ -5,32 +5,32 @@ var rubble:color_data = <map>
 # Used by the "Dev/Extract Tileset" addon
 var rubble:tileset = <array>
 
-(rubble:template "SET_TILE" block id tile {
-	(if (exists [rubble:tile_data] [id]){
+(rubble:template "SET_TILE" block obj id tile {
+	(if (exists [rubble:tile_data] (str:add [obj] "|" [id])){
 	}{
-		[rubble:tile_data [id] = [tile]]
+		[rubble:tile_data (str:add [obj] "|" [id]) = [tile]]
 	})
 	(ret "")
 })
-(rubble:template "#TILE" block id default {
-	[rubble:tileset append = (str:add "{SET_TILE;" [id] ";" [default] "}")]
-	(if (exists [rubble:tile_data] [id]){
-		(ret [rubble:tile_data [id]])
+(rubble:template "#TILE" block obj id default {
+	[rubble:tileset append = (str:add "{SET_TILE;" [obj] ";" [id] ";" [default] "}")]
+	(if (exists [rubble:tile_data] (str:add [obj] "|" [id])){
+		(ret [rubble:tile_data (str:add [obj] "|" [id])])
 	}{
 		(ret [default])
 	})
 })
-(rubble:template "SET_COLOR" block id color {
-	(if (exists [rubble:color_data] [id]){
+(rubble:template "SET_COLOR" block obj id color {
+	(if (exists [rubble:color_data] (str:add [obj] "|" [id])){
 	}{
-		[rubble:color_data [id] = [color]]
+		[rubble:color_data (str:add [obj] "|" [id]) = [color]]
 	})
 	(ret "")
 })
-(rubble:template "#COLOR" block id default {
-	[rubble:tileset append = (str:add "{SET_COLOR;" [id] ";" [default] "}")]
-	(if (exists [rubble:color_data] [id]){
-		(ret [rubble:color_data [id]])
+(rubble:template "#COLOR" block obj id default {
+	[rubble:tileset append = (str:add "{SET_COLOR;" [obj] ";" [id] ";" [default] "}")]
+	(if (exists [rubble:color_data] (str:add [obj] "|" [id])){
+		(ret [rubble:color_data (str:add [obj] "|" [id])])
 	}{
 		(ret [default])
 	})

@@ -9,5 +9,5 @@ Note that skills that do not have a labor appear to allow ANYONE to do the react
 use workshop profiles.
 `
 	
-	activates="Libs/Base"
+	activates="Libs/Base;Libs/Wood Additions"
 >

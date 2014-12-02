@@ -27,6 +27,7 @@ import "dctech/patch"
 import "rubble/rblutil"
 
 import "fmt"
+import "strings"
 
 // Causes rubble to abort with an error, use for correctable errors like configuration problems.
 // 	rubble:abort msg
@@ -36,7 +37,7 @@ func Command_Abort(script *rex.Script, params []*rex.Value) {
 		rex.ErrorParamCount("rubble:abort", "1")
 	}
 
-	panic(Abort(params[0].String()))
+	RaiseAbort(params[0].String())
 }
 
 // Returns the name of the current file.
@@ -81,12 +82,10 @@ func Command_Parse(script *rex.Script, params []*rex.Value) {
 
 	if len(params) == 2 {
 		stage := ParseStage(int(params[0].Int64()))
-		script.RetVal = rex.NewValueString(string(state.ParseFile([]byte(params[0].String()), stage,
-			NewPositionScript(params[0].Pos))))
+		script.RetVal = rex.NewValueString(string(state.ParseFile([]byte(params[0].String()), stage, params[0].Pos)))
 		return
 	}
-	script.RetVal = rex.NewValueString(string(state.ParseFile([]byte(params[0].String()), StgUseCurrent,
-		NewPositionScript(params[0].Pos))))
+	script.RetVal = rex.NewValueString(string(state.ParseFile([]byte(params[0].String()), StgUseCurrent, params[0].Pos)))
 }
 
 // Calls a Rubble template.
@@ -99,18 +98,11 @@ func Command_CallTemplate(script *rex.Script, params []*rex.Value) {
 	state := script.Host.FetchVariable("rubble:state").Data.(*State)
 
 	name := params[0].String()
-
-	strParams := make([]*Value, 0, len(params)-1)
-
-	for _, val := range params[1:] {
-		strParams = append(strParams, NewValueScript(val))
-	}
-
 	if _, ok := state.Templates[name]; !ok {
 		rex.ErrorGeneralCmd("rubble:calltemplate", "Invalid template: "+name)
 	}
 
-	script.RetVal = state.Templates[name].Call(state, strParams).Script()
+	script.RetVal = state.Templates[name].Call(state, params[1:])
 }
 
 // Expands Rubble variables.
@@ -224,6 +216,44 @@ func Command_Template(script *rex.Script, params []*rex.Value) {
 	state := script.Host.FetchVariable("rubble:state").Data.(*State)
 
 	state.NewScriptTemplate(params[0].String(), params[1])
+}
+
+// Defines a Rubble user template.
+// 	rubble:usertemplate name [params...] code
+// Returns unchanged.
+func Command_UserTemplate(script *rex.Script, params []*rex.Value) {
+	if len(params) < 1 {
+		rex.ErrorParamCount("rubble:usertemplate", ">1")
+	}
+	state := script.Host.FetchVariable("rubble:state").Data.(*State)
+
+	name := params[0].String()
+	text := params[len(params)-1]
+	paramNames := params[1 : len(params)-1]
+
+	parsedParams := make([]*TemplateParam, 0, len(paramNames))
+	for _, val := range paramNames {
+		rtn := new(TemplateParam)
+		if strings.Contains(val.String(), "=") {
+			parts := strings.SplitN(val.String(), "=", 2)
+			rtn.Name = parts[0]
+			rtn.Default = parts[1]
+			parsedParams = append(parsedParams, rtn)
+			continue
+		}
+		rtn.Name = val.String()
+		parsedParams = append(parsedParams, rtn)
+	}
+
+	state.NewUserTemplate(name, text, parsedParams)
+}
+
+// Exactly like rubble:usertemplate, just it returns an empty string.
+// Cannot be called directly by scripts.
+// Returns "".
+func userTemplateWrap(script *rex.Script, params []*rex.Value) {
+	Command_UserTemplate(script, params)
+	script.RetVal = rex.NewValueString("")
 }
 
 // Script commands related to patching and loading addons from scripts.

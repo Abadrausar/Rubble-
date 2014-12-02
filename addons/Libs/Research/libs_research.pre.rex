@@ -58,7 +58,7 @@ var rubble:research:handled = <map>
 })
 
 (rubble:template "RESEARCH_BASE_REACTIONS" block building skill hook="ADDON_HOOK_PLAYABLE" {
-	(rubble:stageparse "{REACTION;RESEARCH_STEP_TWO;" [hook] "} 64% chance
+	(rubble:stageparse (str:add "{REACTION;RESEARCH_STEP_TWO;" [hook] "} 64% chance
 	[NAME:continue research (II)]
 	[BUILDING:" [building] ":NONE]
 	[REAGENT:A:1:TOOL:ITEM_TOOL_RESEARCH_ONE:NONE:NONE]
@@ -106,11 +106,11 @@ var rubble:research:handled = <map>
 	[PRODUCT:100:1:TOOL:ITEM_TOOL_RESEARCH_DISCOVERY:GET_MATERIAL_FROM_REAGENT:A:DISCOVERY_MAT]
 	[SKILL:" [skill] "]
 	[AUTOMATIC]
-")
+"))
 })
 
 (rubble:template "RESEARCH_REACTIONS" block class building skill hook="ADDON_HOOK_PLAYABLE" {
-	(if (isnil [rubble:research:topics [class]]) {}{
+	(if (isnil [rubble:research:topics [class]]) {
 		(rubble:abort (str:add "Research class: " [class] " does not exist."))
 	})
 	[rubble:research:handled [class] = true]

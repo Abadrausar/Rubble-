@@ -1,5 +1,37 @@
 	
 Rubble Template Documentation
+
+Script Templates defined in the Rubble binary.
+
+==============================================
+{!TEMPLATE;<NAME>;[<PARAM>[=<DEFAULT_VALUE>]...];<CODE>}
+	Creates a new template definition with name <NAME>, subsequently calling {<NAME>} will return a new parse of <CODE>.
+
+	Calling {<NAME>;<ARGUMENT_1>;<ARGUMENT_2>} will replace instances of %<PARAM_1> or %{<PARAM_1>} with <ARGUMENT_1>, instances of %<PARAM_2> or %{<PARAM_2>} with <ARGUMENT_2>, etcetera. Default values may be specified for parameters.
+	
+	Variables ($<VAR_NAME> or ${<VAR_NAME>}) will be expanded in both the parameters and the <CODE>.
+	(variables will NOT be expanded if they are in the body of a nested child template!)
+	
+	Example:
+		{!TEMPLATE;FOO;bar}
+		{FOO}
+		{FOO}
+		{!TEMPLATE;GREET;thing;Hello %{thing}!}
+		{GREET;World}
+		{!TEMPLATE;GREET_DWARF;dwarf=Urist;Hello %{dwarf}!}
+		{GREET_DWARF}
+		{GREET_DWARF;Led}
+		{@SET;TEST;‼Fun‼}
+		{GREET;$TEST}
+	
+	evaluates to
+		bar
+		bar
+		Hello World!
+		Hello Urist!
+		Hello Led!
+		Hello ‼Fun‼!
+
 User Templates defined in the "Libs/Base" addon.
 
 ==============================================
@@ -28,8 +60,38 @@ User Templates defined in the "Libs/Base" addon.
 	Forces Rubble to exit, <MESSAGE> is displayed.
 
 ==============================================
+{!PRINT;<MSG>...}
+{PRINT;<MSG>...}
+{#PRINT;<MSG>...}
+	Writes <MSG> to the console. Each param gets it's own line.
+
+==============================================
 {@SCRIPT;<CODE>}
 	Runs script code and returns the result (as a string).
+
+==============================================
+{@SET;<NAME>;<VALUE>}
+	Sets a variable of name <NAME> to value <VALUE>. Returns nothing.
+
+==============================================
+{@IF;<STRING1>;<STRING2>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
+	If <STRING1> and <STRING2> are equal, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned. This is very useful with variables.
+	
+	Example:
+		{IF;$TEST_VAR;YES;[FOO];[BAR]}
+
+==============================================
+{@IF_ACTIVE;<ADDON>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
+	If <ADDON> is active, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
+
+==============================================
+{@IF_CODE;<CODE>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
+	If <CODE> returns true, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
+	(<CODE> may be any valid script code)
+	
+==============================================
+{@IF_SKIP;<STRING1>;<STRING2>}
+	If <STRING1> and <STRING2> are equal then skip the current file.
 
 ==============================================
 {SHARED_OBJECT;<ID>;<DEFINITION>}
@@ -71,6 +133,16 @@ User Templates defined in the "Libs/Base" addon.
 	Appends the result of parsing <PRERAWS> to the end of SHARED_OBJECT <ID>. If that shared object does not exist it saves the result to append to any definition that may come later.
 
 ==============================================
+{REGISTER_REACTION_CLASS;<ID>;<CLASS>}
+	Adds a [REACTION_CLASS:<CLASS>] tag to a SHARED_OBJECT.
+	Just a specialized version of SHARED_OBJECT_ADD.
+
+==============================================
+{REGISTER_REACTION_PRODUCT;<ID>;<CLASS>;<PRODUCT>}
+	Adds a [MATERIAL_REACTION_PRODUCT:<CLASS>:<PRODUCT>] tag to a SHARED_OBJECT.
+	Just a specialized version of SHARED_OBJECT_ADD.
+
+==============================================
 {SHARED_OBJECT_KILL_TAG;<ID>;<TAG>}
 	Disable all occurrences of <TAG> in shared object <ID>.
 	<TAG> is the ID of the tag you wish to disable, do not add square brackets or specify it's parameters.
@@ -87,65 +159,29 @@ User Templates defined in the "Libs/Base" addon.
 		{SHARED_OBJECT_REPLACE_TAG;SLADE;UNDIGGABLE;[AQUIFER]}
 
 ==============================================
-{REGISTER_REACTION_CLASS;<ID>;<CLASS>}
-	Adds a [REACTION_CLASS:<CLASS>] tag to a SHARED_OBJECT.
-	Just a specialized version of SHARED_OBJECT_ADD.
-
-==============================================
-{REGISTER_REACTION_PRODUCT;<ID>;<CLASS>;<PRODUCT>}
-	Adds a [MATERIAL_REACTION_PRODUCT:<CLASS>:<PRODUCT>] tag to a SHARED_OBJECT.
-	Just a specialized version of SHARED_OBJECT_ADD.
-
-==============================================
-{@IF;<STRING1>;<STRING2>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
-	If <STRING1> and <STRING2> are equal, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned. This is very useful with variables.
-	
-	Example:
-		{IF;$TEST_VAR;YES;[FOO];[BAR]}
-
-==============================================
-{@IF_ACTIVE;<ADDON>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
-	If <ADDON> is active, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
-
-==============================================
-{@IF_CODE;<CODE>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
-	If <CODE> returns true, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
-	(<CODE> may be any valid script code)
-	
-==============================================
-{@IF_SKIP;<STRING1>;<STRING2>}
-	If <STRING1> and <STRING2> are equal then skip the current file.
-
-==============================================
-{@SET;<NAME>;<VALUE>}
-	Sets a variable of name <NAME> to value <VALUE>. Returns nothing.
-
-==============================================
-{!PRINT;<MSG>...}
-{PRINT;<MSG>...}
-{#PRINT;<MSG>...}
-	Writes <MSG> to the console. Each param gets it's own line.
-
-==============================================
-{SET_TILE;<ID>;<TILE>}
-	Sets tile entry <ID> to <TILE>.
+{SET_TILE;<OBJ>;<ID>;<TILE>}
+	Sets tile entry <OBJ>|<ID> to <TILE>.
+	<ID> may be left blank (it is only used to differentiate multiple different entries for the same object).
 	Used to add support for tilesets, first entry "wins".
 
 ==============================================
-{#TILE;<ID>;<DEFAULT>}
-	If a tile entry for <ID> exists return it, else return <DEFAULT>.
+{#TILE;<OBJ>;<ID>;<DEFAULT>}
+	If a tile entry for <OBJ>|<ID> exists return it, else return <DEFAULT>.
 	Use everywhere a tile number is required.
+	<ID> may be left blank (it is only used to differentiate multiple different entries for the same object).
 	In most cases you will not need to use this template as the specialized SHARED_OBJECT templates handle insertion of this template automatically.
 
 ==============================================
-{SET_COLOR;<ID>;<COLOR>}
-	Sets color entry <ID> to <COLOR>.
+{SET_COLOR;<OBJ>;<ID>;<COLOR>}
+	Sets color entry <OBJ>|<ID> to <COLOR>.
+	<ID> may be left blank (it is only used to differentiate multiple different entries for the same object).
 	Used to add support for tilesets, first entry "wins".
 
 ==============================================
-{#COLOR;<ID>;<DEFAULT>}
-	If a color entry for <ID> exists return it, else return <DEFAULT>.
+{#COLOR;<OBJ>;<ID>;<DEFAULT>}
+	If a color entry for <OBJ>|<ID> exists return it, else return <DEFAULT>.
 	Use everywhere a color is required.
+	<ID> may be left blank (it is only used to differentiate multiple different entries for the same object).
 	In most cases you will not need to use this template as the specialized SHARED_OBJECT templates handle insertion of this template automatically.
 
 ==============================================
@@ -427,6 +463,32 @@ User Templates defined in the "Libs/Base" addon.
 	This template interacts at a low level with !ENTITY_PLAYABLE, SHARED_ITEM, BUILDING_WORKSHOP, BUILDING_FURNACE, and REACTION as well as their many variants and supporting templates. Use this template and it's supports in all your entities for maximum compatibility with the standard addons.
 
 ==============================================
+{!ENTITY_PLAYABLE;<ID>;<FORT>;<ADV>;<INDIV>}
+	Sets an entity's playability state.
+	
+	<FORT> is whether or not the entity is playable in fortress mode.
+	<ADV> controls adventure mode playability.
+	<INDIV> is for playing outsiders in adventure mode.
+	Acceptable values are true and false (0 and -1 will work, as will a few other things).
+	
+	<ID> should be the same ID you pass to ADDON_HOOKS.
+	
+	This template interacts at a low level with ADDON_HOOKS, SHARED_ITEM, BUILDING_WORKSHOP, BUILDING_FURNACE, and REACTION as well as their many variants and supporting templates. Use this template and it's supports in all your entities for maximum compatibility with the standard addons.
+
+==============================================
+{ENTITY_PLAYABLE_EDIT;<ID>;<KEY>;<VALUE>}
+	Edits an entity's playability state (as set by !ENTITY_PLAYABLE).
+	
+	<KEY> may be one of FORT, ADV, or INDIV (not case sensitive).
+	Acceptable values are true and false (0 and -1 will work, as will a few other things).
+
+==============================================
+{@IF_ENTITY_PLAYABLE;<ID>;<KEY>;<THEN>;[<ELSE>=""]}
+	If an entity is playable for a specific mode parse <THEN> else parse <ELSE>.
+	
+	<KEY> may be one of FORT, ADV, or INDIV (not case sensitive).
+
+==============================================
 {DFHACK_LOADSCRIPT;<SCRIPTNAME>}
 	Installs and adds for automatic loading the script <SCRIPTNAME>.
 	This only works for scripts added by an addon, already installed scripts should use DFHACK_RUNCOMMAND.
@@ -517,30 +579,3 @@ User Templates defined in the "Libs/Base" addon.
 	Warning! Make sure the file being patched is not processed before patching (unless you know what you are doing), as this can cause parts of the file to not be processed correctly and/or the patch will not apply completely.
 	
 	If a patch cannot cleanly apply then Rubble will abort!
-
-==============================================
-{!ENTITY_PLAYABLE;<ID>;<FORT>;<ADV>;<INDIV>}
-	Sets an entity's playability state.
-	
-	<FORT> is whether or not the entity is playable in fortress mode.
-	<ADV> controls adventure mode playability.
-	<INDIV> is for playing outsiders in adventure mode.
-	Acceptable values are true and false (0 and -1 will work, as will a few other things).
-	
-	<ID> should be the same ID you pass to ADDON_HOOKS.
-	
-	This template interacts at a low level with ADDON_HOOKS, SHARED_ITEM, BUILDING_WORKSHOP, BUILDING_FURNACE, and REACTION as well as their many variants and supporting templates. Use this template and it's supports in all your entities for maximum compatibility with the standard addons.
-
-==============================================
-{ENTITY_PLAYABLE_EDIT;<ID>;<KEY>;<VALUE>}
-	Edits an entity's playability state (as set by !ENTITY_PLAYABLE).
-	
-	<KEY> may be one of FORT, ADV, or INDIV (not case sensitive).
-	Acceptable values are true and false (0 and -1 will work, as will a few other things).
-
-==============================================
-{@IF_ENTITY_PLAYABLE;<ID>;<KEY>;<THEN>;[<ELSE>=""]}
-	If an entity is playable for a specific mode parse <THEN> else parse <ELSE>.
-	
-	<KEY> may be one of FORT, ADV, or INDIV (not case sensitive).
-	Acceptable values are true and false (0 and -1 will work, as will a few other things).

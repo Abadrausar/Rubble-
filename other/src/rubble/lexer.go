@@ -22,17 +22,16 @@ misrepresented as being the original software.
 
 package rubble
 
-// A semi-generic Lexer framework
-type Lexer struct {
+import "dctech/rex"
 
-	// The next/current tokens
-	Look    *Token
-	Current *Token
+type lexer struct {
+	Look    *token
+	Current *token
 
 	source []byte
 
-	pos      *Position
-	tokenpos *Position
+	pos      *rex.Position
+	tokenpos *rex.Position
 
 	index int
 
@@ -45,164 +44,158 @@ type Lexer struct {
 	token int
 }
 
-// Returns a new Lexer.
-func NewLexer(dat []byte, pos *Position) *Lexer {
-	this := new(Lexer)
+func newLexer(dat []byte, pos *rex.Position) *lexer {
+	lex := new(lexer)
 
-	this.Look = NewToken("INVALID", tknINVALID, pos)
-	this.Current = &Token{"INVALID", tknINVALID, pos}
+	lex.Look = &token{"INVALID", tknINVALID, pos}
+	lex.Current = &token{"INVALID", tknINVALID, pos}
 
-	this.source = dat
+	lex.source = dat
 
-	this.pos = pos.Copy()
-	this.tokenpos = pos.Copy()
+	lex.pos = pos.Copy()
+	lex.tokenpos = pos.Copy()
 
-	this.index = 0
+	lex.index = 0
 
-	this.depth = 0
+	lex.depth = 0
 
-	this.commandDepth = 0
+	lex.commandDepth = 0
 
-	this.lexeme = make([]byte, 0, 20)
+	lex.lexeme = make([]byte, 0, 20)
 
-	this.token = tknString
+	lex.token = tknString
 
-	this.Advance()
+	lex.Advance()
 
-	return this
+	return lex
 }
 
 // This advances the Lexer one token.
 // For most purposes use GetToken instead.
-func (this *Lexer) Advance() {
-	if this.index > len(this.source) {
-		this.Current = this.Look
-		//LastLine = this.Current.Pos
-		this.Look = NewToken("INVALID", tknINVALID, this.tokenpos)
+func (lex *lexer) Advance() {
+	if lex.index > len(lex.source) {
+		lex.Current = lex.Look
+		lex.Look = &token{"INVALID", tknINVALID, lex.tokenpos.Copy()}
 		return
 	}
 
-	for ; this.index < len(this.source); this.index++ {
-		dat := this.source
-		i := this.index
-		lookok := len(this.source) - this.index
+	for ; lex.index < len(lex.source); lex.index++ {
+		dat := lex.source
+		i := lex.index
+		lookok := len(lex.source) - lex.index
 
 		if dat[i] == '\n' {
-			this.pos.Line++
-		}
-
-		if this.depth < 0 {
-			panic("Lexer template depth less than 0 (Unmatched curly brackets)")
+			lex.pos.Line++
+			lex.pos.Column = 0
+		} else {
+			lex.pos.Column++
 		}
 
 		if dat[i] == ';' || dat[i] == '{' || dat[i] == '}' {
 			if 0 < i && lookok > 0 {
 				if dat[i-1] == '\'' && dat[i+1] == '\'' {
-					this.lexeme = append(this.lexeme, dat[i])
+					lex.lexeme = append(lex.lexeme, dat[i])
 					continue
 				}
 			}
 
-			if len(this.lexeme) > 0 && this.depth == 0 {
-				this.Current = this.Look
-				//LastLine = this.Current.Pos
-				this.Look = NewToken(string(this.lexeme), tknString, this.tokenpos)
+			if len(lex.lexeme) > 0 && lex.depth == 0 {
+				lex.Current = lex.Look
+				lex.Look = &token{string(lex.lexeme), tknString, lex.tokenpos.Copy()}
 
-				this.tokenpos = this.pos.Copy()
-				this.lexeme = this.lexeme[0:0]
+				lex.tokenpos = lex.pos.Copy()
+				lex.lexeme = lex.lexeme[0:0]
 				return
 			}
 		}
 
 		if dat[i] == ';' || dat[i] == '}' {
-			if len(this.lexeme) > 0 && this.depth == 1 {
-				this.Current = this.Look
-				//LastLine = this.Current.Pos
-				this.Look = NewToken(string(this.lexeme), tknString, this.tokenpos)
+			if len(lex.lexeme) > 0 && lex.depth == 1 {
+				lex.Current = lex.Look
+				lex.Look = &token{string(lex.lexeme), tknString, lex.tokenpos.Copy()}
 
-				this.tokenpos = this.pos.Copy()
-				this.lexeme = this.lexeme[0:0]
+				lex.tokenpos = lex.pos.Copy()
+				lex.lexeme = lex.lexeme[0:0]
 				return
 			}
 		}
 
 		if dat[i] == ';' {
-			if this.depth != 1 {
-				this.lexeme = append(this.lexeme, dat[i])
+			if lex.depth != 1 {
+				lex.lexeme = append(lex.lexeme, dat[i])
 				continue
 			}
 
-			this.Current = this.Look
-			//LastLine = this.Current.Pos
-			this.Look = NewToken(";", tknDelimiter, this.tokenpos)
-			this.tokenpos = this.pos.Copy()
-			this.lexeme = this.lexeme[0:0]
-			this.index++
+			lex.Current = lex.Look
+			lex.Look = &token{";", tknDelimiter, lex.tokenpos.Copy()}
+			lex.tokenpos = lex.pos.Copy()
+			lex.lexeme = lex.lexeme[0:0]
+			lex.index++
 			return
 		}
 
 		if dat[i] == '{' {
-			this.depth++
-			if this.depth > 1 {
-				this.lexeme = append(this.lexeme, dat[i])
+			lex.depth++
+			if lex.depth > 1 {
+				lex.lexeme = append(lex.lexeme, dat[i])
 				continue
 			}
 
-			this.Current = this.Look
-			//LastLine = this.Current.Pos
-			this.Look = NewToken("{", tknTagBegin, this.tokenpos)
-			this.tokenpos = this.pos.Copy()
-			this.lexeme = this.lexeme[0:0]
-			this.index++
+			lex.Current = lex.Look
+			lex.Look = &token{"{", tknTagBegin, lex.tokenpos.Copy()}
+			lex.tokenpos = lex.pos.Copy()
+			lex.lexeme = lex.lexeme[0:0]
+			lex.index++
 			return
 		}
 
 		if dat[i] == '}' {
-			this.depth--
-			if this.depth != 0 {
-				this.lexeme = append(this.lexeme, dat[i])
+			lex.depth--
+			if lex.depth != 0 {
+				if lex.depth < 0 {
+					lex.depth = 0
+				}
+				lex.lexeme = append(lex.lexeme, dat[i])
 				continue
 			}
 
-			this.Current = this.Look
-			//LastLine = this.Current.Pos
-			this.Look = NewToken("}", tknTagEnd, this.tokenpos)
-			this.tokenpos = this.pos.Copy()
-			this.lexeme = this.lexeme[0:0]
-			this.index++
+			lex.Current = lex.Look
+			lex.Look = &token{"}", tknTagEnd, lex.tokenpos.Copy()}
+			lex.tokenpos = lex.pos.Copy()
+			lex.lexeme = lex.lexeme[0:0]
+			lex.index++
 			return
 		}
 
-		this.lexeme = append(this.lexeme, dat[i])
+		lex.lexeme = append(lex.lexeme, dat[i])
 	}
 
-	if this.index == len(this.source) {
-		this.Current = this.Look
-		//LastLine = this.Current.Pos
-		this.Look = NewToken(string(this.lexeme), tknString, this.tokenpos)
-		this.index++
+	if lex.index == len(lex.source) {
+		lex.Current = lex.Look
+		lex.Look = &token{string(lex.lexeme), tknString, lex.tokenpos.Copy()}
+		lex.index++
 		return
 	}
 }
 
 // Gets the next token, and panics with an error if it's not of type tokenType.
 // Used as a type checked Advance
-func (this *Lexer) GetToken(tokenTypes ...int) {
-	this.Advance()
+func (lex *lexer) GetToken(tokenTypes ...int) {
+	lex.Advance()
 
 	for _, val := range tokenTypes {
-		if this.Current.Type == val {
+		if lex.Current.Type == val {
 			return
 		}
 	}
 
-	ExitOnTokenExpected(this.Current, tokenTypes...)
+	exitOnTokenExpected(lex.Current, tokenTypes...)
 }
 
 // Checks to see if the look ahead is one of tokenTypes and if so returns true
-func (this *Lexer) CheckLookAhead(tokenTypes ...int) bool {
+func (lex *lexer) CheckLookAhead(tokenTypes ...int) bool {
 	for _, val := range tokenTypes {
-		if this.Look.Type == val {
+		if lex.Look.Type == val {
 			return true
 		}
 	}

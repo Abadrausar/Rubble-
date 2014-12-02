@@ -34,66 +34,38 @@ type OSDir struct {
 }
 
 // NewOSDir creates a new OS AXIS directory interface.
-func NewOSDir(path string) (DataSource, error) {
+func NewOSDir(path string) DataSource {
 	dir := new(OSDir)
 	dir.path = filepath.ToSlash(path)
-	
-	info, err := os.Lstat(dir.path)
-	if err != nil {
-		return nil, err
-	}
-	if !info.IsDir() {
-		return nil, NewError(ErrNotDir, path)
-	}
-	return dir, nil
+	return dir
 }
 
-func (dir *OSDir) IsDir(path string) bool {
-	path, err := Sanitize(path)
-	if err != nil {
-		return false
-	}
-	
-	info, err := os.Lstat(dir.path + "/" + path)
+func (dir *OSDir) IsDir(path *Path) bool {
+	info, err := os.Lstat(dir.path + "/" + path.Remainder())
 	if err != nil {
 		return false
 	}
 	return info.IsDir()
 }
 
-func (dir *OSDir) Exists(path string) bool {
-	path, err := Sanitize(path)
-	if err != nil {
-		return false
-	}
-	
-	_, err = os.Lstat(dir.path + "/" + path)
+func (dir *OSDir) Exists(path *Path) bool {
+	_, err := os.Lstat(dir.path + "/" + path.Remainder())
 	if err != nil {
 		return false
 	}
 	return true
 }
 
-func (dir *OSDir) Delete(path string) error {
-	path, err := Sanitize(path)
-	if err != nil {
-		return err
-	}
-	
-	return os.Remove(dir.path + "/" + path)
+func (dir *OSDir) Delete(path *Path) error {
+	return os.Remove(dir.path + "/" + path.Remainder())
 }
 
-func (dir *OSDir) Create(path string) error {
-	path, err := Sanitize(path)
+func (dir *OSDir) Create(path *Path) error {
+	err := os.MkdirAll(gopath.Dir(dir.path + "/" + path.Remainder()), 0666)
 	if err != nil {
 		return err
 	}
-	
-	err = os.MkdirAll(gopath.Dir(dir.path + "/" + path), 0666)
-	if err != nil {
-		return err
-	}
-	f, err := os.Create(dir.path + "/" + path)
+	f, err := os.Create(dir.path + "/" + path.Remainder())
 	if err != nil {
 		return err
 	}
@@ -101,16 +73,8 @@ func (dir *OSDir) Create(path string) error {
 	return nil
 }
 
-func (dir *OSDir) ListDir(path string) []string {
-	path, err := Sanitize(path)
-	if err != nil {
-		return make([]string, 0)
-	}
-	if path == "" {
-		path = "."
-	}
-
-	files, err := ioutil.ReadDir(dir.path + "/" + path)
+func (dir *OSDir) ListDir(path *Path) []string {
+	files, err := ioutil.ReadDir(dir.path + "/" + path.Remainder())
 	if err != nil {
 		return make([]string, 0)
 	}
@@ -124,16 +88,8 @@ func (dir *OSDir) ListDir(path string) []string {
 	return rtn
 }
 
-func (dir *OSDir) ListFile(path string) []string {
-	path, err := Sanitize(path)
-	if err != nil {
-		return make([]string, 0)
-	}
-	if path == "" {
-		path = "."
-	}
-
-	files, err := ioutil.ReadDir(dir.path + "/" + path)
+func (dir *OSDir) ListFile(path *Path) []string {
+	files, err := ioutil.ReadDir(dir.path + "/" + path.Remainder())
 	if err != nil {
 		return make([]string, 0)
 	}
@@ -147,21 +103,11 @@ func (dir *OSDir) ListFile(path string) []string {
 	return rtn
 }
 
-func (dir *OSDir) Read(path string) (io.ReadCloser, error) {
-	path, err := Sanitize(path)
-	if err != nil {
-		return nil, err
-	}
-	
-	return os.Open(dir.path + "/" + path)
+func (dir *OSDir) Read(path *Path) (io.ReadCloser, error) {
+	return os.Open(dir.path + "/" + path.Remainder())
 }
 
-func (dir *OSDir) ReadAll(path string) ([]byte, error) {
-	path, err := Sanitize(path)
-	if err != nil {
-		return nil, err
-	}
-	
+func (dir *OSDir) ReadAll(path *Path) ([]byte, error) {
 	reader, err := dir.Read(path)
 	defer reader.Close()
 	if err != nil {
@@ -171,21 +117,11 @@ func (dir *OSDir) ReadAll(path string) ([]byte, error) {
 	return content, err
 }
 
-func (dir *OSDir) Write(path string) (io.WriteCloser, error) {
-	path, err := Sanitize(path)
-	if err != nil {
-		return nil, err
-	}
-	
-	return os.Create(dir.path + "/" + path)
+func (dir *OSDir) Write(path *Path) (io.WriteCloser, error) {
+	return os.Create(dir.path + "/" + path.Remainder())
 }
 
-func (dir *OSDir) WriteAll(path string, content []byte) error {
-	path, err := Sanitize(path)
-	if err != nil {
-		return err
-	}
-	
+func (dir *OSDir) WriteAll(path *Path, content []byte) error {
 	writer, err := dir.Write(path)
 	defer writer.Close()
 	if err != nil {

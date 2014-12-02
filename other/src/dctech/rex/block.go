@@ -27,123 +27,164 @@ package rex
 // Code is a block of opCodes with meta-data.
 type Code struct {
 	data     []*opCode      // The actual code...
-	parent   *Code          // This code block's containing block, used for name lookup.
-	ntoi     map[string]int // local variables offset from the block start, lookup by name.
-	iton     []string       // local variable names, lookup by offset from the block start.
-	defaults []*Value       // Default values for variables in this block, normally each slot is nil.
-	
-	// This is normally 0, but for blocks created with block or command it contains 
-	// the parameter count (-1 for variable, eg a single sarray named params).
-	params   int
-
-	entoi    map[string]int // external local variables offset from the block start, lookup by name.
-	eiton    []string       // external local variable names, lookup by offset from the block start.
+	meta     *blockMeta     // Block variable information
+	params   *blockParams   // Block parameter information (may be nil)
 }
 
-// NewCode creates an empty Code block, ready to use as a compiler target,
-func NewCode(parent *Code) *Code {
-	code := new(Code)
-	code.data = make([]*opCode, 0, 100)
-	code.parent = parent
-	code.ntoi = make(map[string]int, 10)
-	code.iton = make([]string, 0, 10)
-	code.defaults = make([]*Value, 0, 10)
-	code.entoi = make(map[string]int, 10)
-	code.eiton = make([]string, 0, 10)
-	return code
+func NewCode() *Code {
+	block := new(Code)
+	block.data = make([]*opCode, 0, 100)
+	block.meta = newBlockMeta()
+	return block
 }
 
-// NewCodeShell creates new Code block with the meta-data from source.
-// Use for things like interactive shells where variables need to stick around.
 func NewCodeShell(source *Code) *Code {
-	code := new(Code)
-	code.data = make([]*opCode, 0, 100)
 	if source == nil {
-		code.parent = nil
-		code.ntoi = make(map[string]int, 10)
-		code.iton = make([]string, 0, 10)
-		code.defaults = make([]*Value, 0, 10)
-		code.entoi = make(map[string]int, 10)
-		code.eiton = make([]string, 0, 10)
-	} else {
-		code.parent = source.parent
-		code.ntoi = make(map[string]int, len(source.ntoi))
-		code.iton = make([]string, len(source.iton))
-		code.defaults = make([]*Value, len(source.defaults))
-		code.entoi = make(map[string]int, len(source.entoi))
-		code.eiton = make([]string, len(source.eiton))
-		
-		for i := range source.ntoi {
-			code.ntoi[i] = source.ntoi[i]
-		}
-		copy(code.iton, source.iton)
-		
-		copy(code.defaults, source.defaults)
-		
-		for i := range source.entoi {
-			code.entoi[i] = source.entoi[i]
-		}
-		copy(code.eiton, source.eiton)
+		return NewCode()
 	}
-	return code
+	
+	block := new(Code)
+	block.data = make([]*opCode, 0, 100)
+	block.meta = source.meta.dup()
+	if source.params != nil {
+		block.params = source.params.dup()
+	}
+	return block
 }
 
 // addOp adds an opCode to the block.
-func (code *Code) addOp(op *opCode) {
-	code.data = append(code.data, op)
+func (block *Code) addOp(op *opCode) {
+	block.data = append(block.data, op)
 }
 
-// String prints all the opcodes in the code block.
-func (code *Code) String() string {
+// String prints all the opcodes in the block.
+func (block *Code) String() string {
 	out := ""
-	for _, op := range code.data {
+	for _, op := range block.data {
 		out += " " + op.String()
 	}
 	return out
 }
 
+func (block *Code) addParam(name string, val *Value) {
+	if block.params == nil {
+		block.params = newBlockParams()
+	}
+	
+	i := block.meta.add(name)
+	block.params.add(name, val, i)
+}
+
+// ===========================================================================================
+
+type blockMeta struct {
+	ntoi     map[string]int // local variables offset from the block start, lookup by name.
+	iton     []string       // local variable names, lookup by offset from the block start.
+	
+	entoi    map[string]int // external local variables offset from the block start, lookup by name.
+	eiton    []string       // external local variable names, lookup by offset from the block start.
+}
+
+func newBlockMeta() *blockMeta {
+	meta := new(blockMeta)
+	meta.ntoi = make(map[string]int, 10)
+	meta.iton = make([]string, 0, 10)
+	meta.entoi = make(map[string]int, 10)
+	meta.eiton = make([]string, 0, 10)
+	return meta
+}
+
+func (source *blockMeta) dup() *blockMeta {
+	meta := new(blockMeta)
+	meta.ntoi = make(map[string]int, len(source.ntoi))
+	meta.iton = make([]string, len(source.iton))
+	meta.entoi = make(map[string]int, len(source.entoi))
+	meta.eiton = make([]string, len(source.eiton))
+	
+	for i := range source.ntoi {
+		meta.ntoi[i] = source.ntoi[i]
+	}
+	copy(meta.iton, source.iton)
+	
+	for i := range source.entoi {
+		meta.entoi[i] = source.entoi[i]
+	}
+	copy(meta.eiton, source.eiton)
+	return meta
+}
+
 // lookup returns the local index of a local or external variable by name.
-func (code *Code) lookup(name string) int {
-	if i, ok := code.ntoi[name]; ok {
+func (meta *blockMeta) lookup(name string) int {
+	if i, ok := meta.ntoi[name]; ok {
 		return i
 	}
 
-	if i, ok := code.entoi[name]; ok {
+	if i, ok := meta.entoi[name]; ok {
 		return 0 - (i + 1)
 	}
 
-	index := len(code.eiton)
-	code.entoi[name] = index
-	code.eiton = append(code.eiton, name)
+	index := len(meta.eiton)
+	meta.entoi[name] = index
+	meta.eiton = append(meta.eiton, name)
 	return 0 - (index + 1)
 }
 
 // add is used for adding meta-data for a new local variable.
-func (code *Code) add(name string) int {
-	if _, ok := code.ntoi[name]; ok {
+func (meta *blockMeta) add(name string) int {
+	if _, ok := meta.ntoi[name]; ok {
 		RaiseError("Local Value slot already exists.")
 	}
 
-	index := len(code.iton)
-	code.ntoi[name] = index
-	code.iton = append(code.iton, name)
-	code.defaults = append(code.defaults, nil)
+	index := len(meta.iton)
+	meta.ntoi[name] = index
+	meta.iton = append(meta.iton, name)
 	return index
 }
 
-// addDefault is used for adding meta-data for a new local variable that has a default value.
-// (in practice this is used for parameters only)
-func (code *Code) addDefault(name string, def *Value) int {
-	if _, ok := code.ntoi[name]; ok {
-		RaiseError("Local Value slot already exists.")
+// ===========================================================================================
+
+type blockParams struct {
+	ntoi     map[string]int // Name to param index
+	iton     []string       // index to param name
+	itov     []int          // index to local variable index
+	defaults []*Value       // Parameter default values (non-optional params have a nil value here)
+}
+
+func newBlockParams() *blockParams {
+	meta := new(blockParams)
+	meta.ntoi = make(map[string]int, 5)
+	meta.iton = make([]string, 0, 5)
+	meta.itov = make([]int, 0, 5)
+	meta.defaults = make([]*Value, 0, 5)
+	return meta
+}
+
+func (source *blockParams) dup() *blockParams {
+	meta := new(blockParams)
+	meta.ntoi = make(map[string]int, len(source.ntoi))
+	meta.iton = make([]string, len(source.iton))
+	meta.itov = make([]int, len(source.itov))
+	
+	for i := range source.ntoi {
+		meta.ntoi[i] = source.ntoi[i]
 	}
-
-	index := len(code.iton)
-	code.ntoi[name] = index
-	code.iton = append(code.iton, name)
-	code.defaults = append(code.defaults, def)
-	return index
+	copy(meta.iton, source.iton)
+	copy(meta.itov, source.itov)
+	return meta
 }
+
+func (meta *blockParams) add(name string, val *Value, vIndex int) {
+	if _, ok := meta.ntoi[name]; ok {
+		RaiseError("Parameter slot already exists.")
+	}
+	
+	meta.ntoi[name] = len(meta.iton)
+	meta.iton = append(meta.iton, name)
+	meta.itov = append(meta.itov, vIndex)
+	meta.defaults = append(meta.defaults, val)
+}
+
+// ===========================================================================================
 
 // Code Reader
 
@@ -178,8 +219,8 @@ func (code *codeReader) current() *opCode {
 
 // lookAhead returns the next opCode.
 func (code *codeReader) lookAhead() *opCode {
-	if code.index+1 < code.length {
-		return code.data.data[code.index+1]
+	if code.index + 1 < code.length {
+		return code.data.data[code.index + 1]
 	}
 	return &opCode{Type: opINVALID}
 }
@@ -209,7 +250,7 @@ func (code *codeReader) checkLookAhead(types ...int) bool {
 	return false
 }
 
-// lookAhead returns the next opCode.
+// beginning finds the beginning tag of a construct based on it's end tag.
 func (code *codeReader) beginning(end *opCode) *opCode {
 	start := -1 
 	switch end.Type {

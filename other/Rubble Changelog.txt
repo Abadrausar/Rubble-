@@ -2,6 +2,60 @@
 ==============================================
 Changelog:
 ==============================================
+v5.2 (for DF 40.13)
+	Changed "User/Saurian" entity values a little, they should now dream about things other than becoming a legendary warrior.
+		Saurians are still properly warlike, they just have more other interests now.
+	Fixed Reaction permissions for "User/Saurian", saurians should now be able to brew alcohol and process plants to bags.
+	Fixed the saurian creature's body (it had a few "issues"), this should fix saurians having 5 pairs of gloves and shoes.
+	Added a few more scale color options for saurians.
+	Made a much needed update to the Notepad++ UDL file.
+	Reordered the entries in the "Rubble Base Templates" documentation file to group templates by theme.
+		I also made minor corrections and edits to most (if not all) of the other documentation.
+	Updated to the latest Rex version.
+		This version brings two major changes:
+			Better variadic command/block parameters (to keep old code going replace "..." with "params=...").
+			The ability to specify optional command parameters out of order (by name).
+		And several relatively minor ones:
+			Failed local variable lookups will now fail over to looking the variable up in the global module.
+			ALL global data is now stored in the global module.
+			New bool:sand and bool:sor short-circuit evaluation boolean logic commands.
+			New "struct" type indexable, basically a map that cannot have new keys added that is created from a template.
+		See "Rex Docs/Rex Basics" for details.
+	Added the missing "thread" script commands, I could have sworn I had already included them...
+	Fixed all script code to use the new variadic parameter syntax.
+	Fixed a bug that caused "User/DFHack/Steam" to not work when a research addon was activated.
+	Fixed several bugs in "Libs/Research", I *thought* it worked. I thought wrong.
+	Removed the old (depreciated) GUI, use the web UI.
+	Errors are now tied to a position (which may be WAY off, so user beware).
+		In general error positions should be more-or-less correct, but sadly unless I rewrite large parts of Rubble
+		they will never be as good as the positions reported by Rex (Rex errors are almost always spot on).
+	Rubble now uses rex.Value and rex.Position internally rather than use it's custom (less flexible) versions.
+	Removed the only remaining native template (!TEMPLATE), it is now a script template (backed by a native Rex command).
+	Added rubble:usertemplate script command, allows you to make user templates (like what !TEMPLATE makes) from scripts.
+	Removed support for native templates.
+	The lexer now resets and continues when it finds unmatched curly brackets (this only applies to extra closing brackets).
+	The stage parser now enforces correct template syntax ALL the time, not just when the template name is valid.
+		All opening curly brackets MUST have a matching closing bracket (the old way could cause weird bugs).
+		Opening brackets in single-quote character entities are not effected by this change (they are still ignored).
+	The above two changes fix the "panic attack" Rubble would have if you had unmatched curly brackets.
+	Rubble should now be able to load zipped addons from the Internet by URL (using .webload files), see "Rubble Basics".
+		This is mostly untested (I don't have Internet), but it works fine with a simple HTTP server running on localhost.
+	The "addons:zip:" AXIS DataSource is now created (or recreated!) just before addons are loaded.
+		This allows zip file addons that were added after Rubble has started to be loaded when the other addons are.
+		This change allows web load addons and makes the web UI more consistent.
+	Updated to the latest version of AXIS VFS (major internal changes, but the script API is unchanged).
+	Changed the syntax of the basic tileset templates a little (they now take a third parameter).
+	Changed the "Dev/Tileset/Insert" and "Base" addons to match the tileset template changes.
+		No other addons needed to be updated.
+	All interfaces now have slightly more user-friendly handling of unrecovered errors.
+		The error and program stack trace is now written to the log file (please upload your log if you get an error!).
+		(It is my fondest wish that users never see this change in action!)
+	Moved the shared file "wood_additions.rbl" to it's own addon "Libs/Wood Additions".
+	All addons that used the "wood_additions.rbl" file now use the "Libs/Wood Additions" addon.
+	Removed many addons from the addon list file, to get the real up-to-date list see the web UI addon list page.
+		This file is mostly for posting to the forum, it is not updated except in the most general way.
+	Both parts of the addon description in the web UI use the same font now.
+
 v5.1 (for DF 40.13)
 	Updated the base to DF 40.13
 		40.12's change log lists certain changes that are listed in 40.13's change log as being made in 40.13.

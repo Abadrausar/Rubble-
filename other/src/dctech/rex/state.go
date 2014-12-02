@@ -30,23 +30,20 @@ import "strings"
 // State handles all global script data and settings.
 // The majority of the fields are exported for the use of commands only.
 type State struct {
-	modules   *moduleStore
-	global    *Module
-	types     *typeStore
-	NoRecover bool      // Do not recover errors, this makes it easier to debug internal errors.
+	global    *Module   // The module that stores all global data
 	Output    io.Writer // Normally set to os.Stdout, this can be changed to redirect to a log file or the like.
+	NoRecover bool      // Do not recover errors, this makes it easier to debug internal errors.
 }
 
 // NewState creates (and initializes) a new state.
 func NewState() *State {
-	mod := newModuleStore()
 	globals := newModule()
-	mod.add("global", globals)
+	
+	// Provide a self reference for use when declaring global script variables.
+	globals.modules.add("global", globals)
 	
 	return &State{
-		modules: mod,
 		global: globals,
-		types: newTypeStore(),
 		Output: os.Stdout,
 	}
 }
@@ -60,23 +57,19 @@ func (state *State) RegisterCommand(name string, handler NativeCommand) {
 
 // RegisterType registers a new global indexable type.
 func (state *State) RegisterType(name string, typ ObjectFactory) {
-	state.types.add(name, typ)
+	state.global.RegisterType(name, typ)
 }
 
 // RegisterModule creates a new global module.
 // The module is returned so that it can be immediately used to register global data.
 func (state *State) RegisterModule(name string) *Module {
-	index := state.modules.add(name, newModule())
-	return state.modules.get(index)
+	return state.global.RegisterModule(name)
 }
 
 // FetchModule will retrieve a module by name.
 // Returns nil if the module does not exist.
 func (state *State) FetchModule(name string) *Module {
-	if !state.modules.exists(name) {
-		return nil
-	}
-	return state.modules.get(state.modules.lookup(name))
+	return state.global.FetchModule(name)
 }
 
 // FetchVariable will retrieve a module variable or command by name.
@@ -201,7 +194,7 @@ func (state *State) Run(script *Script, code *Value) (ret *Value, err error) {
 	}
 	block := code.Data.(*Code)
 	
-	script.Locals.Add(block)
+	script.Locals.Add(state, block)
 	script.Exec(block)
 	ret = script.RetVal
 	script.Locals.Remove()
@@ -222,7 +215,7 @@ func (state *State) RunShell(script *Script, code *Value) (ret *Value, err error
 	block := code.Data.(*Code)
 	
 	script.Locals.RemoveNoClear()
-	script.Locals.Add(block)
+	script.Locals.Add(state, block)
 	script.Exec(block)
 	ret = script.RetVal
 	return
@@ -253,7 +246,7 @@ func (state *State) RunCommand(script *Script, code *Value, params []*Value) (re
 	if code.Type != TypCode && code.Type != TypCommand {
 		RaiseError("Attempt to run non-executable Value.")
 	}
-	code.call(script, params)
+	code.call(script, nil, params)
 	ret = script.RetVal
 	return
 }

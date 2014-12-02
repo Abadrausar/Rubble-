@@ -1772,7 +1772,7 @@ Green tree frogs were sponsored by the generous contributions of the Bay 12 comm
 	[DESCRIPTION:A tiny amphibian that lives in the trees.]
 	[NAME:green tree frog:green tree frogs:green tree frog]
 	[CASTE_NAME:green tree frog:green tree frogs:green tree frog]
-	[CREATURE_TILE:{#TILE;GREEN_TREE_FROG;249}][COLOR:{#COLOR;GREEN_TREE_FROG;2:0:1}]
+	[CREATURE_TILE:{#TILE;GREEN_TREE_FROG;;249}][COLOR:{#COLOR;GREEN_TREE_FROG;;2:0:1}]
 	[PETVALUE:10]
 	[VERMIN_GROUNDER][FREQUENCY:100]
 	[AMPHIBIOUS][SMALL_REMAINS][NO_WINTER][UNDERSWIM]

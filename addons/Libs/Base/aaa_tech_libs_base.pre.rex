@@ -96,7 +96,7 @@ command rubble:uses_buildings params {
 	})
 	(str:trimspace [out])
 }
-(rubble:template "#USES_BUILDINGS" block ... {(rubble:uses_buildings [params])})
+(rubble:template "#USES_BUILDINGS" block params=... {(rubble:uses_buildings [params])})
 
 var rubble:reaction_data = <map>
 var rubble:reaction_ban_data = <map>
@@ -202,8 +202,8 @@ command rubble:uses_reactions params {
 	})
 	(str:trimspace [out])
 }
-(rubble:template "#USES_REACTIONS" block ... {(rubble:uses_reactions [params])})
-(rubble:template "#USES_TECH" block ... {
+(rubble:template "#USES_REACTIONS" block params=... {(rubble:uses_reactions [params])})
+(rubble:template "#USES_TECH" block params=... {
 	(if (int:lt (len [params]) 1){(rubble:abort "Error: Invalid param count to #USES_TECH.")})
 	
 	[out = (str:add [out] (rubble:uses_buildings [params]) "\n")]

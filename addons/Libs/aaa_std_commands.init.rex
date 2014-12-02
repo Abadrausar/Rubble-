@@ -5,7 +5,7 @@
 
 # Placeholder template generator.
 command rubble:placeholder name {
-	(rubble:template [name] block ... {
+	(rubble:template [name] block a=... {
 		"Library template addon disabled."
 	})
 }

@@ -8,7 +8,7 @@ Tutorial 1: Basics
 
 This tutorial introduces a few of the basic Rubble templates and explains how to create a simple addon.
 
-In this tutorial I will be recreating the Better Dorfs Bonfire addon.
+In this tutorial I will be recreating the "User/Bonfire" addon.
 
 The bonfire is a simple furnace that lets you create two kinds of burning objects, one that burns out fairly quickly and one that burns for quite a while.
 
@@ -103,7 +103,7 @@ Create a new file (name it "inorganic_bonfire_tutorial.txt") and paste the follo
 Wow, what's this SHARED_INORGANIC thing? That is one of the SHARED_OBJECT templates. SHARED_OBJECT (and the templates based off of it, like SHARED_INORGANIC) provides a mechanism for replacing or modifying objects from other addons. In this case it's not terribly useful, but using it every time you can is a good habit to get into. I will not go into detail about exactly what SHARED_OBJECT (or it's children) does, as that would take far too much time. I suggest you go read the documentation for the "Base Templates" for the whole story.
 
 Now there is one last detail, "How exactly do I make my building/reactions usable?". To put it simply, you already have.
-Earlier I mentioned the ADDON_HOOKS template, this very useful template is already in every entity in the Base/Files addon. Basically ADDON_HOOKS adds calls to all the required templates to insert entity permissions for items, reactions, and buildings for the following classes:
+Earlier I mentioned the ADDON_HOOKS template, this very useful template is already in every entity in the "Base" addon. Basically ADDON_HOOKS adds calls to all the required templates to insert entity permissions for items, reactions, and buildings for the following classes:
 ADDON_HOOK_GENERIC
 ADDON_HOOK_<entity name> (For example ADDON_HOOK_MOUNTAIN or ADDON_HOOK_PLAINS)
 and if the entity is playable (dwarves only by default) ADDON_HOOK_PLAYABLE
@@ -163,12 +163,14 @@ Tutorial 3: Some Basic Script Commands and Concepts
 Rubble includes powerful scripting support, almost everything can be controlled via scripting at some level.
 The only "issue" is that rather than a popular scripting language like Lua or Python, Rubble uses a custom language named Rex.
 
+Rex is a general purpose embedded scripting language that I use in most of my major projects. Rubble uses Rex extensively behind the scenes, almost every part of Rubble integrates with Rex at some level, for example EVERY template is either created by a Rex command or implemented directly by one.
+
 There are three main reasons I use Rex:
 	It is really easy to embed with the language I wrote Rubble in.
 	I know it very well (after all I wrote it :p).
 	Most of the integration work was already done as part of other projects.
 
-The only real drawback to using Rex is that I am the only person who really knows how to use it, this tutorial should help fix that.
+The only real drawback to using Rex is that very few people know how to use it, this tutorial should help fix that.
 
 It is a very good idea to read "Rex Docs/Rex Basics.txt" along side this file, as that file has all the basic documentation for the Rex language, this tutorial is only to help fill in holes and expand upon the things in that document.
 
@@ -185,7 +187,7 @@ Some Important Commands:
 		(if true {(ret a)}{(ret b)})
 		(if true {(ret a)})
 		
-		if is the main conditional command in Rex. It is very simple and used all over, just like the if statements in most languages.
+		if is the main (only!) conditional command in Rex. It is very simple and used all over, just like the if statements in most languages.
 		
 		One important thing to keep in mind is that, like all commands, if returns a value! This means that cool things like the following can be done:
 		(str:add "[NAME:Make Something" (if (int:eq [count] 0){""}{(str:add " (" [count] ")")}) "]")
@@ -194,12 +196,20 @@ Some Important Commands:
 		(if count == 0) "[NAME:Make Something]"
 		(if count == 5) "[NAME:Make Something (5)]"
 		
+		Generally when you need to invert the condition the convention is not to use bool:not and instead just include an empty "then" block:
+		(if true {}{
+			do something...
+		})
+		This is shorter, but maybe not as clear, look for empty blocks when reading the default addon scripts!
+		
 	loop code
 		(loop {
 			false
 		})
 		
 		loop is the basic looping command, it will run it's code block until it returns false. This means that loop and if are close companions, the vast majority of loop commands will consists of a single if command that surrounds the actual loop body.
+		
+		loop is actually really rare, foreach is FAR more common.
 	
 	foreach indexable code
 		(foreach <array a b c> block key value {
@@ -239,6 +249,20 @@ Some Important Commands:
 		
 		The basic boolean operations, I don't use these much, but when you need them you need them.
 		In any case not much to say, if you don't know what these are then you need to go read a beginners programming book (any one will do).
+		
+		These are fairly uncommon, as since these commands do not support short-circuit evaluation most times you will need to use nested if commands or the short-circuit versions (and bool:not is avoided by the empty-then convention).
+	
+	bool:sand a b, bool:sor a b
+		(bool:sand {true} {false}) # false
+		(bool:sor {false} {true}) # true
+		
+		These are sorta like bool:and and bool:or, but they take code values instead of bool values and do short-circuit evaluation.
+		The code values are required so that evaluation may be delayed until during the command call.
+		
+		Short-circuit evaluation means that after the first parameter is evaluated if it is obvious what the result will be the second parameter will be ignored, this means that the following may be done:
+			(if (bool:sand {(exists [a] [x])} {(exists [a [x]] [y])}) {
+				# do something to [a [x] [y]]
+			})
 	
 	expr expression values...
 		(expr "a+b" 1 3) # 4
@@ -268,12 +292,12 @@ For details on how to use the templates mentioned here see the "Base Templates" 
 So you want your cool new mod to support tilesets other than the default? Good thing Rubble goes out of its way to make that easy.
 
 There are 4 core templates that provide support for tilesets:
-	{#TILE;<ID>;<DEFAULT>}
-	{SET_TILE;<ID>;<TILE>}
-	{#COLOR;<ID>;<DEFAULT>}
-	{SET_COLOR;<ID>;<COLOR>}
+	{#TILE;<OBJ>;<ID>;<DEFAULT>}
+	{SET_TILE;<OBJ>;<ID>;<TILE>}
+	{#COLOR;<OBJ>;<ID>;<DEFAULT>}
+	{SET_COLOR;<OBJ>;<ID>;<COLOR>}
 
-(The SET_XXX templates insert a entry in the tile or color dictionary that is later retrieved by the #TILE or #COLOR template with the same <ID>, if no entry for <ID> is present in the dictionary <DEFAULT> is used.)
+(The SET_XXX templates insert a entry in the tile or color dictionary that is later retrieved by the #TILE or #COLOR template with the same <OBJ> and <ID>, if no entry for the <OBJ> and <ID> is present in the dictionary <DEFAULT> is used.)
 
 These templates are a little cumbersome to use but you don't have to. All the specialized SHARED_OBJECT templates will detect tile and color information in their contents and automatically insert calls to #TILE and #COLOR as needed.
 This means that you do not need explicit calls to #TILE or #COLOR as plants, inorganics, tools, and material definitions are handled automatically. Vermin creatures also have some tile information included, but as there is no SHARED_OBJECT template for creatures you will have to insert the tileset templates by hand if you need to edit vermin tile numbers, lucky you there is an addon that mostly automates this.
@@ -476,7 +500,7 @@ The tag ID is: BAZ
 Raws: [FOO][BAR][BAZ]
 [/code]
 
-Although in most cases the tag values generated by the two parser look and act much the same they are very different!
+Although in most cases the tag values generated by the two parsers look and act much the same they are very different!
 
 The "fast" parser (df:raw:walk) supports the following fields:
 	Write-Only:

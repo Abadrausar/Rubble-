@@ -27,6 +27,10 @@ import "strings"
 import "strconv"
 import "io/ioutil"
 
+import "fmt"
+
+import "net/http"
+
 import "dctech/rex"
 import "dctech/rex/genii"
 import "dctech/rex/commands/base"
@@ -46,6 +50,8 @@ import "dctech/rex/commands/png"
 import "dctech/rex/commands/regex"
 import "dctech/rex/commands/sort"
 import "dctech/rex/commands/str"
+import "dctech/rex/commands/structure"
+import "dctech/rex/commands/thread"
 
 import "dctech/rexdfraw"
 
@@ -59,6 +65,7 @@ import "rubble/rblutil"
 // (all the listed versions are assumed to be backwards compatible)
 // Index 0 MUST be the current version!
 var Versions = []string{
+	"5.2",
 	"5.1",
 	"5.0",
 	"4.7",
@@ -71,13 +78,6 @@ var Versions = []string{
 	"4.0",
 	"pre4",
 }
-
-// Abort is a "marker type", eg it is used to discriminate an "error" panic from a "get me out of here" panic.
-// In practice the only real difference is that aborts are normally logged with an "Abort:" prefix while
-// everything else gets an "Error:" prefix
-type Abort string
-
-func (a Abort) Error() string { return string(a) }
 
 // Parse stage constants
 type ParseStage int
@@ -94,17 +94,6 @@ const (
 	StgPostScripts
 	StgWrite
 )
-
-// This MUST be deferred in EVERY function that runs script code!
-func trapAbort(err *error) {
-	if x := recover(); x != nil {
-		if y, ok := x.(Abort); ok {
-			*err = y
-			return
-		}
-		panic(x)
-	}
-}
 
 // State is the core of Rubble, everything connects to the state at some level.
 type State struct {
@@ -143,13 +132,17 @@ type State struct {
 	Templates map[string]*Template
 
 	// The parameters of the last template call, for use with the ... parameter.
-	PrevParams []*Value
+	PrevParams []*rex.Value
 
 	// The file being parsed/executed right now or "".
 	CurrentFile string
 
 	// For debugging, don't touch (unless you know what you are doing).
 	NoRecover bool
+	
+	// The position of the "last token", this may be way off, but should be good enough for error messages.
+	// Set by the stage parser.
+	ErrPos *rex.Position
 }
 
 // NewState creates a new Rubble State with the paths provided.
@@ -171,8 +164,8 @@ func NewState(dfdir, output string, addonsdir []string, log *rblutil.Logger) (er
 	state.ScriptState = rex.NewState()
 	state.VariableData = make(map[string]string)
 	state.Templates = make(map[string]*Template)
-	state.NewNativeTemplate("!TEMPLATE", tempTemplate)
-	state.PrevParams = make([]*Value, 0)
+	state.NewScriptTemplate("!TEMPLATE", rex.NewValueCommand(userTemplateWrap))
+	state.PrevParams = make([]*rex.Value, 0)
 
 	// Massage some of the path variables to allow AXIS paths before AXIS is setup.
 	state.DFDir = dfdir
@@ -192,59 +185,22 @@ func NewState(dfdir, output string, addonsdir []string, log *rblutil.Logger) (er
 	// Now setup the global stuff like Rex and AXIS.
 
 	state.Log.Println("  Initializing AXIS VFS...")
-	fs, err := axis.NewOSDir(state.DFDir)
-	if err != nil {
-		return err, nil
-	}
+	fs := axis.NewOSDir(state.DFDir)
 	state.FS.Mount("df", fs)
 
-	fs, err = axis.NewOSDir(".")
-	if err != nil {
-		return err, nil
-	}
+	fs = axis.NewOSDir(".")
 	state.FS.Mount("rubble", fs)
 
-	fs, err = axis.NewOSDir(state.OutputDir)
-	if err != nil {
-		return err, nil
-	}
+	fs = axis.NewOSDir(state.OutputDir)
 	state.FS.Mount("out", fs)
 
 	addonsFS := axis.NewFileSystem()
 	zipFS := axis.NewLogicalDir()
-	for i := range state.AddonsDir {
-		fs, err = axis.NewOSDir(state.AddonsDir[i])
-		if err != nil {
-			return err, nil
-		}
-		addonsFS.Mount("dir", fs)
-
-		zips, err := ioutil.ReadDir(state.AddonsDir[i])
-		if err != nil {
-			return err, nil
-		}
-
-		for _, file := range zips {
-			if !file.IsDir() {
-				if strings.HasSuffix(file.Name(), ".zip") {
-					fs, err := axiszip.NewFile(state.AddonsDir[i] + "/" + file.Name())
-					if err != nil {
-						return err, nil
-					}
-					zipFS.Mount(rblutil.StripExt(file.Name()), fs)
-				}
-				if strings.HasSuffix(file.Name(), ".zip.b64") {
-					fs, err := axiszip.NewFile64(state.AddonsDir[i] + "/" + file.Name())
-					if err != nil {
-						return err, nil
-					}
-					zipFS.Mount(rblutil.StripExt(rblutil.StripExt(file.Name())), fs)
-				}
-			}
-		}
-	}
 	addonsFS.Mount("zip", zipFS)
-
+	for i := range state.AddonsDir {
+		fs = axis.NewOSDir(state.AddonsDir[i])
+		addonsFS.Mount("dir", fs)
+	}
 	state.FS.Mount("addons", addonsFS)
 
 	state.Log.Println("  Initializing Rex Scripting...")
@@ -266,6 +222,8 @@ func NewState(dfdir, output string, addonsdir []string, log *rblutil.Logger) (er
 	regex.Setup(state.ScriptState)
 	sort.Setup(state.ScriptState)
 	str.Setup(state.ScriptState)
+	structure.Setup(state.ScriptState)
+	thread.Setup(state.ScriptState)
 
 	genii.Setup(state.ScriptState)
 
@@ -298,6 +256,7 @@ func NewState(dfdir, output string, addonsdir []string, log *rblutil.Logger) (er
 	rbl.RegisterCommand("currentfile", Command_CurrentFile)
 
 	rbl.RegisterCommand("template", Command_Template)
+	rbl.RegisterCommand("usertemplate", Command_UserTemplate)
 	rbl.RegisterCommand("stageparse", Command_Parse)
 	rbl.RegisterCommand("calltemplate", Command_CallTemplate)
 	rbl.RegisterCommand("expandvars", Command_ExpandVars)
@@ -320,6 +279,22 @@ func NewState(dfdir, output string, addonsdir []string, log *rblutil.Logger) (er
 	state.ScriptState.Output = state.Log
 
 	return nil, state
+}
+
+func (state *State) trapError(err *error) {
+	if !state.NoRecover {
+		if x := recover(); x != nil {
+			switch y := x.(type) {
+			case RblError:
+				y.Pos = state.ErrPos.Copy()
+				*err = y
+			case error:
+				*err = InternalError{Err: y, Pos: state.ErrPos.Copy()}
+			default:
+				*err = InternalError{Err: fmt.Errorf("%v", x), Pos: state.ErrPos.Copy()}
+			}
+		}
+	}
 }
 
 // Run runs a full Rubble parse cycle.
@@ -376,8 +351,8 @@ func (state *State) Clear() {
 	state.AddonsTbl = make(map[string]*Addon)
 	state.VariableData = make(map[string]string)
 	state.Templates = make(map[string]*Template)
-	state.NewNativeTemplate("!TEMPLATE", tempTemplate)
-	state.PrevParams = make([]*Value, 0)
+	state.NewScriptTemplate("!TEMPLATE", rex.NewValueCommand(userTemplateWrap))
+	state.PrevParams = make([]*rex.Value, 0)
 }
 
 // Load loads all addons and determines which ones should be
@@ -390,12 +365,100 @@ func (state *State) Clear() {
 // If addons is nil the default addons file is used (addons:dir:addonlist.ini).
 // config is exactly the same as addons, just for configuration variables.
 func (state *State) Load(addons, config []string) (err error) {
-	defer trapAbort(&err)
+	defer state.trapError(&err)
 
 	state.Stage = StgLoad
 	state.Log.Separator()
 	state.Log.Println("Loading...")
 
+	state.Log.Println("  Finding and Downloading Web Addons...")
+	client := new(http.Client)
+	
+	for _, filename := range axis.ListFile(state.FS, "addons:dir:") {
+		if strings.HasSuffix(filename, ".webload") {
+			u, err := axis.ReadAll(state.FS, "addons:dir:" + filename)
+			if err != nil {
+				return err
+			}
+			url := strings.TrimSpace(string(u))
+			
+			r, err := client.Head(url)
+			if err != nil {
+				return err
+			}
+			
+			content, err := axis.ReadAll(state.FS, "addons:dir:" + rblutil.StripExt(filename) + ".zip")
+			if err == nil {
+				if r.ContentLength == int64(len(content)) {
+					state.Log.Println("    " + rblutil.StripExt(filename) + ": Our copy is up to date.")
+					continue
+				}
+			}
+			state.Log.Println("    " + rblutil.StripExt(filename) + ": Downloading.")
+			
+			r, err = client.Get(url)
+			if err != nil {
+				state.Log.Println("      Download Error:", err)
+				continue
+			}
+			
+			content, err = ioutil.ReadAll(r.Body)
+			r.Body.Close()
+			if err != nil {
+				return err
+			}
+			
+			err = axis.WriteAll(state.FS, "addons:dir:" + rblutil.StripExt(filename) + ".zip", content)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	
+	state.Log.Println("  Loading Zipped Addons...")
+	aFS, err := axis.GetChild(state.FS, "addons:")
+	if err != nil {
+		return err
+	}
+	addonsFS := aFS.(axis.Collection)
+	err = axis.Delete(addonsFS, "zip:")
+	if err != nil {
+		return err
+	}
+	
+	zipFS := axis.NewLogicalDir()
+	
+	for _, filename := range axis.ListFile(state.FS, "addons:dir:") {
+		if strings.HasSuffix(filename, ".zip") {
+			state.Log.Println("    " + filename)
+			
+			content, err := axis.ReadAll(state.FS, "addons:dir:" + filename)
+			if err != nil {
+				return err
+			}
+			
+			fs, err := axiszip.NewRaw(content)
+			if err != nil {
+				return err
+			}
+			zipFS.Mount(rblutil.StripExt(filename), fs)
+		}
+		if strings.HasSuffix(filename, ".zip.b64") {
+			state.Log.Println("    " + filename)
+			
+			content, err := axis.ReadAll(state.FS, "addons:dir:" + filename)
+			if err != nil {
+				return err
+			}
+			
+			fs, err := axiszip.NewRaw64(content)
+			if err != nil {
+				return err
+			}
+			zipFS.Mount(rblutil.StripExt(rblutil.StripExt(filename)), fs)
+		}
+	}
+	
 	state.Log.Println("  Loading Addons...")
 	state.LoadAddons()
 
@@ -410,7 +473,7 @@ func (state *State) Load(addons, config []string) (err error) {
 // If addons is empty the default addons file is used (addons:dir:addonlist.ini).
 // config is exactly the same as addons, just for configuration variables.
 func (state *State) Activate(addons, config []string) (err error) {
-	defer trapAbort(&err)
+	defer state.trapError(&err)
 
 	state.Stage = StgLoad
 	state.Log.Separator()
@@ -419,7 +482,7 @@ func (state *State) Activate(addons, config []string) (err error) {
 	state.Log.Println("  Loading Config Variables...")
 	if config != nil && len(config) != 0 {
 		for _, val := range config {
-			file, err := state.FS.ReadAll(val)
+			file, err := axis.ReadAll(state.FS, val)
 			if err == nil {
 				state.Log.Println("    Loading Config File: " + val)
 				rblutil.ParseINI(string(file), "\n", func(key, value string) {
@@ -443,7 +506,7 @@ func (state *State) Activate(addons, config []string) (err error) {
 
 	addonNames := make([]string, 0, 10)
 	for _, val := range addons {
-		file, err := state.FS.ReadAll(val)
+		file, err := axis.ReadAll(state.FS, val)
 		if err == nil {
 			state.Log.Println("    Loading List File: " + val)
 			rblutil.ParseINI(string(file), "\n", func(key, value string) {
@@ -477,8 +540,8 @@ func (state *State) Activate(addons, config []string) (err error) {
 			for j := range state.Addons[i].Meta.Activates {
 				name := state.Addons[i].Meta.Activates[j]
 				if _, ok := state.AddonsTbl[name]; !ok {
-					panic(Abort("The \"" + state.Addons[i].Name + "\" addon requires the \"" + name + "\" addon!\n" +
-						"The required addon is not currently installed, please install the required addon and try again."))
+					RaiseAbort("The \"" + state.Addons[i].Name + "\" addon requires the \"" + name + "\" addon!\n" +
+						"The required addon is not currently installed, please install the required addon and try again.")
 				}
 				state.AddonsTbl[name].Active = true
 			}
@@ -515,7 +578,7 @@ func (state *State) Activate(addons, config []string) (err error) {
 // Parse handles everything from running init scripts to running post scripts.
 // If an error is returned state.CurrentFile and state.Stage will still be set to their last values.
 func (state *State) Parse() (err error) {
-	defer trapAbort(&err)
+	defer state.trapError(&err)
 
 	state.Log.Separator()
 	state.Log.Println("Generating Sorted Active File List...")
@@ -567,7 +630,7 @@ func (state *State) Parse() (err error) {
 
 		state.CurrentFile = lfiles.Data[i].Name
 		state.Log.Println("  " + lfiles.Data[i].Name)
-		lfiles.Data[i].Content = state.ParseFile(lfiles.Data[i].Content, StgUseCurrent, NewPosition(1, lfiles.Data[i].Name))
+		lfiles.Data[i].Content = state.ParseFile(lfiles.Data[i].Content, StgUseCurrent, rex.NewPosition(1, 0, lfiles.Data[i].Name))
 	}
 
 	state.Stage = StgParse
@@ -580,7 +643,7 @@ func (state *State) Parse() (err error) {
 
 		state.CurrentFile = lfiles.Data[i].Name
 		state.Log.Println("  " + lfiles.Data[i].Name)
-		lfiles.Data[i].Content = state.ParseFile(lfiles.Data[i].Content, StgUseCurrent, NewPosition(1, lfiles.Data[i].Name))
+		lfiles.Data[i].Content = state.ParseFile(lfiles.Data[i].Content, StgUseCurrent, rex.NewPosition(1, 0, lfiles.Data[i].Name))
 	}
 
 	state.Stage = StgPostParse
@@ -593,7 +656,7 @@ func (state *State) Parse() (err error) {
 
 		state.CurrentFile = lfiles.Data[i].Name
 		state.Log.Println("  " + lfiles.Data[i].Name)
-		lfiles.Data[i].Content = state.ParseFile(lfiles.Data[i].Content, StgUseCurrent, NewPosition(1, lfiles.Data[i].Name))
+		lfiles.Data[i].Content = state.ParseFile(lfiles.Data[i].Content, StgUseCurrent, rex.NewPosition(1, 0, lfiles.Data[i].Name))
 	}
 
 	state.Stage = StgGlobalExpand
@@ -696,14 +759,14 @@ func (state *State) Write() error {
 }
 
 func (state *State) writeFile(path string, content []byte) error {
-	if !state.FS.Exists(path) {
-		err := state.FS.Create(path)
+	if !axis.Exists(state.FS, path) {
+		err := axis.Create(state.FS, path)
 		if err != nil {
 			return err
 		}
 	}
 
-	return state.FS.WriteAll(path, content)
+	return axis.WriteAll(state.FS, path, content)
 }
 
 // Data Dumpers

@@ -46,6 +46,8 @@ func Setup(state *rex.State) (err error) {
 	mod := state.RegisterModule("bool")
 	mod.RegisterCommand("and", Command_And)
 	mod.RegisterCommand("or", Command_Or)
+	mod.RegisterCommand("sand", Command_SAnd)
+	mod.RegisterCommand("sor", Command_SOr)
 	mod.RegisterCommand("not", Command_Not)
 	
 	return nil
@@ -73,6 +75,72 @@ func Command_Or(script *rex.Script, params []*rex.Value) {
 
 	script.RetVal = rex.NewValueBool(params[0].Bool() || params[1].Bool())
 	return
+}
+
+// Ands two values using short-circuit evaluation.
+// 	bool:sand a b
+// a and b must both be code blocks!
+// Returns a && b
+func Command_SAnd(script *rex.Script, params []*rex.Value) {
+	if len(params) != 2 {
+		rex.ErrorParamCount("bool:sand", "2")
+	}
+	
+	if params[0].Type != rex.TypCode {
+		rex.ErrorGeneralCmd("bool:sand", "Param 0 is not type code.")
+	}
+	
+	if params[1].Type != rex.TypCode {
+		rex.ErrorGeneralCmd("bool:sand", "Param 1 is not type code.")
+	}
+	
+	block := params[0].Data.(*rex.Code)
+	script.Locals.Add(script.Host, block)
+	script.Exec(block)
+	script.Return = false
+	script.Locals.Remove()
+	if !script.RetVal.Bool() {
+		return
+	}
+	
+	block = params[1].Data.(*rex.Code)
+	script.Locals.Add(script.Host, block)
+	script.Exec(block)
+	script.Return = false
+	script.Locals.Remove()
+}
+
+// Ors two values using short-circuit evaluation.
+// 	bool:sor a b
+// a and b must both be code blocks!
+// Returns a || b
+func Command_SOr(script *rex.Script, params []*rex.Value) {
+	if len(params) != 2 {
+		rex.ErrorParamCount("bool:sor", "2")
+	}
+	
+	if params[0].Type != rex.TypCode {
+		rex.ErrorGeneralCmd("bool:sor", "Param 0 is not type code.")
+	}
+	
+	if params[1].Type != rex.TypCode {
+		rex.ErrorGeneralCmd("bool:sor", "Param 1 is not type code.")
+	}
+	
+	block := params[0].Data.(*rex.Code)
+	script.Locals.Add(script.Host, block)
+	script.Exec(block)
+	script.Return = false
+	script.Locals.Remove()
+	if script.RetVal.Bool() {
+		return
+	}
+	
+	block = params[1].Data.(*rex.Code)
+	script.Locals.Add(script.Host, block)
+	script.Exec(block)
+	script.Return = false
+	script.Locals.Remove()
 }
 
 // Inverts a value.

@@ -22,7 +22,7 @@ misrepresented as being the original software.
 
 package rubble
 
-import "fmt"
+import "dctech/rex"
 
 // Token Types
 const (
@@ -33,26 +33,20 @@ const (
 	tknDelimiter
 )
 
-type Token struct {
+type token struct {
 	Lexeme string
 	Type   int
-	Pos    *Position
+	Pos    *rex.Position
 }
 
-func NewToken(lexeme string, typ int, pos *Position) *Token {
-	this := new(Token)
-	this.Lexeme = lexeme
-	this.Type = typ
-	this.Pos = pos.Copy()
-	return this
+func (tok *token) Value() *rex.Value {
+	val := rex.NewValueString(tok.Lexeme)
+	val.Pos = tok.Pos.Copy()
+	return val
 }
 
-func (this *Token) Value() *Value {
-	return NewValuePos(this.Lexeme, this.Pos)
-}
-
-func (this *Token) String() string {
-	return tokenTypeToString(this.Type)
+func (tok *token) String() string {
+	return tokenTypeToString(tok.Type)
 }
 
 func tokenTypeToString(tokenType int) string {
@@ -67,24 +61,52 @@ func tokenTypeToString(tokenType int) string {
 		return "tknTagEnd"
 	case tknDelimiter:
 		return "tknDelimiter"
+	default:
+		return "INVALID_TOKEN_TYPE"
 	}
-
-	panic("Token type value out of range")
 }
 
-// Panics with the message:
-//	Invalid Token: Found: thecurrenttoken. Expected: expected.
-func ExitOnTokenExpected(token *Token, expected ...int) {
+// Panics with a message formatted like one of the following:
+//	Invalid token: Found: thecurrenttoken. Expected: expected1, expected2, or expected3.
+//	Invalid token: Found: thecurrenttoken. Expected: expected1 or expected2.
+//	Invalid token: Found: thecurrenttoken. Expected: expected.
+//	Invalid token: Found: thecurrenttoken (Lexeme: test). Expected: expected1, expected2, or expected3.
+//	Invalid token: Found: thecurrenttoken (Lexeme: test). Expected: expected1 or expected2.
+//	Invalid token: Found: thecurrenttoken (Lexeme: test). Expected: expected.
+// If the lexeme is long it is truncated.
+func exitOnTokenExpected(token *token, expected ...int) {
 	expectedString := ""
-	doonce := true
-	for _, val := range expected {
-		if doonce {
-			doonce = false
+	expectedCount := len(expected) - 1
+	for i, val := range expected {
+		// Is the only value
+		if expectedCount == 0 {
 			expectedString = tokenTypeToString(val)
 			continue
 		}
-		expectedString += " or " + tokenTypeToString(val)
+
+		// Is last of a list (2 or more)
+		if i == expectedCount && expectedCount > 0 {
+			expectedString += "or " + tokenTypeToString(val)
+			continue
+		}
+
+		// Is the first of two
+		if expectedCount == 1 {
+			expectedString += tokenTypeToString(val) + " "
+			continue
+		}
+
+		// Is any but the last of a list of 3 or more
+		expectedString += tokenTypeToString(val) + ", "
 	}
 
-	panic(fmt.Sprintf("Invalid Token: Found: %s. Expected: %s.", token.String(), expectedString))
+	found := token.String()
+	if token.Lexeme != "" {
+		if len(token.Lexeme) < 20 {
+			found += " (Lexeme: " + token.Lexeme + ")"
+		} else {
+			found += " (Lexeme: " + token.Lexeme[:17] + "...)"
+		}
+	}
+	RaiseError("Invalid token: Found: " + found + ". Expected: " + expectedString)
 }

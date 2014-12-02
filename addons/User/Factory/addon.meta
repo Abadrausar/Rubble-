@@ -11,5 +11,5 @@ from blocks or planks, save even more resources!
 Uses various skills.
 `
 	
-	activates="Libs/Base;Libs/DFHack/Fix Handedness"
+	activates="Libs/Base;Libs/DFHack/Fix Handedness;Libs/Wood Additions"
 >

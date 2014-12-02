@@ -22,26 +22,28 @@ misrepresented as being the original software.
 
 package axis_test
 
+// This is not a real test!
+// Real testing is accomplished by using AXIS in real-world applications (namely Rubble).
+
 import "dctech/axis"
 import "fmt"
 
 func Example() {
 	FS := axis.NewFileSystem()
 	
-	fs, err := axis.NewOSDir(".")
-	if err != nil {
-		panic(err)
-	}
+	fs := axis.NewOSDir(".")
+	
+	// axis.Mount(FS, "wd", fs) works as well (but is not generally used).
 	FS.Mount("wd", fs)
 
 	fmt.Println("Files (according to AXIS OSDir):")
-	for _, dir := range fs.ListFile("") {
+	for _, dir := range axis.ListFile(fs, "") {
 		fmt.Println(dir)
 	}
 	fmt.Println()
 	
 	fmt.Println("Files (according to AXIS FileSystem):")
-	for _, dir := range FS.ListFile("wd:") {
+	for _, dir := range axis.ListFile(FS, "wd:") {
 		fmt.Println(dir)
 	}
 	
@@ -55,6 +57,7 @@ func Example() {
 	// logicfile.go
 	// osdir.go
 	// osfile.go
+	// path.go
 	// 
 	// Files (according to AXIS FileSystem):
 	// axis_test.go
@@ -65,4 +68,5 @@ func Example() {
 	// logicfile.go
 	// osdir.go
 	// osfile.go
+	// path.go
 }

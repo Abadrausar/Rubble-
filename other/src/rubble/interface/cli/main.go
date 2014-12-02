@@ -70,6 +70,20 @@ func main() {
 
 	log.Header(rubble.Versions[0])
 
+	defer func(){
+		err := recover()
+		if err != nil {
+			log.Println("Unrecovered Error:")
+			log.Println("  The following error was not properly recovered, please report this ASAP!")
+			log.Printf("  %#v\n", err)
+			log.Println("Stack Trace:")
+			buf := make([]byte, 4096)
+			buf = buf[:runtime.Stack(buf, true)]
+			log.Printf("%s\n", buf)
+			os.Exit(1)
+		}
+	}()
+
 	// Used for the -zapxxx options.
 	addonCount := 0
 	configCount := 0

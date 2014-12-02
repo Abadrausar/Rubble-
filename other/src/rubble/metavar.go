@@ -107,7 +107,3 @@ func (meta *MetaVar) Keys() []string {
 func (meta *MetaVar) String() string {
 	return rex.IndexableToString("rubble:addonmetavar", meta)
 }
-
-func (meta *MetaVar) CodeString() string {
-	return rex.IndexableToCodeString("rubble:addonmetavar", meta, true)
-}

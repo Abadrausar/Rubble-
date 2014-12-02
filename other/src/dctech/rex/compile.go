@@ -46,9 +46,9 @@ func (state *State) CompileShell(val string, code *Code) (value *Value, block *C
 }
 
 // Compile is as basic as it gets as far as the compile functions are concerned.
-// It just compiles code and returns the result directly.
+// It just compiles code from a preexisting lexer and returns the result directly.
 func (state *State) Compile(lex *Lexer) (code *Code, err error) {
-	code = NewCode(nil)
+	code = NewCode()
 	err = state.CompileExisting(lex, code)
 	return
 }
@@ -78,6 +78,12 @@ func (state *State) compileCommand(lex *Lexer, code *Code) {
 	// Compile the commands parameters if any
 	for !lex.checkLook(tknCmdEnd) {
 		state.compileValue(lex, code)
+		
+		if lex.checkLook(tknAssignment) {
+			lex.getcurrent(tknAssignment)
+			code.addOp(lex.current.opCode())
+			state.compileValue(lex, code)
+		}
 	}
 
 	lex.getcurrent(tknCmdEnd)
@@ -147,7 +153,7 @@ func (state *State) compileObjLit(lex *Lexer, code *Code) {
 }
 
 func (state *State) compileCodeBlock(lex *Lexer, code *Code) {
-	block := NewCode(code)
+	block := NewCode()
 	lex.getcurrent(tknCodeBegin)
 	pos := lex.current.Pos.Copy()
 
@@ -187,19 +193,12 @@ func (state *State) compileBlockDeclare(lex *Lexer, code *Code) *Code {
 	defaults := make([]*Value, 0, 10)
 	for !lex.checkLook(tknCodeBegin) {
 		lex.getcurrent(tknRawString)
-		if lex.current.Lexeme == "..." {
-			if len(params) != 0 {
-				RaiseError("Unexpected variable param marker.")
-			}
-			params = nil
-			break
-		}
 		params = append(params, lex.current.Lexeme)
 		
 		// Do we have a default value?
 		if lex.checkLook(tknAssignment) {
 			lex.getcurrent(tknAssignment)
-			lex.getcurrent(tknString, tknTrue, tknFalse, tknNil, tknRawString)
+			lex.getcurrent(tknString, tknTrue, tknFalse, tknNil, tknVariadic, tknRawString)
 			val := tokenToValue(lex.current)
 			defaults = append(defaults, val)
 		} else {
@@ -207,21 +206,16 @@ func (state *State) compileBlockDeclare(lex *Lexer, code *Code) *Code {
 		}
 	}
 
-	block := NewCode(code)
-	if params != nil {
-		block.params = len(params)
-		for i := range params {
-			block.addDefault(params[i], defaults[i])
-		}
-	} else {
-		block.params = -1
-		block.add("params")
+	block := NewCode()
+	for i := range params {
+		block.addParam(params[i], defaults[i])
 	}
 	return block
 }
 
 func (state *State) compileName(lex *Lexer, code *Code, typ int) {
-	var module *Module = nil
+	module := state.global
+	ismod := false
 	
 	for {
 		lex.getcurrent(tknRawString)
@@ -229,13 +223,9 @@ func (state *State) compileName(lex *Lexer, code *Code, typ int) {
 		if lex.checkLook(tknNameSplit) {
 			// It's a Module name.
 			index := -1
-			if module == nil {
-				index = state.modules.lookup(lex.current.Lexeme)
-				module = state.modules.get(index)
-			} else {
-				index = module.modules.lookup(lex.current.Lexeme)
-				module = module.modules.get(index)
-			}
+			index = module.modules.lookup(lex.current.Lexeme)
+			module = module.modules.get(index)
+			ismod = true
 
 			code.addOp(&opCode{
 				Index: index,
@@ -256,34 +246,21 @@ func (state *State) compileName(lex *Lexer, code *Code, typ int) {
 		switch typ {
 		case tknCmdBegin:
 			// Command name
-			if module == nil {
-				// Global
-				index = state.global.vars.lookup(lex.current.Lexeme)
-				break
-			}
-			// Module
 			index = module.vars.lookup(lex.current.Lexeme)
 			break
 
 		case tknVarBegin:
 			// Variable name
-			if module == nil {
-				// Local
-				index = code.lookup(lex.current.Lexeme)
+			if ismod {
+				// Module
+				index = module.vars.lookup(lex.current.Lexeme)
 				break
 			}
-			// Module
-			index = module.vars.lookup(lex.current.Lexeme)
+			// Local
+			index = code.meta.lookup(lex.current.Lexeme)
 			break
 
 		case tknObjLitBegin:
-			// Type name
-			if module == nil {
-				// Global
-				index = state.types.lookup(lex.current.Lexeme)
-				break
-			}
-			// Module
 			index = module.types.lookup(lex.current.Lexeme)
 			break
 		}
@@ -300,33 +277,21 @@ func (state *State) compileName(lex *Lexer, code *Code, typ int) {
 func (state *State) compileDeclModule(lex *Lexer, code *Code) {
 	lex.getcurrent(tknDeclModule)
 
-	var module *Module = nil
+	module := state.global
 	for {
 		lex.getcurrent(tknRawString)
 
 		if lex.checkLook(tknNameSplit) {
 			// It's a Module name.
-			index := 0
-			if module == nil {
-				index = state.modules.lookup(lex.current.Lexeme)
-				module = state.modules.get(index)
-			} else {
-				index = module.modules.lookup(lex.current.Lexeme)
-				module = module.modules.get(index)
-			}
+			index := module.modules.lookup(lex.current.Lexeme)
+			module = module.modules.get(index)
 			lex.getcurrent(tknNameSplit)
 			continue
 		}
 
 		// We have found the name we are declaring
-		if module == nil {
-			if !state.modules.exists(lex.current.Lexeme) {
-				state.modules.add(lex.current.Lexeme, newModule())
-			}
-		} else {
-			if !module.modules.exists(lex.current.Lexeme) {
-				module.modules.add(lex.current.Lexeme, newModule())
-			}
+		if !module.modules.exists(lex.current.Lexeme) {
+			module.modules.add(lex.current.Lexeme, newModule())
 		}
 		return
 	}
@@ -335,20 +300,14 @@ func (state *State) compileDeclModule(lex *Lexer, code *Code) {
 func (state *State) compileDeclCommand(lex *Lexer, code *Code) {
 	lex.getcurrent(tknDeclCommand)
 
-	var module *Module = nil
+	module := state.global
 	for {
 		lex.getcurrent(tknRawString)
 
 		if lex.checkLook(tknNameSplit) {
 			// It's a Module name.
-			index := 0
-			if module == nil {
-				index = state.modules.lookup(lex.current.Lexeme)
-				module = state.modules.get(index)
-			} else {
-				index = module.modules.lookup(lex.current.Lexeme)
-				module = module.modules.get(index)
-			}
+			index := module.modules.lookup(lex.current.Lexeme)
+			module = module.modules.get(index)
 			lex.getcurrent(tknNameSplit)
 			continue
 		}
@@ -386,24 +345,20 @@ func (state *State) compileDeclVar(lex *Lexer, code *Code) {
 	lex.getcurrent(tknDeclVar)
 
 	// This generates a set expression for the variable.
-	var module *Module = nil
 	code.addOp(&opCode{
 		Type: opVarBegin,
 		Pos: lex.current.Pos.Copy(),
 	})
+	module := state.global
+	ismod := false
 	for {
 		lex.getcurrent(tknRawString)
 
 		if lex.checkLook(tknNameSplit) {
 			// It's a Module name.
-			index := 0
-			if module == nil {
-				index = state.modules.lookup(lex.current.Lexeme)
-				module = state.modules.get(index)
-			} else {
-				index = module.modules.lookup(lex.current.Lexeme)
-				module = module.modules.get(index)
-			}
+			index := module.modules.lookup(lex.current.Lexeme)
+			module = module.modules.get(index)
+			ismod = true
 			code.addOp(&opCode{
 				Type:  opName,
 				Index: index,
@@ -416,12 +371,12 @@ func (state *State) compileDeclVar(lex *Lexer, code *Code) {
 
 		// We have found the name we are declaring
 		index := 0
-		if module == nil {
-			// it's a local!
-			index = code.add(lex.current.Lexeme)
-		} else {
+		if ismod {
 			// it's a Module variable
 			index = module.vars.add(lex.current.Lexeme)
+		} else {
+			// it's a local!
+			index = code.meta.add(lex.current.Lexeme)
 		}
 
 		code.addOp(&opCode{
@@ -454,8 +409,8 @@ func (state *State) compileDeclVar(lex *Lexer, code *Code) {
 
 func (state *State) compileValue(lex *Lexer, code *Code) {
 	switch lex.look.Type {
-	case tknString, tknTrue, tknFalse, tknNil, tknRawString:
-		lex.getcurrent(tknString, tknTrue, tknFalse, tknNil, tknRawString)
+	case tknString, tknTrue, tknFalse, tknNil, tknVariadic, tknRawString:
+		lex.getcurrent(tknString, tknTrue, tknFalse, tknNil, tknVariadic, tknRawString)
 		code.addOp(lex.current.opCode())
 		return
 	
@@ -493,6 +448,6 @@ func (state *State) compileValue(lex *Lexer, code *Code) {
 	}
 
 	// This one line handles almost ALL compile time errors, wow.
-	exitOntokenExpected(lex.look, tknString, tknTrue, tknFalse, tknNil, tknRawString, tknCmdBegin,
+	exitOnTokenExpected(lex.look, tknString, tknTrue, tknFalse, tknNil, tknRawString, tknCmdBegin,
 		tknVarBegin, tknObjLitBegin, tknCodeBegin, tknDeclModule, tknDeclCommand, tknDeclBlock, tknDeclVar)
 }
