@@ -1,40 +1,85 @@
 
-(if (exists [rubble:raws] "user_tilesets_mlc_dfhack_twbt.pre.rex") {
-	(axis:write [rubble:fs] "out:prep/user_tilesets_mlc_dfhack_twbt.prep.rex" [rubble:raws "user_tilesets_mlc_dfhack_twbt.pre.rex"])
+(rubble:template "TWBT_TRACK_OVERRIDES" block tilemap {
+	var shapes = <sarray
+		FloorTrackN
+		FloorTrackS
+		FloorTrackE
+		FloorTrackW
+		FloorTrackNS
+		FloorTrackNE
+		FloorTrackNW
+		FloorTrackSE
+		FloorTrackSW
+		FloorTrackEW
+		FloorTrackNSE
+		FloorTrackNSW
+		FloorTrackNEW
+		FloorTrackSEW
+		FloorTrackNSEW
+		RampTrackN
+		RampTrackS
+		RampTrackE
+		RampTrackW
+		RampTrackNS
+		RampTrackNE
+		RampTrackNW
+		RampTrackSE
+		RampTrackSW
+		RampTrackEW
+		RampTrackNSE
+		RampTrackNSW
+		RampTrackNEW
+		RampTrackSEW
+		RampTrackNSEW
+	>
+	var mats = <sarray
+		Constructed
+		Feature
+		Frozen
+		Lava
+		Mineral
+		Stone
+	>
+	var shape_to_dtile = <smap
+		FloorTrackN = "208"
+		FloorTrackS = "210"
+		FloorTrackE = "198"
+		FloorTrackW = "181"
+		FloorTrackNS = "186"
+		FloorTrackNE = "200"
+		FloorTrackNW = "188"
+		FloorTrackSE = "201"
+		FloorTrackSW = "187"
+		FloorTrackEW = "205"
+		FloorTrackNSE = "204"
+		FloorTrackNSW = "185"
+		FloorTrackNEW = "202"
+		FloorTrackSEW = "203"
+		FloorTrackNSEW = "206"
+		RampTrackN = "30"
+		RampTrackS = "30"
+		RampTrackE = "30"
+		RampTrackW = "30"
+		RampTrackNS = "30"
+		RampTrackNE = "30"
+		RampTrackNW = "30"
+		RampTrackSE = "30"
+		RampTrackSW = "30"
+		RampTrackEW = "30"
+		RampTrackNSE = "30"
+		RampTrackNSW = "30"
+		RampTrackNEW = "30"
+		RampTrackSEW = "30"
+		RampTrackNSEW = "30"
+	>
+	var shape_to_otile = (eval [tilemap])
 	
-	(rubble:prepfile "MLC 16x16 - Font.png")
-	(rubble:prepfile "MLC 16x16 - Graphics.png")
-	(rubble:prepfile "MLC 16x16 - Overrides.png")
-	(rubble:prepfile "user_tilesets_mlc_dfhack_twbt_overrides.txt")
+	var out = ""
+	(foreach [shapes] block _ shape {
+		(foreach [mats] block _ mat {
+			[out = (str:add [out] "[OVERRIDE:" [shape_to_dtile [shape]] ":T:" [mat] [shape] ":ex1:" [shape_to_otile [shape]] "]\n")]
+		})
+		[out = (str:add [out] "\n")]
+	})
+	(str:trimspace [out])
 })
-
-(rubble:open_d_init)
-(rubble:edit_d_init "PILLAR_TILE" "141")
-(rubble:edit_d_init "TRACK_N" "129")
-(rubble:edit_d_init "TRACK_S" "130")
-(rubble:edit_d_init "TRACK_E" "131")
-(rubble:edit_d_init "TRACK_W" "132")
-(rubble:edit_d_init "TRACK_NS" "133")
-(rubble:edit_d_init "TRACK_NE" "138")
-(rubble:edit_d_init "TRACK_NW" "139")
-(rubble:edit_d_init "TRACK_SE" "135")
-(rubble:edit_d_init "TRACK_SW" "136")
-(rubble:edit_d_init "TRACK_EW" "134")
-(rubble:edit_d_init "TRACK_NSE" "170")
-(rubble:edit_d_init "TRACK_NSW" "171")
-(rubble:edit_d_init "TRACK_NEW" "161")
-(rubble:edit_d_init "TRACK_SEW" "160")
-(rubble:edit_d_init "TRACK_NSEW" "144")
-(rubble:close_d_init)
-
-(axis:write [rubble:fs] "df:data/init/overrides.txt" [rubble:raws "user_tilesets_mlc_dfhack_twbt_overrides.txt"])
-
-(rubble:install_tilesheet "MLC 16x16 - Font.png")
-(rubble:install_tilesheet "MLC 16x16 - Graphics.png")
-(rubble:install_tilesheet "MLC 16x16 - Overrides.png")
-
-(rubble:set_fullscreen_font "MLC 16x16 - Font.png")
-(rubble:set_windowed_font "MLC 16x16 - Font.png")
-
-(rubble:set_fullscreen_font_graphics "MLC 16x16 - Graphics.png")
-(rubble:set_windowed_font_graphics "MLC 16x16 - Graphics.png")

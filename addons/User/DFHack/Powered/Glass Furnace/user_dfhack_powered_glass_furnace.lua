@@ -53,80 +53,81 @@ end
 
 function makeGlass()
 	return function(wshop)
-		if not wshop:isUnpowered() then
-			if not powered.HasOutput(wshop) then
-				return
+		if wshop:isUnpowered() or powered.ControllerOff(wshop) then
+			return
+		end
+		if not powered.HasOutput(wshop) then
+			return
+		end
+		
+		local output = ppersist.GetOutputTypeAsCode(wshop)
+		if output == nil then
+			return
+		end
+		
+		local sand = pitems.FindItemAtInput(wshop, function(item)
+			if item:isBag() then
+				local contents = dfhack.items.getContainedItems(item)
+				if #contents == 1 and contents[1]:isSand() then
+					return true
+				end
 			end
-			
-			local output = ppersist.GetOutputTypeAsCode(wshop)
-			if output == nil then
-				return
-			end
-			
-			local sand = pitems.FindItemAtInput(wshop, function(item)
-				if item:isBag() then
-					local contents = dfhack.items.getContainedItems(item)
-					if #contents == 1 and contents[1]:isSand() then
+			return false
+		end)
+		if sand == nil then
+			return
+		end
+		
+		local pearlash = nil
+		if output.mat == "CLEAR" then
+			pearlash = pitems.FindItemAtInput(wshop, function(item)
+				if df.item_type[item:getType()] == "BAR" then
+					local mat = dfhack.matinfo.decode(item)
+					local ashmat = dfhack.matinfo.find("PEARLASH:NONE")
+					if mat.type == ashmat.type then
 						return true
 					end
 				end
 				return false
 			end)
-			if sand == nil then
+			if pearlash == nil then
+				return
+			end
+		end
+		
+		magma, bar = pitems.FindFuel(wshop)
+		if not magma then
+			if bar == nil then
 				return
 			end
 			
-			local pearlash = nil
-			if output.mat == "CLEAR" then
-				pearlash = pitems.FindItemAtInput(wshop, function(item)
-					if df.item_type[item:getType()] == "BAR" then
-						local mat = dfhack.matinfo.decode(item)
-						local ashmat = dfhack.matinfo.find("PEARLASH:NONE")
-						if mat.type == ashmat.type then
-							return true
-						end
-					end
-					return false
-				end)
-				if pearlash == nil then
-					return
-				end
-			end
-			
-			magma, bar = pitems.FindFuel(wshop)
-			if not magma then
-				if bar == nil then
-					return
-				end
-				
-				dfhack.items.remove(bar)
-			end
-			
-			if pearlash ~= nil then
-				dfhack.items.remove(pearlash)
-			end
-			
-			-- empty the sand bag and eject it
-			for r = #sand.general_refs - 1, 0, -1 do
-				if getmetatable(sand.general_refs[r]) == 'general_ref_contains_itemst' then
-					local contained_item = df.item.find(sand.general_refs[r].item_id)
-					for r2 = #contained_item.general_refs-1, 0, -1 do
-						if getmetatable(contained_item.general_refs[r2]) == 'general_ref_contained_in_itemst' then
-							contained_item.general_refs:erase(r2)
-							contained_item.flags.in_inventory = false
-						end
-					end
-					sand.general_refs:erase(r)
-					dfhack.items.remove(contained_item)
-				end
-			end
-			pitems.Eject(wshop, sand)
-			
-			local glass = dfhack.matinfo.find("GLASS_"..output.mat..":NONE")
-			item = pitems.CreateItemNumeric(glass, output.itype, output.isubtype, nil, 0)
-			pitems.SetAutoItemQuality(wshop, item)
-			pitems.Eject(wshop, item)
+			dfhack.items.remove(bar)
 		end
+		
+		if pearlash ~= nil then
+			dfhack.items.remove(pearlash)
+		end
+		
+		-- empty the sand bag and eject it
+		for r = #sand.general_refs - 1, 0, -1 do
+			if getmetatable(sand.general_refs[r]) == 'general_ref_contains_itemst' then
+				local contained_item = df.item.find(sand.general_refs[r].item_id)
+				for r2 = #contained_item.general_refs-1, 0, -1 do
+					if getmetatable(contained_item.general_refs[r2]) == 'general_ref_contained_in_itemst' then
+						contained_item.general_refs:erase(r2)
+						contained_item.flags.in_inventory = false
+					end
+				end
+				sand.general_refs:erase(r)
+				dfhack.items.remove(contained_item)
+			end
+		end
+		pitems.Eject(wshop, sand)
+		
+		local glass = dfhack.matinfo.find("GLASS_"..output.mat..":NONE")
+		item = pitems.CreateItemNumeric(glass, output.itype, output.isubtype, nil, 0)
+		pitems.SetAutoItemQuality(wshop, item)
+		pitems.Eject(wshop, item)
 	end
 end
 
@@ -144,4 +145,3 @@ buildings.registerBuilding{
 	}
 }
 eventful.registerReaction("LUA_HOOK_ADJUST_GLASS_FURNACE", furnaceAdjust)
-print("    Registered mechanical workshop: DFHACK_RUBBLE_POWERED_GLASS_FURNACE")

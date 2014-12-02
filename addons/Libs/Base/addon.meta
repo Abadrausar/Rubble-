@@ -6,4 +6,8 @@
 Almost all the other addons require this one, so it is almost always active.
 See "Rubble Base Template" for documentation.
 `
+
+	# DO NOT under ANY circumstances add an "activates" key to this addon!
+	# As EVERY other addon depends on this one, doing so will cause an infinite
+	# activation loop!
 >

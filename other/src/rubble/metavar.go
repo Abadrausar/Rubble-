@@ -25,10 +25,11 @@ package rubble
 import "dctech/rex"
 
 // MetaVar is used to store meta data about a config var.
+// Exposed to scripts as the "rubble:addonmetavar" indexable type.
 type MetaVar struct {
-	Name    string // A user friendly name, may be ""
-	Val     string
-	Choices []string
+	Name    string // A user friendly name/description, may be empty.
+	Val     string // The default value.
+	Choices []string // If not nil, a list of possible values for Val.
 }
 
 func NewMetaVar(value *rex.Value) *MetaVar {

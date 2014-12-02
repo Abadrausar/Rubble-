@@ -1,0 +1,19 @@
+<rubble:addonmeta
+	header=`Bugged. Do not use.`
+	
+	description=`
+Make torch "shields" to suppress the speluncaphobia effect.
+
+WARNING! In testing with DFHack 40.15 r1 this addon caused the game to
+immediately crash whenever a speluncaphobia enabled creature entered the
+map (or as soon as the game was unpaused if such a creature was already
+on the map)! This will not happen if the modtools/item-trigger commands
+are disabled, so I am inclined to believe it is a DFHack bug.
+`
+	
+	vars=<map
+		USER_SPELUNCAPHOBIA_DFHACK_ENTITIES=<rubble:addonmetavar name='What entities should have torches?' val="<array SAURIAN HUMAN>">
+	>
+	
+	activates="Libs/Base"
+>

@@ -1,0 +1,13 @@
+[OBJECT:CREATURE]
+
+[CREATURE:SPELUNCAPHOBIA_CREATURE]
+	[NAME:user_dfhack_speluncaphobia:user_dfhack_speluncaphobia:user_dfhack_speluncaphobia]
+	
+	[MATERIAL:SYNDROME_HOLDER]
+		[SYNDROME]
+			[SYN_NAME:speluncaphobia immune]
+			[SYN_CLASS:LIGHT]
+			[CE_ADD_TAG:NO_DIZZINESS:START:0]
+	
+	[ARENA_RESTRICTED]
+	[DOES_NOT_EXIST]

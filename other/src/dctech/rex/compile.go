@@ -315,15 +315,23 @@ func (state *State) compileDeclCommand(lex *Lexer, code *Code) {
 		// We have found the name we are declaring
 		name := lex.current.Lexeme
 
+		// Add the command with an empty body (to allow recursive commands)
+		index := -1
+		if module == nil {
+			index = state.global.vars.add(name)
+		} else {
+			index = module.vars.add(name)
+		}
+		
 		// compile the block
 		block := state.compileBlockDeclare(lex, code)
 		body := state.compileCommandBody(lex, block)
 		
 		if module == nil {
-			state.global.vars.addAndSet(name, body)
+			state.global.vars.set(index, body)
 			return
 		}
-		module.vars.addAndSet(name, body)
+		module.vars.set(index, body)
 		return
 	}
 }
@@ -447,7 +455,6 @@ func (state *State) compileValue(lex *Lexer, code *Code) {
 		return
 	}
 
-	// This one line handles almost ALL compile time errors, wow.
 	exitOnTokenExpected(lex.look, tknString, tknTrue, tknFalse, tknNil, tknRawString, tknCmdBegin,
 		tknVarBegin, tknObjLitBegin, tknCodeBegin, tknDeclModule, tknDeclCommand, tknDeclBlock, tknDeclVar)
 }

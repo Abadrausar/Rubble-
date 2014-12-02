@@ -8,6 +8,9 @@ If you want to load liquids see "User/DFHack/Cart Filler/Powered".
 Input items MUST be on an input tile (a special one tile workshop), items are then loaded
 onto any adjacent minecart.
 
+If the cart loader has an output it will load items into the cart in the output tile, otherwise
+it will use any adjacent minecart.
+
 To keep your dwarves from stealing the items from the input tile either make sure they can't
 path to the input or dump the items there with a sorter (which, like all machines, forbids
 items that it places on an input).

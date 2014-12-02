@@ -23,7 +23,7 @@ Where to Find Help:
 
 All documentation is in the "other" directory, this includes tutorials, template documentation, script documentation, and basic documentation of Rubble's internals.
 
-General users have no need to read ANYTHING except this readme and the addon list! Everything most users need to know (aside from things like how to install Rubble, which can be found in this document) can be found in the web UI addon description pages.
+General users have no need to read ANYTHING except this readme! Everything most users need to know (aside from things like how to install Rubble, which can be found in this document) can be found in the web UI addon description pages.
 
 Most of the documentation assumes you know what you are doing as far as general DF modding goes, please do not read documentation that is above your level and then complain that "Rubble is too hard".
 I do assume that modders will have at least some knowledge of programming (I apologize for this, as I know that not everyone does). If you do not know anything about programming most of the scripting stuff will be hard (if not impossible) to follow, but if you stick to using templates you will be fine (scripting is only needed for advanced stuff anyway, most people will never need it).
@@ -33,16 +33,16 @@ For examples of what all is possible with Rubble see the included addons, they c
 Modders will want to read the following (in most-important-first order):
 	HowTo Rubble - Tutorials, read at least the first two! Feel free to skip the others.
 	Rubble Base Templates - The template documentation for the "Libs/Base" addon, this stuff is VERY important!
+	Rubble Basics - Lots of stuff about addons and Rubble in general, some of this stuff is kinda advanced.
 	Rubble Libs Templates - The template documentation for the library addons
-	Rubble Basics - Lots of stuff about addons and Rubble in general, some of this stuff is really advanced!
-	Everything in "Rex Docs" - the Rex documentation, feel free to skip this if you are not interested in scripting
+	Everything in "Rex Docs" - The Rex documentation, feel free to skip this if you are not interested in scripting
 	The included addons - A little short on comments but full of great examples
 
 ==============================================
 Install:
 ==============================================
 
-If you have anything in your raw folder that you want to keep back it up! Rubble will delete all your existing raw files, including creature graphics and the DFHack onLoad.init and init.lua files!
+If you have anything in your Dwarf Fortress directory that you want to keep back it up! Rubble will delete all your existing raw files, including creature graphics and the DFHack onLoad.init and init.lua files (and maybe a few other things)!
 
 Delete or otherwise remove any old Rubble version you may have.
 Extract the new Rubble to "<DF Directory>/rubble".
@@ -50,6 +50,8 @@ Install any custom addons you may have to "<DF Directory>/rubble/addons".
 See the appropriate "Running Rubble" section below.
 
 Now you are good to go!
+
+DO NOT extract a new Rubble version over an old one! This can cause all sorts of hard to find problems!
 
 If you use OSX or Linux, 32 bit binaries for these OSes are included. If you want 64 bit binaries you can compile them yourself, source code is in "./other/src" (along with basic build instructions).
 To use non-Windows binaries they must be placed in the same directory as the windows ones (you can delete the windows binaries if you don't need them). OSX binaries are in "./other/darwin_386", Linux binaries may be found in "./other/linux_386".
@@ -61,7 +63,7 @@ Running Rubble (Web UI, all OSes):
 
 The web UI is kinda ugly, but simple, functional, and easy to use.
 
-This interface is the new recommended way of running Rubble, as it always has full support for the latest ways of doing things.
+This interface is the recommended way of running Rubble, as it always has full support for the latest ways of doing things.
 
 To use the web UI all you need to do is start the server (rubble_web) and then point your browser to "http://127.0.0.1:2120" (by default), from there just follow the menus.
 
@@ -74,7 +76,7 @@ The web UI is the most advanced (functionality-wise) UI available. The command l
 So far this UI is the only one that fully supports addon meta data.
 A particularly visible example of this meta data in action is addon descriptions, if you click on an addon name (anywhere addon names are shown) it will take you to a small page with information about the addon! No more digging through a text file for addon details, you can even get a list of dependencies or look at the contents of individual files!
 
-The server supports the rubble config file and most of the command line options that the CLI version does, run "rubble_web -h" for a full list.
+The server supports the rubble config file, run "rubble_web -h" for a full list of supported keys and command line options.
 
 The UI's look and feel can be customized, see the "Rubble Web UI Customization" section in "Rubble Basics".
 
@@ -91,7 +93,7 @@ For basic documentation on each command line option run "rubble -h".
 Common Tasks:
 
 To activate or deactivate a Rubble addon manually you may set it's entry in addons/addonlist.ini to "true" or "false". If you just installed an addon it will not have an entry until Rubble has run at least once (after the addon was installed). 
-If you want to run Rubble without generating anything so as to update the addon list file just run 'rubble -addonlist' (the GUI does this as part of it's startup process).
+If you want to run Rubble without generating anything so as to update the addon list file just run 'rubble -addonlist'.
 It is possible to specify addons manually as well, just use -addons.
 
 Some addons may allow additional configuration via "config variables", these are generally for advanced users and may be specified with the -config command line option.

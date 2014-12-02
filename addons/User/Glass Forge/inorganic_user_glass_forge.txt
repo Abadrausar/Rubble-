@@ -5,7 +5,7 @@
 # -20% as good as iron.
 {SHARED_INORGANIC;GLASS_GREEN_WAR;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
-	[STATE_NAME_ADJ:ALL_SOLID:green glass]
+	[STATE_NAME_ADJ:ALL_SOLID:tempered green glass]
 	[STATE_NAME_ADJ:LIQUID:molten green glass]
 	[STATE_NAME_ADJ:GAS:boiling green glass]
 	[DISPLAY_COLOR:2:10:0]
@@ -49,7 +49,7 @@
 # iron grade
 {SHARED_INORGANIC;GLASS_CLEAR_WAR;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
-	[STATE_NAME_ADJ:ALL_SOLID:clear glass]
+	[STATE_NAME_ADJ:ALL_SOLID:tempered clear glass]
 	[STATE_NAME_ADJ:LIQUID:molten clear glass]
 	[STATE_NAME_ADJ:GAS:boiling clear glass]
 	[DISPLAY_COLOR:7:15:1]
@@ -93,7 +93,7 @@
 # -20% as good as steel. 
 {SHARED_INORGANIC;GLASS_CRYSTAL_WAR;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
-	[STATE_NAME_ADJ:ALL_SOLID:crystal glass]
+	[STATE_NAME_ADJ:ALL_SOLID:tempered crystal glass]
 	[STATE_NAME_ADJ:LIQUID:molten crystal glass]
 	[STATE_NAME_ADJ:GAS:boiling crystal glass]
 	[DISPLAY_COLOR:7:11:1]

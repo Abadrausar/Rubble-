@@ -1,7 +1,7 @@
 <rubble:addonmeta
 	lib=true
 	
-	header=`Powered workshop support addon.`
+	header=`Powered workshop support addon (and general documentation).`
 	
 	description=`
 First: If you are looking to produce high quality items, look elsewhere. The various 
@@ -15,6 +15,8 @@ output tile).
 
 The powered workshops follow more or less the same pattern, they take any input items
 they may need from any adjacent inputs and place any output items just beyond any outputs.
+If the workshop deals with minecarts it generally will work with any adjacent one. Each
+workshop's addon description details its needs, look there for specific help.
 
 Input tiles and output tiles are specified with special one tile workshops. If an output
 item is placed on an input tile it will be automatically forbidden. This will keep your
@@ -73,8 +75,9 @@ makes both glass and empty bags, use a sorter to separate dissimilar outputs (th
 may also discriminate based on material!).
 
 An example of a bad setup (that got me):
-This was *supposed* to sort bags and send them right while glass when straight, but sometimes
-bags ended up on top of the glass furnace, can you spot the issue?
+This was *supposed* to sort bags and send them right (to be loaded into a minecart) while
+glass items went straight, but sometimes bags ended up on top of the glass furnace, can
+you spot the issue?
 	o: output
 	i: input
 	s: sorter
@@ -90,11 +93,21 @@ bags ended up on top of the glass furnace, can you spot the issue?
 	aaa
 
 The problem is that the bag sorter and the glass furnace shared an output, moving the sorters
-(and their inputs and outputs) fixed the issue:
+(and their outputs) fixed the issue:
 	o
 	s s
 	 i o l
 	 o  i
+	aaa
+	aaa
+	aaa
+
+Another way you could set this up (to recycle bags directly instead of loading them into
+minecarts):
+	o
+	s s
+	 io
+	 oi
 	aaa
 	aaa
 	aaa
@@ -122,31 +135,90 @@ If you do not want the above system to pile all the items of the correct type in
 on the input tile it would probably be a good idea to set an output limit on the sorter!
 Be aware that sorter output limits count ALL items on ALL of the sorter's output tiles!
 
+Sorter output limits are particularly useful with workshops that uses or produces items that
+can rot. By keeping all but one item in stockpiles the chance of all your raw materials
+rotting away is much reduced.
+
 Make sure you read and understand the addon description for the sorter! This building plays
 a critical role in any advanced factory!
 
+If you like complicated computing setups the logic gates will be just what you need. AND,
+OR, NOT, and XOR gates are available, and they output by toggling the state of many types
+of buildings (doors, hatches, bridges, and gear assemblies to name a few, even levers!).
+
+One other VERY important building is the powered workshop controller. Any powered workshop
+that has an adjacent unpowered controller acts almost exactly like it is unpowered. Basically
+the controller is a way to pause a powered workshop, without removing the ability to make
+adjustments (since adjusting a powered workshop requires the workshop to be powered).
+
+Controllers work very well with item sensors. Item sensors are simple workshops that count all
+adjacent items and compare this count with a user settable limit, if the item count is above
+the limit the output state goes from true to false. In order to save FPS item sensors "tick"
+relatively slowly, so the item count may go a little over (it ticks about as fast as most powered
+workshops, so the chance is low that this will happen). Item sensors output in exactly the same
+way as the logic gates, so the possibilities are just about limitless.
+
+Automatic workshop output limiter example:
+	o: output
+	c: controller
+	s: item sensor
+	*: gear assembly
+	a: workshop
+	<-: power inputs
+	
+	aaa<-
+	aaa
+	aaac
+	 os*<-
+
+This setup will automatically shutdown a workshop when the item sensor's limit is reached,
+very useful for workshops that are generating some kind of raw material (keeps stuff from
+piling up on the next workshop's input).
+
+The cart loader and cart launcher make it possible to make fully automated minecart routes.
+Normally you require dwarf power to, at a minimum, load items into the carts, but with the
+cart loader it is possible to do this automatically. The cart launcher gives the ability to
+start a minecart on it's way without the need for a dwarf to push it or the need for a complex
+launcher system, simply set the launch direction and how full the cart needs to be (as a percent)
+and it will automatically take care of starting the cart on it's way.
+
+With the cart loader and launcher to help minecarts can become an important part of any factory.
+Often the best way to move items from one sub-line to another is a short point-to-point minecart
+route. For example a sawmill can supply several wood furnaces, rather than trying to setup
+everything so all fuel users end up near a wood furnace it is often easier to put the sawmill
+and wood furnaces nearby and use minecarts to move the fuel to where it is required. If you
+really want to get fancy you can use item detectors to make a single minecart line supply whoever
+needs fuel at the moment! (Although depending on how large your factory is this could be something
+of a mega project)
+
 The final destination of most production lines is a powered factory, this building requires
-a dwarf to operate and produces many kinds of items from wood, stone or glass.
+a dwarf to operate and produces many kinds of items from wood, stone or raw glass.
 It uses the same kind of input/output system as the other workshops with the exception that
 an output is not required (with no output the items are dumped in the middle of the factory).
+The quality of the items produced depends on the dwarf's skill, so if you already have skilled
+craftsdwarves this is generally your best bet.
 
-If you just want items in a hurry the powered mason and carpenter may be more your speed.
+If you just want items in a hurry the powered mason and carpenter may be more your "speed".
 They both produce items without the need for a dwarf (keep coffins coming during a tantrum
 spiral!) but the items are a little more expensive and will be lower quality than can be made
-by a skilled dwarf.
+by a skilled dwarf (for best results use high quality trap components and mechanisms).
 
 The glass furnace and kiln may operate either as a raw material generator for the factory or on
 their own like the powered mason and carpenter, which way to run them is up to you.
 
 Many of the powered workshops are made to fill a specific slot in a production line, but
 they work just as well by themselves. For example a powered wood furnace is mostly designed
-as an intermediate stage between a powered sawmill and a powered kiln or smelter, but it also
-works well with that unpowered sawmill that is scrapping all that wooden crap you stole from
-the last elven caravan :p
+as an intermediate stage between a powered sawmill and a powered kiln, glass forge, or smelter,
+but it also works well with that unpowered sawmill that is scrapping all that wooden crap you
+stole from the last elven caravan :p
 
 If a machine seems to not be working look at the DFHack console, if you don't see lots of errors
 the problem is most likely a missing or incorrect input item. Read the workshop's addon description
 for details about what it expects, you may have forgotten something.
+
+Remember: The machine (axle, gear assembly, etc) connecting a powered workshop to your power grid
+MUST be built AFTER the powered workshop! If it's not animated it's probably not powered, if it's
+not powered it won't work!
 `
 	
 	activates="Libs/Base;Libs/DFHack/Upgrade Building"

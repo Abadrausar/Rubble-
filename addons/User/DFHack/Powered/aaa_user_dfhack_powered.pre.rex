@@ -32,6 +32,10 @@ var rubble:dfhack_powered:wshop = <map
 	
 	# Any build items you may want to add beyond the standard.
 	extraitems=""
+	
+	# If true makes a 1x1 workshop rather than a 3x3.
+	# If this is true centertile and centercolor are ignored (set from the Lua side).
+	small=false
 >
 
 var rubble:dfhack_powered:wshops = <map>
@@ -93,7 +97,31 @@ var rubble:dfhack_powered:wshops = <map>
 			})
 		})
 		
-		[out = (str:add [out] `
+		(if [wshop small] {
+			[out = (str:add [out] `
+{BUILDING_WORKSHOP;` [id] (if (isnil [output]) {``}{(str:add `_` [output id])}) `;` [hook] `}
+	[NAME:` [wshop name] `]
+	[NAME_COLOR:7:0:1]
+	[BUILD_LABOR:MECHANIC]
+	[DIM:1:1]
+	[WORK_LOCATION:1:1]
+	[BLOCK:1:0]
+	[TILE:0:1:42]
+	[COLOR:0:1:0:7:0]
+	[TILE:1:1:128]
+	[COLOR:1:1:0:7:0]
+	[TILE:2:1:15]
+	[COLOR:2:1:0:7:0]
+	[TILE:3:1:42]
+	[COLOR:3:1:0:7:0]
+	[BUILD_ITEM:1:BLOCKS:NONE:NONE:NONE]
+		[BUILDMAT]
+	[BUILD_ITEM:1:TRAPPARTS:NONE:NONE:NONE]
+		[CAN_USE_ARTIFACT]
+` (if (isnil [wshop extraitems]) {``}{[wshop extraitems]})
+			)]
+		}{
+			[out = (str:add [out] `
 {BUILDING_WORKSHOP;` [id] (if (isnil [output]) {``}{(str:add `_` [output id])}) `;` [hook] `}
 	[NAME:` [wshop name] `]
 	[NAME_COLOR:7:0:1]
@@ -132,9 +160,9 @@ var rubble:dfhack_powered:wshops = <map>
 		[BUILDMAT]
 	[BUILD_ITEM:2:TRAPPARTS:NONE:NONE:NONE]
 		[CAN_USE_ARTIFACT]
-`
-(if (isnil [wshop extraitems]) {``}{[wshop extraitems]})
-		)]
+` (if (isnil [wshop extraitems]) {``}{[wshop extraitems]})
+			)]
+		})
 	}
 	
 	(if (int:gt (len [wshop outputs]) 0) {

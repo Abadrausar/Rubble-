@@ -27,13 +27,13 @@ import "sort"
 // AddonFile represents any file in an addon.
 type AddonFile struct {
 	Name    string // File name.
-	Source  string // Addon name (including loc ids).
+	Source  string // Addon path (AXIS syntax, including loc ids).
 	Content []byte
 	Tags    map[string]bool
 }
 
 // NewAddonFile creates a new addon with the specified name.
-func NewAddonFile(name string, source string, content []byte) *AddonFile {
+func NewAddonFile(name, source string, content []byte) *AddonFile {
 	file := new(AddonFile)
 	file.Name = name
 	file.Source = source

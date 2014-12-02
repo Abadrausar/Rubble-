@@ -3,16 +3,18 @@ local powered = rubble.require "powered"
 local pswitchable = rubble.require "powered_switchable"
 
 function isInput(x, y, z, cb, wshop)
+	if cb == nil then
+		return
+	end
+	
 	local pos = powered.Center(wshop)
-	if cb.machine.machine_id ~= -1 then
-		if getmetatable(cb) == "building_axle_horizontalst" then
-			if (cb.is_vertical == false and (x == pos.x)) or (cb.is_vertical == true and (y == pos.y))
-				return true
-			end
-		elseif getmetatable(cb) == "building_axle_verticalst" then
-			if cb.z ~= pos.z and x == pos.x and y == pos.y then
-				return true
-			end
+	if getmetatable(cb) == "building_axle_horizontalst" then
+		if (cb.is_vertical == true and (x == pos.x)) or (cb.is_vertical == false and (y == pos.y)) then
+			return true
+		end
+	elseif getmetatable(cb) == "building_axle_verticalst" then
+		if cb.z ~= pos.z and x == pos.x and y == pos.y then
+			return true
 		end
 	end
 	return false
@@ -41,116 +43,58 @@ end
 
 function makeLogicGate(gatetyp)
 	return function(wshop)
-		if not wshop:isUnpowered() then
-			local inputs = findInputs(wshop)
-			local outputs = pswitchable.Switchables(wshop)
-			
-			if #inputs == 0 or #outputs == 0 then
-				return
-			end
-			
-			local pI = false
-			local uI = false
-			for _, input in ipairs(inputs) do
-				if input.machine_id ~= -1 then
-					-- Is this assumption true? (id -> index)
-					--machine = df.global.world.machines.all[input.machine_id]
-					machine = input:getMachineInfo()
-					if machine.flags.active then
-						pI = true
-					else
-						uI = true
-					end
-					if pI == true and uI == true then
-						break
-					end
+		local inputs = findInputs(wshop)
+		local outputs = pswitchable.Switchables(wshop)
+		
+		if #inputs == 0 or #outputs == 0 then
+			return
+		end
+		
+		local pI = false
+		local uI = false
+		for _, input in ipairs(inputs) do
+			if input.machine.machine_id ~= -1 then
+				-- Cache inputs?
+				local machine = df.machine.find(input.machine.machine_id)
+				if machine.flags.active then
+					pI = true
+				else
+					uI = true
+				end
+				if pI and uI then
+					break
 				end
 			end
-			
-			if pI == false and uI == false then
-				-- No valid inputs
-				-- This is probably impossible
-				return
-			end
-			
-			local command = nil
-			if gatetyp == "AND" then
-				if pI == true and uI == false then
-					command = true
-				else
-					command = false
-				end
-			elseif gatetyp == "OR" then
-				if pI == true then
-					command = true
-				else
-					command = false
-				end
-			elseif gatetyp == "NOT" then
-				if pI == true and uI == false then
-					command = false 
-				elseif pI == false and uI == true then
-					command = true
-				end
-			elseif gatetyp == "NAND" then
-				if uI == true then
-					command = true
-				else
-					command = false
-				end
-			elseif gatetyp == "NOR" then
-				if uI == true and pI == false then
-					command = true
-				else
-					command = false
-				end
-			elseif gatetyp == "XOR" then
-				if pI == true and uI == true then
-					command = true
-				else
-					command = false
-				end
-			elseif gatetyp == "XNOR" then
-				if (pI == true and uI == false) or (pI == false and uI == true) then
-					command = false
-				else
-					command = true
-				end
-			end
-			
-			-- Can happen when you have a multiple input NOT with inconsistent values.
-			if command == nil then
-				return
-			end
-			
-			for _, output in ipairs(outputs) do
-				pswitchable.SwitchBuilding(output, command)
-			end
-		end	
+		end
+		
+		if not pI and not uI then
+			-- No valid inputs
+			-- This is probably impossible
+			return
+		end
+		
+		local command = false
+		if gatetyp == "AND" then
+			command = pI and not uI
+		elseif gatetyp == "OR" then
+			command = pI
+		elseif gatetyp == "NOT" then
+			command = not pI
+		elseif gatetyp == "XOR" then
+			command = pI and uI
+		end
+		
+		for _, output in ipairs(outputs) do
+			pswitchable.SwitchBuilding(output, command)
+		end
 	end		
 end
 
 local outputs = {
 	"AND",
-	"OR"
-	"NOT"
-	--"NAND"
-	--"NOR"
-	--"XOR"
-	--"XNOR"
+	"OR",
+	"NOT",
+	"XOR"
 }
 
-for _, output in pairs(outputs) do
-	buildings.registerBuilding{
-		name="LOGIC_GATE_"..output,
-		gears={{x=0,y=0}},
-		action={10, makeLogicGate(output)},
-		animate={
-			isMechanical=true,
-			frames={
-				{{x=0,y=0,42,0,7,0}},
-				{{x=0,y=0,15,0,7,0}}
-			}
-		}
-	}
-end
+powered.RegisterSmall("LOGIC_GATES", outputs, 0, 10, makeLogicGate)

@@ -67,6 +67,7 @@ import "rubble/rblutil"
 // (all the listed versions are assumed to be backwards compatible)
 // Index 0 MUST be the current version!
 var Versions = []string{
+	"5.6",
 	"5.5",
 	"5.4",
 	"5.3",
@@ -497,6 +498,11 @@ func (state *State) Activate(addons, config []string) (err error) {
 	state.Log.Separator()
 	state.Log.Println("Activating...")
 
+	state.Log.Println("  Clearing Addon Activation State...")
+	for i := range state.Addons {
+		state.Addons[i].Active = false
+	}
+	
 	state.Log.Println("  Loading Config Variables...")
 	if config != nil && len(config) != 0 {
 		for _, val := range config {
@@ -538,7 +544,7 @@ func (state *State) Activate(addons, config []string) (err error) {
 		}
 	}
 
-	state.Log.Println("  Activating Addons...")
+	state.Log.Println("  Activating Addons from Generated List...")
 	for _, name := range addonNames {
 		if _, ok := state.AddonsTbl[name]; ok {
 			state.AddonsTbl[name].Active = true
@@ -561,6 +567,11 @@ func (state *State) Activate(addons, config []string) (err error) {
 				RaiseAbort("The \"" + state.AddonsTbl[me].Name + "\" addon requires the \"" + it + "\" addon!\n" +
 					"The required addon is not currently installed, please install the required addon and try again.")
 			}
+			
+			if !state.AddonsTbl[it].Meta.Lib && !state.AddonsTbl[it].Active {
+				state.Log.Println("    Warning: The \"" + me + "\" Addon is Activating Non-Library Addon: \"" + it + "\"")
+			}
+			
 			state.AddonsTbl[it].Active = true
 			activate(it)
 		}
@@ -594,6 +605,18 @@ func (state *State) Activate(addons, config []string) (err error) {
 		}
 	}
 
+	state.Log.Println("  Checking for Incompatible Addons from Meta Data...")
+	for _, addon := range state.Addons {
+		if addon.Active {
+			for _, incompat := range addon.Meta.Incompatible {
+				if iaddon, ok := state.AddonsTbl[incompat]; ok && iaddon.Active {
+					RaiseAbort("The \"" + addon.Name + "\" addon is incompatible with the \"" + iaddon.Name + "\" addon!\n" +
+					"Please deactivate one of these addons and try again.")
+				}
+			}
+		}
+	}
+	
 	state.Log.Println("  Updating the Default Addon List File...")
 	return state.UpdateAddonList("addons:dir:addonlist.ini")
 }

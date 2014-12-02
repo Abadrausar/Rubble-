@@ -23,7 +23,7 @@ function IsSwitchable(building)
 	or getmetatable(building) == "building_weaponst"
 	or getmetatable(building) == "building_bridgest" then
 		return true
-	elseif getmetatable(building) == "building_trapst" and building.trap_type == df.emums.trap_type["Lever"] then
+	elseif getmetatable(building) == "building_trapst" and building.trap_type == df.trap_type["Lever"] then
 		return true
 	end
 	return false
@@ -86,17 +86,14 @@ function SwitchBuilding(building, state)
 				building.timer = 1
 			end
 		end
-	elseif getmetatable(building) == "building_trapst" and building.trap_type == df.emums.trap_type["Lever"] then
+	elseif getmetatable(building) == "building_trapst" and building.trap_type == df.trap_type["Lever"] then
 		-- This is the same basic code used in "lever.rb", but translated to Lua
-		-- This badly needs testing...
 		if state == false then
 			if building.state == 1 then
 				for _, mech in pairs(building.linked_mechanisms) do
 					for _, ref in pairs(mech.general_refs) do
 						if getmetatable(ref) == "general_ref_building_holderst" then
-							--ref.building_id
-							-- Is this the right state?
-							ref.building_tg:setTriggerState(1)
+							df.building.find(ref.building_id):setTriggerState(1)
 						end
 					end
 				end
@@ -107,9 +104,7 @@ function SwitchBuilding(building, state)
 				for _, mech in pairs(building.linked_mechanisms) do
 					for _, ref in pairs(mech.general_refs) do
 						if getmetatable(ref) == "general_ref_building_holderst" then
-							--ref.building_id
-							-- Is this the right state?
-							ref.building_tg:setTriggerState(0)
+							df.building.find(ref.building_id):setTriggerState(0)
 						end
 					end
 				end

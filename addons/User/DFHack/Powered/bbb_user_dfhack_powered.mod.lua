@@ -88,13 +88,10 @@ function FindXItemsArea(wshop, x, check)
 	return items
 end
 
--- Find an item on an adjacent input tile.
--- Checks all input tiles, not just the first one it finds.
--- Returns an item or nil
+-- Find an item at one of the passed in locations.
 -- check should be a function that takes an item and returns true if it
 -- is like the one you are looking for.
-function FindItemAtInput(wshop, check)
-	local inputs = powered.Inputs(wshop)
+function FindItemAt(locs, check)
 	local find = function(x, y, z)
 		local itemblock = dfhack.maps.ensureTileBlock(x, y, z)
 		if itemblock.occupancy[x%16][y%16].item == true then
@@ -110,7 +107,7 @@ function FindItemAtInput(wshop, check)
 		return nil
 	end
 	
-	for _, pos in pairs(inputs) do
+	for _, pos in pairs(locs) do
 		local item = find(pos.x, pos.y, pos.z)
 		if item ~= nil then
 			return item
@@ -119,16 +116,15 @@ function FindItemAtInput(wshop, check)
 	return nil
 end
 
--- Finds a certain number of items on adjacent input tiles.
--- Checks all input tiles, not just the first one it finds.
+-- Finds a certain number of items at one of the passed in locations.
 -- Returns a table containing the items or nil.
 -- check should be a function that takes an item and returns true if it
 -- is like the one you are looking for.
-function FindXItemsAtInput(wshop, x, check)
+function FindXItemsAt(locs, x, check)
 	local items = {}
 	local found = {}
 	for i = 1, x, 1 do
-		local item = FindItemAtInput(wshop, function(item)
+		local item = FindItemAt(locs, function(item)
 			if found[item.id] == true then
 				return false
 			end
@@ -142,6 +138,24 @@ function FindXItemsAtInput(wshop, x, check)
 		items[i] = item
 	end
 	return items
+end
+
+-- Find an item on an adjacent input tile.
+-- Checks all input tiles, not just the first one it finds.
+-- Returns an item or nil
+-- check should be a function that takes an item and returns true if it
+-- is like the one you are looking for.
+function FindItemAtInput(wshop, check)
+	return FindItemAt(powered.Inputs(wshop), check)
+end
+
+-- Finds a certain number of items on adjacent input tiles.
+-- Checks all input tiles, not just the first one it finds.
+-- Returns a table containing the items or nil.
+-- check should be a function that takes an item and returns true if it
+-- is like the one you are looking for.
+function FindXItemsAtInput(wshop, x, check)
+	return FindXItemsAt(powered.Inputs(wshop), x, check)
 end
 
 -- Create a basic item, you will have to set dimensions, subtype or stack size if needed.
@@ -187,6 +201,24 @@ function CreateItemBasic(mat, id, unit, skill)
 	return CreateItem(mat, 'item_'..string.lower(id)..'st', unit, skill)
 end
 
+-- Sets an item as forbidden if it is on an input.
+-- Keeps dwarves from stealing stuff from the middle of your production lines...
+function ForbidIfNeeded(item)
+	if powered.InputAt(item.pos.x, item.pos.y, item.pos.z) then
+		item.flags.forbid = true
+	else
+		item.flags.forbid = false
+	end
+end
+
+-- Allows an item to drop if over open space or a down slope.
+function ProjectileIfNeeded(item)
+	local ttype = dfhack.maps.getTileType(item.pos.x, item.pos.y, item.pos.z)
+	if ttype == 32 or ttype == 1 then
+		dfhack.items.makeProjectile(item)
+	end
+end
+
 -- Put the item on one of the workshop's output tiles.
 -- If there are no output tiles the item is placed in the workshop center.
 -- If the item is to be placed on an input tile it will be forbidden.
@@ -200,7 +232,8 @@ function Eject(wshop, item)
 	end
 	
 	dfhack.items.moveToGround(item, outputs[math.random(#outputs)])
-	powered.ForbidIfNeeded(item)
+	ForbidIfNeeded(item)
+	ProjectileIfNeeded(item)
 end
 
 -- Set an item's quality based on a workshops "skill", aka the quality of it's components.

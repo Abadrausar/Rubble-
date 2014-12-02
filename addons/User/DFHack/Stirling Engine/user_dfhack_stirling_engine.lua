@@ -3,7 +3,7 @@ local buildings = require 'plugins.building-hacks'
 
 buildings.registerBuilding{
 	name="STIRLING_ENGINE",
-	produce=5,
+	produce=6,
 	gears={{x=0,y=0}},
 	animate={
 		isMechanical=true,

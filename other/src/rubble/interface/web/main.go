@@ -235,6 +235,14 @@ func main() {
 
 	// Normal Generation
 
+	http.HandleFunc("/clearaddons", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("UI Transition: \"/clearaddons\"")
+		for _, addon := range state.Addons {
+			addon.Active = false
+		}
+		http.Redirect(w, r, "./genaddons", http.StatusFound)
+	})
+
 	http.HandleFunc("/genaddons", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("UI Transition: \"/genaddons\"")
 
@@ -286,13 +294,22 @@ func main() {
 				}
 			}
 		}
-
+		
 		vars := make(map[string]*rubble.MetaVar)
 		for _, name := range addons {
 			addon := state.AddonsTbl[name]
 			for i := range addon.Meta.Vars {
 				vars[i] = addon.Meta.Vars[i]
 			}
+		}
+		
+		file, err := axis.ReadAll(state.FS, "rubble:userconfig.ini")
+		if err == nil {
+			rblutil.ParseINI(string(file), "\n", func(key, value string) {
+				if _, ok := vars[key]; ok {
+					vars[key].Val = value
+				}
+			})
 		}
 
 		err = genvarsPage.Execute(w, struct {

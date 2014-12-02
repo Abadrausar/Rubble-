@@ -2,32 +2,65 @@
 If I don't write it down I forget it, hence this file.
 If you see something nice in here that you want to use with your mod feel free to steal it :)
 
-Finish the powered logic gates and sensors
-	Test the proof-of-concept addon, in particular switchable levers is all new (and likely broken).
-	Gates:
-		AND
-		OR
-		NOT
-		XOR
+You know, the problem with formal TODO lists like this is that they rapidly fill up with things that I should do, but am too lazy to finish for the foreseeable future...
+
+Make the effect of "User/Speluncaphobia" wear off when maximum cave adaption hits.
+
+"User/Speluncaphobia/DFHack" is bugged (that or DFHack is). Determine where the problem is and fix it (or get it fixed)!
+
+Playable everyone:
+	Remember: Most of the special stuff needs to be in generic addons, if you want to play dwarves with elven wood working that should be possible. The race addon should just set a general "flavor".
+	
+	Humans
+		Done. (sort-of)
+		I should do a crates addon to encourage trading.
+		Make an embassy addon to allow forcing caravans, diplomats, and sieges.
+	
+	Elves
+		Need a way to make grown items and special weapons grade "wood" logs.
+		No real way to disable stone or metal working, so if you want an "elven heretic" fort...
+	
+	Goblins
+		No eat and drink will make it easy to survive if you turtle up
+		This may be a good time to make a raid system.
+	
+	Kobolds
+		Will require a MAJOR rework of the entity!
+
+Other playable races:
+	Gnomes:
+		Mostly just smaller dwarves for flavor, nothing special
+		Excellent mechanics, stone workers, etc, poor anything surface related.
+		Should they be good smiths or should gnomes focus on stone? Probably stone I think.
+		Obviously using the powered workshops is encouraged
+
+Finish the powered sensors:
 	Sensors:
-		Item (settable min/max count)
 		Unit (variants for pets and hostiles?)
 		Cart (settable cargo thresholds)
 		(others?)
 	Other:
 		Repeater (wait y ticks, turn on, wait x ticks, turn off, repeat)
-		Clock (trigger for x ticks at a certain time of year)
 
-Succession fort tools:
-	A special "succession mode":
-		Batch generate a special raw set that supports multiple tilesets (via raw switching)
-			You choose your addons, then choose tileset addons, one raw set is generated per tileset addon
-	A tileset switcher utility (using the already generated raw sets)
+Succession fort tools
+	A way to handle multiple tilesets on one world (in a user friendly way).
+	The problem is that the current system (regen) is too easy to mess a world up with.
+	
+	Proposal A:
+		A special "succession mode":
+			Batch generate a special raw set that supports multiple tilesets (via raw switching)
+				You choose your addons, then choose tileset addons, one raw set is generated per tileset addon
+		A tileset switcher utility (using the already generated raw sets)
+		
+	Proposal B:
+		A utility that reads a Rubble tileset file and modifies existing raws with the information.
+		Basically the parsing from "Dev/Tileset/Insert" paired with something to parse the tileset file.
+		More flexible than proposal A, but may be harder to implement.
 
 Crystal Thorn
 	A slow growing (but not too slow!) farmable plant that has two uses:
 		It may be processed to a low value raw gem
-		It may be ground into sand
+		It may be milled to sand
 	~4 plants for each gem or 1 plant per unit of sand
 		Processing to gems will require a custom reaction, milling to sand can probably use the vanilla system
 		By using vanilla milling nothing special needs to be done to make them work with the powered mill addon
@@ -54,14 +87,15 @@ A powered screw press.
 
 Support milling items to paste at the powered mill
 	Vanilla uses [HAS_MATERIAL_REACTION_PRODUCT:PRESS_LIQUID_MAT], but only for seed items
-		This will need to be extendable by other addons.
+		This will need to be extensible by other addons.
+
+A powered forge?
+	Maybe, maybe not...
 
 Port the "BD/Hives" addons.
 	All of them require a good bit of reworking.
 		The spider addon is designed for use with Essential DF (uses creatures that do not exist in vanilla)
 		The rainbow beetle dyes desperately need to be changed (color names do not match dye descriptions)
-
-Rework the saurian nobles
 
 Make the unpowered quarry require soil (if DFHack is available)
 
@@ -70,3 +104,4 @@ Gem forge
 	Probably requires a new material template for all gems (to make them sharp and hard)
 	Mostly gems should make good edged weapons, but poor armor
 	mostly decorative, good for nobles and fancy stuff like that (but gem swords may make a good early weapon)
+	Not stockpilable? Not sure, but if so (and if there is no easy fix) this won't happen.

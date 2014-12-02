@@ -1,18 +1,9 @@
 
 # Load some helpful commands.
 
-command rubble:fetchaddon name {
-	(foreach [rubble:addons] block _ addon {
-		(if (str:cmp [addon Name] [name]) {
-			(ret [addon])
-		})
-		(break true)
-	})
-	(ret nil)
-}
-
+# Is the named addon active?
 command rubble:addonactive name {
-	var addonref = (rubble:fetchaddon [name])
+	var addonref = [rubble:addonstbl [name]]
 	(if (isnil [addonref]) {
 		(ret false)
 	}{
@@ -20,21 +11,24 @@ command rubble:addonactive name {
 	})
 }
 
+# Activate an addon (and its dependencies).
 # You should generally use addon.meta instead, but just in case...
 command rubble:activateaddon me addon {
 	(if (rubble:addonactive [me]) {
-		var addonref = (rubble:fetchaddon [addon])
+		var addonref = [rubble:addonstbl [addon]]
 		(if (isnil [addonref]) {
 			(rubble:abort (str:add "The \"" [me] "\" addon requires the \"" [addon] "\" addon!\n"
 			"The required addon is not currently installed, please install the required addon and try again."))
 		}{
 			[addonref Active = true]
+			(foreach [addonref Meta Activates] block _ childname {
+				(rubble:activateaddon [addon] [childname])
+			})
 		})
 	})
 }
 
-# Dependency checks
-
+# Check the Rubble version.
 command rubble:checkversion addon version {
 	(if (isnil [rubble:versions [version]]) {
 		(rubble:abort (str:add [addon] " requires Rubble version " [version] " (or a compatible newer version)\n"
@@ -50,73 +44,5 @@ command rubble:checkversion addon version {
 				"    If you encounter issues changing to the requested Rubble version may help.\n"
 			))
 		})
-	})
-}
-
-command rubble:requireaddon me addon {
-	(if (rubble:addonactive [addon]) {
-	}{
-		(rubble:abort (str:add "The \"" [me] "\" addon requires that the \"" [addon] "\" addon be active!\n"
-		"Please activate that addon and try again."))
-	})
-}
-
-command rubble:incompatibleaddon me addon {
-	(if (rubble:addonactive [addon]) {
-		(rubble:abort (str:add "The \"" [me] "\" addon is incompatible with the \"" [addon] "\" addon!\n"
-		"Please deactivate that addon and try again."))
-	})
-}
-
-# Addon group checks
-
-command rubble:ingroup addon group {
-	[group = (str:add [group] "/")]
-	
-	(if (str:cmp (str:left [addon] (str:len [group])) [group]) {
-		(ret true)
-	} {
-		(ret false)
-	})
-}
-
-command rubble:groupactive group {
-	var found = false
-	(foreach [rubble:addons] block _ addon {
-		(if [addon Active] {
-			(if (rubble:ingroup [addon Name] [group]) {
-				[found = true]
-				(break false)
-			}{
-				(break true)
-			})
-		}{
-			(break true)
-		})
-	})
-	(ret [found])
-}
-
-# Example (rubble:grouprequires "Better Dorfs" "Better Dorfs/Base")
-command rubble:grouprequires me addon {
-	(if (rubble:groupactive [me]) {
-		(if (rubble:addonactive [addon]) {
-		}{
-			(rubble:abort (str:add "The \"" [me] "\" addon group requires that the \"" [addon] "\" addon be active!\n"
-			"Please activate that addon and try again."))
-		})
-	}{
-		# No addons in the group are active, do nothing.
-	})
-}
-
-command rubble:groupincompatible me addon {
-	(if (rubble:groupactive [me]) {
-		(if (rubble:addonactive [addon]) {
-			(rubble:abort (str:add "The \"" [me] "\" addon group is incompatible with the \"" [addon] "\" addon!\n"
-			"Please deactivate that addon and try again."))
-		})
-	}{
-		# No addons in the group are active, do nothing.
 	})
 }

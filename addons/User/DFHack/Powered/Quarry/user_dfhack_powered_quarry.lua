@@ -37,40 +37,41 @@ end
 
 function makeDigQuarry(output)
 	return function(wshop)
-		if not wshop:isUnpowered() then
-			if not powered.HasOutput(wshop) then
+		if wshop:isUnpowered() or powered.ControllerOff(wshop) then
+			return
+		end
+		if not powered.HasOutput(wshop) then
+			return
+		end
+		local apos = powered.Area(wshop)
+		
+		if output == "SAND" then
+			local mat = findSandArea(apos.x1, apos.y1, apos.x2, apos.y2, apos.z)
+			if mat == nil then
 				return
 			end
-			local apos = powered.Area(wshop)
 			
-			if output == "SAND" then
-				local mat = findSandArea(apos.x1, apos.y1, apos.x2, apos.y2, apos.z)
-				if mat == nil then
-					return
+			local bag = pitems.FindItemAtInput(wshop, function(item)
+				if item:isBag() and #dfhack.items.getContainedItems(item) == 0 then
+					return true
 				end
-				
-				local bag = pitems.FindItemAtInput(wshop, function(item)
-					if item:isBag() and #dfhack.items.getContainedItems(item) == 0 then
-						return true
-					end
-					return false
-				end)
-				if bag == nil then
-					return
-				end
-				
-				local item = pitems.CreateItem(mat, 'item_powder_miscst', nil, 0)
-				dfhack.items.moveToContainer(item, bag)
-				pitems.Eject(wshop, bag)
-			else
-				local mat = findClayArea(apos.x1, apos.y1, apos.x2, apos.y2, apos.z)
-				if mat == nil then
-					return
-				end
-				
-				local item = pitems.CreateItem(mat, 'item_boulderst', nil, 0)
-				pitems.Eject(wshop, item)
+				return false
+			end)
+			if bag == nil then
+				return
 			end
+			
+			local item = pitems.CreateItem(mat, 'item_powder_miscst', nil, 0)
+			dfhack.items.moveToContainer(item, bag)
+			pitems.Eject(wshop, bag)
+		else
+			local mat = findClayArea(apos.x1, apos.y1, apos.x2, apos.y2, apos.z)
+			if mat == nil then
+				return
+			end
+			
+			local item = pitems.CreateItem(mat, 'item_boulderst', nil, 0)
+			pitems.Eject(wshop, item)
 		end
 	end
 end

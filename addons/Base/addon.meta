@@ -12,8 +12,9 @@ The following changes have been made from vanilla:
 	!ENTITY_PLAYABLE templates have been added to all entities.
 	The dwarven outpost liaison has been modded to works as a trade rep if the dwarves are unplayable.
 	Dwarves have the alchemist labor permitted in their entity.
-	Vermin creatures have #TILE and #COLOR templates inserted.
+	Creatures have #TILE and #COLOR templates inserted.
 	All file IDs have been stripped.
+	Added #ENTITY_NOBLES to all entities except SKULKING and SUBTERRANEAN_ANIMAL_PEOPLES.
 `
 	
 	activates="Libs/Base;Libs/Castes"

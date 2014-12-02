@@ -48,7 +48,7 @@ func (ii *Map) Get(index string) *rex.Value {
 	rval := reflect.Value(*ii).MapIndex(key)
 	zero := reflect.Value{}
 	if rval == zero {
-		rex.RaiseError("GenII: Index does not exist.")
+		return rex.NewValue()
 	}
 	return RValueToSValue(rval)
 }
@@ -59,7 +59,7 @@ func (ii *Map) Set(index string, sval *rex.Value) bool {
 	rval := reflect.Value(*ii).MapIndex(key)
 	zero := reflect.Value{}
 	if rval == zero {
-		rex.RaiseError("GenII: Index does not exist.")
+		return false
 	}
 	SValueToRValue(sval, rval)
 	return true

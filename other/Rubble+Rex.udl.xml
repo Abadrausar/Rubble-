@@ -44,7 +44,7 @@
             <Keywords name="Folders in comment, open"></Keywords>
             <Keywords name="Folders in comment, middle"></Keywords>
             <Keywords name="Folders in comment, close"></Keywords>
-            <Keywords name="Keywords1">nop ret exit break breakif breakloop breakloopif eval error onerror copy exists len isnil type if loop for foreach&#x000D;&#x000A;&#x000D;&#x000A;expr&#x000D;&#x000A;&#x000D;&#x000A;var module command block</Keywords>
+            <Keywords name="Keywords1">nop modval ret exit break breakif breakloop breakloopif eval error onerror copy exists len isnil type if loop for foreach&#x000D;&#x000A;&#x000D;&#x000A;expr&#x000D;&#x000A;&#x000D;&#x000A;var module command block</Keywords>
             <Keywords name="Keywords2">global&#x000D;&#x000A;&#x000D;&#x000A;bool console convert debug env file fileio float int png rand regex sort str&#x000D;&#x000A;&#x000D;&#x000A;axis&#x000D;&#x000A;&#x000D;&#x000A;df rubble</Keywords>
             <Keywords name="Keywords3">... true false nil append</Keywords>
             <Keywords name="Keywords4">array map sarray smap</Keywords>

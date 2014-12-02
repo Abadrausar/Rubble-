@@ -1,22 +1,23 @@
 <rubble:addonmeta
-	header=`Single tile powered boolean logic gates! (experimental)`
+	header=`Single tile powered boolean logic gates!`
 	
 	description=`
-If you do not know why boolean logic is useful keep your hands off!
+This addon adds simple boolean logic gates.
 
-This addon is experimental and utterly untested, the final version will
-likely be quite different!
+The gates added are:
+	Name		Operation
+	AND			Returns true if all inputs are powered
+	OR			Returns true if at least one input is powered
+	NOT			Returns true if no inputs are powered
+	XOR			Returns true if at least one powered and one unpowered input
 
-The gates that are currently available are strictly to allow me to test the
-basic concept and make sure it will work. Before I make the full version I
-will make a generic API to encapsulate the functionality I pioneer here.
+A new gate defaults to AND, use the adjustment reactions to change types.
 
-Eventually building type will be selected by reaction and this system will
-include programmable sensors (item counters, cart detectors, and anything
-else I can think of that can have a meaningful boolean output) and the like.
+Logic gates only receive input from axles (windmills and waterwheels make
+no sense, and gear assemblies are used as outputs).
 
-Currently logic gates only receive input from axles and output by setting
-the state of a variety of buildings:
+Output is by setting the state of a variety of buildings:
+	building (true state/false state)
 	gear assemblies (engaged/disengaged)
 	doors (open/closed)
 	hatch covers (open/closed)
@@ -25,7 +26,10 @@ the state of a variety of buildings:
 	floodgates (open/closed)
 	upright spike traps (extended/retracted)
 	bridges (extended/retracted)
-	levers (and anything connected to the lever! on/off)
+	levers (on/off)
+
+Levers in particular have lots of potential, place your logic wherever
+it fits best and use a lever to hook it into complicated machines!
 
 Connecting machines must be built AFTER any mechanical workshop!
 `

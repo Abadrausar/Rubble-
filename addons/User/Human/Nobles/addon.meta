@@ -1,0 +1,13 @@
+<rubble:addonmeta
+	header=`Gives humans a static set of nobles.`
+	
+	description=`
+Currently the nobles are almost exactly like the dwarven ones.
+
+This is incompatible with "User/Fix/Human Diplomats"!
+`
+	
+	activates="Libs/Base"
+	
+	incompatible="User/Fix/Human Diplomats"
+>

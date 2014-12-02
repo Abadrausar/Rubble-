@@ -14,6 +14,13 @@ func Command_Add(script *rex.Script, params []*rex.Value)
 
     Returns a + b
 
+func Command_Dec(script *rex.Script, params []*rex.Value)
+    Decrements a value "in place".
+
+	int:-- a
+
+    Returns unchanged.
+
 func Command_Div(script *rex.Script, params []*rex.Value)
     Divides two values.
 
@@ -34,6 +41,13 @@ func Command_Gt(script *rex.Script, params []*rex.Value)
 	int:gt a b
 
     Returns true or false.
+
+func Command_Inc(script *rex.Script, params []*rex.Value)
+    Increments a value "in place".
+
+	int:++ a
+
+    Returns unchanged.
 
 func Command_Lt(script *rex.Script, params []*rex.Value)
     Integer less than.

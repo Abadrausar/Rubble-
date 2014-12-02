@@ -49,7 +49,7 @@ func (ii *Struct) Get(index string) *rex.Value {
 
 func (ii *Struct) Set(index string, sval *rex.Value) bool {
 	if _, ok := reflect.Value(*ii).Type().FieldByName(index); !ok {
-		rex.RaiseError("GenII: Field: " + index + " Does not exist in struct.")
+		return false
 	}
 	
 	rval := reflect.Value(*ii).FieldByName(index)

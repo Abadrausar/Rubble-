@@ -69,7 +69,7 @@ loop:
 			lex.GetToken(tknTagEnd)
 
 			if _, ok := state.Templates[name]; !ok {
-				state.Log.Println("      Warning: Nonexistent Template Found: " + name)
+				RaiseError("Nonexistent Template Found: " + name)
 				continue
 			}
 			out = append(out, state.Templates[name].Call(state, params).String()...)

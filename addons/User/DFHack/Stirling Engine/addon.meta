@@ -2,16 +2,19 @@
 	header=`Produces a (very) small amount of power for free.`
 	
 	description=`
-This machine provides 5 power all the time, use to power small
+This machine provides 6 power all the time, use to power small
 machines that would be hard to connect to a conventional power source.
+
+6 power is just enough to run the smallest workshops, basically the cart loader,
+cart launcher, and sorter (if the "sorters require power" option is on). These
+workshops actually require 5 power, but you need an axle between the engine and
+the the workshop, so 6 is the minimum.
 
 As each engine produces so little power (and costs so much to build) producing
 enough power to run larger machines is not really worth the effort.
 
 Use steam engines from "User/DFHack/Steam" or vanilla water wheels and windmills
 for larger machines (or groups of machines).
-
-Most if not all machines will require two or more engines to run.
 
 Connecting machines must be built AFTER any mechanical workshop!
 `

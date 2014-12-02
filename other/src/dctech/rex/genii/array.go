@@ -48,7 +48,7 @@ func (ii *Array) Get(index string) *rex.Value {
 	
 	length := reflect.Value(*ii).Len()
 	if i < 0 || i >= length {
-		rex.RaiseError("GenII: Index out of range.")
+		return rex.NewValue()
 	}
 	
 	rval := reflect.Value(*ii).Index(i)
@@ -60,7 +60,7 @@ func (ii *Array) GetI(index int64) *rex.Value {
 	
 	length := reflect.Value(*ii).Len()
 	if i < 0 || i >= length {
-		rex.RaiseError("GenII: Index out of range.")
+		return rex.NewValue()
 	}
 	
 	rval := reflect.Value(*ii).Index(i)
@@ -76,7 +76,7 @@ func (ii *Array) Set(index string, sval *rex.Value) bool {
 	
 	length := reflect.Value(*ii).Len()
 	if i < 0 || i >= length {
-		rex.RaiseError("GenII: Index out of range.")
+		return false
 	}
 	
 	rval := reflect.Value(*ii).Index(i)
@@ -89,7 +89,7 @@ func (ii *Array) SetI(index int64, sval *rex.Value) bool {
 	
 	length := reflect.Value(*ii).Len()
 	if i < 0 || i >= length {
-		rex.RaiseError("GenII: Index out of range.")
+		return false
 	}
 	
 	rval := reflect.Value(*ii).Index(i)

@@ -25,10 +25,10 @@ On Linux:
 I recently setup a a Linux VM, did some Rubble testing, and found a bunch of issues *sigh*.
 
 To get anything working at all you need to:
-	All the binaries needed to be marked "executable" (chmod +x) and moved to the same directory as the Windows binaries.
-	The browser startup script needed to be marked "executable" (chmod +x)
+	All the binaries need to be marked "executable" (chmod +x) and moved to the same directory as the Windows binaries.
+	The browser startup script needs to be marked "executable" (chmod +x)
 
-After that was done things worked fine.
+After that things *should* work fine.
 
 If the web UI does not automatically start your browser you will have to modify the browser startup script (comments in the default script list some options).
 
@@ -41,6 +41,46 @@ If you want to know how Rubble works on this platform either try it yourself or 
 At a minimum you will have to move the binaries to the same directory as the Windows binaries (do you have to mark them executable like on Linux? OSX and Linux are both UNIX clones).
 
 There is no default browser startup script for the web UI on OSX. It will try to use the Linux script, but this is unlikely to work.
+
+==============================================
+AXIS VFS:
+==============================================
+
+For a variety of reasons Rubble uses AXIS VFS for (almost) all file access.
+Most places where a path is given the AXIS syntax is used, so you will need to know at least a little so you can read these paths.
+
+AXIS uses special (OS-independent) multi-part paths. The first part is one or more colon separated location IDs. You can think of location IDs as drive letters, they each specify a different location on the file system. The second part is the traditional slash separated path.
+
+Examples:
+	df:data/init/d_init.txt
+	out:objects/entity_default.txt
+
+In some cases it may be possible to specify multiple location IDs on a path, in that case just put them one right after another.
+
+Example:
+	addons:dir:addonlist.ini
+
+One thing to keep in mind: Relative paths (paths containing "." or ".." elements) are utterly illegal in AXIS, so don't do that.
+
+The only paths that are not handled by AXIS are:
+	dfdir command-line/config option
+	outputdir command-line/config option
+	addonsdir command-line/config option
+
+And even these paths may use the AXIS syntax (with a reduced set of location IDs):
+	dfdir may use the "rubble" location
+	outputdir may use the "df" and "rubble" locations
+	addonsdir may use the "out", "df", and "rubble" locations
+
+You may still use OS paths (which may be relative) for these three settings, but you do not have to if using the AXIS syntax would be easier.
+
+Location IDs:
+rubble				The current working directory, most of the time this is where the Rubble binary is.
+df					The dwarf fortress directory, defaults to ".."
+out					The output directory, by default "df:raw"
+addons:dir			The addons directory, by default "rubble:addons"
+addons:zip			A composite, read-only, directory made up of the contents of all the zip files in the addons directory
+prep				The prep directory, only valid when a prep cycle is running.
 
 ==============================================
 Template Prefixes Explained:
@@ -109,11 +149,21 @@ OSX users are more or less on their own, but under the hood OSX is a lot like Li
 
 Linux users will have to do a bunch of extra stuff to get Rubble working, see the "Rubble OS Specific Information" section of this document.
 
+----------------------------------------------
+User Configuration Variable Defaults:
+
+During normal generation the configuration variable editor will get default values for the variables from the addon.meta files. This works great except for one thing: While the defaults are relatively sane most advanced users will quickly get tired of changing them to their favorite settings :)
+
+The solution to this is simple: Create a file named "rubble:userconfig.ini" and put values to override the defaults there. This file uses the same format as "out:genconfig.ini", so you can just copy the values you want from that file.
+
+(The above two paths are in the AXIS syntax, see the section on AXIS VFS for details)
+
+----------------------------------------------
 HTML Template Customization:
 
 When the web UI server is run it tries to load HTML templates and CSS files from "./other/webUI/", if it does not find the file it is looking for it tries to write the default version of the file out to that directory.
 
-If you want to customize the look of the UI create the "./other/webUI" directory then run the server once to create these files. You can then modify them, and from then on the server will use your files. (templates for the generation report are also here, you can tell which are which because the report templates end in "_static")
+If you want to customize the look of the UI modify these files, from then on the server will use your files. (templates for the generation report are also here, you can tell which are which because the report templates end in "_static")
 
 Each page template receives raw data about whatever it is supposed to do, in the default templates this data is formatted as JSON and most of the page content is generated client-side by JavaScript, but it is possible to generate the page directly on the server by using the template system for everything. In some cases doing so will cut the page size considerably as some pages receive the parsed version of the entire addons directory! (that's over 7mb of data as encoded!)
 
@@ -125,7 +175,7 @@ For more details on how these templates work see "golang.org/pkg/html/template/"
 For details about exactly what Rubble passes each page you will have to look at the source code ("./other/src/rubble" and "./other/src/rubble/interface/web", specifically the files "meta.go", "addon.go", and "main.go" will be the most helpful).
 
 If anybody comes up with a nicer set of templates (or some better CSS) I want to see them!
-The current look isn't all that great, so this is your chance to get listed in the credits and on the about page :p
+The current look isn't all that great, so this is your chance to get listed in on the about page :p
 
 ==============================================
 .webload files:
@@ -145,9 +195,9 @@ URLs used for web loading MUST be complete, eg "www.example.com/somefile.zip" wi
 addon.meta:
 ==============================================
 
-Addons may now include a special file named addon.meta that contains extra information about the addon. This file is optional but recommended.
+Addons may include a special file named addon.meta that contains extra information about the addon. This file is optional but HIGHLY recommended.
 
-The meta file is actually a Rex script, but please don't abuse this by running arbitrary code as this script MUST return a special value (and load scripts are more flexible). The only reason a Rex script is used is so that I can get complex parsing for "free".
+The meta file is actually a Rex script, but please don't abuse this by running arbitrary code as this script MUST return a special value (and load scripts are more flexible). The only reason a script is used is so that I can get complex parsing for "free".
 
 Example addon.meta file:
 	# Missing fields are set to their defaults.
@@ -160,6 +210,8 @@ Example addon.meta file:
 	<rubble:addonmeta
 		lib=false
 		
+		format="txt"
+		
 		header=`An example addon, nothing special about it.`
 		
 		description=`
@@ -168,6 +220,8 @@ Actually it is totally made up.
 `
 		
 		activates="Libs/Example;Some/Addon"
+		
+		incompatible="Other/Addon"
 		
 		vars=<map
 			CONFIG_VAR="default value"
@@ -179,6 +233,9 @@ Most of the fields are not used directly by Rubble, but may be used by various i
 
 The most important field by far is the "activates" field. This field specifies addons that are required for this addon to function. Addons listed in the activates field are activated automatically if this addon is active, basically an easier to use version of rubble:activateaddon.
 
+Closely related to activates is "incompatible". This field allows specifying addon that are incompatible with the current one. In most cases it is better to insert special case code to make your addon compatible, but sometimes this is not possible.
+If an addon is active that is listed in another addon's incompatible field Rubble will abort (with a message telling you which addon caused the problem).
+
 The "libs" field is also very important. Any addon that has lib set to true will not allow activation in the normal manner eg it will ignore activation by the -addons command line option, the addons config file key, and any entries in addon list files (when an addon list is generated lib addons will not even be listed). Such "lib" addons may only be activated by a load script or by having an entry in the "activates" meta key of an active addon.
 Lib addons are good for libraries and other addons that do not directly effect the user, as they are generally hidden from view and managed automatically.
 
@@ -187,13 +244,31 @@ Most of the time the default value is interpreted as a string, but if you pass a
 
 "header" and "description" are descriptions and documentation for the edification of the user. "header" is a one line description of the addon, it should be short and to the point. "description" may be as long as you wish, put everything a user will need to know to use an addon here, if header already provides sufficient description leave this field empty.
 
-"activates" and "lib" are the only fields that are used directly by Rubble, all of the other fields are provided for use by interfaces. Current the only interface that uses the meta data is the web UI.
+"format" is used to specify how the value of "header" and "description" are formatted. Currently anything other than "html" is assumed to mean pre-formated plain text.
+
+"activates", "incompatible" and "lib" are the only fields that can effect Rubble's behavior, all of the other fields are provided for use by interfaces and the generation report. Current the only interface that uses the meta data is the web UI.
 
 ==============================================
 Tileset Addons:
 ==============================================
 
 There is a rather good (IMHO) tutorial on tileset addons in the "HowTo Rubble" file, see tutorial #4.
+
+There are two basic kinds of tileset addons, those that just modify the raws to fit a tileset and those that install the full package, tile sheets and all.
+
+The addons in the "User/Tilesets/MLC" group are examples of addons that give the full treatment, even though they do not make raw changes they do everything else (change the init files, install the tile sheets, and, in one case installs some special extra files). For an example of one that only installs basic support look at "User/Tilesets/Phoebus".
+
+Tileset support is more-or-less automatic so long as you use the SHARED_OBJECT templates (SHARED_INORGANIC and SHARED_PLANT are particularly important), for cases where this is impossible you will need to use #TILE and #COLOR manually. About the only time you will ever need to do this is in creatures. For various reasons creatures do not have a specialized version of the SHARED_OBJECT template (and they are unlikely to ever get one).
+
+As inserting all these templates is something of a pain I have made a simple addon that automates this. "Dev/Tileset/Insert" will take non-Rubble raws and insert the shared object templates, together with calls to #TILE and #COLOR in creatures.
+
+There are two basic ways to use "Dev/Tileset/Insert": The first is to activate "Dev/Tileset/Export". This will take the information gathered and export it as a "tileset file", basically a long list of calls to SET_TILE and SET_COLOR that represent the tile/color settings used in the current raw set. The second is to set the configuration variable "DEV_TILESET_INSERT_EXPORT" to "true". This will write all the modified files out to the current directory, allowing you to use them as part of an addon.
+
+The first operation mode is for porting a tileset to Rubble. You take the raws that come with the tileset and add them to a temporary addon, then generate this addon together with "Dev/Tileset/Insert" and "Dev/Tileset/Export" (and NOTHING ELSE) to get an almost finished tileset addon, just add a script to handle any init changes you may need and your done!
+
+Generally the second mode of operation is used when porting a non-Rubble mod to use Rubble, as the SHARED_OBJECT templates are important for many things other than tilesets. See the next section for more details on how to do this.
+
+One thing tileset addons need to worry about that most addons do not is prep support. "prep" is Rubble's answer to the problem of running multiple different saves with different non-raw changes. Basically Rubble loads a special "addon" from the save and runs any .prep.rex scripts it contains. These scripts should make sure DF is ready to load the save. For tilesets this means that the prep script should install any tilesheets and make any init changes needed. Generally a tileset addon's prep script can be created from it's initial install script with a bit of cleverness, see the existing tileset addon for examples.
 
 ==============================================
 Porting an existing mod to Rubble with "Dev/Tileset/Insert":
@@ -420,46 +495,6 @@ Scripts with the extension ".prep.rex" are automatically added to the prep "addo
 If you want to revert to the setting used by the main raw folder (if you want to generate a new world or something) just run "rubble -prep=raw".
 
 Most addons do not need to worry about supporting prep, it is only needed for addons that make changes to files outside the raw folder.
-
-==============================================
-AXIS VFS:
-==============================================
-
-For a variety of reasons newer versions of Rubble use AXIS VFS for (almost) all file access.
-For most users this will make absolutely no difference, but if you need to pass a path to Rubble for some reason you will need to know at least a little.
-
-AXIS uses special (OS-independent) multi-part paths. The first part is the colon separated location ID(s). You can think of location IDs as drive letters, they each specify a different location on the file system. The second part is the traditional slash separated path.
-
-Examples:
-	df:data/init/d_init.txt
-	out:objects/entity_default.txt
-
-In some cases it may be possible to specify multiple location IDs on a path, in that case just put them one right after another.
-
-Example:
-	addons:dir:addonlist.ini
-
-One thing to keep in mind: Relative paths (paths containing "." or ".." elements) are utterly illegal in AXIS, so don't do that.
-
-The only paths that are not handled by AXIS are:
-	dfdir command-line/config option
-	outputdir command-line/config option
-	addonsdir command-line/config option
-
-And even these paths may use the AXIS syntax (with a reduced set of location IDs):
-	dfdir may use the "rubble" location
-	outputdir may use the "df" and "rubble" locations
-	addonsdir may use the "out", "df", and "rubble" locations
-
-You may still use OS paths (which may be relative) for these three settings, but you do not have to if using the AXIS syntax would be easier.
-
-Location IDs:
-rubble				The current working directory, most of the time this is where the Rubble binary is.
-df					The dwarf fortress directory, defaults to ".."
-out					The output directory, by default "df:raw"
-addons:dir			The addons directory, by default "rubble:addons"
-addons:zip			A composite, read-only, directory made up of the contents of all the zip files in the addons directory
-prep				The prep directory, only valid when a prep cycle is running.
 
 ==============================================
 The Addon Loader:

@@ -61,7 +61,7 @@ type IntIndexable interface {
 // IntEditIndexable is an edit indexable that may be indexed by integer.
 // Indexes MUST range from 0 to Len() - 1, otherwise all sorts of things will break!
 type IntEditIndexable interface {
-	EditIndexable
+	IntIndexable
 
 	// SetI returns false if the key could not be created.
 	// This may be caused by the indexable being semi-readonly.

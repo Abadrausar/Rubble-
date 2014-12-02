@@ -11,8 +11,9 @@ local buildings = require 'plugins.building-hacks'
 -- This is part A.
 
 -- This is a convenience function for registering powered workshops that use the Rex API
--- provided by this addon.
--- If you do not use the Rex API this function will not be useful.
+-- provided by this addon. If you do not use the Rex API this function will not be useful.
+-- 
+-- This version is for the standard 3x3 workshops
 -- 
 -- id should match that used when registering the workshop on the Rubble side of things
 -- outputs is the same basic thing as the Rubble equivalent, just that here it is just a
@@ -22,8 +23,6 @@ local buildings = require 'plugins.building-hacks'
 -- makeaction is a function that takes one parameter (the output id) and returns
 -- a function to handle the action, this function should take a single parameter as well, the workshop.
 function Register(id, outputs, consume, ticks, makeaction)
-	print("    Registering mechanical workshop: "..id)
-	
 	local register = function(output)
 		if output == nil then
 			buildings.registerBuilding{
@@ -63,7 +62,68 @@ function Register(id, outputs, consume, ticks, makeaction)
 			register(output)
 		end
 	end
+end
+
+-- This is a convenience function for registering powered workshops that use the Rex API
+-- provided by this addon. If you do not use the Rex API this function will not be useful.
+-- 
+-- This version is for small size 1x1 workshops.
+-- 
+-- id should match that used when registering the workshop on the Rubble side of things
+-- outputs is the same basic thing as the Rubble equivalent, just that here it is just a
+-- table of the IDs, no need for the names.
+-- consume is how much power to use
+-- ticks is how often to run the function returned by makeaction
+-- makeaction is a function that takes one parameter (the output id) and returns
+-- a function to handle the action, this function should take a single parameter as well, the workshop.
+-- framea and frameb are partial animation frames (no need to specify x and y coords) these are optional.
+function RegisterSmall(id, outputs, consume, ticks, makeaction, framea, frameb)
+	if framea == nil then
+		framea = {42,0,7,0}
+	end
 	
+	if frameb == nil then
+		frameb = {15,0,7,0}
+	end
+	
+	framea.x = 0
+	framea.y = 0
+	frameb.x = 0
+	frameb.y = 0
+	
+	local register = function(output)
+		if output == nil then
+			buildings.registerBuilding{
+				name=id,
+				consume=consume,
+				gears={{x=0,y=0}},
+				action={ticks, makeaction("")},
+				animate={
+					isMechanical=true,
+					frames={{framea}, {frameb}}
+				}
+			}
+		else
+			buildings.registerBuilding{
+				name=id.."_"..output,
+				consume=consume,
+				gears={{x=0,y=0}},
+				action={ticks, makeaction(output)},
+				animate={
+					isMechanical=true,
+					frames={{framea}, {frameb}}
+				}
+			}
+		end
+	end
+	
+	if outputs == nil or #outputs == 0 then
+		register(nil)
+	else
+		for _, output in pairs(outputs) do
+			register(output)
+		end
+	end
 end
 
 -- Returns true if there is an input at the position.
@@ -172,14 +232,37 @@ function Outputs(wshop)
 	return rtn
 end
 
--- Sets an item as forbidden if it is on an input.
--- Keeps dwarves from stealing stuff from the middle of your production lines...
-function ForbidIfNeeded(item)
-	if InputAt(item.pos.x, item.pos.y, item.pos.z) then
-		item.flags.forbid = true
-	else
-		item.flags.forbid = false
+-- Returns the controller if there is a controller at the position, else returns nil.
+function ControllerAt(x, y, z)
+	building = dfhack.buildings.findAtTile(x, y, z)
+	if building ~= nil then
+		if getmetatable(building) == "building_workshopst" then
+			t = df.building_def.find(building.custom_type)
+			if t ~= nil and t ~= -1 then
+				if t.code == "DFHACK_CONTROLLER_POWERED" then
+					return building
+				end
+			end
+		end
 	end
+	return nil
+end
+
+-- Returns true if the workshop has at least one disabled controller.
+function ControllerOff(wshop)
+	local pos = Area(wshop)
+	
+	for cx = pos.x1, pos.x2, 1 do
+		for cy = pos.y1, pos.y2, 1 do
+			local control = ControllerAt(cx, cy, pos.z)
+			if control ~= nil then
+				if control:isUnpowered() then
+					return true
+				end
+			end
+		end
+	end
+	return false
 end
 
 -- Returns a {x,y,z} for the workshop's center tile.
@@ -204,5 +287,19 @@ end
 function MakeFakeAdv(cx, cy, x1, y1, x2, y2, z)
 	return {centerx = cx, centery = cy, x1 = x1, y1 = y1, x2 = x2, y2 = y2, z = z}
 end
+
+-- Internal, keep your grubby fingers off!
+buildings.registerBuilding{
+	name="DFHACK_CONTROLLER_POWERED",
+	consume=5,
+	gears={{x=0,y=0}},
+	animate={
+		isMechanical=true,
+		frames={
+			{{x=0,y=0,99,0,7,0}},
+			{{x=0,y=0,67,0,7,0}}
+		}
+	}
+}
 
 return _ENV

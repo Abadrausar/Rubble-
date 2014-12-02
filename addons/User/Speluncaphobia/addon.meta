@@ -1,0 +1,11 @@
+<rubble:addonmeta
+	header=`Makes humans and saurians slow down and get dizzy when they spend too long underground.`
+	
+	description=`
+It is possible to change the list of creatures to affect via a config variable.
+`
+	
+	vars=<map
+		USER_SPELUNCAPHOBIA_CREATURES=<rubble:addonmetavar name='"User/Speluncaphobia" creature list' val="<map SAURIAN=true HUMAN=true>">
+	>
+>

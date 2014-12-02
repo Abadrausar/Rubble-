@@ -1,0 +1,57 @@
+
+(if (exists [rubble:raws] "user_tilesets_mlc_dfhack_twbt.post.rex") {
+	(axis:write [rubble:fs] "out:prep/user_tilesets_mlc_dfhack_twbt.prep.rex" [rubble:raws "user_tilesets_mlc_dfhack_twbt.post.rex"])
+	
+	(rubble:prepfile "MLC 16x16 - Font.png")
+	(rubble:prepfile "MLC 16x16 - Graphics.png")
+	(rubble:prepfile "MLC 16x16 - Overrides.png")
+	(rubble:prepfile "user_tilesets_mlc_dfhack_twbt_overrides.txt")
+})
+
+(rubble:open_d_init)
+(rubble:edit_d_init "PILLAR_TILE" "141")
+
+# All this to get rid of a stupid "I"
+(rubble:edit_d_init "TRACK_N" "208")
+(rubble:edit_d_init "TRACK_S" "210")
+(rubble:edit_d_init "TRACK_E" "198")
+(rubble:edit_d_init "TRACK_W" "181")
+(rubble:edit_d_init "TRACK_NS" "186")
+(rubble:edit_d_init "TRACK_NE" "200")
+(rubble:edit_d_init "TRACK_NW" "188")
+(rubble:edit_d_init "TRACK_SE" "201")
+(rubble:edit_d_init "TRACK_SW" "187")
+(rubble:edit_d_init "TRACK_EW" "205")
+(rubble:edit_d_init "TRACK_NSE" "204")
+(rubble:edit_d_init "TRACK_NSW" "185")
+(rubble:edit_d_init "TRACK_NEW" "202")
+(rubble:edit_d_init "TRACK_SEW" "203")
+(rubble:edit_d_init "TRACK_NSEW" "206")
+(rubble:edit_d_init "TRACK_RAMP_N" "30")
+(rubble:edit_d_init "TRACK_RAMP_S" "30")
+(rubble:edit_d_init "TRACK_RAMP_E" "30")
+(rubble:edit_d_init "TRACK_RAMP_W" "30")
+(rubble:edit_d_init "TRACK_RAMP_NS" "30")
+(rubble:edit_d_init "TRACK_RAMP_NE" "30")
+(rubble:edit_d_init "TRACK_RAMP_NW" "30")
+(rubble:edit_d_init "TRACK_RAMP_SE" "30")
+(rubble:edit_d_init "TRACK_RAMP_SW" "30")
+(rubble:edit_d_init "TRACK_RAMP_EW" "30")
+(rubble:edit_d_init "TRACK_RAMP_NSE" "30")
+(rubble:edit_d_init "TRACK_RAMP_NSW" "30")
+(rubble:edit_d_init "TRACK_RAMP_NEW" "30")
+(rubble:edit_d_init "TRACK_RAMP_SEW" "30")
+(rubble:edit_d_init "TRACK_RAMP_NSEW" "30")
+(rubble:close_d_init)
+
+(axis:write [rubble:fs] "df:data/init/overrides.txt" [rubble:raws "user_tilesets_mlc_dfhack_twbt_overrides.txt"])
+
+(rubble:install_tilesheet "MLC 16x16 - Font.png")
+(rubble:install_tilesheet "MLC 16x16 - Graphics.png")
+(rubble:install_tilesheet "MLC 16x16 - Overrides.png")
+
+(rubble:set_fullscreen_font "MLC 16x16 - Font.png")
+(rubble:set_windowed_font "MLC 16x16 - Font.png")
+
+(rubble:set_fullscreen_font_graphics "MLC 16x16 - Graphics.png")
+(rubble:set_windowed_font_graphics "MLC 16x16 - Graphics.png")

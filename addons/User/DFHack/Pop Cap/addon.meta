@@ -13,7 +13,7 @@ The default values (as loaded from the init files) should be automatically resto
 	vars=<map
 		population_cap=<rubble:addonmetavar name='DF Population Cap' val="200">
 		strict_population_cap=<rubble:addonmetavar name='DF Strict Population Cap' val="220">
-		baby_cap_absolute=<rubble:addonmetavar name='DF Child Cap (Absolute)' val="1000">
+		baby_cap_absolute=<rubble:addonmetavar name='DF Child Cap (Absolute)' val="100">
 		baby_cap_percent=<rubble:addonmetavar name='DF Child Cap (Percent)' val="1000">
 	>
 >

@@ -42,22 +42,11 @@ Marks a file as a prep file.
 ============================================================
 Loaded by a loader script in the "Libs" addon:
 
-Retrieves an addon by name.
-	
-	rubble:fetchaddon
-	
-	Only useful from loader scripts.
-	Example:
-	
-	[(rubble:fetchaddon "Libs/Base") Active = true]
-	
-	Returns the addon (nil if addon not found).
-
 Checks if a named addon is active.
 	
 	rubble:addonactive name
 	
-	name needs to be the FULL name of the addon! (for example "Base/Files")
+	name needs to be the FULL name of the addon! (for example "Libs/Base")
 	The name check is case-sensitive!
 	Returns true or false.
 
@@ -76,40 +65,3 @@ Rubble version check, aborts if the current version is not the same as or newer 
 	
 	If the current version is newer a message is printed saying so.
 	addon is used as the name of what is requesting a specific version and does not have to be a valid addon name.
-
-Dependency check.
-	
-	rubble:requireaddon me addon
-	
-	me and addon both need to be the full addon names! 
-	me should be the addon doing the checking, addon should be the one checked.
-
-Dependency check.
-	
-	rubble:incompatibleaddon me addon
-	
-	Same as rubble:requireaddon, just for incompatibilities instead of requirements.
-
-Group state check.
-	
-	rubble:ingroup addon group
-	
-	Returns true if addon is part of the specified group.
-
-Group state check.
-	
-	rubble:groupactive group
-	
-	Returns true if ANY addons in the specified group are active.
-
-Group dependency check.
-	
-	rubble:grouprequires me addon
-	
-	Same as rubble:requireaddon except me should be an addon group.
-
-Group dependency check.
-	
-	rubble:groupincompatible me addon
-	
-	Same as rubble:incompatibleaddon except me should be an addon group.

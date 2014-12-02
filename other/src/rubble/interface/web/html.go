@@ -51,9 +51,6 @@ var menuPage = loadOr("menu.html", `
 	<p><a href="./log">View Rubble log</a>
 	<p><a href="./about">About</a>
 	<p><a href="./kill">Quit</a>
-	<p>WARNING! Be careful with the browser back button!<br>
-	Every time a new page loads Rubble's internal state changes and some of these changes cannot be undone!<br>
-	Returning to the main menu will reset the state, making it safe to start a new operation.
 </body>
 </html>
 `)
@@ -138,17 +135,36 @@ var addondataPage = template.Must(template.New("addondata").Parse(loadOr("addond
 		if (meta.Lib == true) {
 			document.write("(An automatically managed library)")
 		}
-		if (meta.Header != "") {
-			document.write("<p class=\"mono\">" + meta.Header + "</p>")
+		
+		if (meta.Format == "html") {
+			if (meta.Header != "") {
+				document.write("<p>" + meta.Header + "</p>")
+			}
+			
+			if (meta.Description != "") {
+				document.write(meta.Description)
+			}
+		} else {
+			if (meta.Header != "") {
+				document.write("<p class=\"mono\">" + meta.Header + "</p>")
+			}
+			
+			if (meta.Description != "") {
+				document.write("<pre>​" + meta.Description + "</pre>")
+			}
 		}
 		
-		if (meta.Description != "") {
-			document.write("<pre>​" + meta.Description + "</pre>")
-		}
+		document.write("<p><a href=\"./addons\">Back to Addon List</a>")
+		document.write("<p><a href=\"./kill\">Quit</a>")
 		
 		document.write("<h4>Dependencies (automatically activated):</h4>")
 		for (var i in meta.Activates) {
 			document.write("<li><a href=\"./addondata?addon=" + meta.Activates[i] + "\">" + meta.Activates[i] + "</a>")
+		}
+		
+		document.write("<h4>Incompatibilities:</h4>")
+		for (var i in meta.Incompatible) {
+			document.write("<li><a href=\"./addondata?addon=" + meta.Incompatible[i] + "\">" + meta.Incompatible[i] + "</a>")
 		}
 		
 		var files = {{.Files}}
@@ -174,6 +190,8 @@ var addonfilePage = template.Must(template.New("addonfile").Parse(loadOr("addonf
 	<pre class="border">
 {{printf "%s" .Content}}
 	</pre>
+	<p><a href="./addons">Back to Addon List</a>
+	<p><a href="./kill">Quit</a>
 </body>
 </html>
 `)))
@@ -214,6 +232,7 @@ var genaddonsPage = template.Must(template.New("genaddons").Parse(loadOr("genadd
 	<title>Rubble Web UI: Select Addons</title>
 </head>
 <body>
+	<p><a href="./clearaddons">Clear Selection</a>
 	<form action="./genbranch">
 		<table border="0">
 		<script language="JavaScript"> 
@@ -240,6 +259,7 @@ var genaddonsPage = template.Must(template.New("genaddons").Parse(loadOr("genadd
 		<tr><td><input type="submit" name="__Generate__" value="Go Directly To Generation"/></td></tr>
 		</table>
 	</form>
+	<p><a href="./clearaddons">Clear Selection</a>
 	<p><a href="./">Back to Menu</a>
 	<p><a href="./kill">Quit</a>
 </body>
@@ -353,6 +373,7 @@ var regenPage = loadOr("regen.html", `
 	
 	<p><a href="./">Back to Menu</a>
 	<p><a href="./regenregion">Continue to Regeneration</a>
+	<p><a href="./kill">Quit</a>
 </body>
 </html>
 `)

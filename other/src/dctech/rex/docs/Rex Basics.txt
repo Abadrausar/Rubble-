@@ -48,7 +48,7 @@ Some raw strings are reserved key words:
 	command
 	block
 	var
-Some of the above can still be used as normal, but by default they will be translated into specific non-string types, useing them as a string will still work fine, the exceptions to this rule are: module, command, block, and var.
+Some of the above can still be used as normal, but by default they will be translated into specific non-string types, using them as a string will still work fine, the exceptions to this rule are: module, command, block, and var.
 
 ==============================================
 Compile-time declarations
@@ -74,7 +74,17 @@ To create a module:
 To add items to a module just prefix the name with the module name like so:
 	var test:a # declares a variable named "a" in module "test", test needs to be previously defined.
 
+Reading from a module is done in the same way:
+	[test:a]
+
 Once a module is created it may be added to freely and accessed globally, this is the only way to create global variables.
+
+A special module named "global" is available. All global data is stored in this module and may be accessed without the "global:" prefix (in most cases). For example if there is no local variable named "ret" anywhere in the block chain the following code will return a reference to the "ret" command:
+	[ret]
+A safer way to do this would be to include an explicit prefix:
+	[global:ret]
+
+The "global" module has it's own section in this document, see that for more information
 
 ==============================================
 Commands
@@ -163,6 +173,8 @@ One thing that may cause BIG issues if you are not careful: when a variable is "
 In practice this is not a problem as for most types modifying the value results in a new value being created, this is only really evident with types index and user.
 
 If you do run into a case where this causes problems, most of the basic types may be copied via the "copy" base command. Type index cannot usually be copied effectively (as values of that type are a reference to a reference), and the whether or not type user can be copied depends on the actual data (most of the time the answer is no).
+
+The "modval" base command can be used to exploit these references to get some handy pointer-like behavior, be careful!
 
 ==============================================
 Values
@@ -464,8 +476,25 @@ var global:while = block condition code {
 var i = 0
 (while {(int:lt [i] 5)} {
 	(console:print [i] "\n")
-	[i = (int:add [i] 1)]
+	(int:++ [i])
 })
+
+-------------------
+
+# increment or decrement a variable
+# In practice you should use int:++ and int:--, but this is a good demo of modval.
+
+command ++ v {
+	(modval [v] (int:add [v] 1))
+}
+
+command -- v {
+	(modval [v] (int:sub [v] 1))
+}
+
+var a = 5
+(++ [a])
+# a == 6
 
 -------------------
 
@@ -517,6 +546,8 @@ Most of these are not generally a good idea (or even very useful) but are includ
 -------------------
 
 (block a b {<array [a] [b]>} 5 10)
+
+# returns: <array 5 10>
 
 -------------------
 
@@ -576,8 +607,6 @@ var b = [a]
 
 -------------------
 
-var x = (if (isnil [a]) {
-	"nil"
-}{
-	"non-nil"
-})
+var x = (if (isnil [a]) {"nil"}{"non-nil"})
+
+# x == "nil" or "non-nil"

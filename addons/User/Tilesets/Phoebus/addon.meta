@@ -1,0 +1,10 @@
+<rubble:addonmeta
+	header=`Installs raw and init support for the Phoebus tileset.`
+	
+	description=`
+This addon does NOT install the tile sheets or do anything other than
+setup the raws and the d_init file.
+`
+	
+	activates="Libs/Base"
+>

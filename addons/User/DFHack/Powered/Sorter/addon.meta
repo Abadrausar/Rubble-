@@ -10,6 +10,9 @@ a "output item limit". If there are more items on the output tile(s) than the li
 more items will be sorted until some of the items on the output are removed. This is good
 to keep too many items piling up at workshop inputs (which can starve other workshops).
 
+If you wish you may "invert" the sorter settings, this means that the sorter will take
+everything EXCEPT what you selected, very useful!
+
 To sort items simply make several sorters share an input.
 
 Due to the way sorters work you may sort at most eight types of items from a single tile.

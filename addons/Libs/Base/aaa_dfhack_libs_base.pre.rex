@@ -50,7 +50,7 @@ function rubble.load_module(name)
 			dfhack.printerr("    Error: Nil module returned.")
 			return nil
 		end
-		rubble[module.module] = module
+		rubble[module._name] = module
 		return module
 	end
 	dfhack.printerr("    Error: "..perr)
@@ -58,10 +58,13 @@ end
 function rubble.mkmodule(name)
 	rubble[name] = rubble[name] or {}
 	setmetatable(rubble[name], { __index = dfhack.BASE_G })
-	rubble[name].module = name
+	rubble[name]._name = name
 	return rubble[name]
 end
 function rubble.require(name)
+	if rubble[name] == nil then
+		error("Attempt to load nonexistent psudo-module: "..name)
+	end
 	return rubble[name]
 end
 `
@@ -108,13 +111,13 @@ rubble.reload_scripts()
 	[base = "\n# DFHack onLoad.init file\n# Automatically generated, DO NOT EDIT!\n"]
 	
 	[base = (str:add [base] "\n# Reactions:\n")]
-	(foreach [rubble:dfhack_reactions] block id action {
+	(foreach (sort:map [rubble:dfhack_reactions]) block id action {
 		[base = (str:add [base] "modtools/reaction-trigger -reactionName \"" [id] "\" -command [ " [action] " ]\n")]
 		(break true)
 	})
 	
 	[base = (str:add [base] "\n# Commands:\n")]
-	(foreach [rubble:dfhack_commands] block action _ {
+	(foreach (sort:map [rubble:dfhack_commands]) block action _ {
 		[base = (str:add [base] [action] "\n")]
 		(break true)
 	})

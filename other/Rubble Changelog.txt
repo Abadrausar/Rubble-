@@ -2,6 +2,67 @@
 ==============================================
 Changelog:
 ==============================================
+v5.6 (for DF 40.15)
+	"Dev/Tileset/Insert" now adds tileset templates to all creatures.
+	Modified "Base" to have tileset templates in all creatures.
+	The "User/Tileset/MLC/DFHack/TWBT" addon now has better graphical tracks (including individual track ramps!).
+	Slightly revised all the tilesheets in the "User/Tileset/MLC" addon group.
+	Added "User/Tilesets/Phoebus", support for the Phoebus tileset (and any other tileset that uses the same mapping).
+		This addon does NOT include the tileset images, only the init and raw mappings.
+		FYI this addon took less than 10 minutes to make (I love the "Dev/Tileset" addons).
+	Any old addon activation state information is now cleared before activating addons.
+		It should now be possible to *deactivate* addons in the web UI (some weird issues make sense now...).
+	Fixed the many, many, bugs in "User/DFHack/Powered/Logic Gates", it works now (and it's really cool!).
+	Added "User/DFHack/Powered/Item Sensor", detect items and take action based on their count.
+		Finally, the ability to automatically stop powered workshops from over-producing (when used with the new controller).
+	The "User/DFHack/Powered" addon now includes a new basic building, a "powered workshop controller".
+		The controller allows you to "shut down" a powered workshop without cutting it's power.
+	Modified all powered workshops to use the new controller building.
+	Items output from powered workshops will now drop if they come out over open space or a down slope.
+	Fixed the require power option in "User/DFHack/Powered/Sorter", I only had half of what I needed.
+	It is now possible to "invert" powered sorter settings (take everything EXCEPT what is selected).
+	Increased the power output of "User/DFHack/Stirling Engine" (to 6), 5 was not enough to power anything.
+		The smallest workshops require 5 power, but you need a axle between the engine and the workshop, so 6 is the minimum.
+	Fixed a major bug in "User/DFHack/Powered/Cart Launcher" (improper vehicle lookup).
+	The cart launcher can now optionally forbid a cart when it launches it (reduces road kill potential).
+	The cart launcher should now be capable of launching off track stops and in other adverse situations.
+	Allowed the cart loader and cart launcher to use outputs to restrict which carts they should effect.
+	Added a bunch more stuff (and a few diagrams) to the "User/DFHack/Powered" addon documentation.
+	Added a new "incompatible" key to addon.meta, this key allows specifying addon incompatibilities.
+	Addon information pages (both web UI and static) now list incompatibilities right after dependencies.
+	Added a new "format" key to addon.meta, set to "html" to allow "header" and "description" to be HTML formated.
+	Addon information pages (both web UI and static) now handle the new "format" addon.meta key.
+	Removed most of the addon dependency management commands from the standard library, use addon.meta!
+	Made the rubble:activateaddon standard user command recursive (it now activates dependencies as well).
+		This command is still available (against my better judgment) because activating addons is easy to get wrong,
+		and there are cases where it needs to be done from a load script, but use addon.meta if at all possible!
+	The addon activation stage will now print warnings when a non-library addon is automatically activated.
+		This is so users can see why they have addons active that they did not activate.
+	Nonexistent templates are now errors again.
+	Updated Rex to version 1.7, this fixes a minor GenII bug that one of this version's changes triggered.
+		Several other bugs (that did not effect Rubble) were fixed, plus the sort:array, int:++ and int:-- commands were added.
+	DFHack onload.init reaction and command output is now sorted (AFAIK this is cosmetic only).
+	You can now clear your selection in the web UI on the "Select Addons" page during normal generation.
+	The glass "metal" names in the "User/Glass Forge" addon are now prefixed with "tempered" ("tempered green glass", etc).
+	It is now possible for the web UI to load user defaults for configuration variables from "rubble:userconfig.ini".
+		This uses the same format as "out:genconfig.ini", so it should be easy to setup.
+		Obviously this only takes effect if you choose "Edit Configuration Variables" after selecting addons.
+	Added "User/Speluncaphobia", makes selected creatures get dizzy and slow after too long underground.
+		By default this effects saurians and humans (this is changeable via config vars).
+	Added "User/Speluncaphobia/DFHack", allows suppressing the speluncaphobia effect with a torch "shield".
+		Which entities can make torches is controlled via a config var, by default it is saurians and humans.
+		Currently non-working due to (I think) a DFHack bug (see the addon description).
+	Saurians are now better diggers (from 1% to 25% learn rate), there is now a better way to keep you above ground.
+	Saurians may now make coke from coal (this was an oversight).
+	Added "User/Shovel", craft shovels from wood or bone that break after a while.
+	The Rubble DFHack psudo-module function "rubble.require" now generates an error if you try to load a non-existent module.
+	Added three new base templates to deal with entity nobles (#ENTITY_NOBLES, ENTITY_ADD_NOBLE, and ENTITY_REPLACE_NOBLES).
+	Added #ENTITY_NOBLES to all entities in "Base" except kobolds and the layer-linked animal people.
+	Added #ENTITY_NOBLES to "User/Saurian".
+	Added "User/Human/Nobles", static nobles for the human entity.
+	Changed "User/Fix/Human Diplomats" to use the new templates.
+	Added "User/Human/Playable" rudimentary playable humans.
+
 v5.5 (for DF 40.15)
 	Updated to 40.15 (no actual changes needed).
 	Changed the "User/DFHack/Powered/Kiln" addon to work like the other powered production buildings.

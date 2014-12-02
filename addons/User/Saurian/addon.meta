@@ -4,29 +4,20 @@
 	description=`
 Saurians are a small (size 20000) reptilian race of swamp dwellers with mildly venomous bites
 (causes pain).
+
 Saurians cannot dig at embark, but if a pick were to be bought (and resized to fit smaller hands)
 digging, even down to the magma sea and below, should be possible.
-
-While saurians are not very tough, they are FAST and can quickly run down and kill foes many times 
-their size with the proper equipment and training, often before the enemy can get a blow in. Of course 
-if the enemy CAN get a blow in the saurian is often in trouble!
 
 Saurians are very warlike, most times civilians will charge into combat as readily as the military.
 This can cause some problems unless you outfit your civilians with at least basic armor and weapons,
 but it also means that weak enemies tend to get swarmed under and killed quickly (where dwarves
 would spend too much time trying to run away an so would take more casualties).
 
-Beware of werebeasts! With the saurian willingness to charge into combat werebeasts can become deadly
-enemies! With dwarves the transform timer tends to run down with the werebeast chasing fleeing dwarves,
-with saurians the chance of *someone* getting bitten is very high. It is not at all uncommon for a
-saurian fortress to have multiple werebeasts as citizens (if you try to keep them alive with a quarantine
-or the like).
+While saurians are not very tough, they are FAST and can quickly run down and kill foes many times 
+their size with the proper equipment and training, often before the enemy can get a blow in. Of course 
+if the enemy CAN get a blow in the saurian is often in trouble!
 
 In keeping with their small size and speed saurian armor tends to be tough and light.
-
-It is generally assumed that you will activate at least the "User/Quarry", "User/Sawmill",
-"User/Glass Forge", "User/Warcrafter" and "User/Pottery" addons when playing saurians, as saurians may 
-lack industries without at least those addons.
 
 While saurians can dig just like dwarves, they cannot make picks. This means that if you want to do any 
 mining you will need to buy a pick from the dwarves or humans. 
@@ -48,9 +39,11 @@ All saurians have natural skill (level 2) in bite, kick, punch, and fighter.
 
 This addon only includes the saurian creature and entity as well as saurian sized weapons and some 
 basic reactions. Nothing else is included.
-It is HIGHLY recommended to activate at least the "User/Quarry", "User/Glass Forge", "User/Sawmill",
-"User/Warcrafter" and "User/Pottery" addons.
+
+It is HIGHLY recommended to activate at least the "User/Quarry", "User/Sawmill",
+"User/Warcrafter" and "User/Pottery" addons (the "User/Glass Forge" addon is required).
 To dig as saurians you need to buy a pick and resize it at the craftsaurian.
+
 If this addon is activated dwarves are unplayable and the dwarven outpost liaison becomes a trade rep 
 (unless you activate "Saurian/Unplayable").
 
@@ -68,21 +61,16 @@ Pay attention to your saurian's castes.
 	difference. For example shaman caste saurians make good support troops or doctors but would be 
 	wasted as farmers or crafters.
 
-Start a lumber bamboo farm as soon as (or before) you have a sawmill.
-	It's hard to see the need for a lumber bamboo farm in the early game (after clear cutting the 
-	entire surface of the map for the second or third time you should have hundreds of logs), but you 
-	need wood for fuel, building, furniture, and mechanisms, it really doesn't take long to run out. 
-	Lumber bamboo farms are low maintenance, so just make a huge farm plot somewhere and start planting.
-	This is much less critical with 40.x and the huge amounts of wood that can be had from the new 
-	trees, but if you go nuts with wood powered industry lumber bamboo is still VERY useful for when 
-	the wood starts to run low.
+Sawmill!
+	You almost NEED a sawmill. It is possible to do without, but things will be much harder. The
+	sawmill will be your main source of building material one way or another, either building directly
+	with wood blocks or making charcoal for glass blocks and fired bricks.
 
-Buy rare items like gems, silk and stone ASAP (unless you like failed moods).
-	If you need raw gems you can "uncut" large gems you trade for at the craftsaurian's workshop, if 
-	you need cut gems you can use glass. Stone boulders can be pressed from blocks at the 
-	craftsaurian's workshop, fired from clay at the kiln and batch kiln, or dug up at a quarry. Silk 
-	cloth is (generally) only available from trade, if you get lucky and have some aboveground web 
-	vermin in the area pen up the cats!
+Embark with supplies for glass making.
+	Sand is *ahem* cheap as dirt, so take a LOT. All those bags come in handy later an the more stuff
+	you can make before needing to tie up your haulers filling bags the better. Also take some charcoal.
+	Getting a large serrated disk for a sawmill is number 1 priority for most embarks, and not needing
+	to wait for charcoal to be made can speed things up measurably.
 
 Use glass!
 	On most maps glass will make a good, renewable, source of valuable and useful goods. Glass can also 
@@ -90,6 +78,13 @@ Use glass!
 	glass is just as good as iron).
 	If you use the "User/Research" addon don't forget that if you use the "User/Warcrafter" addon you 
 	can make green glass items without needing to research the glass forge!
+
+Buy rare items like gems, silk and stone ASAP (unless you like failed moods).
+	If you need raw gems you can "uncut" large gems you trade for at the craftsaurian's workshop, if 
+	you need cut gems you can use glass. Stone boulders can be pressed from blocks at the 
+	craftsaurian's workshop, fired from clay at the kiln and batch kiln, or dug up at a quarry. Silk 
+	cloth is (generally) only available from trade, if you get lucky and have some aboveground web 
+	vermin in the area pen up the cats!
 
 Don't forget metal!
 	It takes a LONG time to train a smith, but for the absolute best weapons and armor there is no 

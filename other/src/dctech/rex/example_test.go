@@ -26,19 +26,15 @@ import "dctech/rex"
 import "dctech/rex/commands/base"
 import "fmt"
 
-// This is the only test file for the Rex library, as it is really hard to write good tests for a
-// command based scripting language when you have no commands to run :)
-// We do cheat a little and load the base commands in this example, but that is to show
-// how that is done more than anything else.
-
 func Example() {
 	// Everything starts with a state and a script.
 	// You shouldn't need more than one state in most cases, as it can be shared by many scripts.
-	// The script is where all the "local" data is.
+	// The script is where all the "local" data is. You will need one for each concurrent block of
+	// code. Scripts are reusable.
 	state := rex.NewState()
 	script := rex.NewScript()
 
-	// Load the base commands (for the ret command)
+	// Load the base commands.
 	base.Setup(state)
 
 	// If you want the standard indexables you would register them here

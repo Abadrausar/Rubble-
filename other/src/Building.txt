@@ -12,10 +12,6 @@ Now all you need to do is fire up a command prompt and run:
 Or:
 	go build rubble/interface/web
 
-The more daring may try:
-	go build rubble/interface/gui
-For a kinda buggy and mostly non-working cross-platform native GUI (this is almost certainly totally broken by now).
-
 To build the file encoder:
 	go build rubble/encoder
 

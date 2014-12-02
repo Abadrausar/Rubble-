@@ -1,6 +1,8 @@
 
 var rubble:adventure_tier_data = 0
 var rubble:entity_playability = <map>
+var rubble:entity_nobles = <map>
+var rubble:entity_nobles_add = <map>
 
 command rubble:entity_playable id key {
 	(if (exists [rubble:entity_playability] [id]) {}{
@@ -79,4 +81,26 @@ command rubble:entity_playable id key {
 		(ret "")
 	})
 	(ret (rubble:stageparse [else]))
+})
+
+(rubble:template "#ENTITY_NOBLES" block id default {
+	(if (isnil [rubble:entity_nobles [id]]) {
+		(rubble:stageparse (str:add [default] (if (isnil [rubble:entity_nobles_add [id]]) {""}{
+			(str:add "\n\t" [rubble:entity_nobles_add [id]])
+		})))
+	}{
+		(rubble:stageparse [rubble:entity_nobles [id]])
+	})
+})
+
+(rubble:template "ENTITY_ADD_NOBLE" block id noble {
+	(if (isnil [rubble:entity_nobles_add [id]]) {
+		[rubble:entity_nobles_add [id] = [noble]]
+	}{
+		[rubble:entity_nobles_add [id] = (str:add [rubble:entity_nobles_add [id]] "\n\t" [noble])]
+	})
+})
+
+(rubble:template "ENTITY_REPLACE_NOBLES" block id nobles {
+	[rubble:entity_nobles [id] = [nobles]]
 })

@@ -82,7 +82,7 @@ package rex
 					As these are never written after creation thread safety should not be an issue.
 					In any case test this assumption.
 	
-	There is a long list of stuff-to-do in the GenII doc.go file.
+	There is a list of stuff-to-do in the GenII doc.go file.
 	
 	It should be possible to make a generic function-to-command interface via reflection.
 		Support for some complex types would be really hard to do, probably best to use the same rules as GenII.

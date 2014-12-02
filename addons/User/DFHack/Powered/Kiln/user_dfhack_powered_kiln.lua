@@ -61,58 +61,30 @@ end
 
 function makeFireClay()
 	return function(wshop)
-		if not wshop:isUnpowered() then
-			if not powered.HasOutput(wshop) then
-				return
-			end
-			
-			local output = ppersist.GetOutputTypeAsCode(wshop)
-			if output == nil then
-				return
-			end
-			
-			if output.special == "PEARLASH" then
-				local ash = pitems.FindItemAtInput(wshop, function(item)
-					if df.item_type[item:getType()] == "BAR" then
-						local mat = dfhack.matinfo.decode(item)
-						local ashmat = dfhack.matinfo.find("ASH:NONE")
-						if mat.type == ashmat.type then
-							return true
-						end
-					end
-					return false
-				end)
-				if ash == nil then
-					return
-				end
-				
-				local magma, bar = pitems.FindFuel(wshop)
-				if not magma then
-					if bar == nil then
-						return
-					end
-					
-					dfhack.items.remove(bar)
-				end
-				
-				dfhack.items.remove(ash)
-				
-				local item = pitems.CreateItem(dfhack.matinfo.find("PEARLASH:NONE"), 'item_barst', nil, 0)
-				item:setDimension(150)
-				pitems.Eject(wshop, item)
-				return
-			end
-			
-			local boulder = pitems.FindItemAtInput(wshop, function(item)
-				if df.item_type[item:getType()] == "BOULDER" then
-					local mat = isClay(dfhack.matinfo.decode(item))
-					if mat ~= nil then
+		if wshop:isUnpowered() or powered.ControllerOff(wshop) then
+			return
+		end
+		if not powered.HasOutput(wshop) then
+			return
+		end
+		
+		local output = ppersist.GetOutputTypeAsCode(wshop)
+		if output == nil then
+			return
+		end
+		
+		if output.special == "PEARLASH" then
+			local ash = pitems.FindItemAtInput(wshop, function(item)
+				if df.item_type[item:getType()] == "BAR" then
+					local mat = dfhack.matinfo.decode(item)
+					local ashmat = dfhack.matinfo.find("ASH:NONE")
+					if mat.type == ashmat.type then
 						return true
 					end
 				end
 				return false
 			end)
-			if boulder == nil then
+			if ash == nil then
 				return
 			end
 			
@@ -125,13 +97,42 @@ function makeFireClay()
 				dfhack.items.remove(bar)
 			end
 			
-			local mat = isClay(dfhack.matinfo.decode(boulder))
-			dfhack.items.remove(boulder)
+			dfhack.items.remove(ash)
 			
-			local item = pitems.CreateItemNumeric(mat, output.itype, output.isubtype, nil, 0)
-			pitems.SetAutoItemQuality(wshop, item)
+			local item = pitems.CreateItem(dfhack.matinfo.find("PEARLASH:NONE"), 'item_barst', nil, 0)
+			item:setDimension(150)
 			pitems.Eject(wshop, item)
+			return
 		end
+		
+		local boulder = pitems.FindItemAtInput(wshop, function(item)
+			if df.item_type[item:getType()] == "BOULDER" then
+				local mat = isClay(dfhack.matinfo.decode(item))
+				if mat ~= nil then
+					return true
+				end
+			end
+			return false
+		end)
+		if boulder == nil then
+			return
+		end
+		
+		local magma, bar = pitems.FindFuel(wshop)
+		if not magma then
+			if bar == nil then
+				return
+			end
+			
+			dfhack.items.remove(bar)
+		end
+		
+		local mat = isClay(dfhack.matinfo.decode(boulder))
+		dfhack.items.remove(boulder)
+		
+		local item = pitems.CreateItemNumeric(mat, output.itype, output.isubtype, nil, 0)
+		pitems.SetAutoItemQuality(wshop, item)
+		pitems.Eject(wshop, item)
 	end
 end
 
@@ -149,4 +150,3 @@ buildings.registerBuilding{
 	}
 }
 eventful.registerReaction("LUA_HOOK_ADJUST_KILN", kilnAdjust)
-print("    Registered mechanical workshop: DFHACK_RUBBLE_POWERED_GLASS_FURNACE")

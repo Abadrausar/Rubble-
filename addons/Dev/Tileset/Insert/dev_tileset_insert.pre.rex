@@ -80,70 +80,9 @@ var itemtypes = <sarray
 	(break true)
 })
 
-# Insert templates in vermin creatures.
+# Insert templates in creatures.
 
-var isvermin = false
-var verminList = <map>
 var curCreature = ""
-
-(foreach [rubble:raws] block name contents {
-	(if (str:cmp "creature_" (str:left [name] 9)) {
-		(df:raw:walk [contents] block tag {
-			(if (str:cmp [tag "id"] "CREATURE") {
-				(if (int:eq (len [tag]) 1) {
-					(if (bool:not (str:cmp [curCreature] "")){
-						(if [isvermin] {
-							[verminList [curCreature] = true]
-						})
-					})
-					[curCreature = [tag 0]]
-					[isvermin = false]
-				}{
-					(rubble:abort "Error: invalid param count to CREATURE raw tag in last file.")
-				})
-			})
-			
-			# I think this is all the tags that classify a creature as "vermin"
-			
-			# VERMIN_EATER may not be needed, but better safe than sorry.
-			(if (str:cmp [tag "id"] "VERMIN_EATER") {
-				[isvermin = true]
-			})
-			
-			(if (str:cmp [tag "id"] "VERMIN_ROTTER") {
-				[isvermin = true]
-			})
-			
-			(if (str:cmp [tag "id"] "VERMIN_FISH") {
-				[isvermin = true]
-			})
-			
-			(if (str:cmp [tag "id"] "VERMIN_GROUNDER") {
-				[isvermin = true]
-			})
-			
-			(if (str:cmp [tag "id"] "VERMIN_SOIL") {
-				[isvermin = true]
-			})
-			
-			(if (str:cmp [tag "id"] "VERMIN_SOIL_COLONY") {
-				[isvermin = true]
-			})
-			
-			(break true)
-		})
-		# this should take care of the last creature in the file
-		(if (bool:not (str:cmp [curCreature] "")){
-			(if [isvermin] {
-				[verminList [curCreature] = true]
-			})
-		})
-		[curCreature = ""]
-		[isvermin = false]
-	})
-	(break true)
-})
-
 var changedFile = false
 (foreach [rubble:raws] block name contents {
 	(if (str:cmp "creature_" (str:left [name] 9)) {
@@ -151,44 +90,32 @@ var changedFile = false
 		
 		var newfile = (df:raw:walk [contents] block tag {
 			(if (str:cmp [tag id] "CREATURE") {
-				[isvermin = false]
 				[curCreature = [tag 0]]
-				(if (int:eq (len [tag]) 1) {
-					(if (exists [verminList] [tag 0]) {
-						[isvermin = true]
-					})
-				}{
-					(rubble:abort "Error: invalid param count to CREATURE raw tag in last file.")
-				})
 			})
 			
 			# I think the following two tags are the only ones that matter for vermin.
-			(if [isvermin] {
-				# [COLOR:0:0:0]
-				(if (str:cmp [tag id] "COLOR") {
-					(if (int:eq (len [tag]) 3) {
-						[tag replace = (str:add "[COLOR:{#COLOR;" [curCreature] ";;" [tag 0] ":" [tag 1] ":" [tag 2] "}]")]
-						[changedFile = true]
-					}{
-						(rubble:abort "Error: invalid param count to COLOR raw tag in last file.")
-					})
+			# [COLOR:0:0:0]
+			(if (str:cmp [tag id] "COLOR") {
+				(if (int:eq (len [tag]) 3) {
+					[tag replace = (str:add "[COLOR:{#COLOR;" [curCreature] ";;" [tag 0] ":" [tag 1] ":" [tag 2] "}]")]
+					[changedFile = true]
+				}{
+					(rubble:abort "Error: invalid param count to COLOR raw tag in last file.")
 				})
-				
-				# [CREATURE_TILE:'A']
-				(if (str:cmp [tag id] "CREATURE_TILE") {
-					(if (int:eq (len [tag]) 1) {
-						[tag replace = (str:add "[CREATURE_TILE:{#TILE;" [curCreature] ";;" [tag 0] "}]")]
-						[changedFile = true]
-					}{
-						(rubble:abort "Error: invalid param count to CREATURE_TILE raw tag in last file.")
-					})
+			})
+			
+			# [CREATURE_TILE:'A']
+			(if (str:cmp [tag id] "CREATURE_TILE") {
+				(if (int:eq (len [tag]) 1) {
+					[tag replace = (str:add "[CREATURE_TILE:{#TILE;" [curCreature] ";;" [tag 0] "}]")]
+					[changedFile = true]
+				}{
+					(rubble:abort "Error: invalid param count to CREATURE_TILE raw tag in last file.")
 				})
 			})
 			
 			(break true)
 		})
-		
-		[isvermin = false]
 		
 		(if [changedFile] {
 			[rubble:raws [name] = [newfile]]

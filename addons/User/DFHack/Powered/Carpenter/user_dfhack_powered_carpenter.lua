@@ -51,43 +51,44 @@ end
 
 function makeWood()
 	return function(wshop)
-		if not wshop:isUnpowered() then
-			if not powered.HasOutput(wshop) then
-				return
-			end
-			
-			local output = ppersist.GetOutputTypeAsCode(wshop)
-			if output == nil then
-				return
-			end
-			
-			local blocks = pitems.FindXItemsAtInput(wshop, 3, function(item)
-				if df.item_type[item:getType()] == "BLOCKS" then
-					if found[item.id] == true then
-						return false
-					end
-					
-					local mat = dfhack.matinfo.decode(item)
-					if mat.mode == "plant" then
-						return true
-					end
-				end
-				return false
-			end)
-			if blocks == nil then
-				return
-			end
-			
-			local mat = nil
-			for _, block in ipairs(blocks) do
-				mat = dfhack.matinfo.decode(block)
-				dfhack.items.remove(block)
-			end
-			
-			local item = pitems.CreateItemNumeric(mat, output.itype, output.isubtype, nil, 0)
-			pitems.SetAutoItemQuality(wshop, item)
-			pitems.Eject(wshop, item)
+		if wshop:isUnpowered() or powered.ControllerOff(wshop) then
+			return
 		end
+		if not powered.HasOutput(wshop) then
+			return
+		end
+		
+		local output = ppersist.GetOutputTypeAsCode(wshop)
+		if output == nil then
+			return
+		end
+		
+		local blocks = pitems.FindXItemsAtInput(wshop, 3, function(item)
+			if df.item_type[item:getType()] == "BLOCKS" then
+				if found[item.id] == true then
+					return false
+				end
+				
+				local mat = dfhack.matinfo.decode(item)
+				if mat.mode == "plant" then
+					return true
+				end
+			end
+			return false
+		end)
+		if blocks == nil then
+			return
+		end
+		
+		local mat = nil
+		for _, block in ipairs(blocks) do
+			mat = dfhack.matinfo.decode(block)
+			dfhack.items.remove(block)
+		end
+		
+		local item = pitems.CreateItemNumeric(mat, output.itype, output.isubtype, nil, 0)
+		pitems.SetAutoItemQuality(wshop, item)
+		pitems.Eject(wshop, item)
 	end
 end
 
@@ -105,4 +106,3 @@ buildings.registerBuilding{
 	}
 }
 eventful.registerReaction("LUA_HOOK_ADJUST_CARPENTER", carpenterAdjust)
-print("    Registered mechanical workshop: DFHACK_RUBBLE_POWERED_CARPENTER")

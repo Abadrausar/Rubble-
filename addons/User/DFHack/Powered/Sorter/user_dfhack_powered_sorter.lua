@@ -47,6 +47,13 @@ function sorterAdjust(reaction, unit, in_items, in_reag, out_items, call_native)
 				ilimit = "0"
 			end
 			
+			local invert = script.showYesNoPrompt('Sorter Adjust', 'Invert settings?', COLOR_LIGHTGREEN)
+			if invert then
+				invert = "true"
+			else
+				invert = "false"
+			end
+			
 			local ipart = ""
 			local mpart = ""
 			if itemok then
@@ -61,15 +68,23 @@ function sorterAdjust(reaction, unit, in_items, in_reag, out_items, call_native)
 			end
 			
 			local wshop = powered.MakeFake(unit.pos.x, unit.pos.y, unit.pos.z, 1)
-			ppersist.SetOutputType(wshop, "return {"..ipart..", "..mpart..", limit = "..ilimit.."}")
+			ppersist.SetOutputType(wshop, "return {"..ipart..", "..mpart..", limit = "..ilimit..", invert = "..invert.."}")
 			
 			alreadyAdjusting = false
 		end)
 	end
 end
 
+-- Any comments that are all uppercase with underscores are replaced with bits of code
+-- by Rubble. This is what makes the optional "require power" setting to work.
+-- DO NOT MODIFY THESE COMMENTS
+
 function makeSortItem()
 	return function(wshop)
+		if --[[SORTER_POWERED]]powered.ControllerOff(wshop) then
+			return
+		end
+		
 		local output = ppersist.GetOutputTypeAsCode(wshop)
 		if output == nil then
 			return
@@ -121,6 +136,9 @@ function makeSortItem()
 				end
 			end
 			
+			if output.invert then
+				return not match
+			end
 			return match
 		end
 		
@@ -147,4 +165,3 @@ buildings.registerBuilding{
 	action={10, makeSortItem()},
 }
 eventful.registerReaction("LUA_HOOK_ADJUST_SORTER", sorterAdjust)
-print("    Registered mechanical workshop: DFHACK_RUBBLE_POWERED_SORTER")

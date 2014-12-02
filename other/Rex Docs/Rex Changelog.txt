@@ -1,4 +1,11 @@
 
+v1.7
+	Made it possible for a command created with the "command" keyword to refer to itself (recursive commands here I come).
+	GenII indexables now return nil for non-existent keys (like all indexables should).
+	Fixed a major bug with the IntEditIndexable type (had no GetI method).
+	Added new command sort:array, sort an IntEditIndexable in place.
+	Added int:++ and int:-- commands.
+
 v1.6
 	Fixed some incorrect error messages and incorrectly checked error conditions in indexing variable operator execution.
 		There were no false positives, but some errors were not caught at the right spot (or at all) so error messages could make little to no sense.

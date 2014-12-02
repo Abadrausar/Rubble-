@@ -55,42 +55,42 @@ end
 
 function makeSmeltBoulder(output)
 	return function(wshop)
-		if not wshop:isUnpowered() then
-			if not powered.HasOutput(wshop) then
+		if wshop:isUnpowered() or powered.ControllerOff(wshop) then
+			return
+		end
+		if not powered.HasOutput(wshop) then
+			return
+		end
+		
+		local boulder = pitems.FindItemAtInput(wshop, function(item)
+			if df.item_type[item:getType()] == "BOULDER" then
+				local a = isOre(dfhack.matinfo.decode(item))
+				if a ~= nil then
+					return true
+				end
+			end
+			return false
+		end)
+		if boulder == nil then
+			return
+		end
+		
+		local magma, bar = pitems.FindFuel(wshop)
+		if not magma then
+			if bar == nil then
 				return
 			end
 			
-			local boulder = pitems.FindItemAtInput(wshop, function(item)
-				if df.item_type[item:getType()] == "BOULDER" then
-					local a = isOre(dfhack.matinfo.decode(item))
-					if a ~= nil then
-						return true
-					end
-				end
-				return false
-			end)
-			if boulder == nil then
-				return
-			end
-			
-			local magma, bar = pitems.FindFuel(wshop)
-			if not magma then
-				if bar == nil then
-					return
-				end
-				
-				dfhack.items.remove(bar)
-			end
-			
-			local products = isOre(dfhack.matinfo.decode(boulder))
-			dfhack.items.remove(boulder)
-			
-			for _, metal in ipairs(products) do
-				item = pitems.CreateItem(metal, 'item_barst', nil, 0)
-				item:setDimension(150)
-				pitems.Eject(wshop, item)
-			end
-			
+			dfhack.items.remove(bar)
+		end
+		
+		local products = isOre(dfhack.matinfo.decode(boulder))
+		dfhack.items.remove(boulder)
+		
+		for _, metal in ipairs(products) do
+			item = pitems.CreateItem(metal, 'item_barst', nil, 0)
+			item:setDimension(150)
+			pitems.Eject(wshop, item)
 		end
 	end
 end

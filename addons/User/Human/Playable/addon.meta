@@ -1,0 +1,12 @@
+<rubble:addonmeta
+	header=`Makes humans playable (and dwarves unplayable).`
+	
+	description=`
+This should work, but it needs lots of fleshing out...
+
+I suggest you use this with the "User/Pottery" addons at a minimum, the
+"User/Sawmill" addon is also highly recommended.
+`
+	
+	activates="Libs/Base;User/Human/Nobles"
+>

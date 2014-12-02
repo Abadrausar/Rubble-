@@ -292,6 +292,14 @@ misrepresented as being the original software.
 			font-family: Verdana, Arial, Helvetica, sans-serif;
 			font-size: 15pt;
 		}
+		
+		h4
+		{
+			color: Black;
+			background: DarkGray;
+			font-family: Verdana, Arial, Helvetica, sans-serif;
+			font-size: 10pt;
+		}
 	</style>
 </head>
 <body>
@@ -301,17 +309,33 @@ misrepresented as being the original software.
 		if (meta.Lib == true) {
 			document.write("(An automatically managed library)")
 		}
-		if (meta.Header != "") {
-			document.write("<p class=\"mono\">" + meta.Header + "</p>")
-		}
 		
-		if (meta.Description != "") {
-			document.write("<pre>" + meta.Description + "</pre>")
+		if (meta.Format == "html") {
+			if (meta.Header != "") {
+				document.write("<p>" + meta.Header + "</p>")
+			}
+			
+			if (meta.Description != "") {
+				document.write(meta.Description)
+			}
+		} else {
+			if (meta.Header != "") {
+				document.write("<p class=\"mono\">" + meta.Header + "</p>")
+			}
+			
+			if (meta.Description != "") {
+				document.write("<pre>" + meta.Description + "</pre>")
+			}
 		}
 		
 		document.write("<h4>Dependencies (automatically activated):</h4>")
 		for (var i in meta.Activates) {
 			document.write("<li>" + meta.Activates[i] + "</li>")
+		}
+		
+		document.write("<h4>Incompatibilities:</h4>")
+		for (var i in meta.Incompatible) {
+			document.write("<li><a href=\"./addondata?addon=" + meta.Incompatible[i] + "\">" + meta.Incompatible[i] + "</a>")
 		}
 		
 	</script>

@@ -489,6 +489,25 @@ User Templates defined in the "Libs/Base" addon.
 	<KEY> may be one of FORT, ADV, or INDIV (not case sensitive).
 
 ==============================================
+{#ENTITY_NOBLES;<ID>;<DEFAULT>}
+	Write the nobles to the entity.
+	
+	If ENTITY_REPLACE_NOBLES was called use that value, else use <DEFAULT> + anything added by ENTITY_ADD_NOBLE.
+
+==============================================
+{ENTITY_ADD_NOBLE;<ID>;<NOBLE>}
+	Add nobles to the end of the existing ones for the specified entity.
+	This can be called more than once, as the nobles are simply added together.
+	
+	If ENTITY_REPLACE_NOBLES is used this template will do nothing.
+
+==============================================
+{ENTITY_REPLACE_NOBLES;<ID>;<NOBLES>}
+	Replace ALL the nobles for the specified entity.
+	
+	If this is called for an entity any changes made by ENTITY_ADD_NOBLE are ignored.
+
+==============================================
 {DFHACK_LOADSCRIPT;<SCRIPTNAME>}
 	Installs and adds for automatic loading the script <SCRIPTNAME>.
 	This only works for scripts added by an addon, already installed scripts should use DFHACK_RUNCOMMAND.

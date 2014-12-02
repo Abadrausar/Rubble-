@@ -32,6 +32,8 @@ import "dctech/rex"
 //	int:div
 //	int:mod
 //	int:mul
+//	int:++
+//	int:--
 //	int:gt
 //	int:lt
 //	int:eq
@@ -54,6 +56,8 @@ func Setup(state *rex.State) (err error) {
 	mod.RegisterCommand("div", Command_Div)
 	mod.RegisterCommand("mod", Command_Mod)
 	mod.RegisterCommand("mul", Command_Mul)
+	mod.RegisterCommand("++", Command_Inc)
+	mod.RegisterCommand("--", Command_Dec)
 	mod.RegisterCommand("gt", Command_Gt)
 	mod.RegisterCommand("lt", Command_Lt)
 	mod.RegisterCommand("eq", Command_Eq)
@@ -119,6 +123,32 @@ func Command_Mul(script *rex.Script, params []*rex.Value) {
 
 	script.RetVal = rex.NewValueInt64(params[0].Int64() * params[1].Int64())
 	return
+}
+
+// Increments a value "in place".
+// 	int:++ a
+// Returns unchanged.
+func Command_Inc(script *rex.Script, params []*rex.Value) {
+	if len(params) != 1 {
+		rex.ErrorParamCount("int:++", "1")
+	}
+
+	tmp := params[0].Int64() + 1
+	params[0].Type = rex.TypInt
+	params[0].Data = tmp
+}
+
+// Decrements a value "in place".
+// 	int:-- a
+// Returns unchanged.
+func Command_Dec(script *rex.Script, params []*rex.Value) {
+	if len(params) != 1 {
+		rex.ErrorParamCount("int:--", "1")
+	}
+
+	tmp := params[0].Int64() - 1
+	params[0].Type = rex.TypInt
+	params[0].Data = tmp
 }
 
 // Integer greater than.
