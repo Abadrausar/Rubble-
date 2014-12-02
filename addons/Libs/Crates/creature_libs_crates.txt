@@ -6,6 +6,20 @@
 	{#SCRIPT;
 		(var out "")
 		(foreach [rubble:libs_crates:data] {
+			(if [[params 1] bar] {
+				(str:add
+					[out] "\n\n"
+					"\t[USE_MATERIAL_TEMPLATE:" [params 0] ":CRATE_TEMPLATE]\n"
+					"\t\t[STATE_NAME_ADJ:ALL_SOLID:" [[params 1] name] " crate]\n"
+					"\t\t[STATE_NAME_ADJ:LIQUID:melted " [[params 1] name] " crate]\n"
+					"\t\t[STATE_NAME_ADJ:GAS:boiling " [[params 1] name] " crate]\n"
+					"\t\t[PREFIX:NONE]\n"
+					"\t\t[MATERIAL_VALUE:" [[params 1] value] "]"
+					"\t\t[MATERIAL_REACTION_PRODUCT:CRATE_" [params 0] "_MAT:" [[params 1] product] "]"
+				)
+				(breakloop true)
+			})
+			
 			(str:add
 				[out] "\n\n"
 				"\t[USE_MATERIAL_TEMPLATE:" [params 0] ":CRATE_TEMPLATE]\n"

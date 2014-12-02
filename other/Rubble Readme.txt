@@ -31,17 +31,17 @@ Install:
 Backup your "raw/objects" folder! Rubble will delete all your existing raw files!
 Extract Rubble to "<DF Directory>/rubble".
 Install your addons to "<DF Directory>/rubble/addons"
-(If you use DFHack) add "script rubble.dfhack" to your dfhack.init file
+(If you use DFHack) add "script rubble.dfhack" to your dfhack.init file, this step is VERY IMPORTANT for DFHack users!
 Run "rubble -addonlist" OR run "Rubble GUI.exe"
 
-Now you are good to go! Documentation (as you have obviously discovered) is in the "rubble/other" folder as is source code and OSX/Linux binaries.
+Now you are good to go! Documentation is in the "rubble/other" folder as is source code and OSX/Linux binaries.
 
 To activate or deactivate a Rubble addon you may set it's entry in addons/addonlist.ini to "true" or "false". If you just added an addon it will not have an entry until Rubble has run at least once (after the addon was added). 
 If you want to run Rubble without generating anything so as to update the addon list file just run 'rubble -addonlist'
 
 If you can (eg. you are running on windows) it is HIGHLY recommended to use the GUI. The GUI automates the process of updating and editing addonlist.ini and is generally much faster then doing everything by hand (plus you don't have to mess around with the command prompt, if you dislike that kind of thing)
 
-If you use OSX or Linux, 32 bit binaries for these OSes can be found in the "rubble/other" directory. If you want 64 bit binaries you can compile them yourself, source code is in other/src.
+If you use OSX or Linux, 32 bit binaries for these OSes can be found in the "rubble/other" directory. If you want 64 bit binaries you can compile them yourself, source code is in other/src (along with basic build instructions).
 
 ==============================================
 Configure:
@@ -53,7 +53,7 @@ ALL command line options may also be specified in the config file.
 
 Rubble tries to read the file "./rubble.ini", if this does not fail Rubble will load settings from here before processing command line options (command line options always take precedence).
 Example "rubble.ini" (using some of the defaults):
-	[path]
+	[rubble]
 	dfdir = ..
 	outputdir = ../raw/objects
 	addonsdir = ./addons
@@ -166,6 +166,11 @@ Libs/DFHack/Command:
 	Activating this addon adds a template that generates reaction product lines for autosyndrome boiling rocks (the boiling rocks in question are automatically defined).
 	This addon also provides a Raptor command for advanced usage.
 
+Libs/DFHack/Fluids:
+	Adds the extremely useful fluids DFHack Lua library and command.
+	Also adds a pair of convenience templates for filling minecarts and eating fluids.
+	Requires "Libs/DFHack/Command" (for the templates).
+
 Libs/DFHack/Spawn:
 	"Libs/DFHack/Spawn" is a modders resource for spawning creatures via DFHack.
 	Activating this addon installs a creature spawner script into the DFHack scripts directory.
@@ -212,6 +217,16 @@ I know everything there is to know about how Rubble works and so I tend to forge
 ==============================================
 Changelog:
 ==============================================
+v3.11
+	Fix a minor script error that made "Dev/Dummy Reactions" completely useless.
+	Fixed rubble:ingroup (so it actually works now).
+	Extended "Libs/Crates" to solve the metal bar problem (eg entities having access to metals they shouldn't).
+	Added "Libs/DFHack/Fluids", all sorts of wonderful fluid interactions via some DFHack scripts.
+	The naming convention for written out DFHack command and library scripts has changed.
+		Scripts are now named "rubble_<original command name>", so "announce" becomes 
+		"rubble_announce" instead of "libs_dfhack_announcement".
+	GUI: Changed the section name used when reading "rubble.ini" to "rubble" (from "path")
+
 v3.10
 	Updated to Raptor 3.2
 		A (very) slight performance boost, a minor bug fix, a possible string corruption fix,

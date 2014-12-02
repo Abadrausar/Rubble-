@@ -1,5 +1,6 @@
+-- Display an announcement and write it to the game log.
 
-local helpstring = [[ Display an announcment and write it to the game log.
+local helpstring = [[ Display an announcement and write it to the game log.
   announce message|? [color]
     message  The message you want to display.
     color    The color to display the message in.

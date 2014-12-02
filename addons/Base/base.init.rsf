@@ -72,6 +72,8 @@
 	
 	(if (str:cmp (str:left [addon] (str:len [group])) [group]) {
 		(ret true)
+	} {
+		(ret false)
 	})
 })
 

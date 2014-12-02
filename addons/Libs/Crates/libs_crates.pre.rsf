@@ -14,6 +14,23 @@
 			name=[name]
 			value=[value]
 			product=[product]
+			bar=false
+		>)
+	})
+	(ret "")
+})
+
+# Define a new crate (containing 10 bars).
+(rubble:template "!CRATE_BARS" id name value product {
+	(if (exists [rubble:libs_crates:data] [id]){
+		(rubble:abort "Error: Crate already exists.")
+	}{
+		(set rubble:libs_crates:last [id])
+		(set [rubble:libs_crates:data] [id] <map
+			name=(str:add [name] " bars (10)")
+			value=[value]
+			product=[product]
+			bar=true
 		>)
 	})
 	(ret "")
@@ -85,6 +102,21 @@
 (rubble:template "CRATE_UNPACK_REACTIONS" building skill techclass auto=true {
 	(var out "")
 	(foreach [rubble:libs_crates:data] {
+		(if [[params 1] bar] {
+			(set out (str:add
+				[out] "\n"
+				"{REACTION;UNPACK_" [params 0] ";" [techclass] "}\n"
+				"\t[NAME:unpack " [[params 1] name] "]\n"
+				"\t[BUILDING:" [building] ":NONE]\n"
+				"\t[REAGENT:A:150:BAR:NONE:NONE:NONE:" [params 0] "]\n"
+				"\t\t[HAS_MATERIAL_REACTION_PRODUCT:CRATE_" [params 0] "_MAT]"
+				"\t[SKILL:" [skill] "]\n"
+				"\t[PRODUCT:100:10:BAR:NONE:GET_MATERIAL_FROM_REAGENT:A:CRATE_" [params 0] "_MAT]\n"
+				(if [auto] {"\t[AUTOMATIC]\n"}{""})
+			))
+			(breakloop true)
+		})
+		
 		(set out (str:add
 			[out] "\n"
 			"{REACTION;UNPACK_" [params 0] ";" [techclass] "}\n"
@@ -93,7 +125,7 @@
 			"\t[REAGENT:A:150:BAR:NONE:CREATURE_MAT:LIBS_CRATES_CREATURE:" [params 0] "]\n"
 			"\t[SKILL:" [skill] "]\n"
 			"\t" [[params 1] product] "\n"
-			(if auto {"\t[AUTOMATIC]\n"}{""})
+			(if [auto] {"\t[AUTOMATIC]\n"}{""})
 		))
 		(break true)
 	})
@@ -107,15 +139,30 @@
 		(foreach [rubble:libs_crates:classes [crateclass]] {
 			(var id [params 1])
 			
+			(if [rubble:libs_crates:data [id] bar] {
+				(set out (str:add
+					[out] "\n"
+					"{REACTION;UNPACK_" [id] ";" [techclass] "}\n"
+					"\t[NAME:unpack " [rubble:libs_crates:data [id] name] "]\n"
+					"\t[BUILDING:" [building] ":NONE]\n"
+					"\t[REAGENT:A:150:BAR:NONE:NONE:NONE:" [id] "]\n"
+					"\t\t[HAS_MATERIAL_REACTION_PRODUCT:CRATE_" [id] "_MAT]"
+					"\t[SKILL:" [skill] "]\n"
+					"\t[PRODUCT:100:10:BAR:NONE:GET_MATERIAL_FROM_REAGENT:A:CRATE_" [id] "_MAT]\n"
+					(if [auto] {"\t[AUTOMATIC]\n"}{""})
+				))
+				(breakloop true)
+			})
+			
 			(set out (str:add
 				[out] "\n"
 				"{REACTION;UNPACK_" [id] ";" [techclass] "}\n"
-				"\t[NAME:unpack " [[rubble:libs_crates:data [id]] name] "]\n"
+				"\t[NAME:unpack " [rubble:libs_crates:data [id] name] "]\n"
 				"\t[BUILDING:" [building] ":NONE]\n"
 				"\t[REAGENT:A:150:BAR:NONE:CREATURE_MAT:LIBS_CRATES_CREATURE:" [id] "]\n"
 				"\t[SKILL:" [skill] "]\n"
 				"\t" [[rubble:libs_crates:data [id]] product] "\n"
-				(if auto {"\t[AUTOMATIC]\n"}{""})
+				(if [auto] {"\t[AUTOMATIC]\n"}{""})
 			))
 			(break true)
 		})

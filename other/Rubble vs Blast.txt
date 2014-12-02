@@ -4,6 +4,7 @@ Early versions of Rubble were heavily based on a similar utility, Blast, but rec
 Compared to Blast:
 Pros:
 	Comes with an extensive collection of "library addons" to help make modding easy
+	Extensive support for DFHack
 	No need for an external runtime, Rubble is a native application
 	Addons may override each other's files
 	Full parser/lexer, not just a bunch of regular expressions

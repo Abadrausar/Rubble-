@@ -12,17 +12,17 @@
 
 # Gets a material to show the specified announcement.
 (command rubble:libs_dfhack_announcement:getmat text color {
-	(var in <array libs_dfhack_announcement [text] [color]>)
+	(var in <array rubble_announce [text] [color]>)
 	(rubble:libs_dfhack_command:getmat [in])
 })
 
 # Use this template as a replacement for a reaction product line.
 (rubble:template "DFHACK_ANNOUNCEMENT" text color=COLOR_WHITE {
-	(var in <array libs_dfhack_announcement [text] [color]>)
+	(var in <array rubble_announce [text] [color]>)
 	(str:add "[PRODUCT:100:1:BOULDER:NONE:" (rubble:libs_dfhack_command:getmat [in]) "]")
 })
 
 # Install the script.
-(fileio:write (str:add [rubble:dfdir] "/hack/scripts/libs_dfhack_announcement.lua") [rubble:raws "libs_dfhack_announcement.lua"])
+(fileio:write (str:add [rubble:dfdir] "/hack/scripts/rubble_announce.lua") [rubble:raws "libs_dfhack_announcement.lua"])
 
 (ret "")

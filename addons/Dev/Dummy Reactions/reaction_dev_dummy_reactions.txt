@@ -13,5 +13,5 @@
 		"\tAdd your reaction body here\n"
 		)))
 	})
-	(ret out)
+	(ret [out])
 }

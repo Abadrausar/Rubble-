@@ -2,8 +2,9 @@
 #AutoIt3Wrapper_UseX64=n
 #AutoIt3Wrapper_Res_Description=Rubble GUI Launcher
 #AutoIt3Wrapper_Res_Fileversion=1.0
-#AutoIt3Wrapper_Res_LegalCopyright=Copyright 2013 Milo Christiansen
+#AutoIt3Wrapper_Res_LegalCopyright=Copyright 2013-2014 Milo Christiansen
 #AutoIt3Wrapper_Res_Language=1033
+#AutoIt3Wrapper_Res_Comment=Rubble Version (at last GUI build): 3.11
 
 #include <ButtonConstants.au3>
 #include <GUIConstantsEx.au3>
@@ -34,7 +35,7 @@ GUICtrlSetResizing(-1, $GUI_DOCKLEFT+$GUI_DOCKBOTTOM+$GUI_DOCKHEIGHT)
 Dim $Rubble = IniRead(@ScriptDir & "\gui.ini", "general", "rubble", ".")
 Dim $AddonDir = $Rubble & "\addons"
 If FileExists($Rubble & "\rubble.ini") Then
-	$AddonDir = IniRead($Rubble & "\rubble.ini", "path", "addonsdir", $AddonDir)
+	$AddonDir = IniRead($Rubble & "\rubble.ini", "rubble", "addonsdir", $AddonDir)
 EndIf
 
 RunWait($Rubble & "/rubble.exe" & ' -addonlist', $Rubble , @SW_HIDE)
