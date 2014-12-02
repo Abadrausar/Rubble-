@@ -1,7 +1,6 @@
 package main
 
 //import "fmt"
-import "strings"
 
 // Lexer states
 const (
@@ -23,11 +22,6 @@ type Lexer struct {
 // Returns a new Lexer.
 func NewLexer(input string) *Lexer {
 	out := make(chan *Token)
-
-	// Brute force fix some char literals. Ugly, ugly, ugly, but it works.
-	input = strings.Replace(input, "';'", "{#_CHAR_DELIMITER}", -1)
-	input = strings.Replace(input, "'{'", "{#_CHAR_TAG_OPEN}", -1)
-	input = strings.Replace(input, "'}'", "{#_CHAR_TAG_CLOSE}", -1)
 	
 	go func() {
 		
@@ -38,12 +32,19 @@ func NewLexer(input string) *Lexer {
 		lexeme := make([]byte, 0, 20)
 		commandDepth := 0
 
-		for _, val := range []byte(input) {
-			if val == ';' {
+		for i := 0; i < len(input); i++ {
+			if input[i] == ';' {
 				if state == stReadString || commandDepth > 0 {
-					lexeme = append(lexeme, val)
+					lexeme = append(lexeme, input[i])
 					continue
 				}
+				if 0 < i && len(input) > i+1 {
+					if input[i-1] == '\'' && input[i+1] == '\'' {
+						lexeme = append(lexeme, input[i])
+						continue
+					}
+				}
+				
 				out <- &Token{string(lexeme), token}
 				out <- &Token{ ";", tknDelimiter}
 				token = tknString
@@ -51,7 +52,13 @@ func NewLexer(input string) *Lexer {
 				continue
 			}
 			
-			if val == '{' {
+			if input[i] == '{' {
+				if 0 < i && len(input) > i+1 {
+					if input[i-1] == '\'' && input[i+1] == '\'' {
+						lexeme = append(lexeme, input[i])
+						continue
+					}
+				}
 				if state == stReadString {
 					state = stReadCommand
 					out <- &Token{string(lexeme), token}
@@ -61,10 +68,16 @@ func NewLexer(input string) *Lexer {
 					continue
 				}
 				commandDepth++
-				lexeme = append(lexeme, val)
+				lexeme = append(lexeme, input[i])
 				continue
 			}
-			if val == '}' {
+			if input[i] == '}' {
+				if 0 < i && len(input) > i+1 {
+					if input[i-1] == '\'' && input[i+1] == '\'' {
+						lexeme = append(lexeme, input[i])
+						continue
+					}
+				}
 				if state == stReadCommand && commandDepth == 0 {
 					state = stReadString
 					out <- &Token{string(lexeme), token}
@@ -74,11 +87,11 @@ func NewLexer(input string) *Lexer {
 					continue
 				}
 				commandDepth--
-				lexeme = append(lexeme, val)
+				lexeme = append(lexeme, input[i])
 				continue
 			}
 
-			lexeme = append(lexeme, val)
+			lexeme = append(lexeme, input[i])
 		}
 		
 		out <- &Token{string(lexeme), token}

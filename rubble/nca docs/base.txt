@@ -14,12 +14,6 @@ Create a new user command.
 
     Returns unchanged.
 
-Delete a map.
-
-	delmap name
-
-    Returns unchanged
-
 Delete a variable.
 
 	delvar name
@@ -64,6 +58,12 @@ Run code for as long as the code returns true.
     Returns the return value of the last command in the code it runs, always
     "0" or "" unless loop exited with ret (In which case the return value is
     unusable by the command calling loop anyway).
+
+Create a new array.
+
+	array name size
+
+    Returns unchanged
 
 Create a new map.
 

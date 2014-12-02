@@ -1,25 +1,25 @@
 package main
 
-import "dctech/nca4"
-import "dctech/nca4/base"
-import "dctech/nca4/bit"
-import "dctech/nca4/cmp"
-import "dctech/nca4/conio"
-import "dctech/nca4/csv"
-import "dctech/nca4/env"
-import "dctech/nca4/file"
-import "dctech/nca4/fileio"
-import "dctech/nca4/ini"
-import "dctech/nca4/math"
-import "dctech/nca4/stack"
-import "dctech/nca4/str"
+import "dctech/nca5"
+import "dctech/nca5/base"
+import "dctech/nca5/bit"
+import "dctech/nca5/cmp"
+import "dctech/nca5/conio"
+import "dctech/nca5/csv"
+import "dctech/nca5/env"
+import "dctech/nca5/file"
+import "dctech/nca5/fileio"
+import "dctech/nca5/ini"
+import "dctech/nca5/math"
+import "dctech/nca5/stack"
+import "dctech/nca5/str"
 
 import "regexp"
 
-var GlobalNCAState *nca4.State
+var GlobalNCAState *nca5.State
 
 func InitNCA() {
-	state := nca4.NewState()
+	state := nca5.NewState()
 	
 	state.NoRecover = !Recover
 
@@ -38,12 +38,16 @@ func InitNCA() {
 	str.Setup(state)
 	
 	state.NewNameSpace("rubble")
-	state.NewVar("rubble:outputdir", nca4.NewValue(OutputDir))
-	state.NewVar("rubble:configdir", nca4.NewValue(ConfigDir))
-	state.NewVar("rubble:basedir", nca4.NewValue(BaseDir))
-	state.NewVar("rubble:addonsdir", nca4.NewValue(AddonsDir))
+	state.NewVar("rubble:dfdir", nca5.NewValue(DFDir))
+	state.NewVar("rubble:outputdir", nca5.NewValue(OutputDir))
+	state.NewVar("rubble:configdir", nca5.NewValue(ConfigDir))
+	state.NewVar("rubble:basedir", nca5.NewValue(BaseDir))
+	state.NewVar("rubble:addonsdir", nca5.NewValue(AddonsDir))
 	
 	state.NewNativeCommand("panic", CommandPanic)
+	
+	state.NewNameSpace("regex")
+	state.NewNativeCommand("regex:replace", CommandRegEx_Replace)
 	
 	state.NewNativeCommand("rubble:skipfile", CommandRubble_SkipFile)
 	state.NewNativeCommand("rubble:setvar", CommandRubble_SetVar)
@@ -59,7 +63,7 @@ func InitNCA() {
 // Causes a panic.
 // 	panic value
 // Returns unchanged.
-func CommandPanic(state *nca4.State, params []*nca4.Value) {
+func CommandPanic(state *nca5.State, params []*nca5.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to panic (how ironic).")
 	}
@@ -67,11 +71,23 @@ func CommandPanic(state *nca4.State, params []*nca4.Value) {
 	panic(params[0].String())
 }
 
+// Runs a regular expression search and replace.
+// 	regex:replace regex input replace
+// Returns input with all strings matching regex replaced with replace.
+func CommandRegEx_Replace(state *nca5.State, params []*nca5.Value) {
+	if len(params) != 3 {
+		panic("Wrong number of params to regex:replace.")
+	}
+
+	regEx := regexp.MustCompile(params[0].String())
+	state.RetVal = nca5.NewValue(regEx.ReplaceAllString(params[1].String(), params[2].String()))
+}
+
 // Makes Rubble skip a file.
 // 	rubble:skipfile name
 // name is the file's BASE NAME not it's path!
 // Returns unchanged.
-func CommandRubble_SkipFile(state *nca4.State, params []*nca4.Value) {
+func CommandRubble_SkipFile(state *nca5.State, params []*nca5.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to rubble:skipfile.")
 	}
@@ -87,7 +103,7 @@ var varNameValidateRegEx = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 // Sets a Rubble variable.
 // 	rubble:setvar name value
 // Returns unchanged.
-func CommandRubble_SetVar(state *nca4.State, params []*nca4.Value) {
+func CommandRubble_SetVar(state *nca5.State, params []*nca5.Value) {
 	if len(params) != 2 {
 		panic("Wrong number of params to rubble:setvar.")
 	}
@@ -102,7 +118,7 @@ func CommandRubble_SetVar(state *nca4.State, params []*nca4.Value) {
 // Gets the value of a Rubble variable.
 // 	rubble:getvar name
 // Returns the value.
-func CommandRubble_GetVar(state *nca4.State, params []*nca4.Value) {
+func CommandRubble_GetVar(state *nca5.State, params []*nca5.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to rubble:getvar.")
 	}
@@ -111,25 +127,25 @@ func CommandRubble_GetVar(state *nca4.State, params []*nca4.Value) {
 		panic("Rubble variable " + params[0].String() + " does not exist.")
 	}
 	
-	state.RetVal = nca4.NewValue(VariableData[params[0].String()])
+	state.RetVal = nca5.NewValue(VariableData[params[0].String()])
 }
 
 // Parses Rubble code.
 // 	rubble:stageparse code
 // Note that how code is parsed depends on the parse stage.
 // Returns the result of running code through the stage parser.
-func CommandRubble_StageParse(state *nca4.State, params []*nca4.Value) {
+func CommandRubble_StageParse(state *nca5.State, params []*nca5.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to rubble:stageparse.")
 	}
 	
-	state.RetVal = nca4.NewValue(StageParse(params[0].String()))
+	state.RetVal = nca5.NewValue(StageParse(params[0].String()))
 }
 
 // Calles a Rubble template.
 // 	rubble:calltemplate name [params...]
 // Returns the templates return value.
-func CommandRubble_CallTemplate(state *nca4.State, params []*nca4.Value) {
+func CommandRubble_CallTemplate(state *nca5.State, params []*nca5.Value) {
 	if len(params) > 1 {
 		panic("Wrong number of params to rubble:calltemplate.")
 	}
@@ -143,16 +159,16 @@ func CommandRubble_CallTemplate(state *nca4.State, params []*nca4.Value) {
 		panic("Invalid template: " + name)
 	}
 	
-	state.RetVal = nca4.NewValue(Templates[name].Call(strParams))
+	state.RetVal = nca5.NewValue(Templates[name].Call(strParams))
 }
 
 // Expands Rubble variables.
 // 	rubble:expandvars raws
 // Returns the raws with all Rubble variables expanded.
-func CommandRubble_ExpandVars(state *nca4.State, params []*nca4.Value) {
+func CommandRubble_ExpandVars(state *nca5.State, params []*nca5.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to rubble:expandvars.")
 	}
 	
-	state.RetVal = nca4.NewValue(ExpandVars(params[0].String()))
+	state.RetVal = nca5.NewValue(ExpandVars(params[0].String()))
 }

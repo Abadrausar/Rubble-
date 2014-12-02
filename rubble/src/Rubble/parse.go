@@ -175,16 +175,53 @@ func PostParse(input string) string {
 
 var varNameSimpleRegEx = regexp.MustCompile("\\$[a-zA-Z_][a-zA-Z0-9_]*")
 
+// This is a modified version of os.Expand
 func ExpandVars(input string) string {
-	for i := range VariableData {
-		input = strings.Replace(input, "${" + i + "}", VariableData[i], -1)
-	}
-	input = varNameSimpleRegEx.ReplaceAllStringFunc(input, func(in string) string {
-		in = strings.TrimLeft(in, "$")
-		if _, ok := VariableData[in]; ok {
-			return VariableData[in]
+	buf := make([]byte, 0, len(input))
+	
+	depth := 0
+	i := 0
+	for j := 0; j < len(input); j++ {
+		if input[j] == '{' {
+			depth++
 		}
-		return "$" + in
-	})
-	return input
+		if input[j] == '}' && depth > 0 {
+			depth--
+		}
+		
+		if input[j] == '$' && j+1 < len(input) && depth == 0 {
+			buf = append(buf, input[i:j]...)
+			name, w := getVarName(input[j+1:])
+			if name == "" {
+				buf = append(buf, '{')
+			} else {
+				buf = append(buf, VariableData[name]...)
+			}
+			j += w
+			i = j + 1
+		}
+	}
+	
+	return string(buf) + input[i:]
+}
+
+func getVarName(input string) (string, int) {
+	if input[0] == '{' {
+		// Scan to closing brace
+		for i := 1; i < len(input); i++ {
+			if input[i] == '}' {
+				return input[1:i], i + 1
+			}
+		}
+		return "", 1 // Bad syntax
+	}
+	// Scan alphanumerics.
+	var i int
+	for i = 0; i < len(input) && isAlphaNum(input[i]); i++ {
+	}
+	return input[:i], i
+}
+
+func isAlphaNum(c uint8) bool {
+	return c == '_' || '0' <= c && c <= '9' || 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'
 }

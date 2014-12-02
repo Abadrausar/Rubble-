@@ -4,10 +4,11 @@ package main
 import "strings"
 import "strconv"
 import "sort"
-import "dctech/nca4"
+import "dctech/nca5"
 
 func SetupBuiltins() {
 	NewNativeTemplate("!TEMPLATE", tempTemplate)
+	NewNativeTemplate("!SCRIPT_TEMPLATE", tempScriptTemplate)
 	
 	NewNativeTemplate("!SCRIPT", tempScript)
 	NewNativeTemplate("SCRIPT", tempScript)
@@ -33,11 +34,6 @@ func SetupBuiltins() {
 	NewNativeTemplate("#_REGISTERED_REACTION_CLASSES", tempRegisteredReationClasses)
 	NewNativeTemplate("REGISTER_REACTION_PRODUCT", tempRegisterReactionProduct)
 	NewNativeTemplate("#_REGISTERED_REACTION_PRODUCTS", tempRegisteredReationProducts)
-	
-	// Do not port, used by the lexer only
-	NewNativeTemplate("#_CHAR_DELIMITER", tempCharDelimiter)
-	NewNativeTemplate("#_CHAR_TAG_OPEN", tempCharTagOpen)
-	NewNativeTemplate("#_CHAR_TAG_CLOSE", tempCharTagClose)
 }
 
 func tempTemplate(params []string) string {
@@ -69,13 +65,42 @@ func tempTemplate(params []string) string {
 	return ""
 }
 
+func tempScriptTemplate(params []string) string {
+	if len(params) < 2 {
+		panic("Wrong number of params to !SCRIPT_TEMPLATE.")
+	}
+	
+	name := params[0]
+	text := params[len(params)-1]
+	paramNames := params[1:len(params)-1]
+	
+	parsedParams := make([]*TemplateParam, 0, len(paramNames))
+	
+	for _, val := range paramNames {
+		rtn := new(TemplateParam)
+		if strings.Contains(val, "=") {
+			parts := strings.SplitN(val, "=", 2)
+			rtn.Name = parts[0]
+			rtn.Default = parts[1]
+			parsedParams = append(parsedParams, rtn)
+			continue
+		}
+		rtn.Name = val
+		parsedParams = append(parsedParams, rtn)
+	}
+	
+	NewScriptTemplate(name, text, parsedParams)
+	
+	return ""
+}
+
 func tempScript(params []string) string {
 	if len(params) < 1 {
 		panic("Wrong number of params to SCRIPT.")
 	}
 	
 	GlobalNCAState.Code.Add(params[0])
-	GlobalNCAState.Envs.Add(nca4.NewEnvironment())
+	GlobalNCAState.Envs.Add(nca5.NewEnvironment())
 	
 	if len(params) > 1 {
 		GlobalNCAState.AddParams(params[1:]...)
@@ -538,16 +563,4 @@ func tempRegisteredReationProducts(params []string) string {
 		out += "\n\t[MATERIAL_REACTION_PRODUCT:" + val.Name + ":" + val.Mat + "]"
 	}
 	return out
-}
-
-func tempCharDelimiter(params []string) string {
-	return "';'"
-}
-
-func tempCharTagOpen(params []string) string {
-	return "'{'"
-}
-
-func tempCharTagClose(params []string) string {
-	return "'}'"
 }

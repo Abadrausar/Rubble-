@@ -8,179 +8,160 @@ Note that to keep the output properly formatted templates often have ugly indent
 {!TEMPLATE;C;}
 
 'VOID, a little more complicated, this is a prime example of using ...'
-{!TEMPLATE;VOID;
-	{SCRIPT;
-		(foreach params {
-			'Note that params here is NOT the same map as the one passed to foreach'
-			(rubble:stageparse [params 1])
-			(break -1)
-		})
-		(ret "")
-	;...}
+{!SCRIPT_TEMPLATE;VOID;...;
+	(foreach params {
+		'Note that params here is NOT the same array as the one passed to foreach'
+		(rubble:stageparse [params 1])
+		(break -1)
+	})
+	(ret "")
 }
 
 'PANIC, cause Rubble to exit with an error, not used in the base.'
-{!TEMPLATE;!PANIC;msg;
-	{SCRIPT;(panic (rubble:expandvars {%msg}))}
+{!SCRIPT_TEMPLATE;!PANIC;msg;
+	(panic [msg])
 }
-{!TEMPLATE;PANIC;msg;
-	{SCRIPT;(panic (rubble:expandvars {%msg}))}
+{!SCRIPT_TEMPLATE;PANIC;msg;
+	(panic [msg])
 }
-{!TEMPLATE;#PANIC;msg;
-	{SCRIPT;(panic (rubble:expandvars {%msg}))}
+{!SCRIPT_TEMPLATE;#PANIC;msg;
+	(panic [msg])
 }
 
 'The next two templates are for stripping leading/trailing whitespace from a string.
 A formatting tool mostly, helps keep whitespace under control in generated files.'
-{!TEMPLATE;ECHO;
-	{SCRIPT;
-		(var tmp)
-		(foreach params {
-			(set tmp (append [tmp] [params 1]))
-		})
-		(ret (rubble:stageparse [tmp]))
-	;...}
+{!SCRIPT_TEMPLATE;ECHO;...;
+	(var tmp)
+	(foreach params {
+		(set tmp (append [tmp] [params 1]))
+	})
+	(rubble:stageparse [tmp])
 }
 {!TEMPLATE;E;{ECHO;...}}
 
-'SHARED_OBJECT and SHARED_ITEM. SHARED_ITEM will be removed as soon as I get around to it.'
-{!SCRIPT;(map "rubble:shared_object_data")}
-{!TEMPLATE;SHARED_OBJECT;id;raws;
-	{SCRIPT;
-		(if (eq [rubble:shared_object_data {%id}] "ok"){
-			(rubble:stageparse {%raws})
-			(ret "")
-		}{
-			(set rubble:shared_object_data {%id} "ok")
-			(ret (rubble:stageparse {%raws}))
-		})
-	}
-}
-{!TEMPLATE;SHARED_ITEM;id;raws;{SHARED_OBJECT;%id;%raws}}
-
-{!TEMPLATE;IF;a;b;then;else;
-	{SCRIPT;
-		(if (eq {%a} {%b}){
-			(ret {%then})
-		}{
-			(ret {%else})
-		})
-	}
-}
-
-{!SCRIPT;(map "rubble:once_data")}
-{!TEMPLATE;ONCE;id;raws;
-	{SCRIPT;
-		(if (eq [rubble:once_data {%id}] "ok"){
-			(ret "")
-		}{
-			(set rubble:once_data {%id} "ok")
-			(ret (rubble:stageparse {%raws}))
-		})
-	}
-}
-
-{!SCRIPT;(map "rubble:static_data")}
-{!TEMPLATE;STATIC;id;raws;
-	{SCRIPT;
-		(if (exists rubble:static_data {%id}){
-			(ret [rubble:static_data {%id}])
-		}{
-			(set rubble:static_data {%id} (rubble:stageparse {%raws}))
-		})
-	}
-}
-
-{!TEMPLATE;SET;name;value;
-	{SCRIPT;(rubble:setvar {%name} {%value})}
-}
-
-{!SCRIPT;(var "rubble:adventure_tier_data" -1)}
-{!TEMPLATE;#ADVENTURE_TIER;
-	{SCRIPT;
-		(set rubble:adventure_tier_data (add [rubble:adventure_tier_data] 1))
-		(ret [rubble:adventure_tier_data])
-	}
-}
-
-{!TEMPLATE;!PRINT;
-	{SCRIPT;
-		(foreach params {
-			(console:print "\t" [params 1] "\n")
-			(break -1)
-		})
+{!SCRIPT;(map rubble:shared_object_data)}
+{!SCRIPT_TEMPLATE;SHARED_OBJECT;id;raws;
+	(if (eq [rubble:shared_object_data [id]] "ok"){
+		(rubble:stageparse [raws])
 		(ret "")
-	;...}
+	}{
+		(set rubble:shared_object_data [id] "ok")
+		(rubble:stageparse [raws])
+	})
 }
-{!TEMPLATE;PRINT;
-	{SCRIPT;
-		(foreach params {
-			(console:print "\t" [params 1] "\n")
-			(break -1)
-		})
+
+{!SCRIPT_TEMPLATE;IF;a;b;then;else;
+	(if (eq [a] [b]){
+		(rubble:stageparse [then])
+	}{
+		(rubble:stageparse [else])
+	})
+}
+
+{!SCRIPT;(map rubble:once_data)}
+{!SCRIPT_TEMPLATE;ONCE;id;raws;
+	(if (eq [rubble:once_data [id]] "ok"){
 		(ret "")
-	;...}
-}
-{!TEMPLATE;#PRINT;
-	{SCRIPT;
-		(foreach params {
-			(console:print "\t" [params 1] "\n")
-			(break -1)
-		})
-		(ret "")
-	;...}
+	}{
+		(set rubble:once_data [id] "ok")
+		(rubble:stageparse [raws])
+	})
 }
 
-{!TEMPLATE;SHARED_INORGANIC;id;raws;
-	{SCRIPT;
-		(append
-			"{SHARED_OBJECT:" {%id} ";\n"
-			"[INORGANIC:" {%id} "]\n\t"
-			(rubble:stageparse {%raws})
-			"{#_REGISTERED_ORES;" {%id} "}"
-			"{#_REGISTERED_REACTION_CLASSES;" {%id} "}"
-			"{#_REGISTERED_REACTION_PRODUCTS;" {%id} "}"
-			"\n}"
-		)
-	}
-}
-{!TEMPLATE;SHARED_MATERIAL_TEMPLATE;id;raws;
-	{SCRIPT;
-		(append
-			"{SHARED_OBJECT:" {%id} ";\n"
-			"[MATERIAL_TEMPLATE:" {%id} "]\n\t"
-			(rubble:stageparse {%raws})
-			"{#_REGISTERED_ORES;" {%id} "}"
-			"{#_REGISTERED_REACTION_CLASSES;" {%id} "}"
-			"{#_REGISTERED_REACTION_PRODUCTS;" {%id} "}"
-			"\n}"
-		)
-	}
+{!SCRIPT;(map rubble:static_data)}
+{!SCRIPT_TEMPLATE;STATIC;id;raws;
+	(if (exists rubble:static_data [id]){
+		(ret [rubble:static_data [id])
+	}{
+		(set rubble:static_data [id] (rubble:stageparse [raws]))
+	})
 }
 
-'This is used for generic animal mats'
-{!TEMPLATE;ANIMAL_MAT;
-	{IF;$GENERIC_ANIMAL_MATS;YES;
-	CREATURE_MAT:ANIMAL
-	;
-	LOCAL_CREATURE_MAT
-	}
+{!SCRIPT_TEMPLATE;SET;name;value;
+	(rubble:setvar [name] [value])
+	(ret "")
 }
 
-{!TEMPLATE;#AQUIFER;
-	{IF;$USE_AQUIFERS;YES;
-	[AQUIFER]
-	;
-	Aquifer Disabled
-	}
+{!SCRIPT;(var rubble:adventure_tier_data -1)}
+{!SCRIPT_TEMPLATE;#ADVENTURE_TIER;
+	(set rubble:adventure_tier_data (add [rubble:adventure_tier_data] 1))
+	(ret [rubble:adventure_tier_data])
 }
 
-'An evil hack to make declaring items easy.'
+'This refactoring made possible by NCA5'
+{!SCRIPT;(command rubble:print params {
+	(foreach params {
+		(console:print "\t" (rubble:expandvars [params 1]) "\n")
+		(break -1)
+	})
+	(ret "")
+})}
+{!SCRIPT_TEMPLATE;!PRINT;...;
+	(rubble:print [params])
+}
+{!SCRIPT_TEMPLATE;PRINT;...;
+	(rubble:print [params])
+}
+{!SCRIPT_TEMPLATE;#PRINT;...;
+	(rubble:print [params])
+}
+
+{!SCRIPT_TEMPLATE;SHARED_INORGANIC;id;raws;
+	(append
+		"{SHARED_OBJECT;" [id] ";\n"
+		"[INORGANIC:" [id] "]\n\t"
+		[raws]
+		"{#_REGISTERED_ORES;" [id] "}"
+		"{#_REGISTERED_REACTION_CLASSES;" [id] "}"
+		"{#_REGISTERED_REACTION_PRODUCTS;" [id] "}"
+		"\n}"
+	)
+	(rubble:stageparse (nop))
+}
+{!SCRIPT_TEMPLATE;SHARED_MATERIAL_TEMPLATE;id;raws;
+	(append
+		"{SHARED_OBJECT;" [id] ";\n"
+		"[MATERIAL_TEMPLATE:" [id] "]\n\t"
+		[raws]
+		"{#_REGISTERED_ORES;" [id] "}"
+		"{#_REGISTERED_REACTION_CLASSES;" [id] "}"
+		"{#_REGISTERED_REACTION_PRODUCTS;" [id] "}"
+		"\n}"
+	)
+	(rubble:stageparse (nop))
+}
+
+{!SCRIPT_TEMPLATE;#AQUIFER;
+	(if (eq (rubble:getvar USE_AQUIFERS) "YES"){
+		(ret "[AQUIFER]")
+	}{
+		(ret "AQUIFER Disabled")
+	})
+}
+
+'An evil hack to make declaring items easy. Do not use in addons!'
 {!TEMPLATE;BASE_ITEM;type;item;def;
 	{SHARED_OBJECT;%item;
 	{ITEM;%type;%item;%type}
 	%def
 	}
+}
+
+
+{!SCRIPT;(map rubble:tile_data)}
+{!SCRIPT_TEMPLATE;SET_TILE;id;tile;
+	(if (exists rubble:tile_data [id]){
+		'Already set; do nothing.'
+	}{
+		(set rubble:tile_data [id] [tile])
+	})
+}
+{!SCRIPT_TEMPLATE;#TILE;id;default;
+	(if (exists rubble:tile_data [id]){
+		(ret [rubble:tile_data [id]])
+	}{
+		(ret [default])
+	})
 }
 
 'This tells Rubble to only read this file on the first pass and to not write it to disk.'

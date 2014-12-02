@@ -43,8 +43,3 @@
 	[MATERIAL_SIZE:3]
 	[ATTACK:BLUNT:10000:4000:bash:bashes:NO_SUB:1250]
 }
-
-
-
-
-

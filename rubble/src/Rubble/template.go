@@ -3,6 +3,7 @@ package main
 import "strings"
 import "regexp"
 import "strconv"
+import "dctech/nca5"
 
 type NativeTemplate func([]string) string
 
@@ -16,6 +17,9 @@ type TemplateParam struct {
 type Template struct {
 	// Is this a native template?
 	Native bool
+	
+	// Is this template's body made up of NCA code?
+	NCA bool
 
 	// The native template handler
 	Handler NativeTemplate
@@ -61,6 +65,37 @@ func (this *Template) Call(params []string) string {
 	// Native template
 	if this.Native {
 		return this.Handler(params)
+	}
+	
+	// Script template
+	if this.NCA {
+		GlobalNCAState.Code.Add(this.Text)
+		GlobalNCAState.Envs.Add(nca5.NewEnvironment())
+		
+		// Handle params
+		if len(this.Params) == 1 && this.Params[0].Name == "..." {
+			GlobalNCAState.AddParams(params...)
+		} else {
+			for i := range this.Params {
+				if len(params) <= i {
+					GlobalNCAState.NewVar(this.Params[i].Name, nca5.NewValue(this.Params[i].Default))
+				} else {
+					GlobalNCAState.NewVar(this.Params[i].Name, nca5.NewValue(params[i]))
+				}
+			}
+		}
+		
+		rtn, err := GlobalNCAState.Run()
+		if err != nil {
+			panic("Script Error: " + err.Error())
+		}
+		
+		GlobalNCAState.Envs.Remove()
+		
+		if rtn == nil {
+			return ""
+		}
+		return rtn.String()
 	}
 
 	// User template
@@ -115,6 +150,14 @@ func NewNativeTemplate(name string, handler NativeTemplate) {
 
 func NewUserTemplate(name string, text string, params []*TemplateParam) {
 	rtn := new(Template)
+	rtn.Text = text
+	rtn.Params = params
+	Templates[name] = rtn
+}
+
+func NewScriptTemplate(name string, text string, params []*TemplateParam) {
+	rtn := new(Template)
+	rtn.NCA = true
 	rtn.Text = text
 	rtn.Params = params
 	Templates[name] = rtn

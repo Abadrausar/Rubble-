@@ -4,8 +4,8 @@ Built-in Native Templates
 
 ==============================================
 {!TEMPLATE;<NAME>;<CODE>}
-{!TEMPLATE;<NAME>;<PARAM_1>;<PARAM_2>;...;<CODE>}
-{!TEMPLATE;<NAME>;<PARAM_1>=<DEFAULT_VALUE_1>;<PARAM_2>=<DEFAULT_VALUE_2>;...;<CODE>}
+{!TEMPLATE;<NAME>;<PARAM>...;<CODE>}
+{!TEMPLATE;<NAME>;<PARAM>=<DEFAULT_VALUE>...;<CODE>}
 	Creates a new template definition with name <NAME>, subsequently calling {<NAME>} will return a new parse of <CODE>.
 
 	Calling {<NAME>;<ARGUMENT_1>;<ARGUMENT_2>} will replace instances of %<PARAM_1>, %{<PARAM_1>}, or %1 with <ARGUMENT_1>, instances of %<PARAM_2>, %{<PARAM_2>}, or %2 with <ARGUMENT_2>, etcetera. Default values may be specified for parameters.
@@ -31,6 +31,32 @@ Built-in Native Templates
 		Hello Urist!
 		Hello Led!
 		Hello ‼Fun‼!
+
+==============================================
+{!SCRIPT_TEMPLATE;<NAME>;<CODE>}
+{!SCRIPT_TEMPLATE;<NAME>;...;<CODE>}
+{!SCRIPT_TEMPLATE;<NAME>;<PARAM>...;<CODE>}
+{!SCRIPT_TEMPLATE;<NAME>;<PARAM>=<DEFAULT_VALUE>...;<CODE>}
+	Exactly like !TEMPLATE except <CODE> should be a NCA script and any params are declared as NCA variables.
+	
+	Example:
+		{!SCRIPT_TEMPLATE;FOO;(ret "bar")}
+		{!TEMPLATE;GREET;__thing__;(append Hello [__thing__] !)}
+		{!TEMPLATE;LIST;...;
+			(var tmp)
+			(foreach params {
+				(set tmp (append [tmp] ", " [params 1]))
+				(break -1)
+			})
+		}
+		{FOO}
+		{GREET;World}
+		Dwarves: {LIST;Urist;Led}
+	
+	evaluates to
+		bar
+		Hello World!
+		Dwarves: Urist, Led
 
 ==============================================
 {!SCRIPT;<NCACODE>} or {!SCRIPT;<NCACODE>;<PARAMS>...}

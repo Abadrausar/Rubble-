@@ -2,6 +2,7 @@ package main
 
 import "flag"
 
+var DFDir string
 var OutputDir string
 var ConfigDir string
 var BaseDir string
@@ -11,6 +12,7 @@ var LexTest bool
 var Recover bool
 
 func ParseCommandLine() {
+	flag.StringVar(&DFDir ,"dfdir", "..", "What is the base DF directory?")
 	flag.StringVar(&OutputDir ,"outputdir", "./objects", "Where should Rubble write the generated raw files?")
 	flag.StringVar(&ConfigDir ,"configdir", "./source", "Rubble config dir.")
 	flag.StringVar(&BaseDir ,"basedir", "./source/base", "Rubble base dir.")

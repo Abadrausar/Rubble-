@@ -20,7 +20,7 @@ User Templates in Standared Base
 ==============================================
 {ECHO;<PRERAWS>...}
 {E;<PRERAWS>...}
-	Returns <PRERAWS>. Used to strip leading and trailing whitespace for better formatting of output.
+	Returns <PRERAWS>. Used to strip leading and trailing whitespace for better formatting of output and to delay variable expansion.
 
 ==============================================
 {!PANIC;<MESSAGE>}
@@ -62,10 +62,6 @@ User Templates in Standared Base
 	Returns [AQUIFER] if the USE_AQUIFERS config option is YES.
 
 ==============================================
-{ANIMAL_MAT}
-	Returns CREATURE_MAT:ANIMAL if the GENERIC_ANIMAL_MATS config option is YES otherwise it returns LOCAL_CREATURE_MAT.
-
-==============================================
 {!PRINT;<PRERAWS>...}
 {PRINT;<PRERAWS>...}
 {#PRINT;<PRERAWS>...}
@@ -84,3 +80,13 @@ User Templates in Standared Base
 	
 	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
 	Uses SHARED_OBJECT, make sure <NAME> is unique.
+
+==============================================
+{SET_TILE;<ID>;<TILE>}
+	Sets tile entry <ID> to <TILE>.
+	Used to add support for tilesets, first entry "wins".
+
+==============================================
+{#TILE;<ID>;<DEFAULT>}
+	If a tile entry for <ID> exists return it else return <DEFAULT>.
+	Use everywhere a tile number is required.

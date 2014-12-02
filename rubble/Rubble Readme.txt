@@ -9,15 +9,14 @@ Rubble is based on Blast but is not compatible with that utility.
 
 Pros:
 	No need for an external runtime, Rubble is a native application
-	Configurable directory structure via command line options
 	Addons may override vanilla files
 	Full parser/lexer, not just a bunch of regexes
-	Minimal impact, touch only the minimum amount of files
 	Templates are designed to make formatting easy, both output and input files should be easy to read
 	Support for embeding scripts in raw files, do advanced setup right in the raws
-	Simple variable expansion, no more GET_VAR, works in any parse stage
+	Variable expansion, no more GET_VAR, works in any parse stage
 	Many templates for registering objects and the like are replacements for vanilla raw tags allowing better formating
 	Using scripting some files may be parsed but not included in the generated raws
+	Support for easily and quickly installing tilesets as addons
 
 Cons:
 	Not compatible with any version of Blast
@@ -32,7 +31,11 @@ Rubble comes prebuilt for 32 bit Windows, Linux, and OSX
 Why Another Raw Generator?
 ==============================================
 
-I really liked Blast but it was far to inflexable, hard to install, and (IMHO) generated ugly output. This led me to write GoBlast, a easier to install, Blast compatible, raw generator. That worked for a while but I soon realized that while GoBlast got the job done the design/templates forced by Blast compatibility were making my job harder than it needed to be. Rubble is the result of redesigning GoBlast from the ground up to better fit the way I do things.
+Blast has a lot of power and advanced fetures that let you do all kinds of things while still remaining compatible with most if not all other Blast addons. Rubble on the other hand is much more minimalist, Rubble allows you to make many things with a minimum of fuss but has far less in the way of compatibility hand holding.
+
+Which is the best depends on exactly what you want, Rubble for simple and fast, Blast for maximum compatibility and power.
+
+Note that both Rubble and Blast are both still being worked on, so the situation may change as both Blast and Rubble mature.
 
 ==============================================
 Install:
@@ -43,6 +46,8 @@ Copy all files/folders to your raw folder. DO NOT COPY ANYTHING to "raw/objects"
 Install your base (if any) to "raw/source/base" and addons to "raw/source/addons"
 
 Now you are good to go! Documentation (as you have obviously discovered) is in the "raw/rubble" folder as is source code.
+
+To activate or deactivate a rubble addon you may remove or add double leading underscores to the addon's directory, eg. __test_addon is disabled while test_addon is enabled.
 
 If you use OSX or linux, 32 bit binarys for these OSes can be found in the "raw/rubble" directory. If you want 64 bit binarys you can compile them yourself.
 
@@ -71,11 +76,30 @@ All the command documents are in the "raw/rubble/nca docs" directory as well as 
 BUGS:
 ==============================================
 
-The generic animal mats (in the base) do not appear to work 100%, some things like meat are still not generic. Sometime I'll look into it, until then it may be better not to use that setting.
+The generic animal mats addon does not appear to work 100%, some things like meat are still not generic. Sometime I'll look into it, until then it may be better not to use that setting.
 
 ==============================================
 Changelog:
 ==============================================
+v1.4
+	Updated script runtime to NCA5, this may break some code as the way maps are handled is changed
+	Updated all NCA docs to describe NCA5
+	Changed the way the lexer handles the char literals (';', '{', and '}') to remove possible infinite recursion
+	Fixed bug in some of the base templates, the return value should have been run through the stage parser
+	Fixed #AQUIFER not working at all
+	Fixed SET returning whatever junk was in the NCA return register when it was called
+	Fixed some variables expanding too early, variables in nested template calls are not expanded until the nested template runs
+	Removed SHARED_ITEM (alias for SHARED_OBJECT)
+	Added native template !SCRIPT_TEMPLATE for declaring templates consisting of NCA code
+	Added base templates SET_TILE and #TILE for tileset support
+	Wrapped every (non-creature) tile number with a call to #TILE
+	Added rubble:dfdir variable
+	Added regex:replace NCA command
+	Added an example tileset addon mlc_tileset based on an ASCII-like tileset I made
+	Split generic animal mats out of the base and into an addon
+	Removed ANIMAL_MAT template from base
+	Made clear_raws addon active by default
+
 v1.3
 	Added rubble:stageparse NCA command
 	Added rubble:calltemplate NCA command
