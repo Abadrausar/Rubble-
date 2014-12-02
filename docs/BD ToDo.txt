@@ -2,9 +2,8 @@
 Better Dorfs todo list
 The following is a unsorted list of things I (may) want to add to better dorfs at some point
 
-More invaders
-	Add some togglable invader races for those who need more ‼fun‼
-	Orcs, and maybe some sort of powerful late game monster, the kind that will give even the best defences problems
+Flesh out orcs
+	As of now they are just up-sized goblins that can use bronze and steel.
 
 Dwarf castes
 	Add a few castes to the dwarves, not too many
@@ -13,10 +12,7 @@ Training system
 	Not sure if I want something as complicated as the masterwork library system
 
 Combat arena
-	A place to spawn creatures to fight. Basicly turn some kind of pet into a monster. Maybe allow the creation of necromancers for use in fancy traps, training systems, bone generators and more.
+	A place to spawn creatures to fight. Basically turn some kind of pet into a monster. Maybe allow the creation of necromancers for use in fancy traps, training systems, bone generators and more.
 
-Look into providing support for installing bd onto a generic materials base
-	This would need a generic materials Blast base
-
-Maybe make elves and saurians mortal enemys?
+Maybe make elves and saurians mortal enemies?
 	Not sure how (or if) this can be done without making elves hate dwarves as well

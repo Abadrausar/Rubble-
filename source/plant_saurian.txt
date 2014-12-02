@@ -1,4 +1,4 @@
-{IFVAR;CONFIG_BD_PLAY_SAURIANS;YES;
+{IFVAR;@CONFIG_BD_PLAY_SAURIANS;YES;
 [OBJECT:PLANT]
 
 A strong, but very slow growing thread plant.

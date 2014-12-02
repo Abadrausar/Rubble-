@@ -1,6 +1,5 @@
 [OBJECT:PLANT]
-
-Template is in the underground file.
+{C;Template is in the underground file.}
 
 {FARMABLE_TREE;MANGROVE;mangrove;mangroves;roots;mangrove seeds}
 	[PICKED_TILE:5]

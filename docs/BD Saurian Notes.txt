@@ -64,13 +64,13 @@ Tips:
 		Since you lack stone, bone blocks can make a good, early, fire-safe building material. This is mostly useful for item-less embarks but can come in handy for other cases as well.
 	
 	Buy metal whenever you can!
-		Iron is rare and expensive, but crucial for making weapons (and to a lesser extent armor). You will need every little bit you can get. Try to save your water steel for arming your best troops. Don't forget copper, it's great for arrows and arming your early milita. Dwarves should bring all the other metals, so having lots of valuable trade goods ready and waiting is a very good thing.
+		Iron is rare and expensive, but crucial for making weapons (and to a lesser extent armor). You will need every little bit you can get. Try to save your water steel for arming your best troops. Don't forget copper, it's great for arrows and arming your early militia. Dwarves should bring all the other metals, so having lots of valuable trade goods ready and waiting is a very good thing.
 	
 	Buy rare items like gems, silk and stone ASAP.
-		If you need raw gems you can "uncut" large gems you trade for at the craftsaurian, if you need cut gems you can use glass. Stone boulders can be pressed from blocks at the craftsaurian or fired from clay at the kiln and batch kiln. Silk cloth is (AFAIK) only avalible from the dwarves, unless you get VERY luck and have some web vermin in the area. 
+		If you need raw gems you can "uncut" large gems you trade for at the craftsaurian, if you need cut gems you can use glass. Stone boulders can be pressed from blocks at the craftsaurian or fired from clay at the kiln and batch kiln. Silk cloth is (AFAIK) only available from the dwarves, unless you get VERY luck and have some web vermin in the area. 
 	
 	Do not embark with tree seeds.
-		Each farmable tree coresponds to a vanilla DF tree. If you are not careful it is easy to embark with seeds that have the wrong biome needs to grow at your location. Whenever possible gather the required seeds on location.
+		Each farmable tree corresponds to a vanilla DF tree. If you are not careful it is easy to embark with seeds that have the wrong biome needs to grow at your location. Whenever possible gather the required seeds on location.
 
 	Do not plant (most) aboveground crops in autumn.
 		Most of the above ground plants grow in one season. This means that anything planted in summer will be harvested in autumn, and anything planted in autumn harvested in winter. The problem is that above ground plant seeds will rot in the field in winter. The exception to this rule is wire weed which, as it takes much longer to grow, can survive winter just fine. This means that in practice you will only get two harvests a year from any one field.

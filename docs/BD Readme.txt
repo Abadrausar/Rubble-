@@ -7,7 +7,7 @@ Better Dorfs is my stab at overhauling dwarf fortress without getting too far fr
 Overview:
 ==============================================
 Better Dorfs adds a bunch of industries as well as a new (possibly playable) race, the saurians.
-Saurians have some special items/materials/plants that are unavailable to dwarves while dwarves have some special industries that saurians can't use. Most features can be toggled on or off in the configuration file prior to generating the raws.
+Saurians have some special items/materials/plants that are unavailable to dwarves while dwarves have some special industries that saurians can't use. Everything can be toggled on or off in the configuration file prior to generating the raws.
 
 ==============================================
 Install:
@@ -15,13 +15,15 @@ Install:
 	Backup your "raw/objects" folder!
 	Copy all files to your raw folder. DO NOT COPY ANYTHING to raw/objects!
 	Delete "raw/objects/entity_default.txt".
-	Edit "raw/source/bd_config.txt" to your liking.
+	Edit "raw/config.txt" to your liking.
 	Open a command prompt and run "goblast" it should spew a bunch of stuff ending with "Done."
 		If the last little bit is an error message instead something went wrong and your raws are unchanged, please post the contents of the console as an error report.
 		You could just doulble click on the goblast program but then you would not be able to see if anything went wrong.
 	Go generate a world and have fun!
 	
 	Linux and OSX users can find GoBlast binaries in the "other" folder.
+	
+	If you want to use Accelerated DF with Better Dorfs install Accelerated DF and then install Better Dorfs. Before you run GoBlast make sure you set BD_COMPAT_ACCELERATED_DF to YES in config.txt.
 	
 ==============================================
 Plants:
@@ -105,12 +107,25 @@ Special thanks to the makers of:
 ==============================================
 BUGS:
 ==============================================
-	Underground trees do not show on the list of plants at a (underground) farm plot even if you have seeds, I have no idea why this is.
+	None known :)
 	
 	Please report any (other) abnormal behavior.
 
 ==============================================
 Change Log:
 ==============================================
+v1.1 for DF 34.11
+	Updated to GoBlast 1.1
+		GoBlast 1.1 adds some previously unsupported Blast templates that this version of Better Dorfs uses.
+	
+	Added Orcs
+		‼Fun‼++
+	
+	Added config options to disable every race
+		Goodby elf! (or goblin, or human...)
+	
+	Added config option to make BD compatible with Accelerated DF
+		Note that this is not very well tested but everything should work
+
 v1.0 for DF 34.11
 	Initial release
