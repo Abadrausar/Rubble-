@@ -5,6 +5,12 @@ Append two or more strings together.
 
     Returns a string made up of all the params stuck together
 
+Trim leading and trailing whitespace from a string.
+	
+	trimspace str
+	
+	Returns str with leading and trailing whitespace removed.
+
 Format a string.
 
 	fmtstr format values...

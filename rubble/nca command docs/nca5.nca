@@ -3,11 +3,14 @@
 	Maps are now special values stored in normal variables (and so commands may pass them as arguments or return them)
 	Arrays, indexable ony by integers, stored like maps
 	params is now an array
+	map and array no longer create a variable, they only return the new map or array
+	exists and set now have multiple meanings, the first one is for use on simple variables and the second is for use on indexables.
+	foreach now takes a map or array VALUE instead of a NAME
 '
 
 'this is a comment'
 
-'To any poor sucker trying to make sense of this file: Sorry about the mess :p but this 
+'To any poor sucker trying to make sense of this file: Sorry about the mess :p This 
 is all the documentation that exists for the basic syntax of NCA v5 (or any other version of NCA for that matter)'
 
 'Basics:'
@@ -60,8 +63,8 @@ eg.'
 
 'variables, arrays, and maps'
 (var, name, [value])
-(map, name)
-(array, name, size)
+(var, name, (map))
+(var, name, (array size))
 
 'namespace'
 (namespace, name)
@@ -94,9 +97,9 @@ namespace1:namespace2:name
 (command for __init__ __test__ __incriment__ __code__ {
 	(eval [__init__]) 
 	(loop {
-		(if (run [__test__]) {
-			(run [__code__])
-			(run [__incriment__])
+		(if (evalinnew [__test__]) {
+			(evalinnew [__code__])
+			(evalinnew [__incriment__])
 			(break -1)
 		}{
 			(break 0)
@@ -114,8 +117,8 @@ namespace1:namespace2:name
 'simple while loop'
 (command while __test__ __code__ {
 	(loop {
-		(if (run [__test__]) {
-			(run [__code__])
+		(if (evalinnew [__test__]) {
+			(evalinnew [__code__])
 			(break -1)
 		}{
 			(break 0)

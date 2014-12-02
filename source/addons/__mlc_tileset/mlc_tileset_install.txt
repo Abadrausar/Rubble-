@@ -1,5 +1,4 @@
 
-
 This is an example tileset addon
 
 {SCRIPT;

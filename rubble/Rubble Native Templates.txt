@@ -65,59 +65,6 @@ Built-in Native Templates
 	Runs a NCA4 script as a command and returns whatever the script returns.
 
 ==============================================
-{ITEM;<TYPE>;<ITEM>;<RARITY>;<CLASS>...} or {ITEM;<TYPE>;<ITEM>;<CLASS>...}
-	Registers an item <ITEM> of type <TYPE> to item class <CLASS> with rarity <RARITY>. Used later with #USES_ITEMS. 
-	Returns [ITEM_<TYPE>:<ITEM>]
-	
-	<TYPE> must be one of AMMO, ARMOR, DIGGER, GLOVES, HELM, INSTRUMENT, PANTS, SHIELD, SHOES, SIEGEAMMO, TOOL, TOY, TRAPCOMP or WEAPON.
-	<RARITY> can be RARE, UNCOMMON, COMMON and FORCED.
-	
-	Example:
-		{ITEM;AMMO;ITEM_AMMO_BOLT;COMMON;CROSSBOW} -> [ITEM_AMMO:ITEM_AMMO_BOLT]
-
-==============================================
-{ITEM_RARITY;<ITEM>;<CLASS>;<RARITY>}
-	Adjust the rarity setting for just one class. Almost never used.
-	
-	<RARITY> can be RARE, UNCOMMON, COMMON and FORCED.
-	
-	Example:
-		{ITEM;PANTS;ITEM_PANTS_PANTS;COMMON;ELVES;DWARVES}
-			{ITEM_RARITY;ITEM_PANTS_PANTS;ELVES;RARE}
-			It is common for dwarves to wear pants but elves prefer to "let it all hang out"
-
-==============================================
-{#USES_ITEMS;<CLASSES>...}
-	Usable in entity definitions. Expands to a list of item permissions of all the <CLASSES> combined. When two item classes contain the same item, but with different rarities, they will result in one item permission tag with the more common of the two rarities. Be careful when using multiple #USES_ITEMS calls, and make sure every item is returned by at most one #USES_ITEMS call.
-
-==============================================
-{BUILDING_WORKSHOP;<TECH>;<CLASS>}
-	Similar to ITEM_CLASS, this registers a workshop to class <CLASS>. Used with #USES_TECH or #USES_BUILDINGS.
-	Returns [BUILDING_WORKSHOP:<TECH>]
-
-==============================================
-{BUILDING_FURNACE;<TECH>;<CLASS>}
-	Similar to ITEM_CLASS, this registers a furnace to class <CLASS>. Used with #USES_TECH or #USES_BUILDINGS.
-	Returns [BUILDING_FURNACE:<TECH>]
-
-==============================================
-{#USES_BUILDINGS;<CLASSES>...}
-	Usable in entity definitions. Expands to a list of building permissions of all <CLASS>es combined.
-
-==============================================
-{REACTION;<TECH>;<CLASS>}
-	Similar to ITEM_CLASS, this registers a reaction to class <CLASS>. Used with #USES_TECH or #USES_REACTIONS.
-	Returns [REACTION:<TECH>]
-	
-==============================================
-{#USES_REACTIONS;<CLASSES>...}
-	Usable in entity definitions. Expands to a list of reaction permissions of all <CLASS>es combined.
-
-==============================================
-{#USES_TECH;<CLASSES>...}
-	Combo of #USES_BUILDINGS and #USES_REACTIONS
-
-==============================================
 {#ADV_TIME;<AMOUNT>;<UNIT>}
 	Time unit to adventure mode ticks conversion template. Returns a number of ticks that corresponds to <AMOUNT> <UNIT>s in adventure mode. The allowed units are SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR and their respective plurals.
 	
@@ -138,15 +85,3 @@ Built-in Native Templates
 		{#FORT_TIME;24;HOURS} -> 1200
 		{#FORT_TIME;1;DAY} -> 1200
 		{#FORT_TIME;1;YEAR} -> 403200
-
-==============================================
-{REGISTER_ORE;<ORE>;<METAL>;<AMOUNT>}
-	Adds a [METAL_ORE:<METAL>:<AMOUNT>] tag to the definition of <ORE>. For this to work, <ORE> must be registered as a SHARED_INORGANIC. If this is called multiple times with the same <ORE> and <METAL>, the highest <AMOUNT> is used.
-
-==============================================
-{REGISTER_REACTION_CLASS;<INORGANIC>;<CLASS>}
-	Adds a [REACTION_CLASS:<CLASS>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC.
-
-==============================================
-{REGISTER_REACTION_PRODUCT;<INORGANIC>;<CLASS>;<PRODUCT>}
-	Adds a [MATERIAL_REACTION_PRODUCT:<CLASS>:<PRODUCT>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC.

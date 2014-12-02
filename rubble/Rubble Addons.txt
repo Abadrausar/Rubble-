@@ -114,12 +114,6 @@ Example:
 			(ret "")
 		;...}
 	}
-If Rubble finds a template call where the last param is ... it appends the params from the previous template call to the current template's params.
+If Rubble finds a template call where the last param is ... it appends the params from the previous template call to the current template's params. This trick is much less useful now that !SCRIPT_TEMPLATE is avalible.
 
-There is no check for infinite recursion, so make sure you never call rubble:stageparse on code that generates a template call and then stage parses it. For example this template will will cause an infinite loop and eat all your memory until Rubble crashes:
-	{!TEMPLATE;CRASH;
-		{SCRIPT;
-			(rubble:stageparse "{CRASH}")
-		}
-	}
-Needless to say do not create templates like this!
+There is no check for infinite recursion, so make sure you never recurse without breaking out at some point (unless you want to cause an infinite loop and eat all your memory until Rubble crashes)

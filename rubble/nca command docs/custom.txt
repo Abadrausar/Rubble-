@@ -37,6 +37,12 @@ Call a Rubble template.
 	
 	Returns the templates return value.
 
+Print everything known about a value
+	
+	valueinspect value
+	
+	Returns unchanged.
+
 Variables
 	rubble:outputdir
 	rubble:configdir

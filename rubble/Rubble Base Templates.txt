@@ -82,6 +82,18 @@ User Templates in Standared Base
 	Uses SHARED_OBJECT, make sure <NAME> is unique.
 
 ==============================================
+{REGISTER_ORE;<ORE>;<METAL>;<AMOUNT>}
+	Adds a [METAL_ORE:<METAL>:<AMOUNT>] tag to the definition of <ORE>. For this to work, <ORE> must be registered as a SHARED_INORGANIC. If this is called multiple times with the same <ORE> and <METAL>, the highest <AMOUNT> is used.
+
+==============================================
+{REGISTER_REACTION_CLASS;<INORGANIC>;<CLASS>}
+	Adds a [REACTION_CLASS:<CLASS>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC.
+
+==============================================
+{REGISTER_REACTION_PRODUCT;<INORGANIC>;<CLASS>;<PRODUCT>}
+	Adds a [MATERIAL_REACTION_PRODUCT:<CLASS>:<PRODUCT>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC.
+
+==============================================
 {SET_TILE;<ID>;<TILE>}
 	Sets tile entry <ID> to <TILE>.
 	Used to add support for tilesets, first entry "wins".
@@ -90,3 +102,56 @@ User Templates in Standared Base
 {#TILE;<ID>;<DEFAULT>}
 	If a tile entry for <ID> exists return it else return <DEFAULT>.
 	Use everywhere a tile number is required.
+
+==============================================
+{BUILDING_WORKSHOP;<TECH>;<CLASS>}
+	Similar to ITEM_CLASS, this registers a workshop to class <CLASS>. Used with #USES_TECH or #USES_BUILDINGS.
+	Returns [BUILDING_WORKSHOP:<TECH>]
+
+==============================================
+{BUILDING_FURNACE;<TECH>;<CLASS>}
+	Similar to ITEM_CLASS, this registers a furnace to class <CLASS>. Used with #USES_TECH or #USES_BUILDINGS.
+	Returns [BUILDING_FURNACE:<TECH>]
+
+==============================================
+{#USES_BUILDINGS;<CLASSES>...}
+	Usable in entity definitions. Expands to a list of building permissions of all <CLASS>es combined.
+
+==============================================
+{REACTION;<TECH>;<CLASS>}
+	Similar to ITEM_CLASS, this registers a reaction to class <CLASS>. Used with #USES_TECH or #USES_REACTIONS.
+	Returns [REACTION:<TECH>]
+	
+==============================================
+{#USES_REACTIONS;<CLASSES>...}
+	Usable in entity definitions. Expands to a list of reaction permissions of all <CLASS>es combined.
+
+==============================================
+{#USES_TECH;<CLASSES>...}
+	Combo of #USES_BUILDINGS and #USES_REACTIONS
+
+==============================================
+{ITEM;<TYPE>;<ITEM>;<DEFINITION>}
+	Registers an item <ITEM> of type <TYPE>. Used later with #USES_ITEMS and ITEM_CLASS. 
+	Returns [ITEM_<TYPE>:<ITEM>]
+	
+	<TYPE> must be one of AMMO, ARMOR, DIGGER, GLOVES, HELM, INSTRUMENT, PANTS, SHIELD, SHOES, SIEGEAMMO, TOOL, TOY, TRAPCOMP or WEAPON.
+
+==============================================
+{ITEM_CLASS;<CLASS>;<RARITY>=COMMON}
+	
+	Sets an items class and rarity. Items may have many classes and each class may have a different rarity per item. An ITEM_CLASS template always refers to the last ITEM template before it.
+	
+	<RARITY> can be RARE, UNCOMMON, COMMON and FORCED.
+	
+	Example:
+	
+	{ITEM:WEAPON;ITEM_WEAPON_TEST;
+		The weapon definition...
+	}{ITEM_CLASS;TEST_WEAPONS}
+	
+	{#USES_ITEMS;TEST_WEAPONS} -> [WEAPON:ITEM_WEAPON_TEST]
+	
+==============================================
+{#USES_ITEMS;<CLASS>}
+	Usable in entity definitions. Expands to a list of item permissions of the <CLASS>. When using multiple #USES_ITEMS calls make sure every item is returned by at most one #USES_ITEMS call.

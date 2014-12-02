@@ -3,13 +3,60 @@
 
 Note that to keep the output properly formatted templates often have ugly indentation'
 
+'Load some helpful commands.
+These commands are generally called the "NCASH predefs" as they are loaded by 
+NCASH when it is started with the default settings.'
+{!SCRIPT;
+	'increment variable'
+	(command ++ __name__ {
+		(set [__name__] (add [[__name__]] 1))
+	})
+	
+	'decrement variable'
+	(command -- name {
+		(set [name] (sub [[name]] 1))
+	})
+	
+	'for loop'
+	(command for __init__ __test__ __incriment__ __code__ {
+		(eval [__init__])
+		(loop {
+			(if (evalinnew [__test__]) {
+				(evalinnew [__code__])
+				(evalinnew [__incriment__])
+				(break -1)
+			}{
+				(break 0)
+			})
+		})
+	})
+	
+	'simple while loop'
+	(command while __test__ __code__ {
+		(loop {
+			(if (evalinnew [__test__]) {
+				(evalinnew [__code__])
+				(break -1)
+			}{
+				(break 0)
+			})
+		})
+	})
+	
+	'include a file'
+	'requires the file io commands to be loaded'
+	(command include __path__ {
+		(evalinparent (fileio:read [__path__]))
+	})
+}
+
+
 'The comment templates, very simple, just do nothing.'
 {!TEMPLATE;COMMENT;}
 {!TEMPLATE;C;}
 
-'VOID, a little more complicated, this is a prime example of using ...'
 {!SCRIPT_TEMPLATE;VOID;...;
-	(foreach params {
+	(foreach [params] {
 		'Note that params here is NOT the same array as the one passed to foreach'
 		(rubble:stageparse [params 1])
 		(break -1)
@@ -29,23 +76,24 @@ Note that to keep the output properly formatted templates often have ugly indent
 }
 
 'The next two templates are for stripping leading/trailing whitespace from a string.
-A formatting tool mostly, helps keep whitespace under control in generated files.'
+A formatting tool mostly, helps keep whitespace under control in generated files.
+May also be used to help control variable expansion.'
 {!SCRIPT_TEMPLATE;ECHO;...;
 	(var tmp)
-	(foreach params {
+	(foreach [params] {
 		(set tmp (append [tmp] [params 1]))
 	})
 	(rubble:stageparse [tmp])
 }
 {!TEMPLATE;E;{ECHO;...}}
 
-{!SCRIPT;(map rubble:shared_object_data)}
+{!SCRIPT;(var rubble:shared_object_data (map))}
 {!SCRIPT_TEMPLATE;SHARED_OBJECT;id;raws;
 	(if (eq [rubble:shared_object_data [id]] "ok"){
 		(rubble:stageparse [raws])
 		(ret "")
 	}{
-		(set rubble:shared_object_data [id] "ok")
+		(set [rubble:shared_object_data] [id] "ok")
 		(rubble:stageparse [raws])
 	})
 }
@@ -58,22 +106,22 @@ A formatting tool mostly, helps keep whitespace under control in generated files
 	})
 }
 
-{!SCRIPT;(map rubble:once_data)}
+{!SCRIPT;(var rubble:once_data (map))}
 {!SCRIPT_TEMPLATE;ONCE;id;raws;
 	(if (eq [rubble:once_data [id]] "ok"){
 		(ret "")
 	}{
-		(set rubble:once_data [id] "ok")
+		(set [rubble:once_data] [id] "ok")
 		(rubble:stageparse [raws])
 	})
 }
 
-{!SCRIPT;(map rubble:static_data)}
+{!SCRIPT;(var rubble:static_data (map))}
 {!SCRIPT_TEMPLATE;STATIC;id;raws;
-	(if (exists rubble:static_data [id]){
+	(if (exists [rubble:static_data] [id]){
 		(ret [rubble:static_data [id])
 	}{
-		(set rubble:static_data [id] (rubble:stageparse [raws]))
+		(set [rubble:static_data] [id] (rubble:stageparse [raws]))
 	})
 }
 
@@ -90,7 +138,7 @@ A formatting tool mostly, helps keep whitespace under control in generated files
 
 'This refactoring made possible by NCA5'
 {!SCRIPT;(command rubble:print params {
-	(foreach params {
+	(foreach [params] {
 		(console:print "\t" (rubble:expandvars [params 1]) "\n")
 		(break -1)
 	})
@@ -131,6 +179,99 @@ A formatting tool mostly, helps keep whitespace under control in generated files
 	(rubble:stageparse (nop))
 }
 
+{!SCRIPT;(var rubble:ore_data (map))}
+{!SCRIPT_TEMPLATE;REGISTER_ORE;id;metal;amount;
+	(if (exists [rubble:ore_data] [id]){
+	}{
+		(set [rubble:ore_data] [id] (map))
+	})
+	
+	(if (exists [rubble:ore_data [id]] [metal]){
+	}{
+		(set [rubble:ore_data [id]] [metal] [amount])
+		(ret "")
+	})
+	
+	(if (lt [[rubble:ore_data [id]] [metal]] [amount]){
+		(set [rubble:ore_data [id]] [metal] [amount])
+	})
+	(ret "")
+}
+{!SCRIPT_TEMPLATE;#_REGISTERED_ORES;id;
+	(var out)
+	
+	(var test -1)
+	
+	(if (exists [rubble:ore_data] [id]){
+	}{
+		(ret "")
+	})
+	
+	(foreach [rubble:ore_data [id]] {
+		(set out (append [out] "\n\t[METAL_ORE:" [params 0] ":" [params 1] "]"))
+		(break -1)
+	})
+	(ret [out])
+}
+
+{!SCRIPT;(var rubble:reaction_class_data (map))}
+{!SCRIPT_TEMPLATE;REGISTER_REACTION_CLASS;id;class;
+	(if (exists [rubble:reaction_class_data] [id]){
+	}{
+		(set [rubble:reaction_class_data] [id] (map))
+		(set [rubble:reaction_class_data [id]] [class] "")
+		(ret "")
+	})
+	
+	(if (exists [rubble:reaction_class_data [id]] [class]){
+	}{
+		(set [rubble:reaction_class_data [id]] [class] "")
+	})
+	(ret "")
+}
+{!SCRIPT_TEMPLATE;#_REGISTERED_REACTION_CLASSES;id;
+	(if (exists [rubble:reaction_class_data] [id]){
+	}{
+		(ret "")
+	})
+	
+	(var out)
+	(foreach [rubble:reaction_class_data [id]] {
+		(set out (append [out] "\n\t[REACTION_CLASS:" [params 0] "]"))
+		(break -1)
+	})
+	(ret [out])
+}
+
+{!SCRIPT;(var rubble:reaction_product_data (map))}
+{!SCRIPT_TEMPLATE;REGISTER_REACTION_PRODUCT;id;class;mat;
+	(if (exists [rubble:reaction_product_data] [id]){
+	}{
+		(set [rubble:reaction_product_data] [id] (map))
+		(set [rubble:reaction_product_data [id]] [class] [mat])
+		(ret "")
+	})
+	
+	(if (exists [rubble:reaction_product_data [id]] [class]){
+	}{
+		(set [rubble:reaction_product_data [id]] [class] [mat])
+	})
+	(ret "")
+}
+{!SCRIPT_TEMPLATE;#_REGISTERED_REACTION_PRODUCTS;id;
+	(if (exists [rubble:reaction_product_data] [id]){
+	}{
+		(ret "")
+	})
+	
+	(var out)
+	(foreach [rubble:reaction_product_data [id]] {
+		(set out (append [out] "\n\t[MATERIAL_REACTION_PRODUCT:" [params 0] ":" [params 1] "]"))
+		(break -1)
+	})
+	(ret [out])
+}
+
 {!SCRIPT_TEMPLATE;#AQUIFER;
 	(if (eq (rubble:getvar USE_AQUIFERS) "YES"){
 		(ret "[AQUIFER]")
@@ -139,29 +280,255 @@ A formatting tool mostly, helps keep whitespace under control in generated files
 	})
 }
 
-'An evil hack to make declaring items easy. Do not use in addons!'
-{!TEMPLATE;BASE_ITEM;type;item;def;
-	{SHARED_OBJECT;%item;
-	{ITEM;%type;%item;%type}
-	%def
-	}
-}
-
-
-{!SCRIPT;(map rubble:tile_data)}
+{!SCRIPT;(var rubble:tile_data (map))}
 {!SCRIPT_TEMPLATE;SET_TILE;id;tile;
-	(if (exists rubble:tile_data [id]){
+	(if (exists [rubble:tile_data] [id]){
 		'Already set; do nothing.'
 	}{
-		(set rubble:tile_data [id] [tile])
+		(set [rubble:tile_data] [id] [tile])
 	})
 }
 {!SCRIPT_TEMPLATE;#TILE;id;default;
-	(if (exists rubble:tile_data [id]){
+	(if (exists [rubble:tile_data] [id]){
 		(ret [rubble:tile_data [id]])
 	}{
 		(ret [default])
 	})
+}
+
+
+'Tech Templates'
+{!SCRIPT;(var rubble:building_data (map))}
+{!SCRIPT_TEMPLATE;BUILDING_WORKSHOP;...;
+	(if (lt [params] 2){(panic "Invalid param count to BUILDING_WORKSHOP.")})
+	
+	(var id [params 0])
+	(for {(var count 1)}{(lt [count] [params])}{(++ count)}{
+		(var class [params [count]])
+		
+		(if (exists [rubble:building_data] [class]){
+			'The following is a little hard to understand. Just remember these rules:
+				If a map or array is used where a normal value is expected the length of the map or array is returned.
+				If you try to set a value one past the end of an array the array is extended.
+			Basicly this is the NCA equivelent of an append.'
+			(set [rubble:building_data [class]] [rubble:building_data [class]] [id])
+		}{
+			(set [rubble:building_data] [class] (array))
+			(set [rubble:building_data [class]] [rubble:building_data [class]] [id])
+		})
+	})
+	(append "[BUILDING_WORKSHOP:" [id] "]")
+}
+{!SCRIPT_TEMPLATE;BUILDING_FURNACE;...;
+	(if (lt [params] 2){(panic "Invalid param count to BUILDING_FURNACE.")})
+	
+	(var id [params 0])
+	(for {(var count 1)}{(lt [count] [params])}{(++ count)}{
+		(var class [params [count]])
+		
+		(if (exists [rubble:building_data] [class]){
+			(set [rubble:building_data [class]] [rubble:building_data [class]] [id])
+		}{
+			(set [rubble:building_data] [class] (array))
+			(set [rubble:building_data [class]] [rubble:building_data [class]] [id])
+		})
+	})
+	(append "[BUILDING_FURNACE:" [id] "]")
+}
+{!SCRIPT_TEMPLATE;#USES_BUILDINGS;...;
+	(if (lt [params] 1){(panic "Invalid param count to #USES_BUILDINGS.")})
+	
+	(var buildings (map))
+	(var buildingnames (array))
+	(foreach [params] {
+		(var class [params 1])
+		(if (exists [rubble:building_data] [class]){
+			(foreach [rubble:building_data [class]] {
+				(if (exists [buildings] [params 1]){
+					'nop'
+				}{
+					(set [buildings] [params 1] "ok")
+					(set [buildingnames] [buildingnames] [params 1])
+				})
+				(break -1)
+			})
+		})
+		(break -1)
+	})
+	
+	(var out)
+	(foreach [buildingnames] {
+		(set out (append [out] "\n\t[PERMITTED_BUILDING:" [params 1] "]"))
+	})
+	(ret (trimspace [out]))
+}
+
+{!SCRIPT;(var rubble:reaction_data (map))}
+{!SCRIPT_TEMPLATE;REACTION;...;
+	(if (lt [params] 2){(panic "Invalid param count to REACTION.")})
+	
+	(var id [params 0])
+	(for {(var count 1)}{(lt [count] [params])}{(++ count)}{
+		(var class [params [count]])
+		
+		(if (exists [rubble:reaction_data] [class]){
+			(set [rubble:reaction_data [class]] [rubble:reaction_data [class]] [id])
+		}{
+			(set [rubble:reaction_data] [class] (array))
+			(set [rubble:reaction_data [class]] [rubble:reaction_data [class]] [id])
+		})
+	})
+	(append "[REACTION:" [id] "]")
+}
+{!SCRIPT_TEMPLATE;#USES_REACTIONS;...;
+	(if (lt [params] 1){(panic "Invalid param count to #USES_REACTIONS.")})
+	
+	(var reactions (map))
+	(var reactionnames (array))
+	(foreach [params] {
+		(var class [params 1])
+		(if (exists [rubble:reaction_data] [class]){
+			(foreach [rubble:reaction_data [class]] {
+				(if (exists [reactions] [params 1]){
+					'nop'
+				}{
+					(set [reactions] [params 1] "ok")
+					(set [reactionnames] [reactionnames] [params 1])
+				})
+				(break -1)
+			})
+		})
+		(break -1)
+	})
+	
+	(var out)
+	(foreach [reactionnames] {
+		(set out (append [out] "\n\t[PERMITTED_REACTION:" [params 1] "]"))
+	})
+	(ret (trimspace [out]))
+}
+
+{!SCRIPT_TEMPLATE;#USES_TECH;...;
+	(if (lt [params] 1){(panic "Invalid param count to #USES_TECH.")})
+	
+	(var buildings (map))
+	(var buildingnames (array))
+	(var reactions (map))
+	(var reactionnames (array))
+	(foreach [params] {
+		(var class [params 1])
+		(if (exists [rubble:building_data] [class]){
+			(foreach [rubble:building_data [class]] {
+				(if (exists [buildings] [params 1]){
+					'nop'
+				}{
+					(set [buildings] [params 1] "ok")
+					(set [buildingnames] [buildingnames] [params 1])
+				})
+				(break -1)
+			})
+		})
+		(if (exists [rubble:reaction_data] [class]){
+			(foreach [rubble:reaction_data [class]] {
+				(if (exists [reactions] [params 1]){
+					'nop'
+				}{
+					(set [reactions] [params 1] "ok")
+					(set [reactionnames] [reactionnames] [params 1])
+				})
+				(break -1)
+			})
+		})
+		(break -1)
+	})
+	
+	(var out)
+	(foreach [buildingnames] {
+		(set out (append [out] "\n\t[PERMITTED_BUILDING:" [params 1] "]"))
+	})
+	(foreach [reactionnames] {
+		(set out (append [out] "\n\t[PERMITTED_REACTION:" [params 1] "]"))
+	})
+	(ret (trimspace [out]))
+}
+
+'Item templates'
+{!SCRIPT;
+	(var rubble:item_current_id "")
+	(var rubble:item_current_type "")
+	
+	(var rubble:item_types (map))
+	(set [rubble:item_types] "AMMO" "no")
+	(set [rubble:item_types] "ARMOR" "yes")
+	(set [rubble:item_types] "DIGGER" "no")
+	(set [rubble:item_types] "GLOVES" "yes")
+	(set [rubble:item_types] "HELM" "yes")
+	(set [rubble:item_types] "INSTRUMENT" "no")
+	(set [rubble:item_types] "PANTS" "yes")
+	(set [rubble:item_types] "SHIELD" "no")
+	(set [rubble:item_types] "SHOES" "yes")
+	(set [rubble:item_types] "SIEGEAMMO" "no")
+	(set [rubble:item_types] "TOOL" "no")
+	(set [rubble:item_types] "TOY" "no")
+	(set [rubble:item_types] "TRAPCOMP" "no")
+	(set [rubble:item_types] "WEAPON" "no")
+	
+	(var rubble:item_rarities (map))
+	(set [rubble:item_rarities] "RARE" 1)
+	(set [rubble:item_rarities] "UNCOMMON" 2)
+	(set [rubble:item_rarities] "COMMON" 3)
+	(set [rubble:item_rarities] "FORCED" 4)
+	
+	(var rubble:item_data (map))
+}
+{!SCRIPT_TEMPLATE;ITEM;type;id;def;
+	(set rubble:item_current_id [id])
+	(set rubble:item_current_type [type])
+	
+	(if (exists [rubble:item_types] [type]){
+	}{
+		(panic "Invalid item type passed to ITEM.")
+	})
+	
+	(rubble:stageparse (append "{SHARED_OBJECT;" [id] ";\n[ITEM_" [type] ":" [id] "]\n\t" [def] "\n}"))
+}
+{!SCRIPT_TEMPLATE;ITEM_CLASS;class;rarity=COMMON;
+	(if (exists [rubble:item_rarities] [rarity]){
+	}{
+		(panic "Invalid item rarity passed to ITEM_CLASS.")
+	})
+	
+	(if (exists [rubble:item_data] [class]){
+		(if (exists [rubble:item_data [class]] [rubble:item_current_id]) {
+		}{
+			(set [rubble:item_data [class]] [rubble:item_current_id] (map))
+			(set [[rubble:item_data [class]] [rubble:item_current_id]] rarity [rarity])
+			(set [[rubble:item_data [class]] [rubble:item_current_id]] type [rubble:item_current_type])
+		})
+	}{
+		(set [rubble:item_data] [class] (map))
+		(set [rubble:item_data [class]] [rubble:item_current_id] (map))
+		(set [[rubble:item_data [class]] [rubble:item_current_id]] rarity [rarity])
+		(set [[rubble:item_data [class]] [rubble:item_current_id]] type [rubble:item_current_type])
+	})
+}
+{!SCRIPT_TEMPLATE;#USES_ITEMS;class;
+	(var out)
+	(if (exists [rubble:item_data] [class]){
+		(foreach [rubble:item_data [class]] {
+			(var type [[[rubble:item_data [class]] [params 0]] type])
+			(var rarity [[[rubble:item_data [class]] [params 0]] rarity])
+			(if (eq [rubble:item_types [type]] "yes"){
+				'Has rarity'
+				(set out (append [out] "\n\t[" [type] ":" [params 0] ":" [rarity] "]"))
+			}{
+				'Does not have rarity'
+				(set out (append [out] "\n\t[" [type] ":" [params 0] "]"))
+			})
+			(break -1)
+		})
+	})
+	(trimspace [out])
 }
 
 'This tells Rubble to only read this file on the first pass and to not write it to disk.'

@@ -1,8 +1,10 @@
 package nca5
 
-//import "fmt"
+import "fmt"
+import "os"
 import "strconv"
 import "dctech/ncalex"
+import "text/tabwriter"
 
 type Indexable interface {
 	Get(string) *Value
@@ -153,3 +155,37 @@ func (this *Value) Keys() []string {
 	
 	return this.object.Keys()
 }
+
+// CommandValueInspect returns everything you ever wanted to know about a script value.
+// Mostly for the use of NCASH and debugging.
+//	// Register via: 
+//	state.NewNativeCommand("valueinspect", nca5.CommandValueInspect)
+func CommandValueInspect(state *State, params []*Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to valueinspect.")
+	}
+	
+	fmt.Println("NCA Script value inspector")
+	fmt.Println("Simple Data")
+	fmt.Println("data:", params[0].data)
+	fmt.Println("line: ", params[0].line)
+	fmt.Println("column: ", params[0].column)
+	fmt.Println("Object Data")
+	fmt.Println("object: ", params[0].object)
+	if params[0].object != nil {
+		fmt.Println("len: ", params[0].object.Len())
+		
+		w := tabwriter.NewWriter(os.Stdout, 0, 4, 0, '\t', 0)
+		fmt.Fprintf(w, "%v\t%v\t%v\n", "key", "value", "value object")
+		for _, key := range params[0].object.Keys() {
+			val := params[0].object.Get(key)
+			fmt.Fprintf(w, "%v\t%v\t%v\n", key, val, val.object)
+		}
+		w.Flush()
+	}
+}
+
+
+
+
+

@@ -46,6 +46,8 @@ func InitNCA() {
 	
 	state.NewNativeCommand("panic", CommandPanic)
 	
+	state.NewNativeCommand("valueinspect", nca5.CommandValueInspect)
+	
 	state.NewNameSpace("regex")
 	state.NewNativeCommand("regex:replace", CommandRegEx_Replace)
 	

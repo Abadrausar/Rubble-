@@ -131,12 +131,12 @@ func (this *State) VarExists(name string) bool {
 	return false
 }
 
-// NewMap creates a new map.
+// NewMap creates a new map variable.
 func (this *State) NewMap(name string) {
 	this.NewVar(name, NewValueFromObject(NewScriptMap()))
 }
 
-// NewArray creates a new array.
+// NewArray creates a new array variable.
 func (this *State) NewArray(name string, size int) {
 	this.NewVar(name, NewValueFromObject(NewScriptArraySized(size)))
 }
@@ -338,6 +338,7 @@ func (this *State) Run() (ret *Value, err error) {
 		}
 
 		if x := recover(); x != nil {
+			fmt.Printf("%#v Type: %T\n", x, x)
 			switch i := x.(type) {
 			case ExitScript:
 				ret = NewValue(string(i))
@@ -492,6 +493,12 @@ func (this *State) derefVar() {
 		this.RetVal = this.GetValue(name.String())
 		return
 	}
+	
+	if name.HasObject() {
+		this.RetVal = name.Get(index.String())
+		return
+	}
+	
 	this.RetVal = this.GetValueObject(name.String(), index.String())
 	return
 }

@@ -32,6 +32,12 @@ Evaluate code in the current environment's parent.
 
     Returns the return value of the last command in the code it runs.
 
+Evaluate code in a new environment.
+
+	evalinnew code
+
+    Returns the return value of the last command in the code it runs.
+
 Exit the script.
 
 	exit [value]
@@ -61,15 +67,15 @@ Run code for as long as the code returns true.
 
 Create a new array.
 
-	array name size
+	array size
 
-    Returns unchanged
+    Returns the new array.
 
 Create a new map.
 
-	map name
+	map
 
-    Returns unchanged
+    Returns the new map.
 
 Create a new namespace.
 
@@ -106,14 +112,14 @@ Run code as a user command.
 
     Returns the return value of the last command in the code it runs.
 
-Set the value of variable "name" to value or sets the value of map
-    "name" at index to value.
+Set the value of variable "name" to value or sets the value of the map or array at index to value.
+	
+	set name value
+	set objectvalue index value
+	
+	Returns value.
 
-	set name [index] value
-
-    Returns value.
-
-Set (or unsets) the error flag.
+Set (or unset) the error flag.
 
 	seterror [value]
 
@@ -126,9 +132,9 @@ Create a new variable setting the value to value if present.
 
     Returns value or unchanged.
 
-Run code as command for each entry in a map.
+Run code as command for each entry in a map or array.
 
-	foreach map code
+	foreach objectvalue code
 	
 	Params for code:
 	
@@ -137,8 +143,9 @@ Run code as command for each entry in a map.
 	If code returns false foreach aborts.
 	Returns the return value of the last command in code.
 
-Returns true (-1) if variable or map name (and possible index) exists.
+Returns true (-1) if variable exists or if a index exists in a map or array.
 	
-	exists name [index]
+	exists name
+	exists objectvalue index
 	
 	Returns 0 or -1.

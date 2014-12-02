@@ -14,6 +14,7 @@ import "strings"
 //	fmtstr
 func Setup(state *nca5.State) {
 	state.NewNativeCommand("append", CommandAppend)
+	state.NewNativeCommand("trimspace", CommandTrimSpace)
 	state.NewNativeCommand("strlen", CommandStrLen)
 	state.NewNativeCommand("strchar", CommandStrChar)
 	state.NewNativeCommand("fmtstr", CommandFmtStr)
@@ -33,6 +34,18 @@ func CommandAppend(state *nca5.State, params []*nca5.Value) {
 	}
 
 	state.RetVal = nca5.NewValue(result)
+	return
+}
+
+// Trims leading and trailing whitespace from a string.
+// 	trimspace str
+// Returns str with leading and trailing whitespace removed.
+func CommandTrimSpace(state *nca5.State, params []*nca5.Value) {
+	if len(params) != 1 {
+		panic("Wrong param count to trimspace.")
+	}
+
+	state.RetVal = nca5.NewValue(strings.TrimSpace(params[0].String()))
 	return
 }
 

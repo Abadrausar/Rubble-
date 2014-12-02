@@ -1,4 +1,4 @@
-// NCA v4 Base Commands.
+// NCA v5 Base Commands.
 package base
 
 import "dctech/nca5"
@@ -22,6 +22,7 @@ import "dctech/nca5"
 //	run
 //	eval
 //	evalinparent
+//	evalinnew
 //	if
 //	loop
 //	foreach
@@ -44,6 +45,7 @@ func Setup(state *nca5.State) {
 	state.NewNativeCommand("run", CommandRun)
 	state.NewNativeCommand("eval", CommandEval)
 	state.NewNativeCommand("evalinparent", CommandEvalInParent)
+	state.NewNativeCommand("evalinnew", CommandEvalInNew)
 	state.NewNativeCommand("if", CommandIf)
 	state.NewNativeCommand("loop", CommandLoop)
 	state.NewNativeCommand("foreach", CommandForEach)
@@ -186,26 +188,22 @@ func CommandVar(state *nca5.State, params []*nca5.Value) {
 	state.NewVar(params[0].String(), new(nca5.Value))
 }
 
-// Creates a new map variable.
-// 	map name
-// Returns unchanged
+// Creates a new map.
+// 	map
+// Returns the new map
 func CommandMap(state *nca5.State, params []*nca5.Value) {
-	if len(params) != 1 {
-		panic("Wrong number of params to map.")
-	}
-
-	state.NewMap(params[0].String())
+	state.RetVal = nca5.NewValueFromObject(nca5.NewScriptMap())
 }
 
-// Creates a new array variable.
-// 	array name size
-// Returns unchanged
+// Creates a new array.
+// 	array [size]
+// Returns the new array
 func CommandArray(state *nca5.State, params []*nca5.Value) {
-	if len(params) != 2 {
-		panic("Wrong number of params to array.")
+	if len(params) == 0 {
+		state.RetVal = nca5.NewValueFromObject(nca5.NewScriptArray())
+		return
 	}
-
-	state.NewArray(params[0].String(), int(params[1].Int64()))
+	state.RetVal = nca5.NewValueFromObject(nca5.NewScriptArraySized(int(params[0].Int64())))
 }
 
 // Deletes a variable.
@@ -218,25 +216,31 @@ func CommandDelVar(state *nca5.State, params []*nca5.Value) {
 	state.RetVal = state.DeleteVar(params[0].String())
 }
 
-// Sets the value of variable "name" to value or sets the value of map "name" at index to value.
-// 	set name [index] value
+// Sets the value of variable "name" to value or sets the value of the map or array at index to value.
+// 	set name value
+// 	set objectvalue index value
 // Returns value.
 func CommandSet(state *nca5.State, params []*nca5.Value) {
 	if len(params) != 2 && len(params) != 3 {
 		panic("Wrong number of params to set.")
 	}
 
-	if len(params) > 2 {
-		state.SetValueObject(params[0].String(), params[1].String(), params[2])
-		state.RetVal = params[2]
+	if len(params) == 2 {
+		state.SetValue(params[0].String(), params[1])
+		state.RetVal = params[1]
 		return
 	}
-	state.SetValue(params[0].String(), params[1])
-	state.RetVal = params[1]
+	
+	if !params[0].HasObject() {
+		panic("set Param 0 not an object.")
+	}
+	params[0].Set(params[1].String(), params[2])
+	state.RetVal = params[2]
 }
 
-// Returns true (-1) if variable or map name (and possible index) exists.
-// 	exists name [index]
+// Returns true (-1) if variable exists or if a index exists in a map or array.
+// 	exists name
+//	exists value index
 // Returns 0 or -1.
 func CommandExists(state *nca5.State, params []*nca5.Value) {
 	if len(params) != 1 && len(params) != 2 {
@@ -252,12 +256,15 @@ func CommandExists(state *nca5.State, params []*nca5.Value) {
 		return
 	}
 	
-	if state.ObjectKeyExists(params[0].String(), params[1].String()) {
+	if !params[0].HasObject() {
+		panic("exists Param 0 not an object.")
+	}
+	
+	if params[0].Exists(params[1].String()) {
 		state.RetVal = nca5.NewValue("-1")
 		return
 	}
 	state.RetVal = nca5.NewValue("0")
-	return
 }
 
 // Runs code as a user command.
@@ -307,6 +314,20 @@ func CommandEvalInParent(state *nca5.State, params []*nca5.Value) {
 	state.Envs.Add(tempEnv)
 }
 
+// Evaluates code in a new environment.
+// 	evalinnew code
+// Returns the return value of the last command in the code it runs.
+func CommandEvalInNew(state *nca5.State, params []*nca5.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to evalinnew.")
+	}
+
+	state.Code.AddLexer(params[0].AsLexer())
+	state.Envs.Add(nca5.NewEnvironment())
+	state.Exec()
+	state.Envs.Remove()
+}
+
 // If the condition is true run true code else if false code exists call false code.
 // 	if condition truecode [falsecode]
 // Returns the return value of the last command in the code it runs or unchanged.
@@ -352,8 +373,8 @@ func CommandLoop(state *nca5.State, params []*nca5.Value) {
 	panic("CommandLoop: unreachable")
 }
 
-// Runs code as command for each entry in a map.
-// 	foreach map code
+// Runs code as command for each entry in a map or array value.
+// 	foreach objectvalue code
 // Params for code:
 //	code key value
 // If code returns false foreach aborts.
@@ -363,10 +384,14 @@ func CommandForEach(state *nca5.State, params []*nca5.Value) {
 		panic("Wrong number of params to foreach.")
 	}
 
-	for _, i := range state.GetObjectKeys(params[0].String()) {
+	if !params[0].HasObject() {
+		panic("foreach Param 0 not an object.")
+	}
+	
+	for _, i := range params[0].Keys() {
 		state.Code.AddLexer(params[1].AsLexer())
 		state.Envs.Add(nca5.NewEnvironment())
-		state.AddParamsValue(nca5.NewValue(i), state.GetValueObject(params[0].String(), i))
+		state.AddParamsValue(nca5.NewValue(i), params[0].Get(i))
 		state.Exec()
 		if !state.RetVal.Bool() {
 			return

@@ -51,7 +51,7 @@ To activate or deactivate a rubble addon you may remove or add double leading un
 
 If you use OSX or linux, 32 bit binarys for these OSes can be found in the "raw/rubble" directory. If you want 64 bit binarys you can compile them yourself.
 
-Documentation for all NCA4 script commands are in "raw/rubble/nca docs", the file "NCA4.nca" is syntax/code examples.
+Documentation for all NCA4 script commands are in "raw/rubble/nca docs", the file "NCA4.nca" is syntax/code examples. You may also want to look at "raw/source/base/base_templates.txt" for more advanced examples.
 
 ==============================================
 Configure:
@@ -81,6 +81,37 @@ The generic animal mats addon does not appear to work 100%, some things like mea
 ==============================================
 Changelog:
 ==============================================
+v1.5
+	NCA variable dereference syntax now allows index dereferencing a value (eg. [value index])
+	NCA base commands map and array changed, they no longer create a variable, they only return the new map or array
+	NCA base commands exists and set now have multiple meanings, check NCA base docs for details
+	NCA base command foreach now takes a map or array VALUE instead of a NAME
+	Added the "NCASH predefs" to the base
+	Added valueinspect NCA command, very useful for debugging
+	Added new NCA base command evalinnew, works like run but without param support
+	Added new NCA string command trimspace, trims leading and trailing whitespace
+	Fixed major bug with NCA arrays, appending to an array did not work
+	Ported the following templates to Rubble+NCA:
+		BUILDING_WORKSHOP
+		BUILDING_FURNACE
+		#USES_BUILDINGS
+		REACTION
+		#USES_REACTIONS
+		#USES_TECH
+		REGISTER_ORE
+		#_REGISTERED_ORES
+		REGISTER_REACTION_CLASS
+		#_REGISTERED_REACTION_CLASSES
+		REGISTER_REACTION_PRODUCT
+		#_REGISTERED_REACTION_PRODUCTS
+	Rewrote all the item templates
+		ITEM no longer takes a class and rarity
+		ITEM_CLASS takes the place of ITEM's removed params and ITEM_RARITY
+		#USES_ITEMS now only takes one class
+	Added Notepad++ user defined language file for NCA5 and Rubble code
+	Added source code for NCASH5, a useful debugging tool for scripts
+	Added documentation for the NCA base language
+
 v1.4
 	Updated script runtime to NCA5, this may break some code as the way maps are handled is changed
 	Updated all NCA docs to describe NCA5
