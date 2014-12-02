@@ -1,5 +1,29 @@
 -- Do fun stuff with water and magma.
 
+--[[
+Rubble Fluids DFHack Command
+
+Copyright 2014 Milo Christiansen
+
+This software is provided 'as-is', without any express or implied warranty. In
+no event will the authors be held liable for any damages arising from the use of
+this software.
+
+Permission is granted to anyone to use this software for any purpose, including
+commercial applications, and to alter it and redistribute it freely, subject to
+the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim
+that you wrote the original software. If you use this software in a product, an
+acknowledgment in the product documentation would be appreciated but is not
+required.
+
+2. Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original software.
+
+3. This notice may not be removed or altered from any source distribution.
+]]
+
 -- [[  ]] is a really stupid choice for string delimiters, particularly when you need to do a usage statement.
 -- BTW: experience has shown that it is trivial to support multi-line double quote strings in a lexer,
 -- (it actually takes more work to disable them) so why do most languages limit them to a single line?
@@ -7,11 +31,11 @@ local usage = [[
 Usage: 
 	fluids [-h|/?]
 	]].."rubble_fluids [eat] [spot|3x3|5x5|7x7] [magma|water] [amount [minimum [x y z]]]\n"..
-"	rubble_fluids spawn [magma|water] [amount [x y z]]\n"..[[
+"	rubble_fluids spawn [spot|3x3|5x5|7x7] [magma|water] [amount [x y z]]\n"..[[
 	rubble_fluids cart [spot|3x3|5x5|7x7] [magma|water] [x y z]
 
 Allows you to:
-	Spawn fluids in a single tile.
+	Spawn fluids, either in a single tile or in any tile below a downward passable tile in an area.
 	Eat fluids, either from a single tile or from any tile below a downward passable tile in an area.
 	Fill a minecart with fluids, either in a single tile or in an area.
 
@@ -75,20 +99,18 @@ elseif args[narg]=="cart" then
 	narg = narg + 1
 end
 
-if not spawn or tocart then
-	if args[narg]=="3x3" then
-		area = true
-		offset = 1
-		narg = narg + 1
-	elseif args[narg]=="5x5" then
-		area = true
-		offset = 2
-		narg = narg + 1
-	elseif args[narg]=="7x7" then
-		area = true
-		offset = 3
-		narg = narg + 1
-	end
+if args[narg]=="3x3" then
+	area = true
+	offset = 1
+	narg = narg + 1
+elseif args[narg]=="5x5" then
+	area = true
+	offset = 2
+	narg = narg + 1
+elseif args[narg]=="7x7" then
+	area = true
+	offset = 3
+	narg = narg + 1
 end
 
 if args[narg]=="magma" then
@@ -142,6 +164,11 @@ end
 -- Do the requested operation.
 -- Error handling is a little sparse.
 if spawn then
+	if area then
+		fluids.spawnInArea(x-offset, y-offset, x+offset, y+offset, z, magma, amount)
+		return
+	end
+	
 	fluids.spawnFluid(x, y, z, magma, amount)
 	return
 elseif tocart then

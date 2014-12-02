@@ -25,12 +25,15 @@ package main
 import "sort"
 
 // Update this!
-var RubbleVersion = "3.11"
+var RubbleVersion = "3.12"
 var RubbleCompat = map[string]bool{
+	// I don't know why I bothered, this is the next best thing to useless anyway.
+	// I really need to maintain this on a per-addon basis, as is it is just for the binary.
 	"3.8": true,
 	"3.9": true,
 	"3.10": true,
 	"3.11": true,
+	"3.12": true,
 }
 
 // All the addons are loaded to here.
@@ -77,6 +80,7 @@ type AddonFile struct {
 	Content    []byte
 	PreScript  bool
 	PostScript bool
+	PrepScript bool
 	UserData   bool // any unparsable file, eg. images for tileset addons.
 	Graphics   bool // Graphics file raw text
 	Skip       bool
@@ -85,7 +89,7 @@ type AddonFile struct {
 
 // IsRaw returns true if the addon file is a raw file or rbl file.
 func (this *AddonFile) IsRaw() bool {
-	return !this.PreScript && !this.PostScript && !this.UserData && !this.Graphics
+	return !this.PreScript && !this.PostScript && !this.PrepScript && !this.UserData && !this.Graphics
 }
 
 // IsGraphic returns true if the addon file is a creature graphics raw file.

@@ -19,7 +19,7 @@
 (command rubble:libs_dfhack_add_reaction:write {
 	(var base "\n-- Rubble \"Libs/DFHack/Add Reaction\" script file\n-- Automatically generated, DO NOT EDIT!\n\n")
 	
-	(set base (str:add [base] "event=require \"plugins.eventful\"\n\n"))
+	(set base (str:add [base] "local event = require \"plugins.eventful\"\n\n"))
 	
 	(set base (str:add [base] "-- Remove reactions from shops\n"))
 	(foreach [rubble:libs_dfhack_add_reaction:buildings] {
@@ -33,7 +33,9 @@
 		(break true)
 	})
 	
-	(fileio:write (str:add [rubble:dfdir] "dfhack/scripts/libs_dfhack_add_reaction.lua") [base])
+	(fileio:write (str:add [rubble:dfdir] "dfhack/scripts/rubble_add_reaction.lua") [base])
+	(set [rubble:raws] "libs_dfhack_add_reaction.lua" [base])
+	(rubble:prepfile "libs_dfhack_add_reaction.lua")
 })
 
 (rubble:template "REACTION_ADD" reaction building {

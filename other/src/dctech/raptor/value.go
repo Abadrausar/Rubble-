@@ -123,6 +123,7 @@ func TokenToValue(tok *Token) *Value {
 	if tok.Lexeme == "nil" {
 		this.Type = TypNil
 		this.Data = nil
+		return this
 	}
 
 	intval, err := strconv.ParseInt(tok.Lexeme, 10, 64)

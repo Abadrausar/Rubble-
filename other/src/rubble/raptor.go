@@ -101,6 +101,7 @@ func InitScripting() {
 	state.NewNativeCommand("rubble:skipfile", CommandRubble_SkipFile)
 	state.NewNativeCommand("rubble:nowritefile", CommandRubble_NoWriteFile)
 	state.NewNativeCommand("rubble:graphicsfile", CommandRubble_GraphicsFile)
+	state.NewNativeCommand("rubble:prepfile", CommandRubble_PrepFile)
 	state.NewNativeCommand("rubble:currentfile", CommandRubble_CurrentFile)
 	
 	state.NewNativeCommand("rubble:setvar", CommandRubble_SetVar)
@@ -178,6 +179,22 @@ func CommandRubble_GraphicsFile(script *raptor.Script, params []*raptor.Value) {
 	}
 
 	Files.Files[params[0].String()].Graphics = true
+}
+
+// Marks a file as a prep file.
+// 	rubble:prepfile name
+// name is the file's BASE NAME not it's path!
+// Returns unchanged.
+func CommandRubble_PrepFile(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to rubble:prepfile.")
+	}
+
+	if _, ok := Files.Files[params[0].String()]; !ok {
+		panic("rubble:prepfile: \"" + params[0].String() + "\" is not the name of a loaded raw file.")
+	}
+
+	Files.Files[params[0].String()].PrepScript = true
 }
 
 // Returns the name of the current file.

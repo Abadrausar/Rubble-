@@ -101,37 +101,42 @@ func loadAddon(source dcfs.DataSource, addonname, path string) *Addon {
 		}
 		file.Content = content
 
-		basename := classifyFile(file, filepath)
-		addon.Files[basename] = file
+		classifyFile(file, filepath)
+		addon.Files[filepath] = file
 	}
 	return addon
 }
 
-func classifyFile(file *AddonFile, filename string) string {
+func classifyFile(file *AddonFile, filename string) {
 	if strings.HasSuffix(filename, ".pre.rsf") || strings.HasSuffix(filename, ".pre.rbf") {
 		// is pre script
 		file.PreScript = true
-		return filename
+		return
 	}
 	if strings.HasSuffix(filename, ".post.rsf") || strings.HasSuffix(filename, ".post.rbf") {
 		// is post script
 		file.PostScript = true
-		return filename
+		return
+	}
+	if strings.HasSuffix(filename, ".prep.rsf") || strings.HasSuffix(filename, ".prep.rbf") {
+		// is prep script
+		file.PrepScript = true
+		return
 	}
 
 	if strings.HasSuffix(filename, ".rbl") {
 		// is rubble code (do not write out after parse)
 		file.NoWrite = true
-		return filename
+		return
 	}
 
 	if strings.HasSuffix(filename, ".txt") {
 		// is raw file
-		return filename
+		return
 	}
 
 	file.UserData = true
-	return filename
+	return
 }
 
 func loadInit(source dcfs.DataSource, path string) {
@@ -191,10 +196,8 @@ func containsParseable(source dcfs.DataSource, path string) bool {
 }
 
 func UpdateAddonList(dest string, addons []*Addon) {
-	LogPrintln("Updating the Addon List File...")
-
 	out := make([]byte, 0, 2048)
-	out = append(out, "[addons]\n"...)
+	out = append(out, "# Rubble Version: " + RubbleVersion + "\n[addons]\n"...)
 	for i := range addons {
 		out = append(out, addons[i].Name+"="...)
 		if addons[i].Active {

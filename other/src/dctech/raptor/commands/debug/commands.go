@@ -123,6 +123,10 @@ func CommandDebug_Value(script *raptor.Script, params []*raptor.Value) {
 	}
 	script.Println("Data:", params[0].Data)
 	switch params[0].Type {
+	case raptor.TypNil:
+		script.Println("Type: TypNil")
+	case raptor.TypObject:
+		script.Println("Type: TypObject")
 	case raptor.TypString:
 		script.Println("Type: TypString")
 	case raptor.TypInt:
@@ -131,10 +135,10 @@ func CommandDebug_Value(script *raptor.Script, params []*raptor.Value) {
 		script.Println("Type: TypFloat")
 	case raptor.TypBool:
 		script.Println("Type: TypBool")
-	case raptor.TypObject:
-		script.Println("Type: TypObject")
 	case raptor.TypCode:
 		script.Println("Type: TypCode")
+	case raptor.TypCommand:
+		script.Println("Type: TypCommand")
 	}
 	script.Println(params[0].Pos)
 	obj := params[0].Indexable()

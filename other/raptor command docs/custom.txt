@@ -28,6 +28,13 @@ Marks a file as containing creature graphics.
 	name is the file's BASE NAME not it's path!
 	Returns unchanged.
 
+Marks a file as a prep file.
+	
+	rubble:prepfile name
+	
+	name is the file's BASE NAME not it's path!
+	Returns unchanged.
+
 Returns the name of the current file.
 	
 	rubble:currentfile

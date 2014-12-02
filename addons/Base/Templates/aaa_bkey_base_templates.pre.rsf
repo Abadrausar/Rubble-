@@ -1,0 +1,73 @@
+
+# Adds the BUILD_KEY template
+
+(var rubble:bkey_valid <map>) # returns nil for invalid keys
+(var rubble:bkey_index <map>) # returns the key index in the order array
+(var rubble:bkey_order <array>) # the key order, used for picking alternate keys
+# Three cheers for foreach!
+(foreach <array A B C D E F G H I J K L M N O P Q R S T U V W X Y Z> {
+	(var key [params 1])
+	(foreach <array "" SHIFT_ CTRL_ ALT_> {
+		(var full_key (str:add [params 1] [key]))
+		(set [rubble:bkey_valid] [full_key] true)
+		(set [rubble:bkey_index] [full_key] (len [rubble:bkey_order]))
+		(set [rubble:bkey_order] (len [rubble:bkey_order]) [full_key])
+	})
+})
+
+(var rubble:bkey_used_w <map>)
+(foreach <array E Q SHIFT_M O K B C F V J M U N R S T L W Z H Y D> {
+	(set [rubble:bkey_used_w] [params 1] true)
+})
+
+(var rubble:bkey_used_f <map>)
+(foreach <array W S G K L A N> {
+	(set [rubble:bkey_used_f] [params 1] true)
+})
+
+(rubble:template "@BUILD_KEY" key "furnace=false" {
+	# Remember, all Rubble vars are "by reference".
+	# Sometimes I'm amazed this stuff works...
+	(var used_list)
+	(if [furnace] {
+		(set used_list [rubble:bkey_used_f])
+	}{
+		(set used_list [rubble:bkey_used_w])
+	})
+	
+	(if [rubble:bkey_valid [key]] {}{
+		(rubble:abort (str:add "Error: Invalid key: " [key] " passed to @BUILD_KEY"))
+	})
+	
+	# if key is in use, pick next key that is not being used
+	(if [used_list [key]] {
+		(var wrap false)
+		(var next_index (int:add [rubble:bkey_index [key]] 1))
+		(if (int:eq [next_index] (len [rubble:bkey_order])) {
+			(set wrap true)
+			(set next_index 0)
+		})
+		(var next_key [rubble:bkey_order [next_index]])
+		
+		(loop {
+			(if [used_list [next_key]] {
+				(set next_index (int:add [rubble:bkey_index [next_key]] 1))
+				(if (int:eq [next_index] (len [rubble:bkey_order])) {
+					(if [wrap] {
+						(rubble:abort "Error: @BUILD_KEY Cannot find valid key, all keys used?!!")
+					})
+					(set wrap true)
+					(set next_index 0)
+				})
+				(set next_key [rubble:bkey_order [next_index]])
+				(break true)
+			}{
+				(set key [next_key])
+				(break false)
+			})
+		})
+	})
+	
+	(set [used_list] [key] true)
+	(str:add "[BUILD_KEY:CUSTOM_" [key] "]")
+})

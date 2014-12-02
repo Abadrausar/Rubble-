@@ -8,45 +8,76 @@ The information here details how it should be, if that's not how it is, it's a b
 Detailed Order of Execution
 ==============================================
 	
-	This does not take shell mode into consideration!
+	Logging is setup
+	The error handler is setup
 	
 	Config file is loaded (if present)
 	Commandline options are processed
-	All addons are loaded
 	
-	If -addons is set:
-		value from -addons is split and result is used as active addon list
+	If -profile is set:
+		Profiling is started
 	
-	If -addons is not set:
-		If <addondir>/addonlist.ini is present:
-			<addondir>/addonlist.ini is parsed and result is used as active addon list
-		If <addondir>/addonlist.ini is not present:
-			Current addon list is written to <addondir>/addonlist.ini
+	If -netprofile is set:
+		the live profiling server is started
+	
+	If -prep is not set:
+		All addons are loaded
+		
+		If -addons is set:
+			value from -addons is split and result is used as active addon list
+		
+		If -addons is not set:
+			If <addondir>/addonlist.ini is present:
+				<addondir>/addonlist.ini is parsed and result is used as active addon list
+			If <addondir>/addonlist.ini is not present:
+				Current addon list is written to <addondir>/addonlist.ini
+				If -shell is not set:
+					Rubble Exits
+		
+		Addons are activated based on info from the active addons list
+		
+		If no addons are active:
+			If -shell is not set:
+				Rubble Exits
+		
+		If -addonlist is set:
 			Rubble Exits
+		
+		File list is generated
+		The list of input files is sorted (to interleave files)
+		Current addon list is written to <addondir>/addonlist.ini
+		
+		If there are no files in file list:
+			If -shell is not set:
+				Rubble Exits
+		
+		If -lextest is set:
+			If -shell is not set:
+				The lexer test is run
+				Rubble exits
 	
-	Addons are activated based on info from the active addons list
-	
-	If no addons are active:
-		Rubble Exits
-	
-	File list is generated
-	The list of input files is sorted (to interleave files)
-	Current addon list is written to <addondir>/addonlist.ini
-	
-	If -addonlist is set:
-		Rubble Exits
-	
-	If there are no files in file list:
-		Rubble Exits
-	
-	If -lextest is set:
-		The lexer test is run
-		Rubble exits
-	
+	Any Rubble variables specified via -config are set
 	Raptor is initialized
+	
+	If -prep is set:
+		If -prep is set to "raw":
+			All prep scripts for the main raw folder are run.
+		
+		If -prep is not set to "raw":
+			All prep scripts for the specified region are run
+		
+		Rubble Exits
+	
 	Builtin templates are loaded
 	
-	All init scripts are run
+	If -shell is not set or -init is set:
+		All init scripts are run
+	
+	If -shell is set:
+		Enter shell mode
+			(many, many, options here, I will not list them)
+		Rubble Exits
+	
 	All pre tweak scripts are run
 	All .txt and .rbl files are preparsed
 	All .txt and .rbl files are parsed

@@ -70,104 +70,109 @@ func main() {
 		http.ListenAndServe("localhost:" + NetProfile, nil)
 	}
 	
-	LogPrintln("=============================================")
-	LogPrintln("Loading Addons...")
-
-	Addons = LoadAddons(AddonsDir)
-
-	LogPrintln("=============================================")
-	LogPrintln("Activating Addons...")
-
-	addonNames := make([]string, 0, 10)
-	if AddonsList != "" {
-		LogPrintln("Addons Specified via Command Line.")
-		addonNames = filepath.SplitList(AddonsList)
-	} else {
-		LogPrintln("Addons Not Specified via Command line.")
-		LogPrintln("Loading " + AddonsDir + "/addonlist.ini...")
-		file, err := ioutil.ReadFile(AddonsDir + "/addonlist.ini")
-		if err != nil && !ShellMode {
-			LogPrintln("Read failed (this is bad if unexpected)\n  Error:", err)
-			UpdateAddonList(AddonsDir, Addons)
+	// If we are in prep mode do not load any addon (or do any other addon type stuff)
+	if PrepRegion == "" {
+		LogPrintln("=============================================")
+		LogPrintln("Loading Addons...")
+	
+		Addons = LoadAddons(AddonsDir)
+	
+		LogPrintln("=============================================")
+		LogPrintln("Activating Addons...")
+	
+		addonNames := make([]string, 0, 10)
+		if AddonsList != "" {
+			LogPrintln("Addons Specified via Command Line.")
+			addonNames = filepath.SplitList(AddonsList)
+		} else {
+			LogPrintln("Addons Not Specified via Command line.")
+			LogPrintln("Loading " + AddonsDir + "/addonlist.ini...")
+			file, err := ioutil.ReadFile(AddonsDir + "/addonlist.ini")
+			if err != nil && !ShellMode {
+				LogPrintln("Read failed (this is bad if unexpected)\n  Error:", err)
+				LogPrintln("Updating the Addon List File...")
+				UpdateAddonList(AddonsDir, Addons)
+				LogPrintln("Rubble has no files to parse, aborting.")
+				return
+			} else if err != nil && ShellMode {
+				LogPrintln("Read failed (this is bad if unexpected)\n  Error:", err)
+				LogPrintln("Rubble has no files to parse but shell mode is active, continuing.")
+			}
+	
+			lines := strings.Split(string(file), "\n")
+			for i := range lines {
+				if strings.HasPrefix(strings.TrimSpace(lines[i]), "#") {
+					continue
+				}
+				if strings.HasPrefix(strings.TrimSpace(lines[i]), "[") {
+					continue
+				}
+				if strings.TrimSpace(lines[i]) == "" {
+					continue
+				}
+	
+				parts := strings.SplitN(lines[i], "=", 2)
+				if len(parts) != 2 {
+					panic("Malformed config line.")
+				}
+	
+				parts[0] = strings.TrimSpace(parts[0])
+				parts[1] = strings.ToLower(strings.TrimSpace(parts[1]))
+				if parts[1] == "true" {
+					addonNames = append(addonNames, parts[0])
+				}
+			}
+		}
+	
+		if len(addonNames) == 0 && !ShellMode {
+			LogPrintln("No Addons Marked Active")
 			LogPrintln("Rubble has no files to parse, aborting.")
 			return
-		} else if err != nil && ShellMode {
-			LogPrintln("Read failed (this is bad if unexpected)\n  Error:", err)
-			LogPrintln("Rubble has no files to parse but shell mode is active, continuing.")
 		}
-
-		lines := strings.Split(string(file), "\n")
-		for i := range lines {
-			if strings.HasPrefix(strings.TrimSpace(lines[i]), "#") {
-				continue
-			}
-			if strings.HasPrefix(strings.TrimSpace(lines[i]), "[") {
-				continue
-			}
-			if strings.TrimSpace(lines[i]) == "" {
-				continue
-			}
-
-			parts := strings.SplitN(lines[i], "=", 2)
-			if len(parts) != 2 {
-				panic("Malformed config line.")
-			}
-
-			parts[0] = strings.TrimSpace(parts[0])
-			parts[1] = strings.ToLower(strings.TrimSpace(parts[1]))
-			if parts[1] == "true" {
-				addonNames = append(addonNames, parts[0])
-			}
-		}
-	}
-
-	if len(addonNames) == 0 && !ShellMode {
-		LogPrintln("No Addons Marked Active")
-		LogPrintln("Rubble has no files to parse, aborting.")
-		return
-	}
 	
-	addonNameLookupTbl := make(map[string]bool)
-	for _, name := range addonNames {
-		addonNameLookupTbl[name] = true
-	}
-
-	for i := range Addons {
-		if addonNameLookupTbl[Addons[i].Name] {
-			Addons[i].Active = true
-			LogPrintln("  " + Addons[i].Name)
+		addonNameLookupTbl := make(map[string]bool)
+		for _, name := range addonNames {
+			addonNameLookupTbl[name] = true
 		}
-	}
 
-	UpdateAddonList(AddonsDir, Addons)
-
-	if ExitAfterUpdate {
-		LogPrintln("Done.")
-		return
-	}
-
-	// Convert Addons to File List
-	Files = NewFileList(Addons)
-
-	if len(Files.Order) == 0 && !ShellMode {
-		LogPrintln("Files list is empty. (no active addons have parseable files)")
-		LogPrintln("Rubble has no files to parse, aborting.")
-		return
-	}
-
-	// Test lexer, shell mode test happens later.
-	if LexTest && !ShellMode {
-		for _, i := range Files.Order {
-			lex := NewLexer(Files.Files[i].Content, NewPosition(1, Files.Files[i].Path))
-			for {
-				lex.Advance()
-				if lex.Current.Type == tknINVALID {
-					break
-				}
-				LogPrintln(lex.Current, ":", lex.Current.Lexeme)
+		for i := range Addons {
+			if addonNameLookupTbl[Addons[i].Name] {
+				Addons[i].Active = true
+				LogPrintln("  " + Addons[i].Name)
 			}
 		}
-		return
+
+		LogPrintln("Updating the Addon List File...")
+		UpdateAddonList(AddonsDir, Addons)
+	
+		if ExitAfterUpdate {
+			LogPrintln("Done.")
+			return
+		}
+
+		// Convert Addons to File List
+		Files = NewFileList(Addons)
+	
+		if len(Files.Order) == 0 && !ShellMode {
+			LogPrintln("Files list is empty. (no active addons have parseable files)")
+			LogPrintln("Rubble has no files to parse, aborting.")
+			return
+		}
+
+		// Test lexer, shell mode test happens later.
+		if LexTest && !ShellMode {
+			for _, i := range Files.Order {
+				lex := NewLexer(Files.Files[i].Content, NewPosition(1, Files.Files[i].Path))
+				for {
+					lex.Advance()
+					if lex.Current.Type == tknINVALID {
+						break
+					}
+					LogPrintln(lex.Current, ":", lex.Current.Lexeme)
+				}
+			}
+			return
+		}
 	}
 
 	LogPrintln("=============================================")
@@ -199,6 +204,11 @@ func main() {
 	
 	LogPrintln("Adding Builtins.")
 	SetupBuiltins()
+	
+	if PrepRegion != "" {
+		PrepModeRun(PrepRegion)
+		os.Exit(0)
+	}
 	
 	if !ShellMode || RunForcedInit {
 		LogPrintln("Running Init Scripts.")
@@ -356,5 +366,22 @@ func main() {
 			panic("Write Error: " + err.Error())
 		}
 	}
+	LogPrintln("Writing prep files...")
+	os.Mkdir(OutputDir+"/../prep", 0600)
+	for _, i := range Files.Order {
+		if Files.Files[i].Skip || Files.Files[i].NoWrite || !Files.Files[i].PrepScript {
+			continue
+		}
+
+		LogPrintln("  " + Files.Files[i].Path)
+
+		err := ioutil.WriteFile(OutputDir+"/../prep/"+i, Files.Files[i].Content, 0600)
+		if err != nil {
+			panic("Write Error: " + err.Error())
+		}
+	}
+	LogPrintln("Writing addon list to output directory...")
+	LogPrintln("  addonlist.ini")
+	UpdateAddonList(OutputDir, Addons)
 	LogPrintln("Done.")
 }

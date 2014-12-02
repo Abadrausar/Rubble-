@@ -1,4 +1,9 @@
 
+{!SCRIPT;
+	(rubble:prepfile "MLC 16x16.png")
+	(rubble:prepfile "MLC 10x10.png")
+}
+
 {D_INIT_TO_DEFAULTS}
 
 {INSTALL_TILESHEET;MLC 16x16.png}

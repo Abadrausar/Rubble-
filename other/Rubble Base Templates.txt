@@ -19,7 +19,7 @@ User Templates defined in the "Base/Templates" addon.
 {ECHO;<PRERAWS>...}
 {#ECHO;<PRERAWS>...}
 {E;<PRERAWS>...}
-	Returns <PRERAWS>. Used to strip leading and trailing whitespace for better formatting of output and to delay variable expansion.
+	Returns <PRERAWS>. Used to strip leading and trailing whitespace for better formatting of output and to control variable expansion.
 
 ==============================================
 {!ABORT;<MESSAGE>}
@@ -34,8 +34,31 @@ User Templates defined in the "Base/Templates" addon.
 	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws.
 
 ==============================================
-{SHARED_OBJECT_EXISTS;<ID>;<THEN_PRERAWS>}
-{SHARED_OBJECT_EXISTS;<ID>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
+{SHARED_PLANT;<ID>;<DEFINITION>}
+	Adds a common plant to the dictionary. <DEFINITION> should be a complete plant entry, EXCLUDING the [PLANT:<ID>] tag. 
+	
+	SHARED_PLANT, like the other specialized shared object templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR.
+	
+	SHARED_PLANT is simply a specialized version of SHARED_OBJECT.
+
+==============================================
+{SHARED_INORGANIC;<ID>;<DEFINITION>}
+	Adds a common inorganic to the dictionary. <DEFINITION> should be a complete inorganic stone entry, EXCLUDING the [INORGANIC:<ID>] tag. If this template call is the first to define this inorganic, then the given <DEFINITION> will be used in the finished raws. 
+	
+	SHARED_INORGANIC, like the other specialized shared object templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR.
+	
+	SHARED_INORGANIC is simply a specialized version of SHARED_OBJECT.
+
+==============================================
+{SHARED_MATERIAL_TEMPLATE;<ID>;<DEFINITION>}
+	Adds a common material template to the dictionary. <DEFINITION> should be a complete template entry, EXCLUDING the [MATERIAL_TEMPLATE:<ID>] tag. If this template call is the first to define this material template, then the given <DEFINITION> will be used in the finished raws. 
+	
+	SHARED_MATERIAL_TEMPLATE, like the other specialized shared object templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR.
+	
+	SHARED_MATERIAL_TEMPLATE is simply a specialized version of SHARED_OBJECT.
+
+==============================================
+{SHARED_OBJECT_EXISTS;<ID>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
 	If a SHARED_OBJECT with the id <ID> exists then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
 	This is very useful for making addons with additional behavior that depends on things (items, materials, ect) from other addons.
 
@@ -44,21 +67,29 @@ User Templates defined in the "Base/Templates" addon.
 	Appends the result of parsing <PRERAWS> to the end of SHARED_OBJECT <ID>. If that shared object does not exist it saves the result to append to any definition that may come later.
 
 ==============================================
+{REGISTER_REACTION_CLASS;<INORGANIC>;<CLASS>}
+	Adds a [REACTION_CLASS:<CLASS>] tag to a SHARED_OBJECT.
+	Just a specialized version of SHARED_OBJECT_ADD.
+
+==============================================
+{REGISTER_REACTION_PRODUCT;<INORGANIC>;<CLASS>;<PRODUCT>}
+	Adds a [MATERIAL_REACTION_PRODUCT:<CLASS>:<PRODUCT>] tag to a SHARED_OBJECT.
+	Just a specialized version of SHARED_OBJECT_ADD.
+
+==============================================
 {@IF;<STRING1>;<STRING2>;<THEN_PRERAWS>}
-{@IF;<STRING1>;<STRING2>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
+{@IF;<STRING1>;<STRING2>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
 	If <STRING1> and <STRING2> are equal, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned. This is very useful with variables.
 	
 	Example:
 		{IF;$TEST_VAR;YES;[FOO];[BAR]}
 
 ==============================================
-{@IF_ACTIVE;<ADDON>;<THEN_PRERAWS>}
-{@IF_ACTIVE;<ADDON>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
+{@IF_ACTIVE;<ADDON>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
 	If <ADDON> is active, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
 
 ==============================================
-{@IF_CODE;<CODE>;<THEN_PRERAWS>}
-{@IF_CODE;<CODE>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
+{@IF_CODE;<CODE>;<THEN_PRERAWS>;[<ELSE_PRERAWS>=""]}
 	If <CODE> returns true, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
 	(<CODE> may be any valid Raptor code)
 
@@ -79,45 +110,6 @@ User Templates defined in the "Base/Templates" addon.
 {PRINT;<MSG>...}
 {#PRINT;<MSG>...}
 	Writes <MSG> to the console. Each param gets it's own line.
-
-==============================================
-{SHARED_PLANT;<ID>;<DEFINITION>}
-	Adds a common plant to the dictionary. <DEFINITION> should be a complete plant entry, EXCLUDING the [PLANT:<ID>] tag. If this template call is the first to define this plant, then the given <DEFINITION> will be used in the finished raws. 
-	
-	SHARED_PLANT, like the other shared definition templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR. Use #WRITE_TILESET to write a file with all the generated (and user placed) calls.
-	
-	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws.
-	
-	SHARED_PLANT is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS and SHARED_OBJECT_ADD as an id.
-
-==============================================
-{SHARED_INORGANIC;<ID>;<DEFINITION>}
-	Adds a common inorganic to the dictionary. <DEFINITION> should be a complete inorganic stone entry, EXCLUDING the [INORGANIC:<ID>] tag. If this template call is the first to define this inorganic, then the given <DEFINITION> will be used in the finished raws. 
-	
-	SHARED_INORGANIC, like the other shared definition templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR. Use #WRITE_TILESET to write a file with all the generated (and user placed) calls.
-	
-	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_ORE, REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
-	
-	SHARED_INORGANIC is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS and SHARED_OBJECT_ADD as an id.
-
-==============================================
-{SHARED_MATERIAL_TEMPLATE;<ID>;<DEFINITION>}
-	Adds a common material template to the dictionary. <DEFINITION> should be a complete template entry, EXCLUDING the [MATERIAL_TEMPLATE:<ID>] tag. If this template call is the first to define this material template, then the given <DEFINITION> will be used in the finished raws. 
-	
-	SHARED_MATERIAL_TEMPLATE, like the other shared definition templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR. Use #WRITE_TILESET to write a file with all the generated (and user placed) calls.
-	
-	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
-	Uses SHARED_OBJECT, make sure <ID> is unique.
-	
-	SHARED_MATERIAL_TEMPLATE is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS and SHARED_OBJECT_ADD as an id.
-
-==============================================
-{REGISTER_REACTION_CLASS;<INORGANIC>;<CLASS>}
-	Adds a [REACTION_CLASS:<CLASS>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC or SHARED_MATERIAL_TEMPLATE.
-
-==============================================
-{REGISTER_REACTION_PRODUCT;<INORGANIC>;<CLASS>;<PRODUCT>}
-	Adds a [MATERIAL_REACTION_PRODUCT:<CLASS>:<PRODUCT>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC or SHARED_MATERIAL_TEMPLATE.
 
 ==============================================
 {SET_TILE;<ID>;<TILE>}
@@ -246,16 +238,16 @@ User Templates defined in the "Base/Templates" addon.
 	Registers an item <ITEM> of type <TYPE>. Used later with #USES_ITEMS and ITEM_CLASS. 
 	Returns [ITEM_<TYPE>:<ITEM>]
 	
-	SHARED_ITEM, like the other shared definition templates, will extract tile numbers used in tool definitions and wrap them in calls to #TILE.
+	SHARED_ITEM, like the other shared object templates, will extract tile numbers used in tool definitions and wrap them in calls to #TILE.
 	
 	<TYPE> must be one of AMMO, ARMOR, DIGGER, FOOD, GLOVES, HELM, INSTRUMENT, PANTS, SHIELD, SHOES, SIEGEAMMO, TOOL, TOY, TRAPCOMP or WEAPON.
 	For type FOOD SHARED_ITEM just translates directly to a call to SHARED_OBJECT, no support for items classes is initiated (as foods do not need to be registered). The only reason SHARED_ITEM supports FOOD at all is for consistency.
 	
-	SHARED_ITEM is based on SHARED_OBJECT, so <ID> can be passed to SHARED_OBJECT_EXISTS and SHARED_OBJECT_ADD as an id.
+	SHARED_ITEM is just a (very) specialized version of SHARED_OBJECT.
 
 ==============================================
-{ITEM_CLASS;<CLASS>;<RARITY>=COMMON}
-{ITEM_CLASS;<TYPE>;<ITEM>;<CLASS>;<RARITY>=COMMON}
+{ITEM_CLASS;<CLASS>;[<RARITY>=COMMON]}
+{ITEM_CLASS;<TYPE>;<ITEM>;<CLASS>;[<RARITY>=COMMON]}
 	
 	Sets an items class and rarity. Items may have many classes and each class may have a different rarity per item. 
 	
@@ -323,17 +315,35 @@ User Templates defined in the "Base/Templates" addon.
 	Generates a time value for use in interactions and the like.
 	Exactly like #ADV_TIME except for fortress mode.
 	
-	Units below MINUTE may be less than useful, as fortress mode units lack precision.
+	Units below MINUTE may be less than useful, as fortress mode time units lack precision.
 	
 	Example:
 		{@FORT_TIME;5;DAYS} -> 6000
 
 ==============================================
 {@GROWDUR;<COUNT>;<UNIT>}
-	A direct replacement for the GROWDUR tag that lets you specify time in realworld units.
+	A direct replacement for the GROWDUR tag that lets you specify time in real-world units.
 	Uses the same unit types as @ADV_TIME.
 	
-	Units below DAY may be less than useful, as growth duration units lack precision.
+	Units below DAY may be less than useful, as growth duration time units lack precision.
 	
 	Example:
 		{@GROWDUR;5;DAYS} -> [GROWDUR:60]
+
+==============================================
+{@BUILD_KEY;<KEY>;[<FURNACE>=false]}
+	A replacement for the BUILD_KEY tag that automatically works out key conflicts.
+	
+	<KEY> should be of the form: X, SHIFT_X, CTRL_X or ALT_X.
+	<FURNACE> should be true or false, set to true if the building is a furnace.
+	
+	If the requested key is already used it chooses the next open key in this order:
+		X
+		SHIFT_X
+		CTRL_X
+		ALT_X
+	For example if you try to set a workshop key to "M" (which is used by the Mason's Workshop)
+	you will get [BUILD_KEY:CUSTOM_SHIFT_M].
+	"ALT_Z" will wrap around to "A", so no worries about running out (unless you use more than 104 buildings per category).
+	
+	Please note that while this template "knows" about the vanilla build keys it will not magically work with other build keys that do not use this template.

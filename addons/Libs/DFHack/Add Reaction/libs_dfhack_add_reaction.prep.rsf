@@ -1,0 +1,2 @@
+
+(fileio:write (str:add [rubble:dfdir] "dfhack/scripts/rubble_add_reaction.lua") [rubble:raws "libs_dfhack_add_reaction.lua"])

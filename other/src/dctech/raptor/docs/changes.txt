@@ -1,4 +1,8 @@
 
+v3.2.1
+	Fixed bug that made type nil never be created from a lexer token.
+	Updated debug:value sot it (correctly) supports all types.
+
 v3.2
 	Added profiling to the shell.
 	Changed positions so that copied position info objects use a shared file name string.

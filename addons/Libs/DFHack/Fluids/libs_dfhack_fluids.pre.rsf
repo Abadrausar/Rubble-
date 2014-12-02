@@ -2,7 +2,9 @@
 (rubble:requireaddon "Libs/DFHack/Fluids" "Libs/DFHack/Command")
 
 (fileio:write (str:add [rubble:dfdir] "/hack/scripts/rubble_fluids.lua") [rubble:raws "com_libs_dfhack_fluids.lua"])
+(rubble:prepfile "com_libs_dfhack_fluids.lua")
 (fileio:write (str:add [rubble:dfdir] "/hack/lua/rubble_fluids.lua") [rubble:raws "lib_libs_dfhack_fluids.lua"])
+(rubble:prepfile "lib_libs_dfhack_fluids.lua")
 
 # 
 # area may be:
@@ -28,4 +30,9 @@
 	>) "]")
 })
 
-
+# {DFHACK_FLUIDS_SPAWN;water;spot;1}
+(rubble:template "DFHACK_FLUIDS_SPAWN" fluid area amount {
+	(str:add "[PRODUCT:100:1:BOULDER:NONE:" (rubble:libs_dfhack_command:getmat <array 
+		rubble_fluids spawn [area] [fluid] [amount] \LOCATION
+	>) "]")
+})

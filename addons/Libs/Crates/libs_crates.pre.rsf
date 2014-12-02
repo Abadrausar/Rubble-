@@ -66,7 +66,7 @@
 })
 
 # This generates a list of product lines for all crates, use in world gen reactions.
-(rubble:template "CRATE_WORLDGEN_REACTION_PRODUCTS" class {
+(rubble:template "CRATE_WORLDGEN_REACTION_PRODUCTS" {
 	(var out "")
 	(foreach [rubble:libs_crates:data] {
 		(set out (str:add
@@ -96,7 +96,7 @@
 	})
 })
 
-# Generate unpack reactions for all rubble:libs_crates.
+# Generate unpack reactions for all crates.
 # Example:
 # {CRATE_UNPACK_REACTIONS;CRAFTSMAN;CARPENTRY;ADDON_HOOK_PLAYABLE}
 (rubble:template "CRATE_UNPACK_REACTIONS" building skill techclass auto=true {

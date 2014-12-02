@@ -24,5 +24,6 @@
 
 # Install the script.
 (fileio:write (str:add [rubble:dfdir] "/hack/scripts/rubble_announce.lua") [rubble:raws "libs_dfhack_announcement.lua"])
+(rubble:prepfile "libs_dfhack_announcement.lua")
 
 (ret "")

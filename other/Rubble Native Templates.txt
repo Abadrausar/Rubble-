@@ -3,9 +3,8 @@ Rubble Template Documentation
 Built-in Native Templates
 
 ==============================================
-{!TEMPLATE;<NAME>;<CODE>}
-{!TEMPLATE;<NAME>;<PARAM>...;<CODE>}
-{!TEMPLATE;<NAME>;<PARAM>=<DEFAULT_VALUE>...;<CODE>}
+{!TEMPLATE;<NAME>;[<PARAM>[=<DEFAULT_VALUE>]...];<CODE>}
+{!TEMPLATE;<NAME>;...;<CODE>}
 	Creates a new template definition with name <NAME>, subsequently calling {<NAME>} will return a new parse of <CODE>.
 
 	Calling {<NAME>;<ARGUMENT_1>;<ARGUMENT_2>} will replace instances of %<PARAM_1>, %{<PARAM_1>}, or %1 with <ARGUMENT_1>, instances of %<PARAM_2>, %{<PARAM_2>}, or %2 with <ARGUMENT_2>, etcetera. Default values may be specified for parameters.
@@ -33,10 +32,8 @@ Built-in Native Templates
 		Hello ‼Fun‼!
 
 ==============================================
-{!SCRIPT_TEMPLATE;<NAME>;<CODE>}
+{!SCRIPT_TEMPLATE;<NAME>;[<PARAM>[=<DEFAULT_VALUE>]...];<CODE>}
 {!SCRIPT_TEMPLATE;<NAME>;...;<CODE>}
-{!SCRIPT_TEMPLATE;<NAME>;<PARAM>...;<CODE>}
-{!SCRIPT_TEMPLATE;<NAME>;<PARAM>=<DEFAULT_VALUE>...;<CODE>}
 	Exactly like !TEMPLATE except <CODE> should be a Raptor script and any params are declared as Raptor variables.
 	
 	Example:
@@ -60,7 +57,7 @@ Built-in Native Templates
 		Dwarves: Urist, Led
 
 ==============================================
-{!SCRIPT;<CODE>} or {!SCRIPT;<CODE>;<PARAMS>...}
-{SCRIPT;<CODE>} or {SCRIPT;<CODE>;<PARAMS>...}
-{#SCRIPT;<CODE>} or {#SCRIPT;<CODE>;<PARAMS>...}
+{!SCRIPT;<CODE>;[<PARAMS>...]}
+{SCRIPT;<CODE>;[<PARAMS>...]}
+{#SCRIPT;<CODE>;[<PARAMS>...]}
 	Runs a Raptor script as a command and returns whatever the script returns.

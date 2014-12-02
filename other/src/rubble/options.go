@@ -43,6 +43,8 @@ var LexTest bool
 var NoRecover bool
 var ExitAfterUpdate bool
 
+var PrepRegion string
+
 var ShellMode bool
 var ScriptPath string
 var Compile string
@@ -72,6 +74,8 @@ func ParseCommandLine() {
 	LexTest = false
 	NoRecover = false
 	ExitAfterUpdate = false
+	
+	PrepRegion = ""
 	
 	ShellMode = false
 	ScriptPath = ""
@@ -127,6 +131,8 @@ func ParseCommandLine() {
 				LexTest = parts[1] == "true"
 			case "norecover":
 				NoRecover = parts[1] == "true"
+			case "prep":
+				PrepRegion = parts[1]
 			case "shell":
 				ShellMode = parts[1] == "true"
 			case "script":
@@ -175,6 +181,8 @@ func ParseCommandLine() {
 
 	Flags.BoolVar(&LexTest, "lextest", LexTest, "Run a Rubble lexer test. No files will be written.")
 	Flags.BoolVar(&NoRecover, "norecover", NoRecover, "Should Rubble not recover errors? Useful for debugging.")
+	
+	Flags.StringVar(&PrepRegion, "prep", PrepRegion, "Name of a world to prepare DF for loading (or \"raw\" for the base raw folder). Use this to make sure tilesets, init changes, and DFHack scripts match the world's requirements.")
 	
 	Flags.BoolVar(&ShellMode, "shell", ShellMode, "Enter Shell Mode. Shell Mode is a full-up version of the Raptor Shell.")
 	Flags.StringVar(&ScriptPath, "script", ScriptPath, "Shell Mode: Path to the input script, if any. Changes to batch mode. Needed for -compile")

@@ -1,0 +1,164 @@
+	
+Rubble Template Documentation
+Templates added by the addons in "Libs/"
+Documentation is very spotty, sorry. For more information see the files of the addon in question.
+
+**********************************************
+Libs/Castes
+
+==============================================
+{!REGISTER_CREATURE;<ID>;<DESCRIPTION>;<MALE>;<FEMALE>;<ADJ>}
+	Register a creature with the caste library, this needs to be done before any other templates are called for this creature.
+
+==============================================
+{!DEFAULT_CASTE;<CREATURE>;<ID>;<DESC_NAME>;<NAME>;<NAME_PLUR>;<POPM>;<POPF>;<DESC>;<BONUS>}
+	Create a new caste for the specified creature using the provided information.
+	As it's name suggests this template is generally used for the default caste.
+
+==============================================
+{CASTE;<CREATURE>;<ID>;<DESC_NAME>;<NAME>;<NAME_PLUR>;<POPM>;<POPF>;<DESC>;<BONUS>}
+	Create a new caste for the specified creature using the provided information.
+	Exactly like !DEFAULT_CASTE but for all the other castes you may want to add.
+
+==============================================
+{#CASTE_INSERT;<CREATURE>}
+	Write the generated castes here.
+	Place this in your creature file where you want the castes to be added.
+
+==============================================
+{#SYN_AFFECTED_MALES;<CREATURE>;[<TABS>=2]}
+{#SYN_AFFECTED_FEMALES;<CREATURE>;[<TABS>=2]}
+	Write [SYN_AFFECTED_CREATURE:<CREATURE>:CASTE]tags for every male/female caste in the specified creature.
+	VERY useful for transformations.
+	<TABS> specifies the number of leading tabs to add to each new line, for the formatting freaks out there :)
+
+**********************************************
+Libs/Castes/DFHack/Transform
+
+==============================================
+{CASTE_TRANSFORM;<CREATURE>;<TO>;<INTERMEDIATE>;<TIME>}
+	Create a caste transformation, currently rather limited.
+
+==============================================
+{#CASTE_TRANSFORM_PRODUCT;<CREATURE>;<TO>}
+	Returns a reaction product line for transforming any caste of the specified creature to the specified caste.
+	Requires a CASTE_TRANSFORM to be defined first.
+
+**********************************************
+Libs/Crates
+
+==============================================
+{!CRATE;<ID>;<NAME>;<VALUE>;<PRODUCT>}
+	Define a new crate.
+	<PRODUCT> is written directly into the unpack reaction.
+
+==============================================
+{!CRATE_BARS;<ID>;<NAME>;<VALUE>;<PRODUCT>}
+	Define a new crate containing 10 bar items.
+	<PRODUCT> is a material token.
+
+==============================================
+{!CRATE_CLASS;[<ID>];<CLASS>}
+	Add a crate to a class.
+	If <ID> is not specified it defaults to the id of the last crate defined.
+
+==============================================
+{CRATE_WORLDGEN_REACTION_PRODUCTS}
+	This generates a list of product lines for ALL crates, use in world gen reactions.
+
+==============================================
+{CRATE_WORLDGEN_REACTION_PRODUCTS_CLASSED;<CLASS>}
+	This generates a list of product lines for all crates in a class, use in world gen reactions.
+
+==============================================
+{CRATE_UNPACK_REACTIONS;<BUILDING>;<SKILL>;<TECHCLASS>;[<AUTO>=true]}
+	Generate unpack reactions for all crates.
+
+==============================================
+{CRATE_UNPACK_REACTIONS_CLASSED;<BUILDING>;<SKILL>;<TECHCLASS>;<CRATECLASS>;[<AUTO>=true]}
+	Same as CRATE_UNPACK_REACTIONS, except for only a single crate class.
+
+**********************************************
+Libs/DFHack/Add Reaction
+
+==============================================
+{REACTION_ADD;<REACTION>;<BUILDING>}
+	Add a reaction to a hardcoded building.
+	Building List:
+		CARPENTERS
+		FARMERS
+		MASONS
+		CRAFTSDWARFS
+		JEWELERS
+		METALSMITHSFORGE
+		MAGMAFORGE
+		BOWYERS
+		MECHANICS
+		SIEGE
+		BUTCHERS
+		LEATHERWORKS
+		TANNERS
+		CLOTHIERS
+		FISHERY
+		STILL
+		LOOM
+		QUERN
+		KENNELS
+		ASHERY
+		KITCHEN
+		DYERS
+		TOOL
+		MILLSTONE
+		
+		WOOD_FURNACE
+		SMELTER
+		GLASS_FURNACE
+		MAGMA_SMELTER
+		MAGMA_GLASS_FURNACE
+		MAGMA_KILN
+		KILN
+
+==============================================
+{REACTION_CLEAR_LIST;<BUILDING>}
+	Clear the reaction list of a hardcoded building.
+	Uses the same building list as REACTION_ADD.
+
+**********************************************
+Libs\DFHack\Announcement
+
+==============================================
+{DFHACK_ANNOUNCEMENT;<TEXT>;[<COLOR>=COLOR_WHITE]}
+	Write an announcement to the screen and gamelog.
+
+**********************************************
+Libs\DFHack\Command
+
+==============================================
+{DFHACK_COMMAND;<COMMAND>;[<ARGS>...]}
+	Returns a reaction product line to call the specified command via autoSyndrome.
+
+**********************************************
+Libs\DFHack\Fluids
+
+==============================================
+{DFHACK_FLUIDS_EAT;<FLUID>;<AREA>;<AMOUNT>;<MINIMUM>}
+	Eats fluids as specified by the parameters.
+	<FLUID> must be "water" or "magma".
+	<AREA> must be one of: "spot", "3x3", "5x5", or "7x7".
+
+==============================================
+{DFHACK_FLUIDS_CART;<FLUID>;<AREA>}
+	Fills a minecart with fluids.
+
+==============================================
+{DFHACK_FLUIDS_SPAWN;<FLUID>;<AREA>;<AMOUNT>}
+	Spawn fluids.
+
+**********************************************
+Libs\DFHack\Spawn
+
+==============================================
+{DFHACK_SPAWN_CREATURE;<CREATURE>;<CASTE_NUMBER>;<NAME>}
+	Returns a reaction product line to spawn a creature.
+	Example:
+		{DFHACK_SPAWN_CREATURE;CAT;0;Fuzzy}
