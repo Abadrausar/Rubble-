@@ -1,0 +1,29 @@
+<rubble:addonmeta
+	header=`Launch full minecarts automatically.`
+	
+	description=`
+When powered this machine launches any adjacent minecarts that are
+sufficiently full in any direction you choose.
+
+To build a cart launcher you must build the basic building, then run a reaction
+to set the launch direction and fullness threshold. Until these are set the
+building is useless. The launcher needs to be powered before it may be adjusted!
+
+Keep in mind that this does not give carts sufficient velocity to boost them
+off a high speed track stop! You will have to come up with a different system
+for stopping your carts.
+
+The system I found to work best is a T shaped track, where the cart runs into a wall
+then entering the T and stops, the the cart launcher launches the cart down the other
+(perpendicular) leg. An even easier system is just to launch the cart back the way it
+came (provided that is possible of course). For multiple carts (with a single loader)
+dropping the carts from above (and allowing them to stack up if more than one is
+awaiting loading) works well.
+
+Good for use with "User/DFHack/Powered/Cart Loader" or "User/DFHack/Powered/Cart Filler".
+
+Connecting machines must be built AFTER any mechanical workshop!
+`
+	
+	activates="Libs/Base;User/DFHack/Powered"
+>

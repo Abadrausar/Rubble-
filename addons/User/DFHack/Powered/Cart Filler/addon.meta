@@ -1,0 +1,18 @@
+<rubble:addonmeta
+	header=`An automatic mechanically powered version of the "User/DFHack/Cart Filler" addon.`
+	
+	description=`
+This addon works exactly the same with these additional rules (which are evaluated in order):
+	If both magma and a magma safe minecart are present magma is loaded
+	If any minecart and water is present water is loaded
+	If magma is present and the only minecart(s) are not magma safe nothing happens
+	If no minecarts are present nothing happens
+	If no fluids are present nothing happens
+
+Unlike the cart loader the filler will load ANY adjacent minecart!
+
+Connecting machines must be built AFTER any mechanical workshop!
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fluids"
+>

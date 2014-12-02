@@ -25,41 +25,33 @@ misrepresented as being the original software.
 
 local _ENV = rubble.mkmodule("timeout")
 
-data = data or {}
+data = {}
 
-dfhack.onStateChange.rubble_libs_dfhack_timeout = function(code)
-	if code == SC_WORLD_UNLOADED then
-		-- save data to disk
-		print("rubble.timeout: Saving persistence data.")
-		local dat = io.open(rubble.savedir..'/raw/rubble_libs_dfhack_timeout.persist.lua', 'w')
-		dat:write("\n")
-		dat:write("rubble.timeout.data = {\n")
-		for k, v in pairs(data) do
-			if v ~= nil then
-				dat:write('\t["'..k..'"] = {')
-				dat:write(' delay = '..v.delay..',')
-				dat:write(' command = [[ '..v.command..' ]]')
-				dat:write(' },\n')
-			end
+function savePersist()
+	print("rubble.timeout: Saving persistence data.")
+	local dat = io.open(rubble.savedir..'/raw/rubble_libs_dfhack_timeout.persist.lua', 'w')
+	dat:write("\n")
+	dat:write("rubble.timeout.data = {\n")
+	for k, v in pairs(data) do
+		if v ~= nil then
+			dat:write('\t["'..k..'"] = { delay = '..v.delay..', command = [['..v.command..']] },\n')
 		end
-		dat:write("}\n")
-		dat:close()
-		
-		data = {}
 	end
-	if code == SC_WORLD_LOADED then
-		-- load data from disk
-		print("rubble.timeout: Loading persistence data.")
-		rubble.load_script(rubble.savedir.."/raw/rubble_libs_dfhack_timeout.persist.lua")
-	end
+	dat:write("}\n")
+	dat:close()
 end
+
+print("rubble.timeout: Loading persistence data.")
+rubble.load_script(rubble.savedir.."/raw/rubble_libs_dfhack_timeout.persist.lua")
 
 function add(id, delay, command)
 	data[id] = {delay = delay, command = command}
+	savePersist()
 end
 
 function del(id)
 	data[id] = nil
+	savePersist()
 end
 
 function tick()

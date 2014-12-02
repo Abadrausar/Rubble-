@@ -1,0 +1,37 @@
+<rubble:addonmeta
+	header=`Adds a factory building for making batches of items from blocks, planks and raw glass.`
+	
+	description=`
+Create most furniture and tools from nearby blocks, planks and raw glass.
+
+This factory is kinda like the powered mason, carpenter or glass furnace in that it
+produces items with minimal dwarf labor. The difference is that those buildings require
+NO dwarves, while this one requires at least one. In trade for a little more dwarf labor
+the items are cheaper and have a better chance to be higher quality (with a skilled worker).
+In addition the factory produces items in batches of five.
+
+Required raw materials are taken from tiles adjacent to the factory, so your dwarves
+spend less time hauling and more time working! A dwarf is still required to do the
+reaction, but he doesn't have to haul the reagents which, for 8 blocks, can take far
+more time than running the reaction.
+
+Input items MUST be on an input tile (a special one tile workshop), if an output tile is
+available it is used, but an output is not required (items will be ejected in the center
+of the factory if no output is provided).
+
+Unlike the "User/Factory" addon this addon only allows you to use blocks or planks.
+
+Connecting machines must be built AFTER any mechanical workshop!
+`
+	
+	vars=<map
+		DFHACK_FACTORY_NO_STONE=<rubble:addonmetavar
+			name='Remove "User/DFHack/Factory" stone reactions?' val="NO" choices="YES" choices="NO">
+		DFHACK_FACTORY_NO_WOOD=<rubble:addonmetavar
+			name='Remove "User/DFHack/Factory" wood reactions?' val="NO" choices="YES" choices="NO">
+		DFHACK_FACTORY_NO_GLASS=<rubble:addonmetavar
+			name='Remove "User/DFHack/Factory" glass reactions?' val="NO" choices="YES" choices="NO">
+	>
+	
+	activates="Libs/Base;User/DFHack/Powered;Libs/Wood Additions"
+>

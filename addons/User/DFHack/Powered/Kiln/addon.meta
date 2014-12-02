@@ -1,0 +1,23 @@
+<rubble:addonmeta
+	header=`A powered kiln, turn clay into pottery boulders.`
+	
+	description=`
+The powered kiln can make fired boulders from clay or pearlash from ash.
+
+To make pottery items you need to use the boulders with another workshop (a powered block
+cutter + a powered factory works well).
+
+Input items MUST be on an input tile (a special one tile workshop), output is placed
+beyond an output tile (which is also required). If multiple output tiles are provided
+one is chosen at random each time (so output may be split).
+
+To operate the powered kiln requires adjacent magma or fuel on an input (magma is given priority).
+
+Try sawmill+wood furnace+quarry+kiln+block cutter+factory! When connected in the right
+manner you can turn wood into pottery with this setup while using only minimal dwarf labor.
+
+Connecting machines must be built AFTER any mechanical workshop!
+`
+	
+	activates="Libs/Base;User/DFHack/Powered"
+>

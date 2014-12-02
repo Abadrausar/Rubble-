@@ -2,14 +2,20 @@
 	header=`Adds a large factory building for making batches of cheap items (mostly from wood and stone).`
 	
 	description=`
-Allows you to make all kinds of furniture as well as sets of clothing, batches of weapons,
-and sets of armor.
+Allows you to make all kinds of furniture as well as sets of clothing, and batches of tools.
+
 All factory reactions are just a little bit cheaper than the vanilla version.
 All factory items that can be made from stone and wood also have a version that can be made
 from blocks or planks, save even more resources!
 
-Uses various skills.
+All reactions use the mechanics skill.
 `
+	
+	vars=<map
+		FACTORY_NO_CLOTH=<rubble:addonmetavar name='Remove "User/Factory" cloth reactions?' val="NO" choices="YES" choices="NO">
+		FACTORY_NO_STONE=<rubble:addonmetavar name='Remove "User/Factory" stone reactions?' val="NO" choices="YES" choices="NO">
+		FACTORY_NO_WOOD=<rubble:addonmetavar name='Remove "User/Factory" wood reactions?' val="NO" choices="YES" choices="NO">
+	>
 	
 	activates="Libs/Base;Libs/DFHack/Fix Handedness;Libs/Wood Additions"
 >

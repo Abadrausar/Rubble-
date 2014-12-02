@@ -1,0 +1,14 @@
+<rubble:addonmeta
+	header=`An automatic powered version of the "User/DFHack/Magma/Extractor" addon.`
+	
+	description=`
+This addon works mostly the same as "User/DFHack/Magma/Extractor", just without dwarf labor.
+
+Output is placed beyond an output tile (which is required). If multiple output tiles are
+provided one is chosen at random each time (so output may be split).
+
+Connecting machines must be built AFTER any mechanical workshop!
+`
+	
+	activates="Libs/Base;User/DFHack/Powered;Libs/DFHack/Fluids"
+>

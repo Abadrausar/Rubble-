@@ -1,0 +1,18 @@
+<rubble:addonmeta
+	header=`A powered quarry, when built over clay provides a steady supply of boulders.`
+	
+	description=`
+The powered quarry is very simple, if built over the correct tile it provides clay or
+sand, automatically. Sand mining requires bags, have your dwarves dump them on an input tile.
+
+Currently the quarry can be built on any soil and always produces clay or sand (so no
+red sand or fire clay), sorry technical issues.
+
+Output is placed beyond an output tile (which is required). If multiple output tiles are
+provided one is chosen at random each time (so output may be split).
+
+Connecting machines must be built AFTER any mechanical workshop!
+`
+	
+	activates="Libs/Base;User/DFHack/Powered"
+>

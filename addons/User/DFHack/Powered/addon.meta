@@ -1,0 +1,149 @@
+<rubble:addonmeta
+	lib=true
+	
+	header=`Powered workshop support addon.`
+	
+	description=`
+First: If you are looking to produce high quality items, look elsewhere. The various 
+production buildings do a pretty good job, but nothing beats a skilled craftsman at a
+normal workshop for quality.
+
+Second: I tested everything at least once, but there may still be bugs, so be careful.
+That said most "bugs" turned out to be goofed setups, so make sure your inputs/outputs
+are correct before complaining (for example one weird issue turned out to be a misplaced
+output tile).
+
+The powered workshops follow more or less the same pattern, they take any input items
+they may need from any adjacent inputs and place any output items just beyond any outputs.
+
+Input tiles and output tiles are specified with special one tile workshops. If an output
+item is placed on an input tile it will be automatically forbidden. This will keep your
+dwarves from disrupting the (hopefully) smooth operation of your production lines by
+stealing half finished products.
+
+Note: If you place an output diagonally off a workshop's corner it will place the item
+diagonally as well! This means that it is possible to chain workshops diagonally or even
+cross two production lines (by sharing an output).
+
+Shared/crossed output example:
+	o: output
+	i: input
+	a: workshop from line 1
+	b: workshop from line 2
+	Items flow from top to bottom
+	
+	 aaa bbb
+	 aaa bbb
+	 aaa bbb
+	    o
+	   i i
+	 bbb aaa
+	 bbb aaa
+	 bbb aaa
+
+It is also possible to make a circle with three workshops!
+(a gives to c and b, b gives to a and c, c gives to a and b)
+	o: output
+	i: input
+	a: workshop 1
+	b: workshop 2
+	c: workshop 3
+	
+	 aaa
+	 aaa
+	 aaai
+	  iobbb
+	cccibbb
+	ccc bbb
+	ccc
+
+These kinds of setups are less useful than a straight line in most cases, but they should
+give you some kind of idea of what is possible.
+
+Workshops will use ANY adjacent output or input! This makes things very flexible, but
+sometimes this can make things difficult. I suggest that you spread things out as much
+as possible to help keep sharing "issues" from occurring.
+
+If a workshop has multiple output tiles it will choose one at random for each item it
+produces, so using two or more outputs allows you to split a workshop's output more-or-less
+evenly (subject to the whims of RNG of course).
+
+Some workshops produce more than one type of item, for example the powered glass furnace
+makes both glass and empty bags, use a sorter to separate dissimilar outputs (the sorter
+may also discriminate based on material!).
+
+An example of a bad setup (that got me):
+This was *supposed* to sort bags and send them right while glass when straight, but sometimes
+bags ended up on top of the glass furnace, can you spot the issue?
+	o: output
+	i: input
+	s: sorter
+	l: cart loader
+	a: glass furnace
+	
+	 o
+	 s
+	 isoil
+	 o
+	aaa
+	aaa
+	aaa
+
+The problem is that the bag sorter and the glass furnace shared an output, moving the sorters
+(and their inputs and outputs) fixed the issue:
+	o
+	s s
+	 i o l
+	 o  i
+	aaa
+	aaa
+	aaa
+
+I suggest you play around with inputs and outputs until you fully understand how they work!
+
+The first input in a production chain is a little hard to feed without having your dwarves
+insisting on taking the items to a stockpile, use a sorter to feed the items. As a sorter
+without an input tile will take any adjacent items, just use a setup like this:
+	=: input stockpile
+	o: output
+	i: input
+	s: sorter
+	a: workshop
+	
+	 =
+	 s
+	 o
+	 i
+	aaa
+	aaa
+	aaa
+
+Make sure you read and understand the addon description for the sorter! This building plays
+a critical role in any advanced factory!
+
+The final destination of most production lines is a powered factory, this building requires
+a dwarf to operate and produces many kinds of items from wood, stone or glass.
+It uses the same kind of input/output system as the other workshops with the exception that
+an output is not required (with no output the items are dumped in the middle of the factory).
+
+If you just want items in a hurry the powered mason and carpenter may be more your speed.
+They both produce items with the need for a dwarf (keep coffins coming during a tantrum spiral!)
+but the items are a little more expensive and will be lower quality than can be made by a
+skilled dwarf.
+
+The glass furnace may operate either as a raw material generator for the factory or on it's
+own like the powered mason and carpenter, which way to run it is up to you.
+
+Many of the powered workshops are made to fill a specific slot in a production line, but
+they work just as well by themselves. For example a powered wood furnace is mostly designed
+as an intermediate stage between a powered sawmill and a powered kiln or smelter, but it also
+works well with that unpowered sawmill that is scrapping all that wooden crap you stole from
+the last elven caravan :p
+
+If a machine seems to not be working look at the DFHack console, if you don't see lots of errors
+the problem is most likely a missing or incorrect input item. Read the workshop's addon description
+for details about what it expects, you may have forgotten something.
+`
+	
+	activates="Libs/Base;Libs/DFHack/Upgrade Building"
+>

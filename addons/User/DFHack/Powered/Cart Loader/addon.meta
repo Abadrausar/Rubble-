@@ -1,0 +1,26 @@
+<rubble:addonmeta
+	header=`Fill minecarts with items automatically.`
+	
+	description=`
+When powered this machine loads any items that are on it's input side into nearby minecarts.
+If you want to load liquids see "User/DFHack/Cart Filler/Powered".
+
+Input items MUST be on an input tile (a special one tile workshop), items are then loaded
+onto any adjacent minecart.
+
+To keep your dwarves from stealing the items from the input tile either make sure they can't
+path to the input or dump the items there with a sorter (which, like all machines, forbids
+items that it places on an input).
+
+Items are loaded one stack at a time once every 10 ticks.
+
+A common problem with cart loaders is loading the wrong cart. If your cart loader seems
+to not be loading properly make sure it is not putting the items into the wrong minecart!
+
+Connecting machines must be built AFTER any mechanical workshop!
+
+Based on the Masterwork Gnome mode machina scripts.
+`
+	
+	activates="Libs/Base;User/DFHack/Powered"
+>

@@ -25,7 +25,7 @@ misrepresented as being the original software.
 ]]
 
 local utils = require 'utils'
-local fluids = rubble.fluids
+local fluids = rubble.require "fluids"
 
 validArgs = validArgs or utils.invert({
 	'help',

@@ -1,0 +1,21 @@
+<rubble:addonmeta
+	header=`A powered version of the block cutter.`
+	
+	description=`
+The powered block cutter takes any boulders and turns them into 4 blocks of whatever color you want.
+To change the color run one of the adjustment reactions, same goes for input/output directions.
+
+The powered block cutter only makes normal quality blocks, but who cares? It's automatic!
+
+The block cutter will consume any boulder! If you put in ores or other valuable stones it
+will happily cut them into blocks, whether this is a good thing or not is up to you...
+
+Input items MUST be on an input tile (a special one tile workshop), output is placed
+beyond an output tile (which is also required). If multiple output tiles are provided
+one is chosen at random each time (so output may be split).
+
+Connecting machines must be built AFTER any mechanical workshop!
+`
+	
+	activates="Libs/Base;User/DFHack/Powered;User/Block"
+>

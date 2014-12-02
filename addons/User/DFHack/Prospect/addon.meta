@@ -1,0 +1,13 @@
+<rubble:addonmeta
+	header=`Allows your miners to prospect the area for likely ores and gems.`
+	
+	description=`
+All you need to do is build a prospector and run the reaction.
+
+The results are returned as a series of announcements.
+
+Building the prospector and running it's reaction uses the mining skill.
+`
+	
+	activates="Libs/Base"
+>

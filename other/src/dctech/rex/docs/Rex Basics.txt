@@ -573,3 +573,11 @@ var b = [a]
 
 # if a is a code block run it.
 (if (type [a] code) [a])
+
+-------------------
+
+var x = (if (isnil [a]) {
+	"nil"
+}{
+	"non-nil"
+})

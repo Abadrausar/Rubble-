@@ -2,6 +2,28 @@
 ==============================================
 Changelog:
 ==============================================
+v5.4 (for DF 40.14)
+	Updated "Base" to DF 40.14.
+	Added stepladders and removed LIKES_FIGHTING from "User/Saurian".
+	Added "Libs/DFHack/Upgrade Building", allows you to change the type of already constructed workshops.
+	Changed "User/DFHack/Cart Loader" and "User/DFHack/Cart Launcher" to use "Libs/DFHack/Upgrade Building".
+	Changed "User/DFHack/Cart Launcher" to support 100%, 75%, 50%, and 25% launch thresholds.
+	It is now possible to disable reactions in "User/Factory" by category (all wood reactions, all stone reactions, etc.).
+		This is done via configuration variables, if you use the web UI just click "Edit Config Variables" when generating.
+	Removed all metal working reactions from "User/Factory".
+	Added reactions to make tools to "User/Factory".
+	Removed block creation reaction from "User/Factory".
+	Added a BUNCH of new powered workshops and moved the existing ones to the "User/DFHack/Powered" addon group.
+		If you activate all the powered workshops you can make complicated automatic manufacturing setups, have fun!
+		Read the addon descriptions! They have important information about how to use the machines.
+		In particular the description for the "User/DFHack/Powered" addon has an overview of sorts.
+		The existing powered workshops have been changed to better integrate with the new ones.
+	Added "User/DFHack/Prospect", allows your miners to examine the area looking for ores and gems.
+	Fixed a Rex bug that stopped sort:map type indexables from working sometimes, this did not effect any existing addons.
+	Extended "Dev/Cheat" some (obsidian mechanisms and some metal ores).
+	Reworked the persistence support in "Libs/DFHack/Timeout" to better support script system reloads.
+		Now creatures can't get "stuck" when you reload the scripting system (not sure if they ever did, but better safe...).
+
 v5.3 (for DF 40.13)
 	Updated Rex (v1.6).
 		array indexables should be a little faster in most cases.

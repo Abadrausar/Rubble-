@@ -45,6 +45,7 @@ func NewOrderedMap() rex.EditIndexable {
 // NewOrderedMapFromIndexable creates a new OrderedMap from the contents of an existing rex.Indexable.
 func NewOrderedMapFromIndexable(input rex.Indexable) rex.EditIndexable {
 	this := new(OrderedMap)
+	this.lock = new(sync.RWMutex)
 	keys := input.Keys()
 	this.order = make([]string, 0, len(keys))
 	this.order = append(this.order, keys...)
@@ -69,6 +70,7 @@ func NewOrderedMapFromLit(script *rex.Script, keys []string, values []*rex.Value
 	}
 	
 	this := new(OrderedMap)
+	this.lock = new(sync.RWMutex)
 	this.order = make([]string, 0, len(keys))
 	this.order = append(this.order, keys...)
 	sort.Strings(this.order)

@@ -56,6 +56,9 @@ Libs/DFHack/Fluids
 Libs/DFHack/Timeout
 	Adds DFHack Lua support for persistent time delays (eg they survive a save/load).
 
+Libs/DFHack/Upgrade Building
+	Allows you to change the types of certain workshops after they have been built.
+
 Libs/Macro
 	A modders resource for generating macros from scripts.
 
@@ -113,15 +116,6 @@ User/DFHack/Bulletin Board
 User/DFHack/Cart Filler
 	Fill minecarts with water or magma (without big fancy mechanical contraptions).
 
-User/DFHack/Cart Filler/Powered
-	An automatic mechanically powered version of the "User/DFHack/Cart Filler" addon.
-
-User/DFHack/Cart Launcher
-	Launch full minecarts automatically.
-
-User/DFHack/Cart Loader
-	Fill minecarts with items automatically.
-
 User/DFHack/Dragon Engine
 	A direct port of the dragon engines from the DFHack r5 mini-mod pack.
 
@@ -131,20 +125,68 @@ User/DFHack/Fill Barrel
 User/DFHack/Magma/Extractor
 	Extract minerals from magma, get all kinds of rare and valuable metals! (but only rarely)
 
-User/DFHack/Magma/Extractor/Powered
-	An automatic powered version of the "User/DFHack/Magma/Extractor" addon.
-
 User/DFHack/Magma/Melter
 	Melt rocks into magma!
 
 User/DFHack/Obsidian Caster
 	The obsidian caster makes obsidian boulders directly from adjacent water and magma.
 
-User/DFHack/Obsidian Caster/Powered
-	An automatic powered version of the "User/DFHack/Obsidian Caster" addon.
-
 User/DFHack/Pop Cap
 	Allows you to set a population cap that will override the default for this world.
+
+User/DFHack/Powered
+	Powered workshop support addon.
+
+User/DFHack/Powered/Block Cutter
+	A powered version of the block cutter.
+
+User/DFHack/Powered/Carpenter
+	A powered carpenters workshop, make items from wood blocks.
+
+User/DFHack/Powered/Cart Filler
+	An automatic mechanically powered version of the "User/DFHack/Cart Filler" addon.
+
+User/DFHack/Powered/Cart Launcher
+	Launch full minecarts automatically.
+
+User/DFHack/Powered/Cart Loader
+	Fill minecarts with items automatically.
+
+User/DFHack/Powered/Factory
+	Adds a factory building for making batches of items from blocks, planks and raw glass.
+
+User/DFHack/Powered/Glass Furnace
+	A powered glass furnace, turn sand into glass.
+
+User/DFHack/Powered/Kiln
+	A powered kiln, turn clay into pottery boulders.
+
+User/DFHack/Powered/Magma Extractor
+	An automatic powered version of the "User/DFHack/Magma/Extractor" addon.
+
+User/DFHack/Powered/Mason
+	A powered masons workshop, make items from stone blocks.
+
+User/DFHack/Powered/Obsidian Caster
+	An automatic powered version of the "User/DFHack/Obsidian Caster" addon.
+
+User/DFHack/Powered/Quarry
+	A powered quarry, when built over clay provides a steady supply of boulders.
+
+User/DFHack/Powered/Sawmill
+	A powered version of the sawmill.
+
+User/DFHack/Powered/Smelter
+	A powered smelter, ore to bars, no dwarves required.
+
+User/DFHack/Powered/Sorter
+	Sort items by type and/or material.
+
+User/DFHack/Powered/Wood Furnace
+	A powered wood furnace, turn planks into ash or charcoal.
+
+User/DFHack/Prospect
+	Allows your miners to prospect the area for likely ores and gems.
 
 User/DFHack/Spatter
 	A streamlined version of the DFHack spatter example mod.
