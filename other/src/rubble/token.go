@@ -46,9 +46,9 @@ func (this *Token) String() string {
 func tokenTypeToString(tokenType int) string {
 	switch tokenType {
 	case tknINVALID:
-		return "TknINVALID"
+		return "tknINVALID"
 	case tknString:
-		return "TknString"
+		return "tknString"
 	case tknTagBegin:
 		return "tknTagBegin"
 	case tknTagEnd:

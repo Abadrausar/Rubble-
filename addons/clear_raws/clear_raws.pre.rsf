@@ -1,0 +1,8 @@
+
+(file:walkfiles [rubble:outputdir] {
+	(file:del (str:add [rubble:outputdir] "/" [params 0]))
+	(if (error) {
+		(console:print "Error deleting: " [params 0] "\n")
+		(error false)
+	})
+})

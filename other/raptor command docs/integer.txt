@@ -1,0 +1,78 @@
+PACKAGE
+
+package integer
+    import "dctech/raptor/commands/integer"
+
+    Raptor Integer Commands.
+
+FUNCTIONS
+
+func CommandInt_Add(state *raptor.State, params []*raptor.Value)
+    Adds two values.
+
+	int:add a b
+
+    Returns a + b
+
+func CommandInt_Div(state *raptor.State, params []*raptor.Value)
+    Divides two values.
+
+	int:div a b
+
+    Returns a / b
+
+func CommandInt_Eq(state *raptor.State, params []*raptor.Value)
+    Integer equal.
+
+	int:eq a b
+
+    Returns true or false.
+
+func CommandInt_Gt(state *raptor.State, params []*raptor.Value)
+    Integer greater than.
+
+	int:gt a b
+
+    Returns true or false.
+
+func CommandInt_Lt(state *raptor.State, params []*raptor.Value)
+    Integer less than.
+
+	int:lt a b
+
+    Returns true or false.
+
+func CommandInt_Mod(state *raptor.State, params []*raptor.Value)
+    Gives the remainder of dividing two values.
+
+	int:mod a b
+
+    Returns a % b
+
+func CommandInt_Mul(state *raptor.State, params []*raptor.Value)
+    Multiplies two values.
+
+	int:mul a b
+
+    Returns a * b
+
+func CommandInt_Sub(state *raptor.State, params []*raptor.Value)
+    Subtracts two values.
+
+	int:sub a b
+
+    Returns a - b
+
+func Setup(state *raptor.State)
+    Adds the integer commands to the state. The integer commands are:
+
+	int:add
+	int:sub
+	int:div
+	int:mod
+	int:mul
+	int:gt
+	int:lt
+	int:eq
+
+

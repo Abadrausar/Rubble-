@@ -1,0 +1,22 @@
+PACKAGE
+
+package console
+    import "dctech/raptor/commands/console"
+
+    Raptor Console IO Commands.
+
+FUNCTIONS
+
+func CommandConsole_Print(state *raptor.State, params []*raptor.Value)
+    Print a list of values.
+
+	print [value...]
+
+    Returns unchanged.
+
+func Setup(state *raptor.State)
+    Adds the console IO commands to the state. The console IO commands are:
+
+	console:print
+
+

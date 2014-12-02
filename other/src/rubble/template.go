@@ -25,21 +25,21 @@ package main
 import "strings"
 import "regexp"
 import "strconv"
-import "dctech/nca7"
+import "dctech/raptor"
 
 type NativeTemplate func([]string) string
 
 var Templates = make(map[string]*Template)
 
 type TemplateParam struct {
-	Name string
+	Name    string
 	Default string
 }
 
 type Template struct {
 	// Is this a native template?
 	Native bool
-	
+
 	// Is this template's body made up of NCA code?
 	NCA bool
 
@@ -71,11 +71,10 @@ func (this *Template) Call(params []string) string {
 	} else {
 		PrevParams = make([]string, 0)
 	}
-	
-	
+
 	for i := range params {
 		params[i] = strings.TrimSpace(params[i])
-		
+
 		// If the param is a variable name replace with value
 		// Does not replace variables embeded in other text
 		name := varNameRegEx.FindStringSubmatch(params[i])
@@ -83,37 +82,37 @@ func (this *Template) Call(params []string) string {
 			params[i] = varNameRegEx.ReplaceAllString(params[i], VariableData[name[1]])
 		}
 	}
-	
+
 	// Native template
 	if this.Native {
 		return this.Handler(params)
 	}
-	
+
 	// Script template
 	if this.NCA {
-		GlobalNCAState.Code.Add(this.Text)
-		GlobalNCAState.Envs.Add(nca7.NewEnvironment())
-		
+		GlobalRaptorState.Code.Add(this.Text)
+		GlobalRaptorState.Envs.Add(raptor.NewEnvironment())
+
 		// Handle params
 		if len(this.Params) == 1 && this.Params[0].Name == "..." {
-			GlobalNCAState.AddParams(params...)
+			GlobalRaptorState.AddParams(params...)
 		} else {
 			for i := range this.Params {
 				if len(params) <= i {
-					GlobalNCAState.NewVar(this.Params[i].Name, nca7.NewValueString(this.Params[i].Default))
+					GlobalRaptorState.NewVar(this.Params[i].Name, raptor.NewValueString(this.Params[i].Default))
 				} else {
-					GlobalNCAState.NewVar(this.Params[i].Name, nca7.NewValueString(params[i]))
+					GlobalRaptorState.NewVar(this.Params[i].Name, raptor.NewValueString(params[i]))
 				}
 			}
 		}
-		
-		rtn, err := GlobalNCAState.Run()
+
+		rtn, err := GlobalRaptorState.Run()
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
-		
-		GlobalNCAState.Envs.Remove()
-		
+
+		GlobalRaptorState.Envs.Remove()
+
 		if rtn == nil {
 			return ""
 		}
@@ -122,13 +121,13 @@ func (this *Template) Call(params []string) string {
 
 	// User template
 	out := ExpandVars(this.Text)
-	
+
 	// Named replacement tokens
 	for i := range this.Params {
 		if len(params) <= i {
-			out = strings.Replace(out, "%{" + this.Params[i].Name + "}", this.Params[i].Default, -1)
+			out = strings.Replace(out, "%{"+this.Params[i].Name+"}", this.Params[i].Default, -1)
 		} else {
-			out = strings.Replace(out, "%{" + this.Params[i].Name + "}", params[i], -1)
+			out = strings.Replace(out, "%{"+this.Params[i].Name+"}", params[i], -1)
 		}
 	}
 	out = repTokenNameRegEx.ReplaceAllStringFunc(out, func(in string) string {
@@ -143,7 +142,7 @@ func (this *Template) Call(params []string) string {
 		}
 		return "%" + in
 	})
-	
+
 	// Numbered replacement tokens
 	out = repTokenNumberRegEx.ReplaceAllStringFunc(out, func(in string) string {
 		in = strings.TrimLeft(in, "%")
@@ -159,8 +158,8 @@ func (this *Template) Call(params []string) string {
 		}
 		return "%" + in
 	})
-	
-	return StageParse(out)
+
+	return string(Parse([]byte(out), stgUseCurrent))
 }
 
 func NewNativeTemplate(name string, handler NativeTemplate) {
@@ -184,4 +183,3 @@ func NewScriptTemplate(name string, text string, params []*TemplateParam) {
 	rtn.Params = params
 	Templates[name] = rtn
 }
-

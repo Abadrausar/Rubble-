@@ -11,6 +11,7 @@
 #include <WindowsConstants.au3>
 
 #include <File.au3>
+#include <Array.au3>
 
 Opt("TrayMenuMode",1)
 Opt("TrayIconHide",1)
@@ -27,14 +28,15 @@ Dim $hOtherOptions = GUICtrlCreateInput("", 5, 210, 455, 21)
 GUISetState(@SW_SHOW)
 
 _LoadAddons()
-_Init()
+GUICtrlSetData($hOtherOptions, IniRead(@ScriptDir & "\gui.ini", "general", "otheroptions", ""))
 
 Dim $msg
 While 1
 	$msg = GUIGetMsg()
 	Switch $msg
 		Case $GUI_EVENT_CLOSE
-			_Exit()
+			IniWrite(@ScriptDir & "\gui.ini", "general", "otheroptions", GUICtrlRead($hOtherOptions))
+			Exit
 		Case $hRun
 			Local $addons = ""
 			For $X = 1 To $AddonItemList[0]
@@ -44,59 +46,33 @@ While 1
 			Next
 			$addons = StringTrimLeft($addons,1)
 			Run(@ComSpec & ' /k rubble.exe -addons="' & $addons & '" ' & GUICtrlRead($hOtherOptions))
-			_Exit()
+			IniWrite(@ScriptDir & "\gui.ini", "general", "otheroptions", GUICtrlRead($hOtherOptions))
+			Exit
 	EndSwitch
 WEnd
 
 Func _LoadAddons()
-	$AddonList = _FileListToArray("./addons", "*", 2)
-	If @error Then
-		Dim $AddonList[1]
-		$AddonList[0] = 0
-		Dim $AddonItemList[1]
-		$AddonItemList[0] = 0
-		Return
+	RunWait('rubble.exe -addonlist', @ScriptDir, @SW_HIDE)
+
+	If Not FileExists(@ScriptDir & "\addons\addonlist.ini") Then
+		MsgBox(16, "Loading Error", "Rubble failed to generate/update the addonlist.ini, are you sure you set this thing up right?")
+		Exit 1
 	EndIf
 
-	ReDim $AddonItemList[$AddonList[0] + 1]
-	$AddonItemList[0] = $AddonList[0]
-	For $X = 1 To $AddonList[0]
-		$AddonItemList[$X] = GUICtrlCreateTreeViewItem($AddonList[$X], $hAddons)
-	Next
-EndFunc
+	Dim $AddonList[1]
+	$AddonList[0] = 0
+	Dim $AddonItemList[1]
+	$AddonItemList[0] = 0
 
-Func _Init()
-	If FileExists(@ScriptDir & "\gui.ini") Then
-		Local $count = 0
+	Local $section = IniReadSection(@ScriptDir & "\addons\addonlist.ini", "addons")
+	For $X = 1 To $section[0][0]
+		_ArrayAdd($AddonList, $section[$X][0])
+		_ArrayAdd($AddonItemList, GUICtrlCreateTreeViewItem($section[$X][0], $hAddons))
+		$AddonList[0] += 1
+		$AddonItemList[0] +=1
 
-		While 1
-			Local $val = IniRead(@ScriptDir & "\gui.ini", "addons", $count, "ERROR")
-			If $val == "ERROR" Then
-				ExitLoop
-			EndIf
-
-			For $X = 1 To $AddonList[0]
-				If $AddonList[$X] == $val Then
-					GUICtrlSetState($AddonItemList[$X], $GUI_CHECKED)
-					ExitLoop
-				EndIf
-			Next
-			$count += 1
-		WEnd
-
-		GUICtrlSetData($hOtherOptions, IniRead(@ScriptDir & "\gui.ini", "general", "otheroptions", ""))
-	EndIf
-EndFunc
-
-Func _Exit()
-	FileClose(FileOpen(@ScriptDir & "\gui.ini", 2))
-	Local $count = 0
-	For $X = 1 To $AddonItemList[0]
-		If BitAnd(GUICtrlRead($AddonItemList[$X]),$GUI_CHECKED) Then
-			IniWrite(@ScriptDir & "\gui.ini", "addons", $count, $AddonList[$X])
-			$count += 1
+		If $section[$X][1] == "true" Then
+			GUICtrlSetState($AddonItemList[$AddonItemList[0]], $GUI_CHECKED)
 		EndIf
 	Next
-	IniWrite(@ScriptDir & "\gui.ini", "general", "otheroptions", GUICtrlRead($hOtherOptions))
-	Exit
 EndFunc

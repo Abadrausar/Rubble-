@@ -22,135 +22,167 @@ misrepresented as being the original software.
 
 package main
 
-//import "fmt"
-
-// Lexer states
-const (
-	stReadString = iota
-	stReadCommand
-)
-
 // A semi-generic Lexer framework
 type Lexer struct {
 
 	// The next/current tokens
 	Look    *Token
 	Current *Token
-	
-	// The token stream
-	stream    <-chan *Token
+
+	source []byte
+
+	line      int
+	tokenline int
+
+	index int
+
+	depth int
+
+	commandDepth int
+
+	lexeme []byte
+
+	token int
 }
 
 // Returns a new Lexer.
-func NewLexer(input string) *Lexer {
-	out := make(chan *Token)
-	
-	go func() {
-		
-		token := tknString
+func NewLexer(dat []byte) *Lexer {
+	this := new(Lexer)
 
-		state := stReadString
-		
-		lexeme := make([]byte, 0, 20)
-		commandDepth := 0
-		
-		line := 1
-		tknline := 1
+	this.Look = &Token{"INVALID", tknINVALID, -1}
+	this.Current = &Token{"INVALID", tknINVALID, -1}
 
-		for i := 0; i < len(input); i++ {
-			if input[i] == '\n' {
-				line++
-			}
-			
-			if input[i] == ';' {
-				if state == stReadString || commandDepth > 0 {
-					lexeme = append(lexeme, input[i])
-					continue
-				}
-				if 0 < i && len(input) > i+1 {
-					if input[i-1] == '\'' && input[i+1] == '\'' {
-						lexeme = append(lexeme, input[i])
-						continue
-					}
-				}
-				
-				out <- &Token{string(lexeme), token, tknline}
-				out <- &Token{ ";", tknDelimiter, tknline}
-				token = tknString
-				lexeme = lexeme[0:0]
-				tknline = line
-				continue
-			}
-			
-			if input[i] == '{' {
-				if 0 < i && len(input) > i+1 {
-					if input[i-1] == '\'' && input[i+1] == '\'' {
-						lexeme = append(lexeme, input[i])
-						continue
-					}
-				}
-				if state == stReadString {
-					state = stReadCommand
-					out <- &Token{string(lexeme), token, tknline}
-					out <- &Token{ "{", tknTagBegin, tknline}
-					token = tknString
-					lexeme = lexeme[0:0]
-					tknline = line
-					continue
-				}
-				commandDepth++
-				lexeme = append(lexeme, input[i])
-				continue
-			}
-			if input[i] == '}' {
-				if 0 < i && len(input) > i+1 {
-					if input[i-1] == '\'' && input[i+1] == '\'' {
-						lexeme = append(lexeme, input[i])
-						continue
-					}
-				}
-				if state == stReadCommand && commandDepth == 0 {
-					state = stReadString
-					out <- &Token{string(lexeme), token, tknline}
-					out <- &Token{ "}", tknTagEnd, tknline}
-					token = tknString
-					lexeme = lexeme[0:0]
-					tknline = line
-					continue
-				}
-				commandDepth--
-				lexeme = append(lexeme, input[i])
-				continue
-			}
+	this.source = dat
 
-			lexeme = append(lexeme, input[i])
-		}
-		
-		out <- &Token{string(lexeme), token, tknline}
-		close(out)
-	}()
-	
-	lexer := new(Lexer)
-	lexer.stream = out
-	lexer.Look = new(Token)
-	lexer.Current = new(Token)
-	lexer.Advance()
-	return lexer
+	this.line = 1
+	this.tokenline = 1
+
+	this.index = 0
+
+	this.depth = 0
+
+	this.commandDepth = 0
+
+	this.lexeme = make([]byte, 0, 20)
+
+	this.token = tknString
+
+	this.Advance()
+
+	return this
 }
 
 // This advances the Lexer one token.
 // For most purposes use GetToken instead.
-func (this *Lexer) Advance() bool {
-	this.Current = this.Look
-	this.Look = <-this.stream
-	
-	LastLine = this.Current.Line
-	
-	if this.Look == nil {
-		this.Look = new(Token)
+func (this *Lexer) Advance() {
+	if this.index > len(this.source) {
+		this.Current = this.Look
+		LastLine = this.Current.Line
+		this.Look = &Token{"INVALID", tknINVALID, this.tokenline}
+		return
 	}
-	
-	return this.Current.Type != tknINVALID
+
+	for ; this.index < len(this.source); this.index++ {
+		dat := this.source
+		i := this.index
+		lookok := len(this.source) - this.index
+
+		if dat[i] == '\n' {
+			this.line++
+		}
+
+		if this.depth < 0 {
+			panic("Lexer template depth less than 0 (Unmatched curly brackets)")
+		}
+
+		if dat[i] == ';' || dat[i] == '{' || dat[i] == '}' {
+			if 0 < i && lookok > 0 {
+				if dat[i-1] == '\'' && dat[i+1] == '\'' {
+					this.lexeme = append(this.lexeme, dat[i])
+					continue
+				}
+			}
+
+			if len(this.lexeme) > 0 && this.depth == 0 {
+				this.Current = this.Look
+				LastLine = this.Current.Line
+				this.Look = &Token{string(this.lexeme), tknString, this.tokenline}
+
+				this.tokenline = -1
+				this.lexeme = this.lexeme[0:0]
+				return
+			}
+		}
+
+		if dat[i] == ';' || dat[i] == '}' {
+			if len(this.lexeme) > 0 && this.depth == 1 {
+				this.Current = this.Look
+				LastLine = this.Current.Line
+				this.Look = &Token{string(this.lexeme), tknString, this.tokenline}
+
+				this.tokenline = -1
+				this.lexeme = this.lexeme[0:0]
+				return
+			}
+		}
+
+		if dat[i] == ';' {
+			if this.depth != 1 {
+				this.lexeme = append(this.lexeme, dat[i])
+				continue
+			}
+
+			this.Current = this.Look
+			LastLine = this.Current.Line
+			this.Look = &Token{";", tknDelimiter, this.line}
+			this.tokenline = this.line
+			this.lexeme = this.lexeme[0:0]
+			this.index++
+			return
+		}
+
+		if dat[i] == '{' {
+			this.depth++
+			if this.depth > 1 {
+				this.lexeme = append(this.lexeme, dat[i])
+				continue
+			}
+
+			this.Current = this.Look
+			LastLine = this.Current.Line
+			this.Look = &Token{"{", tknTagBegin, this.line}
+			this.tokenline = this.line
+			this.lexeme = this.lexeme[0:0]
+			this.index++
+			return
+		}
+
+		if dat[i] == '}' {
+			this.depth--
+			if this.depth != 0 {
+				this.lexeme = append(this.lexeme, dat[i])
+				continue
+			}
+
+			this.Current = this.Look
+			LastLine = this.Current.Line
+			this.Look = &Token{"}", tknTagEnd, this.line}
+			this.tokenline = this.line
+			this.lexeme = this.lexeme[0:0]
+			this.index++
+			return
+		}
+
+		this.lexeme = append(this.lexeme, dat[i])
+	}
+
+	if this.index == len(this.source) {
+		this.Current = this.Look
+		LastLine = this.Current.Line
+		this.Look = &Token{string(this.lexeme), tknString, this.tokenline}
+		this.index++
+		return
+	}
 }
 
 // Gets the next token, and panics with an error if it's not of type tokenType.

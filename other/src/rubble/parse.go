@@ -22,185 +22,108 @@ misrepresented as being the original software.
 
 package main
 
-import "fmt"
-import "strings"
-import "io/ioutil"
-import "regexp"
-
-func ReadConfig(path string) {
-	fmt.Println("Reading Config File:", path)
-	file, err := ioutil.ReadFile(path)
-	if err != nil {
-		fmt.Println("Error:", err)
-		panic(err)
+// The parser
+func Parse(input []byte, stage int) []byte {
+	if stage == stgUseCurrent {
+		stage = ParseStage
+	}
+	if stage != stgPreParse && stage != stgParse && stage != stgPostParse {
+		panic("Parse called with invalid parse stage")
 	}
 	
-	lines := strings.Split(string(file), "\n")
-	for i := range lines {
-		if strings.HasPrefix(strings.TrimSpace(lines[i]), "#") {
-			continue
-		}
-		if strings.TrimSpace(lines[i]) == "" {
-			continue
-		}
-		
-		parts := strings.SplitN(lines[i], "=", 2)
-		if len(parts) != 2 {
-			panic("Malformed config line.")
-		}
-		
-		parts[0] = strings.TrimSpace(parts[0])
-		VariableData[parts[0]] = strings.TrimSpace(parts[1])
-	}
-}
-
-// This is the stage parser
-func StageParse(input string) string {
-	if ParseStage == 0 {
-		return PreParse(input)
-	} else if ParseStage == 1 {
-		return Parse(input)
-	} else if ParseStage == 2 {
-		return PostParse(input)
-	}
-	panic("Invalid ParseStage")
-}
-
-func PreParse(input string) string {
-	out := ""
+	// 100k sounds like a lot, but there are vanilla raw files that are almost 400k
+	// Most seem to be around 50k-70k so 100k is not too high
+	out := make([]byte, 0, 102400)
 	lex := NewLexer(input)
-	
+
+loop:
 	for {
 		lex.Advance()
-		if lex.Current.Type == tknString {
-			out += lex.Current.Lexeme
-		} else if lex.Current.Type == tknTagBegin {
-			lex.GetToken(tknString)
-			if lex.Current.Lexeme[0] != '!' {
-				// Not a pre tag, copy over until we get a tag end
-				out += "{" + lex.Current.Lexeme
-				for lex.Advance() {
-					if lex.Current.Type == tknTagEnd {
-						out += lex.Current.Lexeme
-						break
-					}
-					out += lex.Current.Lexeme
-				}
+		switch lex.Current.Type {
+		case tknTagBegin:
+			if !stageTemplate(lex.Look.Lexeme, stage) {
+				out = append(out, templateToString(lex)...)
 				continue
 			}
+
+			lex.GetToken(tknString)
 			name := lex.Current.Lexeme
 			params := make([]string, 0, 5)
 			for lex.CheckLookAhead(tknDelimiter) {
 				lex.GetToken(tknDelimiter)
-				lex.GetToken(tknString)
-				params = append(params, lex.Current.Lexeme)
+				if lex.CheckLookAhead(tknString) {
+					lex.GetToken(tknString)
+					params = append(params, lex.Current.Lexeme)
+				} else {
+					params = append(params, "")
+				}
 			}
 			lex.GetToken(tknTagEnd)
-			
+
 			if _, ok := Templates[name]; !ok {
 				panic("Invalid template: " + name)
 			}
-			out += Templates[name].Call(params)
-		} else if lex.Current.Type == tknINVALID {
-			break
+			out = append(out, Templates[name].Call(params)...)
+
+		case tknINVALID:
+			break loop
+
+		default:
+			out = append(out, lex.Current.Lexeme...)
 		}
 	}
-	
-	return out
+
+	return []byte(out)
 }
 
-func Parse(input string) string {
-	out := ""
-	lex := NewLexer(input)
+func stageTemplate(name string, stage int) bool {
+	if len(name) < 1 {
+		panic("Invalid template name.")
+	}
+
+	switch stage {
+	case stgPreParse:
+		return name[0] == '!'
+
+	case stgParse:
+		return !(name[0] == '#' || name[0] == '!')
+
+	case stgPostParse:
+		return name[0] == '#'
 	
+	}
+	return false
+}
+
+// Takes a lexer where the current token is a tknTagBegin and the lookahead is the template name.
+// Returns a string form of the template (and any nested templates).
+// The lexer is advanced so the current token is the template's tknTagEnd.
+func templateToString(lex *Lexer) string {
+	if lex.Current.Type != tknTagBegin {
+		panic("templateToString: Bad beginning.")
+	}
+
+	out := "{"
 	for {
 		lex.Advance()
-		if lex.Current.Type == tknString {
-			out += lex.Current.Lexeme
-		} else if lex.Current.Type == tknTagBegin {
-			lex.GetToken(tknString)
-			if lex.Current.Lexeme[0] == '#' {
-				// Post tag, copy over until we get a tag end
-				out += "{" + lex.Current.Lexeme
-				for lex.Advance() {
-					if lex.Current.Type == tknTagEnd {
-						out += lex.Current.Lexeme
-						break
-					}
-					out += lex.Current.Lexeme
-				}
-				continue
-			}
-			name := lex.Current.Lexeme
-			params := make([]string, 0, 5)
-			for lex.CheckLookAhead(tknDelimiter) {
-				lex.GetToken(tknDelimiter)
-				lex.GetToken(tknString)
-				params = append(params, lex.Current.Lexeme)
-			}
-			lex.GetToken(tknTagEnd)
-			
-			if _, ok := Templates[name]; !ok {
-				panic("Invalid template: " + name)
-			}
-			out += Templates[name].Call(params)
-		} else if lex.Current.Type == tknINVALID {
-			break
-		}
-	}
-	
-	return out
-}
 
-func PostParse(input string) string {
-	out := ""
-	lex := NewLexer(input)
-	
-	for {
-		lex.Advance()
-		if lex.Current.Type == tknString {
-			out += lex.Current.Lexeme
-		} else if lex.Current.Type == tknTagBegin {
-			lex.GetToken(tknString)
-			if lex.Current.Lexeme[0] != '#' {
-				// Not a post tag, copy over until we get a tag end
-				out += "{" + lex.Current.Lexeme
-				for lex.Advance() {
-					if lex.Current.Type == tknTagEnd {
-						out += lex.Current.Lexeme
-						break
-					}
-					out += lex.Current.Lexeme
-				}
-				continue
-			}
-			name := lex.Current.Lexeme
-			params := make([]string, 0, 5)
-			for lex.CheckLookAhead(tknDelimiter) {
-				lex.GetToken(tknDelimiter)
-				lex.GetToken(tknString)
-				params = append(params, lex.Current.Lexeme)
-			}
-			lex.GetToken(tknTagEnd)
-			
-			if _, ok := Templates[name]; !ok {
-				panic("Invalid template: " + name)
-			}
-			out += Templates[name].Call(params)
-		} else if lex.Current.Type == tknINVALID {
-			break
+		if lex.Current.Type == tknTagEnd {
+			return out + "}"
 		}
-	}
-	
-	return out
-}
 
-var varNameSimpleRegEx = regexp.MustCompile("\\$[a-zA-Z_][a-zA-Z0-9_]*")
+		if lex.Current.Type == tknINVALID {
+			panic("templateToString: tknINVALID.")
+		}
+
+		out += lex.Current.Lexeme
+	}
+	panic("templateToString: Unexpected EOS.")
+}
 
 // This is a modified version of os.Expand
 func ExpandVars(input string) string {
 	buf := make([]byte, 0, len(input))
-	
+
 	depth := 0
 	i := 0
 	for j := 0; j < len(input); j++ {
@@ -210,7 +133,7 @@ func ExpandVars(input string) string {
 		if input[j] == '}' && depth > 0 {
 			depth--
 		}
-		
+
 		if input[j] == '$' && j+1 < len(input) && depth == 0 {
 			buf = append(buf, input[i:j]...)
 			name, w := getVarName(input[j+1:])
@@ -223,7 +146,7 @@ func ExpandVars(input string) string {
 			i = j + 1
 		}
 	}
-	
+
 	return string(buf) + input[i:]
 }
 

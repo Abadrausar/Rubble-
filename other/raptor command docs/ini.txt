@@ -1,0 +1,55 @@
+PACKAGE
+
+package ini
+    import "dctech/raptor/commands/ini"
+
+    Raptor INI Commands.
+
+FUNCTIONS
+
+func CommandIni_Create(state *raptor.State, params []*raptor.Value)
+    Create a new (empty) ini file.
+
+	ini:create
+
+    Returns the ini file
+
+func CommandIni_Format(state *raptor.State, params []*raptor.Value)
+    Format an ini file for writing to disk.
+
+	ini:format file
+
+    Returns the string representation of the ini file or an error message.
+    May set the Error flag.
+
+func CommandIni_GetValue(state *raptor.State, params []*raptor.Value)
+    Gets a specific value from an ini file.
+
+	ini:getvalue file sectionname keyname
+
+    Returns the value or an error message. May set the Error flag.
+
+func CommandIni_Parse(state *raptor.State, params []*raptor.Value)
+    Parse an ini file.
+
+	ini:parse filecontents
+
+    Returns the ini file or an error message. May set the Error flag.
+
+func CommandIni_SetValue(state *raptor.State, params []*raptor.Value)
+    Sets a specific value in an ini file.
+
+	ini:setvalue file sectionname keyname value
+
+    Returns unchanged or an error message. May set the Error flag.
+
+func Setup(state *raptor.State)
+    Adds the ini commands to the state. The ini commands are:
+
+	ini:create
+	ini:parse
+	ini:format
+	ini:getvalue
+	ini:setvalue
+
+

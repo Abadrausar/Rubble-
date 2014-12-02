@@ -1,6 +1,0 @@
-
-MLC 10x10.png
-	This tilesheet is all hand drawn by me to match the 16x16 tiles as closly as possible
-	
-MLC 16x16.png
-	Most of the tiles on this sheet are resized from the CLA 18x18 tileset, all tiles were resized by hand.

@@ -22,72 +22,134 @@ misrepresented as being the original software.
 
 package main
 
-import "fmt"
-import "os"
 import "io/ioutil"
 import "path/filepath"
 import "strings"
-import "sort"
-import "dctech/nca7"
+import "dctech/raptor"
 
 func main() {
-	
+	// init logging
+	InitLogging()
+
 	// Init crash handler
 	defer func() {
 		if !RblRecover {
 			return
 		}
-		
+
 		if x := recover(); x != nil {
-			fmt.Println("    Error:", x)
-			fmt.Println("    Near line:", LastLine, "In last file")
+			LogPrintln("Error:", x)
+			LogPrintln("  Near line:", LastLine, "In last file.")
 		}
 	}()
-	
-	fmt.Println("Rubble v2.0")
-	fmt.Println("After Blast comes Rubble.")
-	fmt.Println("Initalizing...")
-	
+
+	LogPrintln("Rubble v2.1")
+	LogPrintln("After Blast comes Rubble.")
+	LogPrintln("=============================================")
+
 	ParseCommandLine()
-	
-	InitNCA()
 
-	SetupBuiltins()
-	
-	// Read files
-	fmt.Println("=============================================")
-	fmt.Println("Loading Files...")
-	
-	// Load base files
-	CurWalkDir = BaseDir
-	CurNamespace = "base"
-	filepath.Walk(CurWalkDir, ListFiles)
-	
-	_, err := os.Lstat(BaseDir + "/config.ini")
-	if err == nil {
-		ReadConfig(BaseDir + "/config.ini")
-	}
+	LogPrintln("=============================================")
+	LogPrintln("Loading Addons...")
 
-	// Load addon files
+	Addons = LoadAddons(AddonsDir)
+
+	LogPrintln("=============================================")
+	LogPrintln("Activating Addons...")
+
+	addonNames := make([]string, 0, 10)
 	if AddonsList != "" {
-		AddonNames = filepath.SplitList(AddonsList)
+		LogPrintln("Addons Specified via Command Line.")
+		addonNames = filepath.SplitList(AddonsList)
 	} else {
-		filepath.Walk(AddonsDir, ListAddonNames)
-	}
-	for i := range AddonNames {
-		CurWalkDir = AddonsDir + "/" + AddonNames[i]
-		CurNamespace = AddonNames[i]
-		filepath.Walk(CurWalkDir, ListFiles)
-		
-		_, err := os.Lstat(CurWalkDir + "/config.ini")
-		if err == nil {
-			ReadConfig(CurWalkDir + "/config.ini")
+		LogPrintln("Addons Not Specified via Command line.")
+		LogPrintln("Loading " + AddonsDir + "/addonlist.ini...")
+		file, err := ioutil.ReadFile(AddonsDir + "/addonlist.ini")
+		if err != nil {
+			LogPrintln("Read failed (this is bad if unexpected)\n  Error:", err)
+			UpdateAddonList(AddonsDir, Addons)
+			LogPrintln("Rubble has no files to parse, aborting.")
+			return
+		}
+
+		lines := strings.Split(string(file), "\n")
+		for i := range lines {
+			if strings.HasPrefix(strings.TrimSpace(lines[i]), "#") {
+				continue
+			}
+			if strings.HasPrefix(strings.TrimSpace(lines[i]), "[") {
+				continue
+			}
+			if strings.TrimSpace(lines[i]) == "" {
+				continue
+			}
+
+			parts := strings.SplitN(lines[i], "=", 2)
+			if len(parts) != 2 {
+				panic("Malformed config line.")
+			}
+
+			parts[0] = strings.TrimSpace(parts[0])
+			parts[1] = strings.ToLower(strings.TrimSpace(parts[1]))
+			if parts[1] == "true" {
+				addonNames = append(addonNames, parts[0])
+			}
 		}
 	}
+
+	if len(addonNames) == 0 {
+		LogPrintln("No Addons Marked Active")
+		LogPrintln("Rubble has no files to parse, aborting.")
+		return
+	}
 	
-	// Add config overrides
-	fmt.Println("=============================================")
-	fmt.Println("Loading Config Overrides...")
+	addonNameLookupTbl := make(map[string]bool)
+	for _, name := range addonNames {
+		addonNameLookupTbl[name] = true
+	}
+
+	for i := range Addons {
+		if addonNameLookupTbl[Addons[i].Name] {
+			Addons[i].Active = true
+			LogPrintln("  " + Addons[i].Name)
+		}
+	}
+
+	UpdateAddonList(AddonsDir, Addons)
+
+	if ExitAfterUpdate {
+		LogPrintln("Done.")
+		return
+	}
+
+	// Convert Addons to File List
+	Files = NewFileList(Addons)
+
+	if len(Files.Order) == 0 {
+		LogPrintln("Files list is empty. (no active addons have parseable files)")
+		LogPrintln("Rubble has no files to parse, aborting.")
+		return
+	}
+
+	// Test lexer
+	if LexTest {
+		for _, i := range Files.Order {
+			lex := NewLexer(Files.Files[i].Content)
+			for {
+				lex.Advance()
+				if lex.Current.Type == tknINVALID {
+					break
+				}
+				LogPrintln(lex.Current, ":", lex.Current.Lexeme)
+			}
+		}
+		return
+	}
+
+	LogPrintln("=============================================")
+	LogPrintln("Initializing...")
+
+	LogPrintln("Loading Variables from Command Line.")
 	if ConfigList != "" {
 		lines := filepath.SplitList(ConfigList)
 		for i := range lines {
@@ -97,251 +159,132 @@ func main() {
 			if strings.TrimSpace(lines[i]) == "" {
 				continue
 			}
-			
+
 			parts := strings.SplitN(lines[i], "=", 2)
 			if len(parts) != 2 {
 				panic("Malformed config line.")
 			}
-			
+
 			parts[0] = strings.TrimSpace(parts[0])
 			VariableData[parts[0]] = strings.TrimSpace(parts[1])
 		}
 	}
-	
-	// This is needed to interleave addon and base files
-	sort.Strings(RawOrder)
-	sort.Strings(PreScriptOrder)
-	sort.Strings(PostScriptOrder)
-	
-	// Test lexer
-	if LexTest {
-		for _, i := range RawOrder {
-			lex := NewLexer(RawFiles[i].Content)
-			for lex.Advance() {
-				fmt.Println(lex.Current, ":", lex.Current.Lexeme)
-			}
-		}
-		return
-	}
-	
-	// Prescripts
-	fmt.Println("=============================================")
-	fmt.Println("Running Prescripts...")
-	for _, i := range PreScriptOrder {
-		if PreScripts[i].Skip {
+
+	LogPrintln("Initializing Scripting Subsystem.")
+	InitScripting()
+	LogPrintln("Adding Builtins.")
+	SetupBuiltins()
+
+	LogPrintln("=============================================")
+	LogPrintln("Running Prescripts...")
+	ParseStage = stgPreScripts
+	for _, i := range Files.Order {
+		if Files.Files[i].Skip || !Files.Files[i].PreScript {
 			continue
 		}
-		
-		fmt.Println(PreScripts[i].Path)
-		
-		GlobalNCAState.Code.Add(PreScripts[i].Content)
-		GlobalNCAState.Envs.Add(nca7.NewEnvironment())
-		
-		rtn, err := GlobalNCAState.Run()
+
+		LogPrintln("  " + Files.Files[i].Path)
+
+		err := raptor.LoadFile(Files.Files[i].Content, GlobalRaptorState)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
-		
-		GlobalNCAState.Envs.Remove()
-		
-		if rtn == nil {
-			PreScripts[i].Content = ""
-			continue
-		}
-		PreScripts[i].Content = rtn.String()
-	}
-	
-	// preparse
-	fmt.Println("=============================================")
-	fmt.Println("Preparsing...")
-	for _, i := range RawOrder {
-		if RawFiles[i].Skip {
-			continue
-		}
-		
-		fmt.Println(RawFiles[i].Path)
-		CurFile = i
-		RawFiles[i].Content = PreParse(RawFiles[i].Content)
-	}
-	ParseStage++
-	
-	// parse
-	fmt.Println("=============================================")
-	fmt.Println("Parsing...")
-	for _, i := range RawOrder {
-		if RawFiles[i].Skip {
-			continue
-		}
-		
-		fmt.Println(RawFiles[i].Path)
-		CurFile = i
-		RawFiles[i].Content = Parse(RawFiles[i].Content)
-	}
-	ParseStage++
-	
-	// postparse
-	fmt.Println("=============================================")
-	fmt.Println("Postparsing...")
-	for _, i := range RawOrder {
-		if RawFiles[i].Skip {
-			continue
-		}
-		
-		fmt.Println(RawFiles[i].Path)
-		CurFile = i
-		RawFiles[i].Content = PostParse(RawFiles[i].Content)
-	}
-	ParseStage++
-	
-	// Expand any remaining vars
-	fmt.Println("=============================================")
-	fmt.Println("Expanding Vars...")
-	for _, i := range RawOrder {
-		if RawFiles[i].Skip {
-			continue
-		}
-		
-		RawFiles[i].Content = ExpandVars(RawFiles[i].Content)
-	}
-	
-	// Postscripts
-	fmt.Println("=============================================")
-	fmt.Println("Running Postscripts...")
-	for _, i := range PostScriptOrder {
-		if PostScripts[i].Skip {
-			continue
-		}
-		
-		fmt.Println(PostScripts[i].Path)
-		
-		GlobalNCAState.Code.Add(PostScripts[i].Content)
-		GlobalNCAState.Envs.Add(nca7.NewEnvironment())
-		
-		rtn, err := GlobalNCAState.Run()
+
+		GlobalRaptorState.Envs.Add(raptor.NewEnvironment())
+
+		_, err = GlobalRaptorState.Run()
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
-		
-		GlobalNCAState.Envs.Remove()
-		
-		if rtn == nil {
-			PostScripts[i].Content = ""
+
+		GlobalRaptorState.Envs.Remove()
+	}
+
+	LogPrintln("=============================================")
+	LogPrintln("Preparsing...")
+	ParseStage = stgPreParse
+	for _, i := range Files.Order {
+		if Files.Files[i].Skip || !Files.Files[i].IsRaw() {
 			continue
 		}
-		PostScripts[i].Content = rtn.String()
+
+		LogPrintln("  " + Files.Files[i].Path)
+		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent)
 	}
-	
-	// Write files out
-	fmt.Println("=============================================")
-	fmt.Println("Writing files...")
-	for _, i := range RawOrder {
-		if RawFiles[i].Skip || RawFiles[i].NoWrite {
+
+	LogPrintln("=============================================")
+	LogPrintln("Parsing...")
+	ParseStage = stgParse
+	for _, i := range Files.Order {
+		if Files.Files[i].Skip || !Files.Files[i].IsRaw() {
 			continue
 		}
-		
-		file := []byte(i + "\n\n" + RawFiles[i].Content)
-		ioutil.WriteFile(OutputDir + "/" + i + ".txt", file, 0600)
-	}
-	fmt.Println("Done.")
-}
 
-func ListFiles(path string, info os.FileInfo, err error) error {
-	if path == CurWalkDir {
-		return nil
+		LogPrintln("  " + Files.Files[i].Path)
+		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent)
 	}
-	if info.IsDir() {
-		return filepath.SkipDir
-	}
-	
-	fmt.Println(path)
-	file, err := ioutil.ReadFile(path)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return err
-	}
-	
-	if strings.HasSuffix(filepath.Base(path), ".pre.nca") {
-		// is pre script
-		name := StripExt(StripExt(filepath.Base(path)))
-		scriptfile := new(RawFile)
-		scriptfile.Path = path
-		scriptfile.Content = string(file)
-		
-		if _, ok := RawFiles[name]; !ok {
-			PreScriptOrder = append(PreScriptOrder, name)
-		}
-		PreScripts[name] = scriptfile
-		return nil
-	}
-	if strings.HasSuffix(filepath.Base(path), ".post.nca") {
-		// is post script
-		name := StripExt(StripExt(filepath.Base(path)))
-		scriptfile := new(RawFile)
-		scriptfile.Path = path
-		scriptfile.Content = string(file)
-		
-		if _, ok := RawFiles[name]; !ok {
-			PostScriptOrder = append(PostScriptOrder, name)
-		}
-		PostScripts[name] = scriptfile
-		return nil
-	}
-	
-	if strings.HasSuffix(filepath.Base(path), ".rbl") {
-		// is rubble code (do not write out after parse)
-		name := StripExt(filepath.Base(path))
-		rawfile := new(RawFile)
-		rawfile.Path = path
-		rawfile.Content = string(file)
-		rawfile.NoWrite = true
-		
-		if _, ok := RawFiles[name]; !ok {
-			RawOrder = append(RawOrder, name)
-		}
-		RawFiles[name] = rawfile
-		return nil
-	}
-	
-	if strings.HasSuffix(filepath.Base(path), ".txt") {
-		// is raw file
-		name := StripExt(filepath.Base(path))
-		rawfile := new(RawFile)
-		rawfile.Path = path
-		rawfile.Content = string(file)
-		
-		if _, ok := RawFiles[name]; !ok {
-			RawOrder = append(RawOrder, name)
-		}
-		RawFiles[name] = rawfile
-		return nil
-	}
-	
-	fmt.Println("    Not a parsable file.")
-	return nil
-}
 
-func ListAddonNames(path string, info os.FileInfo, err error) error {
-	if path == AddonsDir {
-		return nil
-	}
-	if info.IsDir() {
-		if !strings.HasPrefix(filepath.Base(path), "__") {
-			AddonNames = append(AddonNames, filepath.Base(path))
+	LogPrintln("=============================================")
+	LogPrintln("Postparsing...")
+	ParseStage = stgPostParse
+	for _, i := range Files.Order {
+		if Files.Files[i].Skip || !Files.Files[i].IsRaw() {
+			continue
 		}
-		
-		return filepath.SkipDir
-	}
-	
-	return nil
-}
 
-func StripExt(name string) string {
-	i := len(name) - 1
-	for i >= 0 {
-		if name[i] == '.' {
-			return name[:i]
-		}
-		i--
+		LogPrintln("  " + Files.Files[i].Path)
+		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent)
 	}
-	return name
+
+	LogPrintln("=============================================")
+	LogPrintln("Expanding Variables...")
+	ParseStage = stgGlobalExpand
+	for _, i := range Files.Order {
+		if Files.Files[i].Skip || !Files.Files[i].IsRaw() {
+			continue
+		}
+
+		LogPrintln("  " + Files.Files[i].Path)
+		Files.Files[i].Content = []byte(ExpandVars(string(Files.Files[i].Content)))
+	}
+
+	LogPrintln("=============================================")
+	LogPrintln("Running Postscripts...")
+	ParseStage = stgPostScripts
+	for _, i := range Files.Order {
+		if Files.Files[i].Skip || !Files.Files[i].PostScript {
+			continue
+		}
+
+		LogPrintln("  " + Files.Files[i].Path)
+
+		err := raptor.LoadFile(Files.Files[i].Content, GlobalRaptorState)
+		if err != nil {
+			panic("Script Error: " + err.Error())
+		}
+
+		GlobalRaptorState.Envs.Add(raptor.NewEnvironment())
+
+		_, err = GlobalRaptorState.Run()
+		if err != nil {
+			panic("Script Error: " + err.Error())
+		}
+
+		GlobalRaptorState.Envs.Remove()
+	}
+
+	LogPrintln("=============================================")
+	LogPrintln("Writing files...")
+	for _, i := range Files.Order {
+		if Files.Files[i].Skip || Files.Files[i].NoWrite || !Files.Files[i].IsRaw() {
+			continue
+		}
+
+		LogPrintln("  " + Files.Files[i].Path)
+
+		// HACK: Redo this
+		file := []byte(i + "\n\n" + string(Files.Files[i].Content))
+		ioutil.WriteFile(OutputDir+"/"+i+".txt", file, 0600)
+	}
+	LogPrintln("Done.")
 }

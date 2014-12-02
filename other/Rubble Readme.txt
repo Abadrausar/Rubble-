@@ -4,27 +4,45 @@ Rubble: After Blast comes Rubble
 ==============================================
 Overview:
 ==============================================
-Rubble is a raw generator eg. it takes "preraws" and generates valid Dwarf Fortress raw files from them.
-Rubble is based on Blast but is not compatible with that utility.
+Rubble is a raw generator, eg. it takes "preraws" and generates Dwarf Fortress raw files from them.
 
+Early versions of Rubble were heavily based on a similar utility, Blast, but recent versions resemble that utility only in the basic syntax.
+
+Compared to Blast:
 Pros:
 	No need for an external runtime, Rubble is a native application
-	Addons may override vanilla files
+	Addons may override each other's files
 	Full parser/lexer, not just a bunch of regexes
 	Templates are designed to make formatting easy, both output and input files should be easy to read
-	Support for embeding scripts in raw files, do advanced setup right in the raws
+	It's really easy to mix script code and raw text in a template, use whichever one is easier
 	Variable expansion, no more GET_VAR, works in any parse stage
-	Many templates for registering objects and the like are replacements for vanilla raw tags allowing better formating
-	Using scripting some files may be parsed but not included in the generated raws
+	Many templates for registering objects and the like are replacements for vanilla raw tags allowing better formatting
+	Some files may be parsed but not included in the generated raws
 	Support for easily and quickly installing tilesets as addons
-	Allows you to run "tweak scripts" on the input or output to allow fine-tuning the results
-	Easy to use support for external launchers
+	Allows you to run "tweak scripts" before or after generation to allow fine-tuning the results
+	Support for external launchers via the command line
+	Easy to use GUI to enable and disable addons (sorry it's windows only)
+	Support for loading addons directly from zip files (you can even have more than one addon per file!)
+	Faster (not that it really matters)
 
 Cons:
-	Not compatible with any version of Blast
 	No support for handling file name collisions in any way other than as an override
-	No support for Blast namespaces (@, @@, and @@@)
-	Variables are simple key:value pairs instead of Blasts more powerful system
+	No support for Blast namespaces (eg. @, @@, and @@@)
+	Variables are simple key:value pairs instead of Blast's more powerful system
+	No built-in pretty printer (unless, like me, you think of this as a pro :) )
+	The scripting language isn't exactly mainstream
+
+Required Reading for Modders (in most-important-first order):
+	This readme
+	Rubble Addons.txt - lots of stuff about addons in general
+	Rubble Base Templates - the template documentation for the base_templates addon
+	Rubble Native Templates - the template documentation for the builtin templates
+	The included addons - A little short on comments but still a great resource
+	Raptor Basics.txt - Raptor overview
+	Porting.txt - has some useful stuff about Raptor, also info on how to update addons from 2.0
+	Everything in "raptor command docs" - the Raptor command documentation, NEEDED if you plan to do anything with Raptor
+
+If you do not plan on doing any modding the only thing you need to read is this readme.
 
 Rubble comes prebuilt for 32 bit Windows, Linux, and OSX
 
@@ -32,11 +50,9 @@ Rubble comes prebuilt for 32 bit Windows, Linux, and OSX
 Why Another Raw Generator?
 ==============================================
 
-Blast has a lot of power and advanced fetures that let you do all kinds of things while still remaining compatible with most if not all other Blast addons. Rubble on the other hand is much more minimalist, Rubble allows you to make many things with a minimum of fuss but has far less in the way of compatibility hand holding.
+Blast is too... narrow. It allows you to do all kinds of stuff but is too hard (for me) to extend. Basically I just wanted something that allowed me to do most of the things I could do with Blast, but with less fuss.
 
-Which is the best depends on exactly what you want, Rubble for simple and fast, Blast for maximum compatibility and power.
-
-Basicly I just wanted something that allowed me to do most of the things I could do with Blast, but with less fuss.
+Of course if you know Perl and don't want to learn Raptor (Rubble's scripting language) you will be in the same situation I was in with Blast, just in reverse ;)
 
 ==============================================
 Install:
@@ -44,61 +60,96 @@ Install:
 
 Backup your "raw/objects" folder!
 Extract Rubble to "<DF Directory>/rubble".
-Install your base (if not using the default) to "rubble/source/base" and addons to "rubble/source/addons"
+Install your addons to "rubble/addons"
+Run "rubble -addonlist"
 
-Now you are good to go! Documentation (as you have obviously discovered) is in the "rubble/other" folder as is source code and OSX/Linux binarys.
+Now you are good to go! Documentation (as you have obviously discovered) is in the "rubble/other" folder as is source code and OSX/Linux binaries.
 
-To activate or deactivate a rubble addon you may remove or add double leading underscores to the addon's directory, eg. __test_addon is disabled while test_addon is enabled.
+To activate or deactivate a Rubble addon you may set it's entry in addons/addonlist.ini to false. If you just added an addon it will not have an entry until Rubble has run at least once (after the addon was added). 
+If you want to run Rubble without generating anything so as to update the addon list file just run 'rubble -addonlist'
 
-If you use OSX or linux, 32 bit binarys for these OSes can be found in the "rubble/other" directory. If you want 64 bit binarys you can compile them yourself.
+If you can (eg. you are running on windows) it is HIGHLY recommended to use the GUI. The GUI automates the process of updating and editing addonlist.ini and is generally much faster then doing everything by hand (plus you don't have to mess around with the command prompt, if you dislike that kind of thing)
+
+If you use OSX or Linux, 32 bit binaries for these OSes can be found in the "rubble/other" directory. If you want 64 bit binaries you can compile them yourself, source code is in other/src.
 
 ==============================================
 Configure:
 ==============================================
 
-Rubble allows you to change its directory settings via command line options. To see these options and their defaults run "rubble -h". 
+Rubble allows you to change its directory settings via command line options or a config file. To see these options and their defaults run "rubble -h". 
 
-Rubble supports external launchers via the -config and -addons commandline options
--config allows you to add or override rubble variables like those created by the ini files in the config directory.
+Rubble tries to read the file "./rubble.cfg", if this does not fail Rubble will load directory setting from here before processing command line options (command line options always take precedence).
+Example "rubble.cfg" (using the defaults):
+	dfdir = ..
+	outputdir = ../raw/objects
+	addonsdir = ./addons
+
+Rubble supports external launchers via the -config and -addons command line options
+-config allows you to add or override rubble variables like those created by config.ini.
 	Usage: -config="key1=value1;key2=value2;keyN=valueN" 
 		(Note that the ';' may need to be a ':' on non-windows systems)
 -addons allows you to override the default rules for loading addons by explicitly listing which ones you want to load.
-	Usage: -addons="addon1;addon2;__addon3;ect"
+	Usage: -addons="addon1;addon2;addon3;ect"
 		(the same note about ';' applies here as well)
 These two options are more for use by external launchers but may be useful for if you want to generate two or more mods from the same base and would rather not mess around with renaming addon folders
 
-Rubble tries to read the file "./rubble.cfg", if this does not fail Rubble will load directory setting from here before processing command line options (command line options always take presidence).
-Example "rubble.cfg":
-	dfdir = ..
-	outputdir = ../raw/objects
-	basedir = ./base
-	addonsdir = ./addons
-
 If you want to regenerate the raws for a save just run 'rubble -outputdir="../data/saves/<savename>/raw/objects"'
 
-All directorys used by Rubble must exist (if they do not exist nothing bad will happen, Rubble will just quietly fail).
+All directories used by Rubble must exist (if they do not exist nothing bad will happen, Rubble will just quietly fail).
 
 ==============================================
 Included Addons:
 ==============================================
 
+I include addons in the base Rubble install that fix bugs or demo something useful. Needless to say these addons make a good place to look for info on how to do something. Sorry about the lack of comments in the addon files, I need to fix that sometime.
+
+If you want to generate the Rubble version of "vanilla DF" you will need to activate the base, base_templates, and clear_raws addons.
+
+Add Child Tags:
+	Adds a CHILD tag to every creature that does not already have one.
+	This is an advanced tweak script that processes files in multiple passes.
+	This addon is stand-alone, as it uses no outside templates.
+
+Base:
+	The standard base addon. Contains Rubblized versions of the vanilla raw files. 
+	Do not disable unless you have a replacement.
+
+Base Templates:
+	This contains all kinds of useful templates.
+	Required by most of the other addons.
+	Do not disable unless you like error messages :)
+
 Broken Arrow:
 	A simple addon that nerfs bows and crossbows, uses the stats from the popular Broken Arrow mod.
-	Demos overriding items.
-
-Generic Animal Mats:
-	Make animal mats such as meat and leather generic. This is mostly for those who have FPS issues.
-	As a special bonus :p this addon should work with any mod, even total conversions.
-	Demos tweak scripts.
-
-MLC Tileset:
-	A simple addon that installs my custom ASSCI-like tileset.
-	Demos tileset addons.
 
 Clear Raws:
 	This must-have addon clears the output folder before generation.
+	This addon is completely stand-alone.
 	You should never disable this addon without a good reason!
+
+Fix Vermin Variations:
+	This adds two fixes:
+		It forces all giant animals to have a life span of at least 10 years and
+		It replaces all pool biome tags in giant and animal-man creatures with the correct lake biome.
+	This is useful to make variations on vermin appear in game and to help them live long enough to be interesting.
 	
+Generic Animal Mats:
+	Make animal mats such as meat and leather generic. This is mostly for those who have FPS issues.
+	As a special bonus :p this addon should work with most any mod, even total conversions.
+	This addon is packed as a zip to demo how that is done.
+
+MLC Tileset:
+	A simple addon that installs my custom ASCII-like tileset.
+	This addon is stand-alone, as it uses no outside templates.
+	Demos tileset addons.
+
+Nerfed Whips:
+	Nerfs whips so they are not deadly anti-armor weapons, sorta like Broken Arrow but for the other over-powered weapon class :)
+
+Zap Aquifers:
+	Disables all AQUIFER tags.
+	A simple replacement for #AQUIFER that does not need the config file or require modders to use a template.
+	This addon is stand-alone, as it uses no outside templates.
 
 ==============================================
 BUGS:
@@ -106,9 +157,48 @@ BUGS:
 
 None known.
 
+Note that the loader was completely rewritten. I think I got everything working like the old loader as far as who overrides what when there is a conflict, but if not please let me know.
+
 ==============================================
 Changelog:
 ==============================================
+v3.0
+	Added ability to load an addon from a zip file
+	Added ability to make addon "packs", eg. multiple addons grouped in one zip file
+		Use the extension .pack.zip, one addon per subdirectory, no nesting
+	The generic animal mats addon is now packed as a zip to demo how that is done
+	Replaced addon enabling mechanism with an automatically updated ini file, addonlist.ini
+	Updated the Rubble GUI to read addon names and active status from addonlist.ini
+	Rewrote the lexer and parser from scratch
+		The new versions are much better, certainly easier for me to work with (and possibly a little faster)
+	All addon files (not just parseable files!) are now available in rubble:raws
+	Added an addon to add a CHILD tag to all creatures that do not already have one
+	Added an addon that forces all giant animals to have a life span of at least 10 years and 
+		replaces all pool biome tags in giant and animal-man creatures with the correct lake biome
+	Added an addon to nerf whips (just like broken arrow, but for whips)
+	Removed the #AQUIFER template from the base_templates addon
+		It was simple to replace this with a tweak script, and not having to use a template results in 
+		less work for modders (and me) in the long run.
+	Added an addon to strip AQUIFER tags
+	Rubble now duplicates it's output to the file rubble.log
+	Removed the #ADV_TIME and #FORT_TIME native templates
+		I never used them and having non-critical native templates rubs me the wrong way.
+		As Raptor has floating point commands it should be possible to reimplement these, so if anyone 
+		actually used them please tell me.
+	Updated from NCA7 to Raptor v1.0
+		Raptor is based on NCA, but there are (a lot of) differences, see Porting.txt for details.
+	Pre and Post tweak script extensions have changed from .nca to .rsf (Raptor Script File) or .rbf (Raptor Binary File)
+	Fixed some script errors that I discovered as I was porting everything
+	Removed support for the base
+		The old base is now just another addon (named "base").
+	The base templates are now in their own addon named "base_templates"
+	Stripped support for addon config files completely
+		If you really need a config file it is easy to use a pre script to load one.
+	Removed the rubble:basedir script variable as it is obsolete
+	Added an optional parameter to rubble:stageparse to allow specifying the parse stage to use
+	Fixed some minor mistakes in the docs
+	Rewrote the Notepad++ UDL
+	
 v2.0
 	Added pre and post tweak scripts
 		Pre tweak scripts have the file extension ".pre.nca" and post scripts have the extension ".post.nca"
@@ -122,8 +212,8 @@ v2.0
 		Config files are now in the same directory as the base or addon and are named "config.ini"
 	I think I fixed all the documents I broke... If you see something wrong tell me
 	Fixed #ADVENTURE_TIER
-	The raw files are now avalible as unparsed strings to NCA scripts via the indexable rubble:raws
-		Skipped files are not avalible
+	The raw files are now available as unparsed strings to NCA scripts via the indexable rubble:raws
+		Skipped files are not available
 		This is mostly useful only for pre and post tweak scripts
 	Added simple NCA raw parser, currently you can disable, replace or append tags, see command docs for "raw"
 	Fixed fire clay giving earthenware items, not sure how this came to be
@@ -131,8 +221,8 @@ v2.0
 	Fixed the generic_animal_mats addon clobbering animal venom, webs, and the like
 	The usual little bits added to NCA, just some new commands this time
 		See the command docs for base, str, bool and raw for details.
-	Updated the Notepad++ UDF
-	Stoped ITEM_CLASS from writing junk to the raws, another case of forgeting to clear the return register
+	Updated the Notepad++ UDL
+	Stopped ITEM_CLASS from writing junk to the raws, another case of forgetting to clear the return register
 	Added template SHARED_OBJECT_EXISTS to base
 
 v1.9
@@ -162,7 +252,7 @@ v1.7
 			debug:namespace	->	Lists all variables, commands, and namespaces in a namespace
 			debug:env		->	Lists all variables in all environments, sorted by environment
 			debug:clrret	->	Clears the return value, useful for cleaning up after playing around in the shell
-	Notepad++ UDF updated
+	Notepad++ UDL updated
 	Error reporting now should display a line number for Rubble errors
 		Script error line numbers are still an offset from the start of the script
 		Errors in templates will refer to the place where the template was called
@@ -174,8 +264,8 @@ v1.6
 	Re-exported all of the NCA command documents
 	Fixed all the templates to work with NCA6
 	Removed the old item templates (the native ones from 1.1), this was supposed to happen in 1.5 but I forgot
-	Changed ITEM_CLASS to be more flexable
-	Changed SHARED_INORGANIC and SHARED_MATERIAL_TEMPLATE to automaticly support tilesets
+	Changed ITEM_CLASS to be more flexible
+	Changed SHARED_INORGANIC and SHARED_MATERIAL_TEMPLATE to automatically support tilesets
 	Added template SHARED_PLANT, just like SHARED_INORGANIC but for plants
 	Added template #WRITE_TILESET to help modders make tileset addons
 
@@ -267,7 +357,7 @@ v1.2
 	Updated the base and addons to use the new abilities
 	Fixed some minor bugs in NCA4 and updated docs to match
 	Fixed bug that made files process in the wrong order
-	Stoped Rubble from mangling special chars
+	Stopped Rubble from mangling special chars
 
 v1.1
 	Added the NCA4 file system commands

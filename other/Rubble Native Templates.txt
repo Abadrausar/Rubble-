@@ -41,13 +41,14 @@ Built-in Native Templates
 	
 	Example:
 		{!SCRIPT_TEMPLATE;FOO;(ret "bar")}
-		{!TEMPLATE;GREET;__thing__;(append Hello [__thing__] !)}
+		{!TEMPLATE;GREET;__thing__;(str:add Hello [__thing__] !)}
 		{!TEMPLATE;LIST;...;
 			(var tmp)
 			(foreach params {
-				(set tmp (append [tmp] ", " [params 1]))
-				(break -1)
+				(set tmp (str:add [tmp] ", " [params 1]))
+				(break true)
 			})
+			(str:trimleft [tmp] 2) # strip the leading ", "
 		}
 		{FOO}
 		{GREET;World}
@@ -59,29 +60,7 @@ Built-in Native Templates
 		Dwarves: Urist, Led
 
 ==============================================
-{!SCRIPT;<NCACODE>} or {!SCRIPT;<NCACODE>;<PARAMS>...}
-{SCRIPT;<NCACODE>} or {SCRIPT;<NCACODE>;<PARAMS>...}
-{#SCRIPT;<NCACODE>} or {#SCRIPT;<NCACODE>;<PARAMS>...}
-	Runs a NCA4 script as a command and returns whatever the script returns.
-
-==============================================
-{#ADV_TIME;<AMOUNT>;<UNIT>}
-	Time unit to adventure mode ticks conversion template. Returns a number of ticks that corresponds to <AMOUNT> <UNIT>s in adventure mode. The allowed units are SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR and their respective plurals.
-	
-	Examples:
-		{#ADV_TIME;1;SECOND} -> 1
-		{#ADV_TIME;2;MINUTES} -> 120
-		{#ADV_TIME;24;HOURS} -> 86400
-		{#ADV_TIME;1;DAY} -> 86400
-		{#ADV_TIME;1;YEAR} -> 29030400
-
-==============================================
-{#FORT_TIME;<AMOUNT>;<UNIT>}
-	Time unit to fortress mode ticks conversion template. Returns a number of ticks that corresponds to <AMOUNT> <UNIT>s in fortress mode. The allowed units are SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR and their respective plurals.
-
-	Examples:
-		{#FORT_TIME;1;SECOND} -> 0
-		{#FORT_TIME;2;MINUTES} -> 1
-		{#FORT_TIME;24;HOURS} -> 1200
-		{#FORT_TIME;1;DAY} -> 1200
-		{#FORT_TIME;1;YEAR} -> 403200
+{!SCRIPT;<CODE>} or {!SCRIPT;<CODE>;<PARAMS>...}
+{SCRIPT;<CODE>} or {SCRIPT;<CODE>;<PARAMS>...}
+{#SCRIPT;<CODE>} or {#SCRIPT;<CODE>;<PARAMS>...}
+	Runs a Raptor script as a command and returns whatever the script returns.

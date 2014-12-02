@@ -185,7 +185,11 @@ func Format(file *File) string {
 			ret = formatSection(val, sec, ret)
 		}
 	}
-	return string(ret[:len(ret)-1])
+
+	if len(ret) > 0 {
+		return string(ret[:len(ret)-1])
+	}
+	return ""
 }
 
 func formatComment(comment string) []byte {

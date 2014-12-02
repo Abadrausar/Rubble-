@@ -1,0 +1,80 @@
+
+==============================================
+Porting Scripts to Raptor:
+==============================================
+
+If there is anyone (aside from me) who has written any NCA code for Rubble, said code will need to be ported to Raptor.
+Good thing it's simple.
+
+The only differences visible to a user are the lack of curly bracket strings and the change in comment syntax.
+
+comments are now line based and begin with a # symbol
+eg.
+#comment
+rather than 'comment'
+
+Curly bracket strings are replaced with code blocks, which work much the same from the users point of view, so long as such strings contain only valid Raptor code anyway. Any curly bracket string that does not contain code must be converted to a double quote strings. AFAIK every possible curly bracket string can be represented as a double quote string.
+
+All calls to seterror and geterror will need to be replaced with calls to the new error command, see the command docs for the base commands for details.
+
+All calls to breakif need to be replaced with a combo of if and breakloop, see the command docs for the base commands for details.
+
+Raptor adds a bunch of (other) new stuff as well, but none of it will get in the way when porting old NCA scripts.
+
+If you get some really odd error message chances are you forgot to replace all curly bracket strings with double quote strings. Remember, the only thing allowed in curly brackets now is code (and comments :).
+
+If you get an "Invalid template: xxxxxx" error this may mean that you forgot to make sure not to return random junk from a SCRIPT template, add a (ret "") to the end of your SCRIPT template(s) and try again. This was a problem before as well but Raptor makes it really obvious due to how a value containing pre-lexed code is converted to a string. Make sure not to return such values to Rubble by mistake! 
+
+To see if you are returning junk from templates in a .rbl file you can try this little script 
+(assuming your file is named xyz.rbl):
+(fileio:write "./xyz.txt" [rubble:raws xyz])
+
+==============================================
+List of Changes From NCA7 to Raptor 1.0:
+==============================================
+
+The following is a list of non-internal changes from NCA7 to Raptor 1.0.
+I may have forgot a few but this should be most of them.
+
+Removed breakif
+Added breakloop
+Removed geterror and seterror
+Added error
+Changed comment syntax
+Removed curly bracket string syntax
+Added code type and syntax
+Added command reference type
+Added getcommand
+Added this
+Added convert:int
+Added convert:float
+Added convert:bool
+Added convert:string
+Added convert:command
+Added convert:escape
+Added str:find
+Added str:trimleft
+Added str:trimright
+Added str:mid
+Added str:replace
+Added str:tolower
+Added str:toupper
+Added float:add
+Added float:sub
+Added float:div
+Added float:mul
+Added float:gt
+Added float:lt
+Added float:eq
+Removed all the stack commands
+
+The following is a list of the more interesting internal changes (there are many more).
+
+Added support for four kinds of binary scripts.
+	(small, normal, small with compressed string table, and normal with compressed string table)
+Faster creation of a CompiledScript from a CompiledLexer, this speeds up loops a good bit
+Added support for converting a CompiledScript to a parseable string
+Added better support for converting Indexables to strings, both for use as code and for displaying to users
+Made it much easier to add new exit states
+Added a new exit state, BreakLoop
+Streamlined the shell/utility program, added the ability to compile scripts

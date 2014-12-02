@@ -1,8 +1,0 @@
-
-(file:walkfiles [rubble:outputdir] {
-	(file:del (str:add [rubble:outputdir] "/" [params 0]))
-	(if (geterror) {
-		(console:print "Error deleting: " [params 0] "\n")
-		(seterror 0)
-	})
-})

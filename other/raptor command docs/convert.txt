@@ -1,0 +1,67 @@
+PACKAGE
+
+package convert
+    import "dctech/raptor/commands/convert"
+
+    Raptor Type Conversion Commands.
+
+FUNCTIONS
+
+func CommandConvert_Bool(state *raptor.State, params []*raptor.Value)
+    Forces a value to type bool. Not all values will produce useful results.
+
+	convert:bool value
+
+    Returns the converted value.
+
+func CommandConvert_Command(state *raptor.State, params []*raptor.Value)
+    Forces a value to type command. Not all values will produce useful
+    results.
+
+	convert:command value
+
+    Returns the converted value.
+
+func CommandConvert_Escape(state *raptor.State, params []*raptor.Value)
+    Converts a value into a string that you can write out for parsing later.
+    Not all values will produce useful results.
+
+	convert:escape value
+
+    Returns a properly escaped string representaion of value.
+
+func CommandConvert_Float(state *raptor.State, params []*raptor.Value)
+    Forces a value to type float. Not all values will produce useful
+    results.
+
+	convert:float value
+
+    Returns the converted value.
+
+func CommandConvert_Int(state *raptor.State, params []*raptor.Value)
+    Forces a value to type int. Not all values will produce useful results.
+
+	convert:int value
+
+    Returns the converted value.
+
+func CommandConvert_String(state *raptor.State, params []*raptor.Value)
+    Forces a value to type string. Not all values will produce useful
+    results.
+
+	convert:string value
+
+    Returns the converted value.
+
+func Setup(state *raptor.State)
+    Adds the type conversion commands to the state. The type conversion
+    commands are:
+
+	convert:int
+	convert:float
+	convert:bool
+	convert:string
+	convert:command
+	convert:escape
+
+

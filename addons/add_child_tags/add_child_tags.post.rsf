@@ -1,0 +1,107 @@
+
+(var noCHILD <map>)
+(var curCreature "")
+(var haschild false)
+
+(var creaturecount 0)
+(var creaturecounttotal 0)
+(var nochildcount 0)
+(var nochildcounttotal 0)
+(var fixedcount 0)
+(var fixedcounttotal 0)
+
+# This loop makes a list of all creatures that do NOT have a CHILD tag...
+(console:print "    Generating Table...\n")
+(foreach [rubble:raws] {
+	(if (str:cmp "creature_" (str:left [params 0] 9)) {
+		(var file (raw:init [params 1]))
+		(var tag (raw:current))
+		
+		(console:print "      " [params 0] "\n")
+		
+		(loop {
+			(raw:advance)
+			
+			(if (raw:valid){}{(breakloop false)})
+				
+			(if (str:cmp [tag id] "CREATURE") {
+				(++ creaturecount)
+				(if (int:eq (len [tag]) 1) {
+					(if (bool:not (str:cmp [curCreature] "")){
+						(if (bool:not [haschild]) {
+							(set [noCHILD] [curCreature] true)
+							(++ nochildcount)
+						})
+					})
+					(set curCreature [tag 0])
+					(set haschild false)
+				}{
+					(panic "invalid param count to CREATURE raw tag in last file.")
+				})
+			})
+			
+			(if (str:cmp [tag id] "CHILD") {
+				(set haschild true)
+			})
+			
+			(break true)
+		})
+		# this should take care of the last creature in the file
+		(if (bool:not (str:cmp [curCreature] "")){
+			(if (bool:not [haschild]) {
+				(set [noCHILD] [curCreature] true)
+				(++ nochildcount)
+			})
+		})
+		(console:print "        Found Creatures  : " [creaturecount] "\n")
+		(console:print "        Had no CHILD tag : " [nochildcount] "\n")
+		(set creaturecounttotal (int:add [creaturecounttotal] [creaturecount]))
+		(set nochildcounttotal (int:add [nochildcounttotal] [nochildcount]))
+		(set creaturecount 0)
+		(set nochildcount 0)
+		(set curCreature "")
+		(set haschild false)
+	})
+	(break true)
+})
+
+(console:print "    Fixing raws...\n")
+
+# and this loop fixes them.
+(foreach [rubble:raws] {
+	(if (str:cmp "creature_" (str:left [params 0] 9)) {
+		(var file (raw:init [params 1]))
+		(var tag (raw:current))
+		
+		(console:print "      " [params 0] "\n")
+		
+		(loop {
+			(raw:advance)
+			
+			(if (raw:valid){}{(breakloop false)})
+				
+			(if (str:cmp [tag id] "CREATURE") {
+				(if (int:eq (len [tag]) 1) {
+					(if (exists [noCHILD] [tag 0]) {
+						(raw:append "\n\t[CHILD:1]")
+						(++ fixedcount)
+					})
+				}{
+					(panic "invalid param count to CREATURE raw tag in last file.")
+				})
+			})
+			
+			(break true)
+		})
+		(console:print "        Fixed Creatures : " [fixedcount] "\n")
+		(set fixedcounttotal (int:add [fixedcounttotal] [fixedcount]))
+		(set fixedcount 0)
+		
+		(set [rubble:raws] [params 0] (raw:dump))
+	})
+	(break true)
+})
+(console:print "    Found Creatures total  : " [creaturecounttotal] "\n")
+(console:print "    Had no CHILD tag total : " [nochildcounttotal] "\n")
+(console:print "    Fixed total            : " [fixedcounttotal] "\n")
+(console:print "    (The last two numbers should match.)\n")

@@ -23,13 +23,15 @@ misrepresented as being the original software.
 package main
 
 import "flag"
-import "fmt"
 import "strings"
 import "io/ioutil"
+import "os"
+
+// Getting usage info and flag parse errors into the log file is a pain in the a**
+var Flags = flag.NewFlagSet("rubble", flag.ExitOnError)
 
 var DFDir string
 var OutputDir string
-var BaseDir string
 var AddonsDir string
 
 var AddonsList string
@@ -38,16 +40,18 @@ var ConfigList string
 var LexTest bool
 var NCARecover bool
 var RblRecover bool
+var ExitAfterUpdate bool
 
 func ParseCommandLine() {
+	Flags.SetOutput(logFile)
+
 	// Setting default defaults
 	DFDir = ".."
 	OutputDir = "../raw/objects"
-	BaseDir = "./base"
 	AddonsDir = "./addons"
-	
+
 	// Load defaults from config if present
-	fmt.Println("Attempting Read of Config File: ./rubble.cfg")
+	LogPrintln("Attempting to Read Config File: ./rubble.cfg")
 	file, err := ioutil.ReadFile("./rubble.cfg")
 	if err == nil {
 		lines := strings.Split(string(file), "\n")
@@ -58,44 +62,43 @@ func ParseCommandLine() {
 			if strings.TrimSpace(lines[i]) == "" {
 				continue
 			}
-			
+
 			parts := strings.SplitN(lines[i], "=", 2)
 			if len(parts) != 2 {
-				fmt.Println("    Malformed config line found, skipping.")
+				LogPrintln("  Malformed config line found, skipping.")
 				continue
 			}
-			
+
 			parts[0] = strings.TrimSpace(parts[0])
-			
+
 			switch parts[0] {
 			case "dfdir":
 				DFDir = parts[1]
 			case "outputdir":
 				OutputDir = parts[1]
-			case "basedir":
-				BaseDir = parts[1]
 			case "addonsdir":
 				AddonsDir = parts[1]
 			default:
-				fmt.Println("    Invalid config option:", parts[0], ", skipping.")
+				LogPrintln("  Invalid config option:", parts[0], ", skipping.")
 			}
 		}
 	} else {
-		fmt.Println("Read failed (this is most likely ok)\n    Error:", err)
-		fmt.Println("    Using hardcoded defaults.")
+		LogPrintln("Read failed (this is most likely ok)\n  Error:", err)
+		LogPrintln("  Using hardcoded defaults.")
 	}
-	
-	flag.StringVar(&DFDir ,"dfdir", DFDir, "The path to the DF directory. May be relative.")
-	flag.StringVar(&OutputDir ,"outputdir", OutputDir, "Where should Rubble write the generated raw files?")
-	flag.StringVar(&BaseDir ,"basedir", BaseDir, "Rubble base directory.")
-	flag.StringVar(&AddonsDir ,"addonsdir", AddonsDir, "Rubble addons directory.)")
-	
-	flag.StringVar(&AddonsList, "addons", "", "List of addons to load. This is optional.")
-	flag.StringVar(&ConfigList, "config", "", "List of config overrides. This is optional.")
-	
-	flag.BoolVar(&LexTest, "lextest", false, "Run a Rubble lexer test. No files will be written.")
-	flag.BoolVar(&NCARecover, "ncarecover", true, "Should NCA recover errors? Useful for debugging.")
-	flag.BoolVar(&RblRecover, "rblrecover", true, "Should Rubble recover errors? Useful for debugging.")
-	
-	flag.Parse()
+
+	Flags.StringVar(&DFDir, "dfdir", DFDir, "The path to the DF directory. May be relative.")
+	Flags.StringVar(&OutputDir, "outputdir", OutputDir, "Where should Rubble write the generated raw files?")
+	Flags.StringVar(&AddonsDir, "addonsdir", AddonsDir, "Rubble addons directory.")
+
+	Flags.StringVar(&AddonsList, "addons", "", "List of addons to load. This is optional.")
+	Flags.StringVar(&ConfigList, "config", "", "List of config overrides. This is optional.")
+
+	Flags.BoolVar(&ExitAfterUpdate, "addonlist", false, "Update the addon list and exit.")
+
+	Flags.BoolVar(&LexTest, "lextest", false, "Run a Rubble lexer test. No files will be written.")
+	Flags.BoolVar(&NCARecover, "scrrecover", true, "Should the scripting system recover errors? Useful for debugging.")
+	Flags.BoolVar(&RblRecover, "rblrecover", true, "Should Rubble recover errors? Useful for debugging.")
+
+	Flags.Parse(os.Args[1:])
 }

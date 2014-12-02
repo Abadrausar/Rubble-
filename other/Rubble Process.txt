@@ -1,24 +1,57 @@
 
 The Rubble Processing Pipeline
 
+This File is mostly for the terminally curious, and me of course ;)
+The information here details how it should be, if that's not how it is, it's a bug.
+
 ==============================================
 Detailed Order of Execution
 ==============================================
 
 	Config file is loaded (if present)
 	Commandline options are processed
-	NCA is initalized
+	All addons are loaded
+	
+	If -addons is set:
+		value from -addons is split and result is used as active addon list
+	
+	If -addons is not set:
+		If <addondir>/addons.ini is present:
+			<addondir>/addons.ini is parsed and result is used as active addon list
+		If <addondir>/addons.ini is not present:
+			Current addon list is written to <addondir>/addonlist.ini
+			Rubble Exits
+	
+	Addons are activated based on info from the active addons list
+	
+	If no addons are active:
+		Rubble Exits
+	
+	File list is generated
+	The list of input files is sorted (to interleave files)
+	Current addon list is written to <addondir>/addonlist.ini
+	
+	If -addonlist is set:
+		Rubble Exits
+	
+	If there are no files in file list:
+		Rubble Exits
+	
+	If -lextest is set:
+		The lexer test is run
+		Rubble exits
+	
+	Raptor is initialized
 	Builtin templates are loaded
-	All the files in the Base dir are loaded
-	Any files in Addon dirs are loaded
-		If -lextest=true the lexer test happens and Rubble exits
-	All pre-scripts are run
-	All files are preparsed
-	All files are parsed
-	All files are postparsed
-	All files have any variables outside of templates expanded
-	All post-scripts are run
-	All files are prepended with file ids and written to disk
+	
+	All pre tweak scripts are run
+	All .txt and .rbl files are preparsed
+	All .txt and .rbl files are parsed
+	All .txt and .rbl files are postparsed
+	All .txt and .rbl files have any variables outside of templates expanded
+	All post tweak scripts are run
+	All .txt files are prepended with file ids and written to disk
+	Rubble exits
 
 ==============================================
 Anatomy of a Template Call
@@ -26,9 +59,10 @@ Anatomy of a Template Call
 
 	All leading and trailing whitespace is striped from the params
 		If a param is of the form $<NAME> or ${<NAME>} then it is treated like a variable name and replaced with it's value
-	If the template is a native template then it's handler is called and the template manager returns
-	The templates body is loaded and these transforms are run on it:
+	If the template is a native template then it's handler is called and the handler's return value is returned
+	If the template is a script template then the script is run and the script's return value is converted to a string and returned
+	Else the template's body is loaded and these transforms are run on it:
 		Text of the forms $<NAME> or ${<NAME>} that is not in a child template is replaced with the value of the variable <NAME>
-		Text of the forms %<NAME> or %{<NAME>} is replaced with the value of the param named <NAME> or the default value specifyed for that param
-		Text of the forms %N or %{N} (where N is an integer) is replaced with the value of the Nth param or the default value specifyed for that position if there is no Nth param
-	The template body is passed to the parser for that stage
+		Text of the forms %<NAME> or %{<NAME>} is replaced with the value of the param named <NAME> or the default value specified for that param
+		Text of the forms %N or %{N} (where N is an integer) is replaced with the value of the Nth param or the default value specified for that position if there is no Nth param
+	The template body is passed to the parser for that stage and the result is returned

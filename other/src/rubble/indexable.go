@@ -22,27 +22,27 @@ misrepresented as being the original software.
 
 package main
 
-import "dctech/nca7"
+import "dctech/raptor"
 
 type IndexableRaws int
 
-func NewIndexableRaws() nca7.EditIndexable {
+func NewIndexableRaws() raptor.EditIndexable {
 	return new(IndexableRaws)
 }
 
-func (this IndexableRaws) Get(index string) *nca7.Value {
-	if _, ok := RawFiles[index]; ok {
-		if !RawFiles[index].Skip {
-			return nca7.NewValueString(RawFiles[index].Content)
+func (this IndexableRaws) Get(index string) *raptor.Value {
+	if _, ok := Files.Files[index]; ok {
+		if !Files.Files[index].Skip {
+			return raptor.NewValueString(string(Files.Files[index].Content))
 		}
 	}
-	return nca7.NewValueInt64(0)
+	return raptor.NewValueString("")
 }
 
-func (this IndexableRaws) Set(index string, value *nca7.Value) bool {
-	if _, ok := RawFiles[index]; ok {
-		if !RawFiles[index].Skip {
-			RawFiles[index].Content = value.String()
+func (this IndexableRaws) Set(index string, value *raptor.Value) bool {
+	if _, ok := Files.Files[index]; ok {
+		if !Files.Files[index].Skip {
+			Files.Files[index].Content = []byte(value.String())
 			return true
 		}
 	}
@@ -50,8 +50,8 @@ func (this IndexableRaws) Set(index string, value *nca7.Value) bool {
 }
 
 func (this IndexableRaws) Exists(index string) bool {
-	if _, ok := RawFiles[index]; ok {
-		if !RawFiles[index].Skip {
+	if _, ok := Files.Files[index]; ok {
+		if !Files.Files[index].Skip {
 			return true
 		}
 	}
@@ -60,8 +60,8 @@ func (this IndexableRaws) Exists(index string) bool {
 
 func (this IndexableRaws) Len() int64 {
 	var length int64
-	for _, key := range RawOrder {
-		if RawFiles[key].Skip {
+	for _, key := range Files.Order {
+		if Files.Files[key].Skip {
 			continue
 		}
 		length++
@@ -71,11 +71,19 @@ func (this IndexableRaws) Len() int64 {
 
 func (this IndexableRaws) Keys() []string {
 	rtn := make([]string, 0, this.Len())
-	for _, key := range RawOrder {
-		if RawFiles[key].Skip {
+	for _, key := range Files.Order {
+		if Files.Files[key].Skip {
 			continue
 		}
 		rtn = append(rtn, key)
 	}
 	return rtn
+}
+
+func (this IndexableRaws) String() string {
+	return raptor.GenericIndexableToString("rubble:Raws", this)
+}
+
+func (this IndexableRaws) CodeString() string {
+	return raptor.GenericIndexableToCodeString("map", this, true)
 }

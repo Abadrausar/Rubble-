@@ -1,0 +1,62 @@
+PACKAGE
+
+package bit
+    import "dctech/raptor/commands/bit"
+
+    Raptor Bitwise Commands.
+
+FUNCTIONS
+
+func CommandBit_And(state *raptor.State, params []*raptor.Value)
+    Ands two values.
+
+	bit:and a b
+
+    Returns a & b
+
+func CommandBit_LShift(state *raptor.State, params []*raptor.Value)
+    Shifts the value left. Count values of 0 or less are given the value 1.
+
+	bit:lshift a [count]
+
+    Returns the param shifted "count" places
+
+func CommandBit_Not(state *raptor.State, params []*raptor.Value)
+    Inverts a value.
+
+	bit:not a
+
+    Returns a ^ -1
+
+func CommandBit_Or(state *raptor.State, params []*raptor.Value)
+    Ors two values.
+
+	bit:or a b
+
+    Returns a | b
+
+func CommandBit_RShift(state *raptor.State, params []*raptor.Value)
+    Shifts the value right. Count values of 0 or less are given the value 1.
+
+	bit:rshift a [count]
+
+    Returns the param shifted "count" places
+
+func CommandBit_Xor(state *raptor.State, params []*raptor.Value)
+    Xors two values.
+
+	bit:xor a b
+
+    Returns a ^ b
+
+func Setup(state *raptor.State)
+    Adds the bitwise commands to the state. The bitwise commands are:
+
+	bit:lshift
+	bit:rshift
+	bit:and
+	bit:or
+	bit:xor
+	bit:not
+
+
