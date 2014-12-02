@@ -15,4 +15,7 @@ xcopy "C:/Docs/Projects/Go/src/dctech/ini" ini /e /i
 rmdir /S /Q dcfs
 xcopy "C:/Docs/Projects/Go/src/dctech/dcfs" dcfs /e /i
 
+rmdir /S /Q iconsole
+xcopy "C:/Docs/Projects/Go/src/dctech/iconsole" iconsole /e /i
+
 cd ..

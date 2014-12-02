@@ -55,6 +55,9 @@ var RunForcedInit bool
 
 var Threaded bool
 
+var Profile string
+var NetProfile string
+
 func ParseCommandLine() {
 	Flags.SetOutput(logFile)
 
@@ -148,6 +151,10 @@ func ParseCommandLine() {
 				RunForcedInit = parts[1] == "true"
 			case "threads":
 				Threaded = parts[1] == "true"
+			case "profile":
+				Profile = parts[1]
+			case "netprofile":
+				NetProfile = parts[1]
 			default:
 				LogPrintln("  Invalid config option:", parts[0], ", skipping.")
 			}
@@ -180,6 +187,9 @@ func ParseCommandLine() {
 	Flags.BoolVar(&RunForcedInit, "init", RunForcedInit, "Shell Mode: Run the Rubble init scripts before entering shell mode.")
 	
 	Flags.BoolVar(&Threaded, "threads", Threaded, "Allows Rubble to use more than one processor core, not useful except for running threaded tweak scripts.")
+	
+	Flags.StringVar(&Profile, "profile", "", "Output CPU profile information to specified file.")
+	Flags.StringVar(&NetProfile, "netprofile", "", "Use the http pprof interface on specified port")
 	
 	Flags.Parse(os.Args[1:])
 	

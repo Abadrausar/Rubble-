@@ -1,0 +1,24 @@
+
+# Adds the templates, commands and variables that make up the automatic DFHack.init editor
+
+(var rubble:dfhackinit <map>)
+
+(command rubble:dfhackinit_add key content {
+	(set [rubble:dfhackinit] [key] [content])
+})
+
+(command rubble:dfhackinit_write {
+	(var base "\n# Rubble DFHack.init script file\n# Automatically generated, DO NOT EDIT!\n")
+	
+	(foreach [rubble:dfhackinit] {
+		(set base (str:add [base] "\n" [params 1] "\n"))
+		(break true)
+	})
+	
+	(fileio:write (str:add [rubble:dfdir] "/rubble.dfhack") [base])
+})
+
+(rubble:template "DFHACKINIT_ADD" key content {
+	(rubble:dfhackinit_add [key] [content])
+})
+

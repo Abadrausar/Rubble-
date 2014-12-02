@@ -1,4 +1,12 @@
 
+v3.2
+	Added profiling to the shell.
+	Changed positions so that copied position info objects use a shared file name string.
+		This gives a (very) minor speed boost (according to pprof) at the cost of not being
+		able to change the file name after creation (which was never done anyway).
+	Raptor no longer automatically converts hex or octal constants to type int when they are loaded from the lexer.
+		This should stop strings from unexpectedly failing to compare.
+
 v3.1
 	Fixed base:map not returning nil for bad keys.
 	Added functions for clearing the script (mostly for use by the state)
@@ -49,7 +57,8 @@ v2.0
 		From the point of view of a command author the Script almost seamlessly takes the place of the State.
 			Some small changes need to be made where data access is concerned.
 		From the point of view of a client many things have changed.
-			You only need one State, it can be used by as many scripts as you like, commands, namespaces, and types are properties of the State.
+			You only need one State, it can be used by as many scripts as you like, commands, namespaces,
+			and types are properties of the State.
 			For each script you want running concurrently you need one Script object.
 				After every use the script object is cleared for reuse.
 				The Script stores all non-namespaced variables (such variables are cleared when the script returns)

@@ -27,6 +27,9 @@ import "path/filepath"
 import "strings"
 import "dctech/raptor"
 import "os"
+import "runtime/pprof"
+import "net/http"
+import _ "net/http/pprof"
 
 func main() {
 	// init logging
@@ -51,6 +54,22 @@ func main() {
 
 	ParseCommandLine()
 
+	if Profile != "" {
+		LogPrintln("Writing profiling data to file:", Profile)
+		f, err := os.Create(Profile)
+		if err != nil {
+			LogPrintln("  Profile Error:", err)
+			return
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+    }
+	
+	if NetProfile != "" {
+		LogPrintln("Started live profile on port:", NetProfile)
+		http.ListenAndServe("localhost:" + NetProfile, nil)
+	}
+	
 	LogPrintln("=============================================")
 	LogPrintln("Loading Addons...")
 
@@ -178,9 +197,13 @@ func main() {
 	LogPrintln("Initializing Scripting Subsystem.")
 	InitScripting()
 	
+	LogPrintln("Adding Builtins.")
+	SetupBuiltins()
+	
 	if !ShellMode || RunForcedInit {
 		LogPrintln("Running Init Scripts.")
 		for _, i := range ForcedInitOrder {
+			CurrentFile = i
 			LogPrintln("  " + i)
 			
 			script := raptor.NewScript()
@@ -198,9 +221,6 @@ func main() {
 		LogPrintln("Skipping Init Scripts.")
 	}
 	
-	LogPrintln("Adding Builtins.")
-	SetupBuiltins()
-	
 	// Embedded Raptor Shell
 	if ShellMode {
 		ShellModeRun()
@@ -215,6 +235,7 @@ func main() {
 			continue
 		}
 
+		CurrentFile = i
 		LogPrintln("  " + Files.Files[i].Path)
 
 		script := raptor.NewScript()
@@ -233,10 +254,11 @@ func main() {
 	LogPrintln("Preparsing...")
 	ParseStage = stgPreParse
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || !Files.Files[i].IsRaw() {
+		if Files.Files[i].Skip || (!Files.Files[i].IsRaw() && !Files.Files[i].IsGraphic()) {
 			continue
 		}
 
+		CurrentFile = i
 		LogPrintln("  " + Files.Files[i].Path)
 		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent, NewPosition(1, Files.Files[i].Path))
 	}
@@ -245,10 +267,11 @@ func main() {
 	LogPrintln("Parsing...")
 	ParseStage = stgParse
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || !Files.Files[i].IsRaw() {
+		if Files.Files[i].Skip || (!Files.Files[i].IsRaw() && !Files.Files[i].IsGraphic()) {
 			continue
 		}
 
+		CurrentFile = i
 		LogPrintln("  " + Files.Files[i].Path)
 		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent, NewPosition(1, Files.Files[i].Path))
 	}
@@ -257,10 +280,11 @@ func main() {
 	LogPrintln("Postparsing...")
 	ParseStage = stgPostParse
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || !Files.Files[i].IsRaw() {
+		if Files.Files[i].Skip || (!Files.Files[i].IsRaw() && !Files.Files[i].IsGraphic()) {
 			continue
 		}
 
+		CurrentFile = i
 		LogPrintln("  " + Files.Files[i].Path)
 		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent, NewPosition(1, Files.Files[i].Path))
 	}
@@ -269,10 +293,11 @@ func main() {
 	LogPrintln("Expanding Variables...")
 	ParseStage = stgGlobalExpand
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || !Files.Files[i].IsRaw() {
+		if Files.Files[i].Skip || (!Files.Files[i].IsRaw() && !Files.Files[i].IsGraphic()) {
 			continue
 		}
 
+		CurrentFile = i
 		LogPrintln("  " + Files.Files[i].Path)
 		Files.Files[i].Content = []byte(ExpandVars(string(Files.Files[i].Content)))
 	}
@@ -285,6 +310,7 @@ func main() {
 			continue
 		}
 
+		CurrentFile = i
 		LogPrintln("  " + Files.Files[i].Path)
 
 		script := raptor.NewScript()
@@ -311,6 +337,21 @@ func main() {
 		// HACK: Redo this
 		file := []byte(StripExt(i) + "\n\n" + string(Files.Files[i].Content))
 		err := ioutil.WriteFile(OutputDir+"/"+i, file, 0600)
+		if err != nil {
+			panic("Write Error: " + err.Error())
+		}
+	}
+	LogPrintln("Writing graphics files...")
+	for _, i := range Files.Order {
+		if Files.Files[i].Skip || Files.Files[i].NoWrite || !Files.Files[i].IsGraphic() {
+			continue
+		}
+
+		LogPrintln("  " + Files.Files[i].Path)
+
+		// HACK: Redo this
+		file := []byte(StripExt(i) + "\n\n" + string(Files.Files[i].Content))
+		err := ioutil.WriteFile(OutputDir+"/../graphics/"+i, file, 0600)
 		if err != nil {
 			panic("Write Error: " + err.Error())
 		}

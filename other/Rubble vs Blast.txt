@@ -3,6 +3,7 @@ Early versions of Rubble were heavily based on a similar utility, Blast, but rec
 
 Compared to Blast:
 Pros:
+	Comes with an extensive collection of "library addons" to help make modding easy
 	No need for an external runtime, Rubble is a native application
 	Addons may override each other's files
 	Full parser/lexer, not just a bunch of regular expressions
@@ -24,7 +25,7 @@ Cons:
 	No support for Blast namespaces (eg. @, @@, and @@@)
 	Variables are simple key:value pairs instead of Blast's more powerful system
 	No built-in pretty printer (unless, like me, you think of this as a pro :) )
-	No per-addon configuration file (unless you script in support for one)
+	No per-addon configuration file (unless you script in support for one, which would be easy)
 	The scripting language isn't exactly mainstream
 
 

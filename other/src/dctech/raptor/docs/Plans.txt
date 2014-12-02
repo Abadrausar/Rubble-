@@ -41,14 +41,17 @@ Debugger:
 					123
 					456
 				)
-	This is sort-of a long term goal, as pretty good debugging is possible via debug:shell (but loops are hell...)
+	This is sort-of a long term goal, as OK debugging is possible via debug:shell (but loops are hell...)
 
 ==============================================
 Random Rambles
 ==============================================
 
-Distributed Scanner
-	I could possibly gain some speed by ditching the traditional scanner/tokenizer, going with a more distributed system instead.
-		The main issue I can see would be Code objects, distributed scanning may not work with the current CodeSource system.
-		It may be possible to rewrite raptor to use a "compiler" that would reduce the source first, the main issue with such a system would be that it would be very hard (if not impossible) to separate normal strings from identifiers.
-			If classifying strings proved to be too hard I would just be adding overhead for no real gain.
+I finally got pprof working, too bad none of the "slow" areas lend themselves well to optimization...
+	Slowest spots:
+		Variable and command lookup
+		CodeReader.Token
+		Garbage collection/memory allocation
+
+Optimizing Token may be possible, after all most of the time we only need one value, not the whole token object.
+	This may complicate the CodeSource interface though, I guess I'll just have to try it out.

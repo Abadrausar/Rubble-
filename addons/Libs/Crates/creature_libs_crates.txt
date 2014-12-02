@@ -1,7 +1,7 @@
 [OBJECT:CREATURE]
 
 [CREATURE:LIBS_CRATES_CREATURE]
-	[NAME:::]
+	[NAME:libs_crates:libs_crates:libs_crates]
 	
 	{#SCRIPT;
 		(var out "")

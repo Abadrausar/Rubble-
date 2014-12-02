@@ -47,7 +47,7 @@ func NewPositionRaptor(pos *raptor.Position) *Position {
 	if pos.Column == -1 {
 		this.Line = 1
 	}
-	this.File = pos.File
+	this.File = pos.File()
 	return this
 }
 

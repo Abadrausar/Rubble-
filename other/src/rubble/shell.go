@@ -22,9 +22,9 @@ misrepresented as being the original software.
 
 package main
 
-import "os"
 import "io"
 import "dctech/raptor"
+import "dctech/iconsole"
 import "io/ioutil"
 
 func ShellModeRun() {
@@ -222,13 +222,10 @@ func ShellModeRun() {
 	}
 
 	// Interactive Shell
-	escape := false
-	line := make([]byte, 0, 100)
-	curchar := make([]byte, 1, 1)
-
-	LogPrint(">>>")
+	console := iconsole.New()
+	console.Out = logFile
 	for {
-		_, err := os.Stdin.Read(curchar)
+		line, err := console.Run()
 		if err == io.EOF {
 			LogPrintln("Exiting...")
 			break
@@ -236,43 +233,17 @@ func ShellModeRun() {
 			LogPrintln("Read Error:", err, "\nExiting...")
 			break
 		}
-
-		if curchar[0] == byte('\r') {
-			continue
+		
+		script.Code.AddString(string(line), raptor.NewPosition(1, 1, ""))
+		rtn, err := GlobalRaptorState.RunShell(script)
+		if err != nil {
+			LogPrintln("Error:", err)
 		}
-
-		if curchar[0] == byte('\\') && !escape {
-			escape = true
-			continue
-		}
-
-		if curchar[0] == byte('\n') && !escape {
-			script.Code.AddString(string(line), raptor.NewPosition(1, 1, ""))
-			rtn, err := GlobalRaptorState.RunShell(script)
-			if err != nil {
-				LogPrintln("Error:", err)
-			}
-			LogPrintln("Ret:", rtn)
-
-			line = line[:0]
-			LogPrint(">>>")
-			continue
-		}
-
-		if curchar[0] != byte('\n') && escape {
-			line = append(line, byte('\\'))
-		}
-
-		if curchar[0] == byte('\n') && escape {
-			LogPrint(">>>")
-		}
-
-		escape = false
-		line = append(line, curchar...)
+		LogPrintln("Ret:", rtn)
 	}
 }
 
-var preDefPos = raptor.NewPosition(275, 1, "rubble/shell.go")
+var preDefPos = raptor.NewPosition(247, 1, "rubble/shell.go")
 var preDefs = `
 	# increment variable
 	(command ++ __name__ {

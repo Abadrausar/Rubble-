@@ -65,13 +65,20 @@
 	})
 })
 
-# Group dependency checks
+# Addon group checks
 
-# Example (rubble:grouprequires "Better Dorfs" "Better Dorfs/Base")
-(command rubble:grouprequires me addon {
+(command rubble:ingroup addon group {
+	(set group (str:add [group] "/"))
+	
+	(if (str:cmp (str:left [addon] (str:len [group])) [group]) {
+		(ret true)
+	})
+})
+
+(command rubble:groupactive group {
 	(var found false)
 	(foreach [rubble:activeaddons] {
-		(if (str:cmp (str:left [params 1] (str:len [addon])) [addon]) {
+		(if (rubble:ingroup [params 1] [group]) {
 			(set found true)
 			(break false)
 		}{
@@ -79,26 +86,29 @@
 		})
 	})
 	
-	(if [found] {
+	(ret [found])
+})
+
+# Example (rubble:grouprequires "Better Dorfs" "Better Dorfs/Base")
+(command rubble:grouprequires me addon {
+	(if (rubble:groupactive [me]) {
+		(if (rubble:addonactive [addon]) {
+		}{
+			(rubble:abort (str:add "The \"" [me] "\" addon group requires that the \"" [addon] "\" addon be active!\n"
+			"Please activate that addon and try again."))
+		})
 	}{
-		(rubble:abort (str:add "The \"" [me] "\" addon group requires that the \"" [addon] "\" addon be active!\n"
-		"Please activate that addon and try again."))
+		# No addons in the group are active, do nothing.
 	})
 })
 
 (command rubble:groupincompatible me addon {
-	(var found false)
-	(foreach [rubble:activeaddons] {
-		(if (str:cmp (str:left [params 1] (str:len [addon])) [addon]) {
-			(set found true)
-			(break false)
-		}{
-			(break true)
+	(if (rubble:groupactive [me]) {
+		(if (rubble:addonactive [addon]) {
+			(rubble:abort (str:add "The \"" [me] "\" addon group is incompatible with the \"" [addon] "\" addon!\n"
+			"Please deactivate that addon and try again."))
 		})
-	})
-	
-	(if [found] {
-		(rubble:abort (str:add "The \"" [me] "\" addon group is incompatible with the \"" [addon] "\" addon!\n"
-		"Please deactivate that addon and try again."))
+	}{
+		# No addons in the group are active, do nothing.
 	})
 })

@@ -5,20 +5,20 @@
  in any case the actual implementation is the correct way.
 */
 
-newline = "\n" | "\r" .
+newline = "\n" .
 
-/* Yes, raptor treats commas as whitespace, if you want to use commas as delimiters go ahead */
-whitespace = " " | "\t" | "," .
+/* Yes, Raptor treats commas as whitespace, if you want to use commas as delimiters go ahead */
+whitespace = " " | "\t" | "," | "\r" .
 
-reservedchar = "[" | "]" | "{" | "}" | "<" | ">" | "(" | ")" .
+bracket = "[" | "]" | "{" | "}" | "<" | ">" | "(" | ")" .
 
-letter = /* any character except newline, whitespace, or a reserved char */ .
+letter = /* any character except newline, whitespace, doublequote, or a bracket */ .
 
-comment = "#" { letter | whitespace | reservedchar } newline .
+comment = "#" { letter | whitespace | bracket } newline .
 
 rawstring = letter { letter } .
 
-dqstring = "\"" { letter | whitespace | reservedchar | newline } "\"" .
+dqstring = "\"" { letter | whitespace | bracket | newline | "\\\"" } "\"" .
 
 string = rawstring | dqstring .
 

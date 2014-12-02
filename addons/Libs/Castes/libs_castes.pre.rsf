@@ -1,0 +1,144 @@
+
+# This just supports basic castes, for more advanced abilities you can further specialize these templates.
+
+(namespace rubble:libs_castes)
+(var rubble:libs_castes:castes <map>)
+(var rubble:libs_castes:bonuses <map>)
+(var rubble:libs_castes:names <map>)
+(var rubble:libs_castes:names_plur <map>)
+
+(var rubble:libs_castes:creature_castes <map>)
+(var rubble:libs_castes:creature_desc <map>)
+(var rubble:libs_castes:creature_male <map>)
+(var rubble:libs_castes:creature_female <map>)
+(var rubble:libs_castes:creature_adj <map>)
+
+(command rubble:libs_castes:registercreature id desc male female adj {
+	(set [rubble:libs_castes:creature_castes] [id] (sort:new))
+	(set [rubble:libs_castes:creature_desc] [id] [desc])
+	(set [rubble:libs_castes:creature_male] [id] [male])
+	(set [rubble:libs_castes:creature_female] [id] [female])
+	(set [rubble:libs_castes:creature_adj] [id] [adj])
+	
+	(set [rubble:libs_castes:castes] [id] <map>)
+	(set [rubble:libs_castes:bonuses] [id] <map>)
+	(set [rubble:libs_castes:names] [id] <map>)
+	(set [rubble:libs_castes:names_plur] [id] <map>)
+	
+	(ret "")
+})
+
+(command rubble:libs_castes:newcaste creature id desc_name name name_plur popm popf desc bonus {
+	(if (str:cmp [desc_name] "") {}{
+		(set desc_name (str:add "*" [desc_name] "* "))
+	})
+	(if (str:cmp [desc] "") {}{
+		(set desc (str:add " " [desc]))
+	})
+	
+	(set [rubble:libs_castes:castes [creature]] [id] (str:add
+		"\t[CASTE:MALE_" [id] "]\n"
+		"\t\t[DESCRIPTION:" [desc_name] [rubble:libs_castes:creature_desc [creature]] [desc] "]\n"
+		"\t\t[POP_RATIO:" [popm] "]\n"
+		"\t[CASTE:FEMALE_" [id] "]\n"
+		"\t\t[DESCRIPTION:" [desc_name] [rubble:libs_castes:creature_desc [creature]] [desc] "]\n"
+		"\t\t[POP_RATIO:" [popf] "]\n"
+	))
+	
+	(set [rubble:libs_castes:creature_castes [creature]] [id] true)
+	(set [rubble:libs_castes:bonuses [creature]] [id] [bonus])
+	(set [rubble:libs_castes:names [creature]] [id] [name])
+	(set [rubble:libs_castes:names_plur [creature]] [id] [name_plur])
+	(ret "")
+})
+
+(rubble:template "!REGISTER_CREATURE" id desc male female adj {
+	(rubble:libs_castes:registercreature [id] [desc] [male] [female] [adj])
+	(ret "")
+})
+
+(rubble:template "!DEFAULT_CASTE" creature id desc_name name name_plur popm popf desc bonus {
+	(rubble:libs_castes:newcaste [creature] [id] [desc_name] [name] [name_plur] [popm] [popf] [desc] [bonus])
+	(ret "")
+})
+
+(rubble:template "CASTE" creature id desc_name name name_plur popm popf desc bonus {
+	(rubble:libs_castes:newcaste [creature] [id] [desc_name] [name] [name_plur] [popm] [popf] [desc] [bonus])
+	(ret "")
+})
+
+(rubble:template "#CASTE_INSERT" creature {
+	(var out "")
+	
+	# Caste Declarations
+	(set out (str:add [out] "# Generated Castes\n"))
+	(foreach [rubble:libs_castes:creature_castes [creature]] {
+		(set out (str:add [out] [rubble:libs_castes:castes [creature] [params 0]]))
+		(break true)
+	})
+	
+	# Set male/female info
+	(var m_castes "")
+	(var f_castes "")
+	(var once true)
+	(foreach [rubble:libs_castes:creature_castes [creature]] {
+		(var id [params 0])
+		
+		(if [once] {
+			(set m_castes (str:add [m_castes] "\t[SELECT_CASTE:MALE_" [id] "]\n"))
+			(set f_castes (str:add [f_castes] "\t[SELECT_CASTE:FEMALE_" [id] "]\n"))
+			(set once false)
+		}{
+			(set m_castes (str:add [m_castes] "\t[SELECT_ADDITIONAL_CASTE:MALE_" [id] "]\n"))
+			(set f_castes (str:add [f_castes] "\t[SELECT_ADDITIONAL_CASTE:FEMALE_" [id] "]\n"))
+		})
+		(break true)
+	})
+	(set out (str:add [out] "\n" [m_castes]
+	"\t\t" [rubble:libs_castes:creature_male [creature]] "\n"))
+	(set out (str:add [out] "\n" [f_castes]
+	"\t\t" [rubble:libs_castes:creature_female [creature]]))
+	
+	# Set bonuses
+	(foreach [rubble:libs_castes:creature_castes [creature]] {
+		(set out (str:add [out] 
+			"\n\n"
+			"\t[SELECT_CASTE:MALE_" [params 0] "]\n"
+			"\t[SELECT_ADDITIONAL_CASTE:FEMALE_" [params 0] "]\n"
+			"\t\t[CASTE_NAME:" [rubble:libs_castes:names [creature] [params 0]] ":" 
+				[rubble:libs_castes:names_plur [creature] [params 0]] ":" [rubble:libs_castes:creature_adj [creature]] "]\n"
+			"\t\t" [rubble:libs_castes:bonuses [creature] [params 0]]
+		))
+		(break true)
+	})
+	
+	[out]
+})
+
+(command rubble:libs_castes:tabs tabs {
+	(var out "")
+	(for {(var count 0)}{(int:lt [count] [tabs])}{(++ count)}{
+		(set out (str:add [out] "\t"))
+	})
+	(ret [out])
+})
+
+(rubble:template "#SYN_AFFECTED_MALES" creature tabs=2 {
+	(var out "")
+	(foreach [rubble:libs_castes:creature_castes [creature]] {
+		(set out (str:add [out] 
+			(rubble:libs_castes:tabs [tabs]) "[SYN_AFFECTED_CREATURE:" [creature] ":MALE_" [params 0] "]\n"))
+		(break true)
+	})
+	(str:trimspace [out])
+})
+
+(rubble:template "#SYN_AFFECTED_FEMALES" creature tabs=2 {
+	(var out "")
+	(foreach [rubble:libs_castes:creature_castes [creature]] {
+		(set out (str:add [out] 
+			(rubble:libs_castes:tabs [tabs]) "[SYN_AFFECTED_CREATURE:" [creature] ":FEMALE_" [params 0] "]\n"))
+		(break true)
+	})
+	(str:trimspace [out])
+})

@@ -99,6 +99,10 @@ func InitScripting() {
 	state.NewNativeCommand("rubble:abort", CommandRubble_Abort)
 	
 	state.NewNativeCommand("rubble:skipfile", CommandRubble_SkipFile)
+	state.NewNativeCommand("rubble:nowritefile", CommandRubble_NoWriteFile)
+	state.NewNativeCommand("rubble:graphicsfile", CommandRubble_GraphicsFile)
+	state.NewNativeCommand("rubble:currentfile", CommandRubble_CurrentFile)
+	
 	state.NewNativeCommand("rubble:setvar", CommandRubble_SetVar)
 	state.NewNativeCommand("rubble:getvar", CommandRubble_GetVar)
 	
@@ -114,17 +118,6 @@ func InitScripting() {
 	state.Output = logFile
 
 	GlobalRaptorState = state
-}
-
-// Causes a panic.
-// 	panic value
-// Returns unchanged.
-func CommandPanic(script *raptor.Script, params []*raptor.Value) {
-	if len(params) != 1 {
-		panic("Wrong number of params to panic (how ironic).")
-	}
-
-	panic(params[0].String())
 }
 
 // Causes rubble to abort with an error, use for correctable errors like configuration problems.
@@ -155,6 +148,45 @@ func CommandRubble_SkipFile(script *raptor.Script, params []*raptor.Value) {
 	Files.Files[params[0].String()].Skip = true
 }
 
+// Makes Rubble not write a file out after generation.
+// 	rubble:nowritefile name
+// name is the file's BASE NAME not it's path!
+// Returns unchanged.
+func CommandRubble_NoWriteFile(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to rubble:nowritefile.")
+	}
+
+	if _, ok := Files.Files[params[0].String()]; !ok {
+		panic("rubble:nowritefile: \"" + params[0].String() + "\" is not the name of a loaded raw file.")
+	}
+
+	Files.Files[params[0].String()].NoWrite = true
+}
+
+// Marks a file as containing creature graphics.
+// 	rubble:graphicsfile name
+// name is the file's BASE NAME not it's path!
+// Returns unchanged.
+func CommandRubble_GraphicsFile(script *raptor.Script, params []*raptor.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to rubble:graphicsfile.")
+	}
+
+	if _, ok := Files.Files[params[0].String()]; !ok {
+		panic("rubble:graphicsfile: \"" + params[0].String() + "\" is not the name of a loaded raw file.")
+	}
+
+	Files.Files[params[0].String()].Graphics = true
+}
+
+// Returns the name of the current file.
+// 	rubble:currentfile
+// Returns the file name.
+func CommandRubble_CurrentFile(script *raptor.Script, params []*raptor.Value) {
+	script.RetVal = raptor.NewValueString(CurrentFile)
+}
+
 var varNameValidateRegEx = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 
 // Sets a Rubble variable.
@@ -181,7 +213,7 @@ func CommandRubble_GetVar(script *raptor.Script, params []*raptor.Value) {
 	}
 
 	if _, ok := VariableData[params[0].String()]; !ok {
-		panic("Rubble variable " + params[0].String() + " does not exist.")
+		script.RetVal = raptor.NewValueString("")
 	}
 
 	script.RetVal = raptor.NewValueString(VariableData[params[0].String()])

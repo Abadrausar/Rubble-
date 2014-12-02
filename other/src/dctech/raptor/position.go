@@ -12,22 +12,32 @@ import "fmt"
 type Position struct {
 	Line   int
 	Column int
-	File   string
+	file   *string
 }
 
 // NewPosition creates and returns a new Position object.
 // To create a token offset Position pass -1 as the column and the offset as the line.
 func NewPosition(line, column int, file string) *Position {
+	return newPosition(line, column, &file)
+}
+
+// For internal use only.
+func newPosition(line, column int, file *string) *Position {
 	this := new(Position)
 	this.Line = line
 	this.Column = column
-	this.File = file
+	this.file = file
 	return this
+}
+
+// File returns the name of the file this position refers to (or "").
+func (this *Position) File() string {
+	return *this.file
 }
 
 // Copy copies a Position object, more useful than it sounds.
 func (this *Position) Copy() *Position {
-	return NewPosition(this.Line, this.Column, this.File)
+	return newPosition(this.Line, this.Column, this.file)
 }
 
 // String returns strings of one of the following forms: 
@@ -38,8 +48,8 @@ func (this *Position) Copy() *Position {
 func (this *Position) String() string {
 	out := ""
 	
-	if this.File != "" {
-		out += this.File + "|"
+	if *this.file != "" {
+		out += *this.file + "|"
 	}
 	
 	if this.Column == -1 {

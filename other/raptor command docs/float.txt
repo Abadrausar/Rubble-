@@ -1,0 +1,71 @@
+PACKAGE
+
+package float
+    import "dctech/raptor/commands/float"
+
+    Raptor Floating Point Commands.
+
+FUNCTIONS
+
+func CommandFloat_Add(script *raptor.Script, params []*raptor.Value)
+    Adds two values.
+
+	float:add a b
+
+    Returns a + b
+
+func CommandFloat_Div(script *raptor.Script, params []*raptor.Value)
+    Divides two values.
+
+	float:div a b
+
+    Returns a / b
+
+func CommandFloat_Eq(script *raptor.Script, params []*raptor.Value)
+    Floating point equal.
+
+	float:eq a b
+
+    Returns true or false.
+
+func CommandFloat_Gt(script *raptor.Script, params []*raptor.Value)
+    Floating point greater than.
+
+	float:gt a b
+
+    Returns true or false.
+
+func CommandFloat_Lt(script *raptor.Script, params []*raptor.Value)
+    Floating point less than.
+
+	float:lt a b
+
+    Returns true or false.
+
+func CommandFloat_Mul(script *raptor.Script, params []*raptor.Value)
+    Multiplies two values.
+
+	float:mul a b
+
+    Returns a * b
+
+func CommandFloat_Sub(script *raptor.Script, params []*raptor.Value)
+    Subtracts two values.
+
+	float:sub a b
+
+    Returns a - b
+
+func Setup(state *raptor.State)
+    Adds the floating point commands to the state. The floating point
+    commands are:
+
+	float:add
+	float:sub
+	float:div
+	float:mul
+	float:gt
+	float:lt
+	float:eq
+
+

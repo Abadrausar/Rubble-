@@ -76,7 +76,7 @@ Included Addons:
 ==============================================
 
 I include addons in the base Rubble install that fix bugs, demo something useful, or are just too useful to leave out. 
-Needless to say these addons make a good place to look for info on how to do something. Sorry about the lack of comments in the addon files, I need to fix that sometime.
+Needless to say these addons make a good place to look for info on how to do something.
 
 If you want to generate the Rubble version of "vanilla DF" you will need to activate the "Base/Files", "Base/Templates", and "Base/Clear" addons, these addons are already active in the default addonlist.ini.
 
@@ -107,7 +107,8 @@ Dev/Cheat:
 	Uses animal caretaker skill (the most useless skill I could think of :) )
 
 Dev/Dummy Reactions:
-	This addon adds 15 "dummy reactions" eg. empty reactions registered to "ADDON_HOOK_PLAYABLE".
+	This addon adds "dummy reactions" eg. empty reactions registered to "ADDON_HOOK_PLAYABLE".
+	By default 15 reactions are created, if you want a different number of reactions to be generated pass '-config="DEV_DUMMY_REACTION_COUNT=count"' to Rubble when generating.
 	These reactions are empty by default, use if you want to add new content after worldgen.
 
 Fix/Butcher Inorganic:
@@ -136,6 +137,13 @@ Fix/Vermin Variations:
 Generic Animal Mats:
 	Make animal mats such as meat and leather generic. This is mostly for those who have FPS issues.
 	This addon is packed as a zip to demo how that is done.
+
+Libs/Castes:
+	Adds support for dynamically adding castes to a creature.
+
+Libs/Castes/DFHack/Transform:
+	Adds support for transforming castes via autosyndrome and true transform.
+	Requires the "Libs/Castes" addon.
 
 Libs/Crates:
 	Adds infrastructure for "crates", eg bars that can be bought from caravans and then "unpacked" via special reactions into items.
@@ -189,11 +197,13 @@ BUGS (and other issues):
 ==============================================
 
 Known Issues (non-bug):
+	
 	You should not use the extension .txt for readme files, as this will cause Rubble to parse those files.
 		See "Rubble Addons.txt" for more details.
+	
+	It may be possible to see FBs made from "dfhack command" or "caste transformation", there is nothing I can do about this as autosyndrome requires the use of inorganic materials.
 
 When making an error report please post the FULL log file! Posting just a few line tells me almost nothing about the problem, after all I made Rubble write all that stuff for a reason :)
-If you really want to be helpful run "rubble -norecover" and post that log IN ADDITION TO the normal log. To do this from the GUI just add "-norecover" to the "Extra options" box at the bottom.
 
 If any of the documentation is not 100% clear just ask. 
 I know everything there is to know about how Rubble works and so I tend to forget to put 
@@ -202,6 +212,26 @@ I know everything there is to know about how Rubble works and so I tend to forge
 ==============================================
 Changelog:
 ==============================================
+v3.10
+	Updated to Raptor 3.2
+		A (very) slight performance boost, a minor bug fix, a possible string corruption fix,
+		and some other minor changes that don't effect Rubble.
+	Added profiling (writes data in the format expected by pprof), not that you care.
+	Added rubble:ingroup, check if an addon is part of a specified group.
+	Added rubble:groupactive, check if any addon in a specified group is active.
+	Added native script commands rubble:nowritefile, rubble:graphicsfile, and rubble:currentfile.
+	rubble:getvar now returns "" for non-existent variables.
+	The behavior of some of the dependency check commands has changed (to make them more accurate)
+	The behavior of "Dev/Dummy Reactions" has changed slightly (should not effect users).
+	Added some caste related library addons.
+	Added the time templates (@ADV_TIME and @FORT_TIME) back to Rubble, this time they are in the "Base/Templates" addon.
+		(These templates were removed in 3.0 in order to remove all non-essential native templates)
+	Added @GROWDUR, a replacement for the vanilla GROWDUR tag that uses the same mechanism as the other time templates.
+	Execution of init scripts moved one step later (to just after built-ins are loaded)
+		This should make it so that init scripts can do literally everything that a pre tweak script can.
+	Added #INSTALL_GRAPHICS_FILE and @GRAPHICS_FILE, support for creature graphics.
+	Updated the Notepad++ UDL (lots of changes from previous versions never got added, now they are).
+
 v3.9
 	Fixed lots of cases where Raptor error handlers still used panic, oops.
 	Updated some of the docs.

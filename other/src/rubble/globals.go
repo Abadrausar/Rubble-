@@ -25,10 +25,11 @@ package main
 import "sort"
 
 // Update this!
-var RubbleVersion = "3.9"
+var RubbleVersion = "3.10"
 var RubbleCompat = map[string]bool{
 	"3.8": true,
 	"3.9": true,
+	"3.10": true,
 }
 
 // All the addons are loaded to here.
@@ -66,6 +67,9 @@ var PrevParams = make([]*Value, 0)
 // Used by the error handler and lexer.
 var LastLine = NewPosition(-1, "bad_position")
 
+// Used by rubble:currentfile
+var CurrentFile string
+
 // AddonFile represents any file in an addon.
 type AddonFile struct {
 	Path       string
@@ -73,13 +77,19 @@ type AddonFile struct {
 	PreScript  bool
 	PostScript bool
 	UserData   bool // any unparsable file, eg. images for tileset addons.
+	Graphics   bool // Graphics file raw text
 	Skip       bool
 	NoWrite    bool
 }
 
 // IsRaw returns true if the addon file is a raw file or rbl file.
 func (this *AddonFile) IsRaw() bool {
-	return !this.PreScript && !this.PostScript && !this.UserData
+	return !this.PreScript && !this.PostScript && !this.UserData && !this.Graphics
+}
+
+// IsGraphic returns true if the addon file is a creature graphics raw file.
+func (this *AddonFile) IsGraphic() bool {
+	return this.Graphics
 }
 
 // Addon represents an addon.

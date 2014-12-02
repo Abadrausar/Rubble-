@@ -1,46 +1,17 @@
 [OBJECT:REACTION]
 
-The following are "dummy" reactions used to add content after worldgen.
 {!SCRIPT;
-	(var rubble:dummy_reaction_count 0)
-	(rubble:template "DUMMY_REACTION" {
-		(++ rubble:dummy_reaction_count)
-		(rubble:stageparse (str:add 
-		"{REACTION;DUMMY_REACTION_" [rubble:dummy_reaction_count] ";ADDON_HOOK_PLAYABLE}\n"
-		"\tAdd your reaction body here"
-		))
+	(var howmany (rubble:getvar "DEV_DUMMY_REACTION_COUNT"))
+	(if (str:cmp [howmany] "") {
+		(set howmany 15)
 	})
-	(ret "")
+	
+	(var out "The following are \"dummy\" reactions used to add content after worldgen.\n")
+	(for {(var count 0)}{(int:lt [count] [howmany])}{(++ count)}{
+		(set out (rubble:stageparse (str:add [out] 
+		"\n{REACTION;DUMMY_REACTION_" [count] ";ADDON_HOOK_PLAYABLE}\n"
+		"\tAdd your reaction body here\n"
+		)))
+	})
+	(ret out)
 }
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-{DUMMY_REACTION}
-
-
-

@@ -150,7 +150,7 @@ User Templates defined in the "Base/Templates" addon.
 
 ==============================================
 {INSTALL_TILESHEET;<TILESHEET>}
-	Copies the specified tilesheet image from you addon into the data/art directory.
+	Copies the specified tilesheet image from your addon into the data/art directory.
 
 ==============================================
 {SET_FULLSCREEN_TILESHEET;<TILESHEET>}
@@ -205,6 +205,14 @@ User Templates defined in the "Base/Templates" addon.
 ==============================================
 {CLOSE_D_INIT}
 	Writes all changes to "d_init.txt", any value that was not set by a call to EDIT_D_INIT will have the vanilla default written.
+
+==============================================
+{#INSTALL_GRAPHICS_FILE;<FILE>}
+	Copies the specified file from your addon into the raw/graphics directory.
+
+==============================================
+{@GRAPHICS_FILE}
+	Changes the type of the current file to a graphics file.
 
 ==============================================
 {BUILDING_WORKSHOP;<TECH>;<CLASS>}
@@ -281,3 +289,51 @@ User Templates defined in the "Base/Templates" addon.
 {DFHACKINIT_ADD;<ID>;<CONTENT>}
 	Adds <CONTENT> to the rubble dfhack init script. <ID> is strictly to allow overriding.
 	(This requires "script rubble.dfhack" to be added to your dfhack.init file)
+
+==============================================
+{@ADV_TIME;<COUNT>;<UNIT>}
+	Generates a time value for use in interactions and the like.
+	This version is adventure mode centric.
+	
+	Using values like ".5" for the <COUNT> value should work but "1/2" will not.
+	
+	Valid values for <UNIT> are:
+		SECOND
+		SECONDS
+		MINUTE
+		MINUTES
+		HOUR
+		HOURS
+		DAY
+		DAYS
+		WEEK
+		WEEKS
+		MONTH
+		MONTHS
+		SEASON
+		SEASONS
+		YEAR
+		YEARS
+	
+	Example:
+		{@ADV_TIME;5;DAYS} -> 432000
+
+==============================================
+{@FORT_TIME;<COUNT>;<UNIT>}
+	Generates a time value for use in interactions and the like.
+	Exactly like #ADV_TIME except for fortress mode.
+	
+	Units below MINUTE may be less than useful, as fortress mode units lack precision.
+	
+	Example:
+		{@FORT_TIME;5;DAYS} -> 6000
+
+==============================================
+{@GROWDUR;<COUNT>;<UNIT>}
+	A direct replacement for the GROWDUR tag that lets you specify time in realworld units.
+	Uses the same unit types as @ADV_TIME.
+	
+	Units below DAY may be less than useful, as growth duration units lack precision.
+	
+	Example:
+		{@GROWDUR;5;DAYS} -> [GROWDUR:60]

@@ -7,6 +7,7 @@ package main
 import "fmt"
 import "os"
 import "io"
+import "dctech/iconsole"
 import "dctech/raptor"
 import "dctech/raptor/commands/base"
 import "dctech/raptor/commands/bit"
@@ -29,6 +30,9 @@ import "dctech/raptor/commands/thread"
 import "io/ioutil"
 import "flag"
 import "runtime"
+import "runtime/pprof"
+import "net/http"
+import _ "net/http/pprof"
 
 // The bit about "Enter Ctrl+Z to exit." is true in windows when using the default command prompt, 
 // I have no idea how to generate an EOF in linux/mac.
@@ -48,6 +52,8 @@ var NoPredefs bool
 var NoRecover bool
 var LexTest bool
 var Threaded bool
+var Profile string
+var NetProfile string
 
 var preDefPos = raptor.NewPosition(53, 1, "main.go")
 var preDefs = `
@@ -100,11 +106,27 @@ func main() {
 	flag.BoolVar(&NoRecover, "norecover", false, "If set disables error recovery. Use for debuging the runtime.")
 	flag.BoolVar(&LexTest, "lextest", false, "Makes the shell run a lexer test and exit.")
 	flag.BoolVar(&Threaded, "threads", false, "Allows the shell to use more than one processor core, not useful unless running a threaded script.")
+	flag.StringVar(&Profile, "profile", "", "Output CPU profile information to specified file.")
+	flag.StringVar(&NetProfile, "netprofile", "", "Use the http pprof interface on specified port")
 
 	flag.Parse()
 
 	if Threaded {
 		runtime.GOMAXPROCS(runtime.NumCPU())
+	}
+	
+	if Profile != "" {
+		f, err := os.Create(Profile)
+		if err != nil {
+			fmt.Println("Profile Error:", err)
+			return
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+    }
+	
+	if NetProfile != "" {
+		http.ListenAndServe("localhost:" + NetProfile, nil)
 	}
 	
 	fmt.Print(header)
@@ -322,13 +344,9 @@ func main() {
 	}
 
 	// Interactive Shell
-	escape := false
-	line := make([]byte, 0, 100)
-	curchar := make([]byte, 1, 1)
-
-	fmt.Print(">>>")
+	console := iconsole.New()
 	for {
-		_, err := os.Stdin.Read(curchar)
+		line, err := console.Run()
 		if err == io.EOF {
 			fmt.Println("Exiting...")
 			break
@@ -336,38 +354,12 @@ func main() {
 			fmt.Println("Read Error:", err, "\nExiting...")
 			break
 		}
-
-		if curchar[0] == byte('\r') {
-			continue
+		
+		script.Code.AddString(string(line), raptor.NewPosition(1, 1, ""))
+		rtn, err := state.RunShell(script)
+		if err != nil {
+			fmt.Println("Error:", err)
 		}
-
-		if curchar[0] == byte('\\') && !escape {
-			escape = true
-			continue
-		}
-
-		if curchar[0] == byte('\n') && !escape {
-			script.Code.AddString(string(line), raptor.NewPosition(1, 1, ""))
-			rtn, err := state.RunShell(script)
-			if err != nil {
-				fmt.Println("Error:", err)
-			}
-			fmt.Println("Ret:", rtn)
-
-			line = line[:0]
-			fmt.Print(">>>")
-			continue
-		}
-
-		if curchar[0] != byte('\n') && escape {
-			line = append(line, byte('\\'))
-		}
-
-		if curchar[0] == byte('\n') && escape {
-			fmt.Print(">>>")
-		}
-
-		escape = false
-		line = append(line, curchar...)
+		fmt.Println("Ret:", rtn)
 	}
 }

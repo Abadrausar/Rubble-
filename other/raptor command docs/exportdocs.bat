@@ -13,6 +13,7 @@ call export debug
 call export env
 call export file
 call export fileio
+call export float
 call export ini
 call export integer
 call export raw

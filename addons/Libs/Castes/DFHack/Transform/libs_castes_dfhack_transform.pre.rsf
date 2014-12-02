@@ -1,0 +1,23 @@
+
+(rubble:requireaddon "Libs/Castes/DFHack/Transform" "Libs/Castes")
+
+(namespace rubble:libs_castes_transform)
+(var rubble:libs_castes_transform:transforms <map>) # creature -> array of transform objects
+
+(rubble:template "CASTE_TRANSFORM" creature to intermediate time {
+	(if (exists [rubble:libs_castes_transform:transforms] [creature]) {
+	}{
+		(set [rubble:libs_castes_transform:transforms] [creature] <map>)
+	})
+	
+	(set [rubble:libs_castes_transform:transforms [creature]] (str:add [creature] "_" [to]) <map
+		to=[to]
+		intermediate=[intermediate]
+		time=[time]
+	>)
+	(ret "")
+})
+
+(rubble:template "#CASTE_TRANSFORM_PRODUCT" creature to {
+	(str:add "[PRODUCT:100:1:BOULDER:NONE:INORGANIC:CASTE_TRANSFORM_" [creature] "_" [to] "]")
+})

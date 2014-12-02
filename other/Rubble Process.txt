@@ -18,9 +18,9 @@ Detailed Order of Execution
 		value from -addons is split and result is used as active addon list
 	
 	If -addons is not set:
-		If <addondir>/addons.ini is present:
-			<addondir>/addons.ini is parsed and result is used as active addon list
-		If <addondir>/addons.ini is not present:
+		If <addondir>/addonlist.ini is present:
+			<addondir>/addonlist.ini is parsed and result is used as active addon list
+		If <addondir>/addonlist.ini is not present:
 			Current addon list is written to <addondir>/addonlist.ini
 			Rubble Exits
 	
@@ -46,6 +46,7 @@ Detailed Order of Execution
 	Raptor is initialized
 	Builtin templates are loaded
 	
+	All init scripts are run
 	All pre tweak scripts are run
 	All .txt and .rbl files are preparsed
 	All .txt and .rbl files are parsed

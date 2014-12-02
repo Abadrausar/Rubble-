@@ -14,6 +14,26 @@ Makes Rubble skip a file.
 	name is the file's BASE NAME not it's path!
 	Returns unchanged.
 	
+Makes Rubble not write a file out after generation..
+	
+	rubble:nowritefile name
+	
+	name is the file's BASE NAME not it's path!
+	Returns unchanged.
+
+Marks a file as containing creature graphics.
+	
+	rubble:graphicsfile name
+	
+	name is the file's BASE NAME not it's path!
+	Returns unchanged.
+
+Returns the name of the current file.
+	
+	rubble:currentfile
+	
+	Returns the file name.
+
 Set a Rubble variable.
 	
 	rubble:setvar name value
@@ -94,6 +114,18 @@ Dependency check.
 	rubble:incompatibleaddon me addon
 	
 	Same as rubble:requireaddon, just for incompatibilities instead of requirements.
+
+Group state check.
+	
+	rubble:ingroup addon group
+	
+	Returns true if addon is part of the specified group.
+
+Group state check.
+	
+	rubble:groupactive group
+	
+	Returns true if ANY addons in the specified group are active.
 
 Group dependency check.
 	
