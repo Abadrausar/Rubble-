@@ -179,24 +179,6 @@ At first using commands for almost everything seems a little odd, but it allows 
 Return Values:
 	In Rex all return values are stored in a single "register" (it isn't actually a hardware register) that is shared with things like variable dereferences and object literals, basically every time a value is retrieved it is stuck in the the return register. This means that every command "returns a value" whether it wants to or not. If it doesn't return something explicitly it is said to return "unchanged", eg. whatever was in the register before. If you want to insert the last retrieved value into a command call or the like you can use the nop command. nop (no operation) is a simple command that does nothing, and so it obviously returns unchanged, perfect for getting the current value of the return register. 
 
-Exit States:
-	Rex has several "exit states" that are used to control program flow. Whenever an exit state is active the runtime halts execution and starts dropping blocks from the chain until a specific condition is met (or a native command clears the exit state). Several exit states may be active at once (but in practice this never happens)
-	
-	Return:
-		When this exit state is active blocks are dropped until a user command is exited, at which point it is halted by the command call handler.
-	Break:
-		This exit state is halted by the parser after exactly one block is dropped.
-	BreakLoop:
-		This exit state is special in that it is not normally halted by the runtime, it is halted by some native commands (mainly loop and foreach, but most other loops handle it as well)
-		BreakLoop is started by the command breakloop and is halted by being explicitly cleared by a native command.
-	Exit:
-		When this state is active blocks are dropped until there are none left (which exits the script)
-		Exit is started by the exit command and is never halted.
-	
-	Most (if not all) of the commands that start an exit state take a parameter, this parameter is put in the return register. This is a convenience as `true (break)` is functionally identical to `(break true)`.
-	
-	All exit states are cleared when the script exits.
-
 Some Important Commands:
 
 	if condition then [else]
@@ -225,7 +207,10 @@ Some Important Commands:
 			(break true)
 		})
 		
-		This example is much more complicated the the previous ones. 
+		foreach will run it's code block for every item in an indexable. The code block needs to have at least two variables, the first of which foreach will fill in with the current indexable key and the second will be filled with the value.
+		Each indexable type will determine it's own iteration order, for example most maps will iterate randomly and arrays will go from low keys to high keys.
+		
+		This example is much more complicated than the previous ones. 
 		First of all right after the command name you will see a "object literal", I will not try to explain them here, see the "Rex Docs/Rex Basics.txt" file that comes with Rubble.
 		After that comes a block declaration, this is basically a way to add variables to a block before it is created, in this case the variables "key" and "value", which are then filled in by the foreach command. These variables are filled in by position, not name, so you could name them anything you want.
 		The body uses the console:print command to write the values of key and value to the console, nothing too fancy. The important bit is the `(break true)` command at the bottom, this ensures that the block returns true, as if the block returns false the foreach loop will abort early.
@@ -253,7 +238,7 @@ Some Important Commands:
 		(bool:not false) # true
 		
 		The basic boolean operations, I don't use these much, but when you need them you need them.
-		In any case not much to say, if you don't know what these are then you need to go read a beginners programming book (any will do).
+		In any case not much to say, if you don't know what these are then you need to go read a beginners programming book (any one will do).
 	
 	expr expression values...
 		(expr "a+b" 1 3) # 4
@@ -290,7 +275,7 @@ There are 4 core templates that provide support for tilesets:
 
 (The SET_XXX templates insert a entry in the tile or color dictionary that is later retrieved by the #TILE or #COLOR template with the same <ID>, if no entry for <ID> is present in the dictionary <DEFAULT> is used.)
 
-These templates are a little cumbersome to use but you don't have to. All the specialized SHARED_OBJECT templates will detect tile and color information in their contents and automatically inserts calls to #TILE and #COLOR.
+These templates are a little cumbersome to use but you don't have to. All the specialized SHARED_OBJECT templates will detect tile and color information in their contents and automatically insert calls to #TILE and #COLOR as needed.
 This means that you do not need explicit calls to #TILE or #COLOR as plants, inorganics, tools, and material definitions are handled automatically. Vermin creatures also have some tile information included, but as there is no SHARED_OBJECT template for creatures you will have to insert the tileset templates by hand if you need to edit vermin tile numbers, lucky you there is an addon that mostly automates this.
 
 With #TILE and #COLOR handled, all you really need to worry about is SET_TILE and SET_COLOR. If you are adding support for a brand new tileset, the easiest way is to use the "Dev/Tileset/Export" addon. "Dev/Tileset/Export" is a developer addon that makes a list of all calls to #TILE and #COLOR and generates a file containing the corresponding calls to SET_TILE and SET_COLOR.
@@ -299,10 +284,10 @@ You would then edit the generated file to change the tile numbers and colors to 
 If you already have the tileset raws you can use "Dev/Tileset/Insert" to add the templates automatically (and then use "Dev/Tileset/Export" to extract the gathered information).
 THIS PROCEDURE IS ONLY FOR CASES WHERE YOU ALREADY HAVE A FULL SET OF RAWS FOR YOUR TILESET! It is, IMHO, much easier to generate a default tileset addon and then edit that than it is to edit the full raws.
 
-First make a new folder in you addons directory, this will be temporary, so name it anything you want.
+First make a new folder in your addons directory, this will be temporary, so name it anything you want.
 Now copy all the raw files that your tileset modified to your new temporary addon, you want only the changed files.
 
-Now generate the raws, activating ONLY your temporary addon, "Base/Templates", "Base/Clear", "Dev/Tileset/Insert", and "Dev/Tileset/Export", the generated raws are useless, what you want is the file "dev_export_tileset.tile_info.rbl" that should be in your current working directory (generally the directory containing "rubble.exe").
+Now generate the raws, activating ONLY your temporary addon, "Dev/Tileset/Insert", and "Dev/Tileset/Export", the generated raws are useless, what you want is the file "dev_export_tileset.tile_info.rbl" that should be in your current working directory (generally the directory containing "rubble.exe").
 
 Once you have your tileset file ready to go (however you got it) create a new addon and add the tileset file as well as your tileset's font image.
 
@@ -321,6 +306,8 @@ To set things like track tiles you use OPEN_D_INIT, EDIT_D_INIT, CLOSE_D_INIT, a
 [/code]
 Note that CLOSE_D_INIT will set ALL tileset related init settings to their defaults unless a call to EDIT_D_INIT has explicitly set that value! This is so that it is easy to reset values changed by other tilesets you may have installed before. 
 If you use all default init settings all you need to do is call D_INIT_TO_DEFAULTS to make sure a different tileset didn't clobber your settings.
+
+If you want to provide prep support (highly recommended!) you will need to include a couple of other scripts in your addon, see "Tilesets/MLC/Normal" for an example.
 
 ========================================================
 
@@ -501,7 +488,7 @@ Raws: [FOO][BAR][BAZ]
 Internally df:raw:walk is a lot like foreach, so like foreach you have to remember to "break true" unless you want to abort early (breakloop also works as expected).
 
 The other parser is much more flexible, but it can also be much slower. Rather than running code for each tag this parser converts the raws to an indexable that you can use however you wish. This means that you can store single tags and iterate over the raws in any order that you wish, but converting the indexable back to a string is rather slow.
-Another cool thing you can do with this parser is reorder the tags, or even construct new raw files, as the file is just a standard array indexable filled with a custom tag indexables.
+Another cool thing you can do with this parser is reorder the tags, or even construct new raw files, as the file is just a standard array indexable filled with custom tag indexables.
 
 As this parser just generates a standard array (of special tag values) you just use the normal methods you would use with any indexable when working with it.
 
@@ -608,7 +595,7 @@ Feel free to add any other options you like, for a full list run "rubble -h".
 
 Now run the GUI again, it should start properly this time, just without the "Prep" and "Regen" tabs.
 
-Go ahead and delete any addons you don't need (which should be most of them) this will shorten the list and make it easier to find stuff. DO NOT DELETE "Base/Templates" or the "base.init.rex" file! They contain valuable commands you will need, if not now then later.
+Go ahead and delete any addons you don't need (which should be most of them) this will shorten the list and make it easier to find stuff. DO NOT DELETE "Libs/Base" or any ".init.rex" files! They contain valuable commands you will need, if not now then later.
 Most of contents of the "other" directory can be deleted as well, the only things I would suggest you keep are the documents.
 
 Now you should have a copy of Rubble ready to use for various development tasks.
@@ -617,4 +604,4 @@ Most of the time when using Rubble this way you will be working with temporary a
 
 An excellent example of an addon meant to be used with a setup like this is "Dev/Tileset/Insert", it is less than useful for end users, but invaluable for developers. For example when using "Dev/Tileset/Insert" with the "DEV_TILESET_INSERT_EXPORT" config variable set it works best on a minimal setup like this, otherwise you trash your default settings and/or send too much time wading around other things you may have installed.
 
-If you really want to get fancy you can install go (golang.org) and build "rexsh" as directed in "src/Building.txt", this is an invaluable tool when trying to learn how to script with Rubble, and makes testing small code snippets a breeze. Unfortunately while building a go program is absurdly easy compared to building programs written in most languages it is still something best left to advanced users.
+If you really want to get fancy you can install go (golang.org) and build "rexsh" as directed in "other/src/Building.txt", this is an invaluable tool when trying to learn how to script with Rubble, and makes testing small code snippets a breeze. Unfortunately while building a go program is absurdly easy compared to building programs written in most languages it is still something best left to advanced users.

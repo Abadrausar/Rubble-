@@ -17,7 +17,12 @@ command rubble:dfhack_loadscript scr {
 }
 
 command rubble:dfhack_runcommand com {
-	[rubble:dfhack_commands [com] = true]
+	var comstring = ""
+	(foreach [com] block _ param {
+		[comstring = (str:add [comstring] [param] ' ')]
+		(break true)
+	})
+	[rubble:dfhack_commands [comstring] = [com]]
 }
 
 command rubble:dfhack_write {
@@ -32,14 +37,8 @@ command rubble:dfhack_write {
 	})
 	
 	[base = (str:add [base] "\n-- Commands:\n")]
-	(foreach [rubble:dfhack_commands] block com _ {
-		var comstring = ""
-		(foreach [com] block _ param {
-			[comstring = (str:add [comstring] [param] ' ')]
-			(break true)
-		})
+	(foreach [rubble:dfhack_commands] block comstring com {
 		[base = (str:add [base] "\nprint(\"  Command: " [comstring] "\")\n")]
-		
 		[base = (str:add [base] "dfhack.run_command(")]
 		(foreach [com] block _ param {
 			[base = (str:add [base] '"' [param] '",')]
@@ -69,3 +68,5 @@ command rubble:dfhack_write {
 (rubble:template "DFHACK_RUNCOMMAND" block ... {
 	(rubble:dfhack_runcommand [params])
 })
+
+# The Reaction template is with the tech templates.

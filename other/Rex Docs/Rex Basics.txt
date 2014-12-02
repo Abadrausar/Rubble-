@@ -154,7 +154,7 @@ If you do run into a case where this causes problems, most of the basic types ma
 Values
 ==============================================
 
-Script values are stored internally as several types: nil, string, int, float, bool, code, index, and user.
+Script values are stored internally as several types: nil, string, int, float, bool, code, command, index, and user.
 
 The run-time knows how to convert between types automatically, though some types will not yield useful data if converted.
 
@@ -177,10 +177,30 @@ Type user is special in that it may contain literally anything that a command wa
 
 Type code is used internally for code blocks (sections of code contained in curly brackets).
 
+Type command is used internally for native commands.
+
 If you need a value to be a specific type or you want to see what type a value has, there are some commands in the "convert" module that may prove useful.
 
 For example '1.0' will have type float, but if you need an int you can use '(convert:int 1.0)' and get the int value '1'.
 '(convert:type value)' will return a string describing a value's type. Please note that some types lack conversion commands, as those types cannot be converted to. For example it would be pretty silly to try to convert most of the types to an indexable, so there is no "convert to index" command.
+
+==============================================
+Values and Commands
+==============================================
+
+Internally all commands are values, and (in some cases) a command may be used like a variable or a variable like a command.
+
+The main issue with using variables as commands is caused by the way Rex handles global variables. The command call operator always expects to be fed the name of a global variable, but the variable operator alway expects a local variable. If the variable/command is in a module there is not a problem, but for non-module variables/commands things will not work as expected.
+
+For example the following will not work:
+	[ret]
+But this will:
+	[console:print]
+The first one will complain about not finding a local variable named "ret" (because the variable operator assumes that if it does not have a module name it is local).
+
+The same problem happens when you try to use a local variable with the command call operator, it assumes that the name describes a global variable no matter what.
+
+Most of the time it is fine to just pretend that variables and commands have nothing in common, but sometimes it is nice to be able to treat one as the other.
 
 ==============================================
 More Indexables
@@ -226,6 +246,30 @@ foreach example:
 		(console:print [key] " = " [value] "\n")
 		(break true)
 	})
+
+==============================================
+Exit States
+==============================================
+
+Rex has several "exit states" that are used to control program flow. Whenever an exit state is active the runtime halts execution and starts dropping blocks from the chain until a specific condition is met (or a native command clears the exit state). Several exit states may be active at once (but in practice this never happens)
+
+Return:
+	When this exit state is active blocks are dropped until a user command is exited, at which point it is halted by the command call handler.
+
+Break:
+	This exit state is halted by the parser after exactly one block is dropped.
+
+BreakLoop:
+	This exit state is special in that it is not normally halted by the runtime, it is halted by some native commands (mainly loop and foreach, but most other loops handle it as well)
+	BreakLoop is started by the command breakloop and is halted by being explicitly cleared by a native command.
+
+Exit:
+	When this state is active blocks are dropped until there are none left (which exits the script)
+	Exit is started by the exit command and is never halted.
+
+Most (if not all) of the commands that start an exit state take a parameter, this parameter is put in the return register. This is a convenience as `true (break)` is functionally identical to `(break true)`.
+
+All exit states are cleared when the script exits.
 
 ==============================================
 GenII

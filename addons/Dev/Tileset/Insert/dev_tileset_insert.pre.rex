@@ -12,29 +12,35 @@ var export = false
 	[export = true]
 })
 
-command rubble:dev_tileset_insert:guts name contents type {
+command rubble:dev_tileset_insert:guts name contents prefix tags tagprefix="" {
 	var foundfirst = false
 	var prev
 	var file = (df:raw:parse [contents])
 	(foreach [file] block i tag {
-		(if (str:cmp [tag id] [type]) {
-			(if (int:eq (len [tag params]) 1) {
-				(if (bool:and (exists [file] (int:sub [i] 1)) [foundfirst]) {
-					[file (int:sub [i] 1) append = "\n}"]
+		(foreach [tags] block _ type {
+			(if (str:cmp [tag id] (str:add [tagprefix] [type])) {
+				(if (int:eq (len [tag params]) 1) {
+					(if (bool:and (exists [file] (int:sub [i] 1)) [foundfirst]) {
+						[file (int:sub [i] 1) append = "\n}"]
+					})
+					[foundfirst = true]
+					[tag replace = (str:add "{" [prefix] [type] ";" [tag params 0] ";")]
+				}{
+					(rubble:abort (str:add "Error: invalid param count to " [type] " raw tag in last file."))
 				})
-				[foundfirst = true]
-				[tag replace = (str:add "{SHARED_" [type] ";" [tag params 0] ";\n\t")]
-			}{
-				(rubble:abort (str:add "Error: invalid param count to " [type] " raw tag in last file."))
 			})
 		})
+	})
+	
+	(if [foundfirst] {
+		[file (int:sub (len [file]) 1) append = "\n}"]
 	})
 	
 	var out = (df:raw:dump [file])
 	[rubble:raws [name] = [out]]
 	
 	(if [export] {
-		(axis:write [rubble:fs] (str:add "rubble:" [name]) [out])
+		(axis:write [rubble:fs] (str:add "rubble:dev_tileset_insert/" [name]) [out])
 	})
 }
 
@@ -57,41 +63,16 @@ var itemtypes = <sarray
 
 (foreach [rubble:raws] block name contents {
 	(if (str:cmp "inorganic_" (str:left [name] 10)) {
-		(rubble:dev_tileset_insert:guts [name] [contents] "INORGANIC")
+		(rubble:dev_tileset_insert:guts [name] [contents] "SHARED_" <sarray "INORGANIC">)
 	}{
 		(if (str:cmp "plant_" (str:left [name] 6)) {
-			(rubble:dev_tileset_insert:guts [name] [contents] "PLANT")
+			(rubble:dev_tileset_insert:guts [name] [contents] "SHARED_" <sarray "PLANT">)
 		}{
 			(if (str:cmp "material_template_" (str:left [name] 18)) {
-				(rubble:dev_tileset_insert:guts [name] [contents] "MATERIAL_TEMPLATE")
+				(rubble:dev_tileset_insert:guts [name] [contents] "SHARED_" <sarray "MATERIAL_TEMPLATE">)
 			}{
 				(if (str:cmp "item_" (str:left [name] 5)) {
-					var foundfirst = false
-					var prev
-					var file = (df:raw:parse [contents])
-					(foreach [file] block i tag {
-						(foreach [itemtypes] block _ type {
-							(if (str:cmp [tag id] (str:add "ITEM_" [type])) {
-								(if (int:eq (len [tag params]) 1) {
-									(if (bool:and (exists [file] (int:sub [i] 1)) [foundfirst]) {
-										[file (int:sub [i] 1) append = "\n}"]
-									})
-									[foundfirst = true]
-									[tag replace = (str:add "{SHARED_ITEM;" [type] ";" [tag params 0] ";\n\t")]
-									(breakloop false)
-								}{
-									(rubble:abort (str:add "Error: invalid param count to ITEM_" [type] " raw tag in last file."))
-								})
-							})
-						})
-					})
-					
-					var out = (df:raw:dump [file])
-					[rubble:raws [name] = [out]]
-					
-					(if [export] {
-						(axis:write [rubble:fs] (str:add "rubble:" [name]) [out])
-					})
+					(rubble:dev_tileset_insert:guts [name] [contents] "SHARED_ITEM;" [itemtypes] "ITEM_")
 				})
 			})
 		})
@@ -213,7 +194,7 @@ var changedFile = false
 			[rubble:raws [name] = [newfile]]
 			
 			(if [export] {
-				(axis:write [rubble:fs] (str:add "rubble:" [name]) [newfile])
+				(axis:write [rubble:fs] (str:add "rubble:dev_tileset_insert/" [name]) [newfile])
 			})
 		})
 		[changedFile = false]

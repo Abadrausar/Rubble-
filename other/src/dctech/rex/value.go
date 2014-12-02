@@ -32,6 +32,7 @@ const (
 	TypFloat          // float64
 	TypBool           // bool
 	TypCode           // *Code
+	TypCommand        // NativeCommand
 	TypIndex          // Indexable or EditIndexable
 	TypUser           // User data, could be anything
 )
@@ -92,6 +93,15 @@ func NewValueBool(val bool) *Value {
 func NewValueCode(val *Code) *Value {
 	return &Value{
 		Type: TypCode,
+		Data: val,
+		Pos: NewPosition(1, 1, ""),
+	}
+}
+
+// NewValueCommand creates a new Value from a NativeCommand.
+func NewValueCommand(val NativeCommand) *Value {
+	return &Value{
+		Type: TypCommand,
 		Data: val,
 		Pos: NewPosition(1, 1, ""),
 	}
@@ -202,6 +212,8 @@ func (val *Value) CodeString() string {
 		}
 		out += "}"
 		return out
+	case TypCommand:
+		return "\"{NativeCommand}\""
 	case TypIndex:
 		return val.Data.(Indexable).CodeString()
 	case TypUser:
@@ -236,6 +248,8 @@ func (val *Value) String() string {
 		}
 		out += "}"
 		return out
+	case TypCommand:
+		return "{NativeCommand}"
 	case TypIndex:
 		return val.Data.(Indexable).String()
 	case TypUser:
@@ -267,6 +281,8 @@ func (val *Value) Int64() int64 {
 		}
 		return 0
 	case TypCode:
+		return 0
+	case TypCommand:
 		return 0
 	case TypIndex:
 		return 0
@@ -300,6 +316,8 @@ func (val *Value) Float64() float64 {
 		return 0.0
 	case TypCode:
 		return 0.0
+	case TypCommand:
+		return 0.0
 	case TypIndex:
 		return 0.0
 	case TypUser:
@@ -330,6 +348,8 @@ func (val *Value) Bool() bool {
 		return val.Data.(bool)
 	case TypCode:
 		return true
+	case TypCommand:
+		return true
 	case TypIndex:
 		return val.Data != nil
 	case TypUser:
@@ -354,6 +374,8 @@ func (val *Value) TypeString() string {
 		return "bool"
 	case TypCode:
 		return "code"
+	case TypCommand:
+		return "command"
 	case TypIndex:
 		return "index"
 	case TypUser:
@@ -361,6 +383,34 @@ func (val *Value) TypeString() string {
 	}
 	RaiseError("Script Value has invalid Type.")
 	panic("UNREACHABLE")
+}
+
+// NativeCommand is the function signature for a native command handler.
+type NativeCommand func(*Script, []*Value)
+
+func (val *Value) call(script *Script, params []*Value) {
+	if val.Type != TypCommand && val.Type != TypCode {
+		RaiseError("Attempt to call non-runnable value.")
+	}
+	
+	// Native command
+	if val.Type == TypCommand {
+		val.Data.(NativeCommand)(script, params)
+		return
+	}
+
+	// User command
+
+	// Parameters are always the first variables in a block.
+	block := val.Data.(*Code)
+	script.Locals.Add(block)
+	
+	script.setParams(block, params)
+
+	script.Exec(block)
+	script.Locals.Remove()
+	script.Return = false
+	return
 }
 
 // Formatting Functions

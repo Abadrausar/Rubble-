@@ -67,7 +67,7 @@ var rubble:reaction_data = <map>
 	(for 1 (int:sub (len [params]) 1) 1 block count {
 		var class = [params [count]]
 		(if (exists [rubble:reaction_data] [class]){
-			[rubble:reaction_data [class] "append" = [id]]
+			[rubble:reaction_data [class] append = [id]]
 		}{
 			[rubble:reaction_data [class] = <array [id]>]
 		})
@@ -83,7 +83,7 @@ var rubble:reaction_data = <map>
 	(for 2 (int:sub (len [params]) 1) 1 block count {
 		var class = [params [count]]
 		(if (exists [rubble:reaction_data] [class]){
-			[rubble:reaction_data [class] "append" = [id]]
+			[rubble:reaction_data [class] append = [id]]
 		}{
 			[rubble:reaction_data [class] = <array [id]>]
 		})

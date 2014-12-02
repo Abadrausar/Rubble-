@@ -86,7 +86,7 @@ Add CHILD Tags:
 	DOES_NOT_EXIST, NOT_LIVING, and EQUIPMENT_WAGON count as CHILD tags for the purpose of this script, vermin are also skipped.
 	This addon is stand-alone, as it uses no outside templates.
 
-Base/Files:
+Base:
 	The standard base addon. Contains Rubblized versions of the vanilla raw files. 
 	Do not disable unless you have a replacement.
 
@@ -152,17 +152,15 @@ Libs/Castes:
 	Adds support for dynamically adding castes to a creature.
 
 Libs/Castes/DFHack/Transform:
-	Adds support for transforming castes via autosyndrome and true transform.
+	Adds support for transforming castes via autoSyndrome and syndromeTrigger.
 	Requires the "Libs/Castes" addon.
 
 Libs/Crates:
 	Adds infrastructure for "crates", eg bars that can be bought from caravans and then "unpacked" via special reactions into items.
-	This templates added by this addon are always available (even when the addon is not active). If the addon is not active then the templates will not actually do anything.
-	The main reason for having always active templates is so that adding crate support in many addons is very easy.
+	The templates added by this addon are always available (even when the addon is not active). If the addon is not active then the templates will not actually do anything.
 
 Libs/DFHack/Add Reaction:
 	Allows you to add reactions to buildings that are normally not possible to add reactions to, also allows you to remove all hardcoded reactions from a building.
-	This addon uses an automatically generated DFHack script that is unique to each set of raws, to ensure proper operation of this addon use "rubble -prep=<region>" before loading a region that uses this addon! If you do not prep between switching regions this addon may fail to work!
 	Requires the "Base/Templates" addon.
 	WARNING! Largely untested!
 
@@ -174,7 +172,7 @@ Libs/DFHack/Announcement:
 
 Libs/DFHack/Command:
 	This addon is a modders resource for running DFHack commands from reactions.
-	Activating this addon adds a template that generates reaction product lines for autosyndrome boiling rocks (the boiling rocks in question are automatically defined).
+	Activating this addon adds a template that generates reaction product lines for autoSyndrome boiling rocks (the boiling rocks in question are automatically defined).
 	This addon also provides a script command for advanced usage.
 
 Libs/DFHack/Fluids:
@@ -209,7 +207,7 @@ Tileset/MLC/Normal:
 
 Tileset/MLC/Tracks:
 	A simple addon that installs my custom ASCII-like tileset.
-	This version has really nice track graphics. The only side effect should be "railroad rivers" on the world map.
+	This version has really nice track graphics. There are a bunch of things that will look a little funny, but tracks look great.
 	This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
 
 Tileset/MLC/DFHack/TWBT:
@@ -251,6 +249,13 @@ I know everything there is to know about how Rubble works and so I tend to forge
 ==============================================
 Changelog:
 ==============================================
+v4.0 (for DF 40.3)
+	First public release for the 4.x series.
+	Replaced "Base" with a base made from the raws for DF 40.3.
+	While the DFHack library addons were not removed do not assume that they will work with DFHack for DF2014.
+		In particular anything that needs "Libs/DFHack/Command" probably won't work.
+		"Libs/Caste/DFHack/Transform" will probably work just fine as will "Libs/DFHack/Add Reaction".
+
 v4pre (for DF 34.11, changes from Rubble 3.13)
 	Changed scripting subsystems from Raptor to Rex.
 		Rex is a little less flexible but ultimately faster and more powerful scripting language loosely based on Raptor.
@@ -333,4 +338,6 @@ v4pre (for DF 34.11, changes from Rubble 3.13)
 	Replaced the "Libs/Base" DFHack support with a much more flexible and less error prone system, no more extra install steps!
 	Updated "Libs/DFHack/Add Reaction" to use the new DFHack support.
 		There is no longer a need to prep between regions when using this addon.
+	Moved "Base/Files" to "Base"
+	Updated "Libs/Caste/DFHack/Transform" to use the newest DFHack stuff.
 	Updated a LOT of documentation, and still more needs to be written...

@@ -27,7 +27,6 @@ import "sync"
 // A Module is a named, hierarchical global data store that may
 // contain other Modules, variables, types, and commands.
 type Module struct {
-	commands *commandStore
 	modules  *moduleStore
 	types    *typeStore
 	vars     *valueStore
@@ -36,7 +35,6 @@ type Module struct {
 // newModule will create a new, empty Module.
 func newModule() *Module {
 	return &Module{
-		commands: newCommandStore(),
 		modules: newModuleStore(),
 		types: newTypeStore(),
 		vars: newValueStore(),
@@ -52,7 +50,7 @@ func (mod *Module) RegisterVar(name string, val *Value) {
 // RegisterCommand will create a new Module native command.
 // WARNING! If you try to redeclare a command this function will case a panic!
 func (mod *Module) RegisterCommand(name string, handler NativeCommand) {
-	mod.commands.add(name, NewNativeCommand(handler))
+	mod.vars.addAndSet(name, NewValueCommand(handler))
 }
 
 // RegisterType will create a new Module indexable type.

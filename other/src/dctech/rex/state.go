@@ -30,7 +30,7 @@ import "os"
 // The majority of the fields are exported for the use of commands only.
 type State struct {
 	modules   *moduleStore
-	commands  *commandStore
+	vars      *valueStore
 	types     *typeStore
 	NoRecover bool      // Do not recover errors, this makes it easier to debug internal errors.
 	Output    io.Writer // Normally set to os.Stdout, this can be changed to redirect to a log file or the like.
@@ -40,7 +40,7 @@ type State struct {
 func NewState() *State {
 	return &State{
 		modules: newModuleStore(),
-		commands: newCommandStore(),
+		vars: newValueStore(),
 		types: newTypeStore(),
 		Output: os.Stdout,
 	}
@@ -51,7 +51,7 @@ func NewState() *State {
 // RegisterCommand registers a new native command.
 // WARNING! If you try to redeclare a command this function will case a panic!
 func (state *State) RegisterCommand(name string, handler NativeCommand) {
-	state.commands.add(name, NewNativeCommand(handler))
+	state.vars.addAndSet(name, NewValueCommand(handler))
 }
 
 // RegisterType registers a new global indexable type.

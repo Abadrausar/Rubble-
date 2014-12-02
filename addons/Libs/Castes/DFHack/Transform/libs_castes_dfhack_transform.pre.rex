@@ -1,6 +1,9 @@
 
 (rubble:requireaddon "Libs/Castes/DFHack/Transform" "Libs/Castes")
 
+(rubble:dfhack_runcommand <sarray autoSyndrome enable>)
+(rubble:dfhack_runcommand <sarray syndromeTrigger enable>)
+
 module rubble:libs_castes_transform
 
 # creature -> array of transform objects
@@ -48,61 +51,17 @@ var rubble:libs_castes_transform:transforms = (sort:new)
 				"\t[LIQUID_DENSITY:2000000]\n"
 				"\t[SYNDROME]\n"
 				"\t\t{#SYN_AFFECTED_MALES;" [creature] "}\n"
+				"\t\t[SYN_CLASS:\\AUTO_SYNDROME]\n"
 				"\t\t[SYN_CLASS:\\WORKER_ONLY]\n"
-				"\t\t[CE_CAN_DO_INTERACTION:START:0:END:299]\n"
-				"\t\t\t[CDI:INTERACTION:CASTE_TRANSFORM_MALE_" [creature] "_" [transform "to"] "]\n"
-				"\t\t\t[CDI:TARGET:A:SELF_ONLY]\n"
-				"\t\t\t[CDI:ADV_NAME:change caste]\n"
-				"\t\t\t[CDI:TARGET_RANGE:A:1]\n"
-				"\t\t\t[CDI:MAX_TARGET_NUMBER:A:1]\n"
-				"\t\t\t[CDI:WAIT_PERIOD:300]\n"
-				"\t[SYNDROME]\n"
-				"\t\t{#SYN_AFFECTED_FEMALES;" [creature] "}\n"
-				"\t\t[SYN_CLASS:\\WORKER_ONLY]\n"
-				"\t\t[CE_CAN_DO_INTERACTION:START:0:END:299]\n"
-				"\t\t\t[CDI:INTERACTION:CASTE_TRANSFORM_FEMALE_" [creature] "_" [transform "to"] "]\n"
-				"\t\t\t[CDI:TARGET:A:SELF_ONLY]\n"
-				"\t\t\t[CDI:ADV_NAME:change caste]\n"
-				"\t\t\t[CDI:TARGET_RANGE:A:1]\n"
-				"\t\t\t[CDI:MAX_TARGET_NUMBER:A:1]\n"
-				"\t\t\t[CDI:WAIT_PERIOD:300]\n"
-			)]
-			(break true)
-		})
-		(break true)
-	})
-	
-	(str:trimspace (rubble:stageparse [out]))
-})
-
-(rubble:template "#CASTE_TRANSFORM_INTERACTIONS" {
-	var out = ""
-	(foreach [rubble:libs_castes_transform:transforms] block creature transforms {
-		(foreach [transforms] block _ transform {
-			[out = (str:add [out]
-				"\n"
-				"[INTERACTION:CASTE_TRANSFORM_MALE_" [creature] "_" [transform "to"] "]\n"
-				"\t[I_TARGET:A:CREATURE]\n"
-				"\t\t[IT_LOCATION:CONTEXT_CREATURE]\n"
-				"\t\t[IT_MANUAL_INPUT:self]\n"
-				"\t[I_EFFECT:ADD_SYNDROME]\n"
-				"\t\t[IE_TARGET:A]\n"
-				"\t\t[IE_IMMEDIATE]\n"
-				"\t\t[SYNDROME]\n"
 				"\t\t\t[CE_BODY_TRANSFORMATION:PROB:100:START:0:END:" [transform "time"] "]\n"
 				"\t\t\t[CE:CREATURE:" [transform "intermediate"] "]\n"
 				"\t\t\t[SYN_CLASS:\\PERMANENT]\n"
 				"\t\t\t[SYN_CLASS:" [creature] "]\n"
 				"\t\t\t[SYN_CLASS:MALE_" [transform "to"] "]\n"
-				"\n"
-				"[INTERACTION:CASTE_TRANSFORM_FEMALE_" [creature] "_" [transform "to"] "]\n"
-				"\t[I_TARGET:A:CREATURE]\n"
-				"\t\t[IT_LOCATION:CONTEXT_CREATURE]\n"
-				"\t\t[IT_MANUAL_INPUT:self]\n"
-				"\t[I_EFFECT:ADD_SYNDROME]\n"
-				"\t\t[IE_TARGET:A]\n"
-				"\t\t[IE_IMMEDIATE]\n"
-				"\t\t[SYNDROME]\n"
+				"\t[SYNDROME]\n"
+				"\t\t{#SYN_AFFECTED_FEMALES;" [creature] "}\n"
+				"\t\t[SYN_CLASS:\\AUTO_SYNDROME]\n"
+				"\t\t[SYN_CLASS:\\WORKER_ONLY]\n"
 				"\t\t\t[CE_BODY_TRANSFORMATION:PROB:100:START:0:END:" [transform "time"] "]\n"
 				"\t\t\t[CE:CREATURE:" [transform "intermediate"] "]\n"
 				"\t\t\t[SYN_CLASS:\\PERMANENT]\n"
@@ -114,5 +73,5 @@ var rubble:libs_castes_transform:transforms = (sort:new)
 		(break true)
 	})
 	
-	(str:trimspace [out])
+	(str:trimspace (rubble:stageparse [out]))
 })

@@ -255,11 +255,11 @@ func (state *State) compileName(lex *Lexer, code *Code, typ int) {
 			// Command name
 			if Module == nil {
 				// Global
-				index = state.commands.lookup(lex.current.Lexeme)
+				index = state.vars.lookup(lex.current.Lexeme)
 				break
 			}
 			// Module
-			index = Module.commands.lookup(lex.current.Lexeme)
+			index = Module.vars.lookup(lex.current.Lexeme)
 			break
 
 		case tknVarBegin:
@@ -358,10 +358,10 @@ func (state *State) compileDeclCommand(lex *Lexer, code *Code) {
 		body := state.compileCommandBody(lex, block)
 		
 		if Module == nil {
-			state.commands.add(name, NewUserCommand(body))
+			state.vars.addAndSet(name, body)
 			return
 		}
-		Module.commands.add(name, NewUserCommand(body))
+		Module.vars.addAndSet(name, body)
 		return
 	}
 }

@@ -258,7 +258,7 @@ func (script *Script) execCommand() {
 
 	// Read the command's name
 	var module *Module = nil
-	var command *Command = nil
+	var command *Value = nil
 	for {
 		script.code.last().getOpCode(opName)
 
@@ -276,11 +276,11 @@ func (script *Script) execCommand() {
 
 		if module == nil {
 			// Global
-			command = script.Host.commands.get(script.code.last().current().Index)
+			command = script.Host.vars.get(script.code.last().current().Index)
 			break
 		}
 		// Module
-		command = module.commands.get(script.code.last().current().Index)
+		command = module.vars.get(script.code.last().current().Index)
 		break
 	}
 
