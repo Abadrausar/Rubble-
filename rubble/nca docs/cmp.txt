@@ -1,0 +1,18 @@
+
+Equal. Does a simple string compare. Make sure numeric values are normalized. If you try to load a hexadecimal constant and compare it to a existing number it will not work correctly. A simple (set numbervar (add [numbervar] 0)) should work.
+
+	eq a b
+
+    Returns "0" or "-1"
+
+Greater than. If the value can be converted to int64 that is the value used otherwise the length is used.
+
+	gt a b
+
+    Returns "0" or "-1"
+
+Less than. If the value can be converted to int64 that is the value used otherwise the length is used.
+
+	lt a b
+
+    Returns "0" or "-1"

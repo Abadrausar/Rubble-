@@ -1,0 +1,30 @@
+
+Add two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+
+	add a b
+
+    Returns a + b
+
+Divide two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+
+	div a b
+
+    Returns a / b
+
+Give the remainder of dividing two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+
+	mod a b
+
+    Returns a % b
+
+Multiply two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+
+	mul a b
+
+    Returns a * b
+
+Subtract two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+
+	sub a b
+
+    Returns a - b

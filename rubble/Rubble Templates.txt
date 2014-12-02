@@ -69,7 +69,7 @@ Template are about to go through a major rewrite, the stuff here is mostly lefto
 {!SCRIPT;<NCACODE>} or {!SCRIPT;<NCACODE>;<PARAMS>...}
 {SCRIPT;<NCACODE>} or {SCRIPT;<NCACODE>;<PARAMS>...}
 {#SCRIPT;<NCACODE>} or {#SCRIPT;<NCACODE>;<PARAMS>...}
-	Run a NCA4 script and returns whatever the script returns. This is not very useful yet because there are no custom NCA commands for Rubble yet. When this is finished you will be able to script most Rubble actions as well as do all sorts of other things.
+	Run a NCA4 script as a command and returns whatever the script returns.
 
 ==============================================
 {#ADVENTURE_TIER}
@@ -80,25 +80,57 @@ Template are about to go through a major rewrite, the stuff here is mostly lefto
 		{#ADVENTURE_TIER} -> [ADVENTURE_TIER:2]
 
 ==============================================
-{ITEM_CLASS;<TYPE>;<ITEM>;<RARITY>;<CLASS>} or {ITEM_CLASS;<TYPE>;<ITEM>;<RARITY>;<CLASS>;<TAGS>...}
-	Registers an item <ITEM> of type <TYPE> to item class <CLASS> with rarity <RARITY>, optionally assigning specific <TAGS>. Used later with #USES_ITEM_CLASSES.
+{ITEM;<TYPE>;<ITEM>;<RARITY>;<CLASS>...} or {ITEM;<TYPE>;<ITEM>;<CLASS>...}
+	Registers an item <ITEM> of type <TYPE> to item class <CLASS> with rarity <RARITY>. Used later with #USES_ITEMS. 
+	Returns [ITEM_<TYPE>:<ITEM>]
 	
 	<TYPE> must be one of AMMO, ARMOR, DIGGER, GLOVES, HELM, INSTRUMENT, PANTS, SHIELD, SHOES, SIEGEAMMO, TOOL, TOY, TRAPCOMP or WEAPON.
 	<RARITY> can be RARE, UNCOMMON, COMMON and FORCED.
+	
+	Example:
+		{ITEM;AMMO;ITEM_AMMO_BOLT;COMMON;CROSSBOW} -> [ITEM_AMMO:ITEM_AMMO_BOLT]
 
 ==============================================
-{#USES_ITEM_CLASSES;<CLASSES>...;<TAGS>...}
-	Usable in entity definitions. Expands to a list of item permissions of all the <CLASSES> combined. If tags were specified in a {ITEM_CLASS} call, all of those tags need to be in the tag list for this item permission to be returned. When two item classes contain the same item, but with different rarities, they will result in one item permission tag with the more common of the two rarities. Be careful when using multiple #USES_ITEM_CLASSES calls, and make sure every item is returned by at most one #USES_ITEM_CLASSES call.
+{ITEM_RARITY;<ITEM>;<CLASS>;<RARITY>}
+	Adjust the rarity setting for just one class. Almost never used.
+	
+	<RARITY> can be RARE, UNCOMMON, COMMON and FORCED.
+	
+	Example:
+		{ITEM;PANTS;ITEM_PANTS_PANTS;COMMON;ELVES;DWARVES}
+			{ITEM_RARITY;ITEM_PANTS_PANTS;ELVES;RARE}
+			It is common for dwarves to wear pants but elves prefer to "let it all hang out"
 
 ==============================================
-{TECH_CLASS;<TYPE>;<TECH>;<CLASS>}
-	Similar to ITEM_CLASS, this registers a technology of type <TYPE> to class <CLASS>. Used with #USES_TECH_CLASSES.
-
-	<TYPE> may be either BUILDING or REACTION.
+{#USES_ITEMS;<CLASSES>...}
+	Usable in entity definitions. Expands to a list of item permissions of all the <CLASSES> combined. When two item classes contain the same item, but with different rarities, they will result in one item permission tag with the more common of the two rarities. Be careful when using multiple #USES_ITEMS calls, and make sure every item is returned by at most one #USES_ITEMS call.
 
 ==============================================
-{#USES_TECH_CLASSES;<CLASSES>...}
-	Usable in entity definitions. Expands to a list of tech permissions of all <CLASS>es combined.
+{BUILDING_WORKSHOP;<TECH>;<CLASS>}
+	Similar to ITEM_CLASS, this registers a workshop to class <CLASS>. Used with #USES_TECH or #USES_BUILDINGS.
+	Returns [BUILDING_WORKSHOP:<TECH>]
+
+==============================================
+{BUILDING_FURNACE;<TECH>;<CLASS>}
+	Similar to ITEM_CLASS, this registers a furnace to class <CLASS>. Used with #USES_TECH or #USES_BUILDINGS.
+	Returns [BUILDING_FURNACE:<TECH>]
+
+==============================================
+{#USES_BUILDINGS;<CLASSES>...}
+	Usable in entity definitions. Expands to a list of building permissions of all <CLASS>es combined.
+
+==============================================
+{REACTION;<TECH>;<CLASS>}
+	Similar to ITEM_CLASS, this registers a reaction to class <CLASS>. Used with #USES_TECH or #USES_REACTIONS.
+	Returns [REACTION:<TECH>]
+	
+==============================================
+{#USES_REACTIONS;<CLASSES>...}
+	Usable in entity definitions. Expands to a list of reaction permissions of all <CLASS>es combined.
+
+==============================================
+{#USES_TECH;<CLASSES>...}
+	Combo of #USES_BUILDINGS and #USES_REACTIONS
 
 ==============================================
 {#ADV_TIME;<AMOUNT>;<UNIT>}
@@ -124,10 +156,15 @@ Template are about to go through a major rewrite, the stuff here is mostly lefto
 
 ==============================================
 {SHARED_INORGANIC;<NAME>;<DEFINITION>}
-{SHARED_MATERIAL_TEMPLATE;<NAME>;<DEFINITION>}
-	Adds a common inorganic or material template to the dictionary. <DEFINITION> should be a complete inorganic stone entry, including the [INORGANIC:<NAME>] tag. If this template call is the first to define this type of stone, then the given <DEFINITION> will be used in the finished raws. 
+	Adds a common inorganic to the dictionary. <DEFINITION> should be a complete inorganic stone entry, EXCLUDING the [INORGANIC:<NAME>] tag. If this template call is the first to define this inorganic, then the given <DEFINITION> will be used in the finished raws. 
 	
 	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_ORE, REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
+
+==============================================
+{SHARED_MATERIAL_TEMPLATE;<NAME>;<DEFINITION>}
+	Adds a common material template to the dictionary. <DEFINITION> should be a complete template entry, EXCLUDING the [MATERIAL_TEMPLATE:<NAME>] tag. If this template call is the first to define this material template, then the given <DEFINITION> will be used in the finished raws. 
+	
+	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
 
 ==============================================
 {REGISTER_ORE;<ORE>;<METAL>;<AMOUNT>}
@@ -146,3 +183,7 @@ Template are about to go through a major rewrite, the stuff here is mostly lefto
 	Adds a common item of name <NAME> to the item dictionary. <DEFINITION> should be a complete item entry, including the [ITEM_<TYPE>:<NAME>] tag. If this template call is the first to define this item, then the given <DEFINITION> will be used in the finished raws.
 	
 	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws.
+
+==============================================
+{PANIC;<MESSAGE>}
+	Forces Rubble to exit, <MESSAGE> is displayed.

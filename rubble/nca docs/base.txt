@@ -1,0 +1,138 @@
+
+A "soft" return, break will never return more than one level.
+
+	break [value]
+
+    Calling break inside a loop or if command will return from the current
+    BLOCK not the command itself, this makes break good for ensuring if
+    returns a specific value and/or "returning" a value to loop. Returns
+    value or unchanged.
+
+Create a new user command.
+
+	command name code [paramName...]
+
+    Returns unchanged.
+
+Delete a map.
+
+	delmap name
+
+    Returns unchanged
+
+Delete a variable.
+
+	delvar name
+
+    Returns the deleted vars value.
+
+Evaluate code in the current environment.
+
+	eval code
+
+    Returns the return value of the last command in the code it runs.
+
+Evaluate code in the current environment's parent.
+
+	evalinparent code
+
+    Returns the return value of the last command in the code it runs.
+
+Exit the script.
+
+	exit [value]
+
+    Returns value or unchanged.
+
+Get the error flag.
+
+	geterror
+
+    Returns "-1" or "0".
+
+If the condition is true run true code else if false code exists call false code.
+
+	if condition truecode [falsecode]
+
+    Returns the return value of the last command in the code it runs or
+    unchanged.
+
+Run code for as long as the code returns true.
+
+	loop code
+
+    Returns the return value of the last command in the code it runs, always
+    "0" or "" unless loop exited with ret (In which case the return value is
+    unusable by the command calling loop anyway).
+
+Create a new map.
+
+	map name
+
+    Returns unchanged
+
+Create a new namespace.
+
+	namespace name
+
+    Returns unchanged.
+
+Do nothing.
+
+	nop
+
+    VERY useful as a replacement for short lived variables. Example:
+
+	(fileio:read "somefile.ini")
+	(ini:parse (nop))
+	(ini:getvalue (nop) "somesection" "somekey")
+	(console:print (nop))
+
+    This showcases the rule that if a command returns nothing the return
+    value will be the same as the return value of the previous command to
+    run. Returns unchanged.
+
+Return from current command.
+
+	ret [value]
+
+    Some commands will be bypassed like if and loop, for example calling ret
+    from inside a loop will not return from the loop, it will return from
+    the command that called loop. See break. Returns value or unchanged.
+
+Run code as a user command.
+
+	run code [params...]
+
+    Returns the return value of the last command in the code it runs.
+
+Set the value of variable "name" to value or sets the value of map
+    "name" at index to value.
+
+	set name [index] value
+
+    Returns value.
+
+Set (or unsets) the error flag.
+
+	seterror [value]
+
+    If you pass no params the error flag will be set, to unset pass "0" or
+    "" Returns unchanged.
+
+Create a new variable setting the value to value if present.
+
+	var name [value]
+
+    Returns value or unchanged.
+
+Run code as command for each entry in a map.
+
+	foreach map code
+	
+	Params for code:
+	
+	code key value
+	
+	If code returns false foreach aborts.
+	Returns the return value of the last command in code.

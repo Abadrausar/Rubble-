@@ -190,6 +190,24 @@ func (this *State) SetValueMap(name, index string, value *Value) {
 	panic(fmt.Sprintf("Undeclared map: \"%v\"", name))
 }
 
+// GetMap retrives a map for advanced command usage.
+func (this *State) GetMap(name string) map[string]*Value {
+	space, itemname := this.ParseName(name)
+	if space == nil {
+		for i := len(*this.Envs) - 1; i >= 0; i-- {
+			if _, ok := (*this.Envs)[i].Maps[itemname]; ok {
+				return (*this.Envs)[i].Maps[itemname]
+			}
+		}
+		panic(fmt.Sprintf("Undeclared map: \"%v\"", name))
+	}
+
+	if _, ok := space.Maps[itemname]; ok {
+		return space.Maps[itemname]
+	}
+	panic(fmt.Sprintf("Undeclared map: \"%v\"", name))
+}
+
 // AddParams creates the special "params" map using strings.
 func (this *State) AddParams(params ...string) {
 	this.NewMap("params")

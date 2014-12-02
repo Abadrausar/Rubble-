@@ -5,6 +5,7 @@ import "strings"
 import "strconv"
 import "sort"
 import "regexp"
+import "dctech/nca4"
 
 func SetupBuiltins() {
 	NewNativeTemplate("!TEMPLATE", tempTemplate)
@@ -17,24 +18,28 @@ func SetupBuiltins() {
 	NewNativeTemplate("SET", tempSet)
 	NewNativeTemplate("IF", tempIf)
 	
-	// Not very useful yet, needs custom nca commands
 	NewNativeTemplate("!SCRIPT", tempScript)
 	NewNativeTemplate("SCRIPT", tempScript)
 	NewNativeTemplate("#SCRIPT", tempScript)
 	
 	NewNativeTemplate("#ADVENTURE_TIER", tempAdventureTier)
 	
-	// Replace?
-	NewNativeTemplate("ITEM_CLASS", tempItemClass)
-	NewNativeTemplate("#USES_ITEM_CLASSES", tempUsesItemClasses)
-	NewNativeTemplate("TECH_CLASS", tempTechClass)
-	NewNativeTemplate("#USES_TECH_CLASSES", tempUsesTechClasses)
+	NewNativeTemplate("ITEM", tempItem)
+	NewNativeTemplate("ITEM_RARITY", tempItemRarity)
+	NewNativeTemplate("#USES_ITEMS", tempUsesItems)
+
+	NewNativeTemplate("BUILDING_WORKSHOP", tempBuildingWorkshop)
+	NewNativeTemplate("BUILDING_FURNACE", tempBuildingFurnace)
+	NewNativeTemplate("#USES_BUILDINGS", tempUsesBuildings)
+	NewNativeTemplate("REACTION", tempReaction)
+	NewNativeTemplate("#USES_REACTIONS", tempUsesReactions)
+	NewNativeTemplate("#USES_TECH", tempUsesTech)
 	
 	NewNativeTemplate("#ADV_TIME", tempAdvTime)
 	NewNativeTemplate("#FORT_TIME", tempFortTime)
 	
 	NewNativeTemplate("SHARED_INORGANIC", tempSharedInorganic)
-	NewNativeTemplate("SHARED_MATERIAL_TEMPLATE", tempSharedInorganic)
+	NewNativeTemplate("SHARED_MATERIAL_TEMPLATE", tempSharedMaterialTemplate)
 	
 	NewNativeTemplate("REGISTER_ORE", tempRegisterOre)
 	NewNativeTemplate("#_REGISTERED_ORES", tempRegisteredOres)
@@ -43,8 +48,9 @@ func SetupBuiltins() {
 	NewNativeTemplate("REGISTER_REACTION_PRODUCT", tempRegisterReactionProduct)
 	NewNativeTemplate("#_REGISTERED_REACTION_PRODUCTS", tempRegisteredReationProducts)
 	
-	// Replace
 	NewNativeTemplate("SHARED_ITEM", tempSharedItem)
+	
+	NewNativeTemplate("PANIC", tempPanic)
 }
 
 func tempTemplate(params []string) string {
@@ -148,6 +154,7 @@ func tempScript(params []string) string {
 	}
 	
 	GlobalNCAState.Code.Add(params[0])
+	GlobalNCAState.Envs.Add(nca4.NewEnvironment())
 	
 	if len(params) > 1 {
 		GlobalNCAState.AddParams(params[1:]...)
@@ -158,7 +165,11 @@ func tempScript(params []string) string {
 		panic("Script Error:" + err.Error())
 	}
 	
-	GlobalNCAState.DeleteMap("params") // Something of a hack to keep from trashing the env
+	GlobalNCAState.Envs.Remove()
+	
+	if rtn == nil {
+		return ""
+	}
 	return rtn.String()
 }
 
@@ -170,20 +181,20 @@ func tempAdventureTier(params []string) string {
 }
 
 var itemTypes = map[string]bool {
-	"AMMO": true,
+	"AMMO": false,
 	"ARMOR": true,
-	"DIGGER": true,
+	"DIGGER": false,
 	"GLOVES": true,
 	"HELM": true,
-	"INSTRUMENT": true,
+	"INSTRUMENT": false,
 	"PANTS": true,
-	"SHIELD": true,
+	"SHIELD": false,
 	"SHOES": true,
-	"SIEGEAMMO": true,
-	"TOOL": true,
-	"TOY": true,
-	"TRAPCOMP": true,
-	"WEAPON": true }
+	"SIEGEAMMO": false,
+	"TOOL": false,
+	"TOY": false,
+	"TRAPCOMP": false,
+	"WEAPON": false }
 
 var itemRarities = map[string]int {
 	"RARE": 1,
@@ -195,76 +206,70 @@ type itemClassItem struct {
 	Name string
 	Type string
 	Rarity string
-	Tags []string
 }
 
 var itemClasses = make(map[string][]*itemClassItem)
-func tempItemClass(params []string) string {
-	if len(params) < 4 {
-		panic("Wrong number of params to ITEM_CLASS.")
+func tempItem(params []string) string {
+	if len(params) < 3 {
+		panic("Wrong number of params to ITEM.")
 	}
 	
 	rtn := new(itemClassItem)
 	rtn.Type = params[0]
 	rtn.Name = params[1]
-	if !itemTypes[rtn.Type] {
+	if _, ok := itemTypes[rtn.Type]; !ok {
 		panic("Invalid item type: " + rtn.Type)
 	}
-	rtn.Rarity = params[2]
-	if itemRarities[rtn.Rarity] == 0 {
-		panic("Invalid item rarity: " + rtn.Rarity)
-	}
-	class := params[3]
-	rtn.Tags = make([]string, 0, 5)
 	
-	for i := range params[4:] {
-		rtn.Tags = append(rtn.Tags, params[i+4])
+	
+	
+	classes := params[2:]
+	if itemTypes[rtn.Type] {
+		rtn.Rarity = params[2]
+		if itemRarities[rtn.Rarity] != 0 {
+			classes = params[3:]
+			rtn.Rarity = "NULL"
+		}
 	}
 	
-	if _, ok := itemClasses[class]; !ok {
-		itemClasses[class] = make([]*itemClassItem, 0, 10)
+	for _, class := range classes {
+		if _, ok := itemClasses[class]; !ok {
+			itemClasses[class] = make([]*itemClassItem, 0, 10)
+		}
+		itemClasses[class] = append(itemClasses[class], rtn)
 	}
-	itemClasses[class] = append(itemClasses[class], rtn)
 	
-	return ""
+	return "[ITEM_" + rtn.Type + ":" + rtn.Name + "]"
 }
 
-func tempUsesItemClasses(params []string) string {
-	if len(params) < 1 {
-		panic("Wrong number of params to #USES_ITEM_CLASSES.")
+func tempItemRarity(params []string) string {
+	if len(params) != 3 {
+		panic("Wrong number of params to ITEM_RARITY.")
 	}
 	
-	classes := make([]string, 0, 5)
-	tags := make([]string, 0, 5)
-	for _, val := range params {
-		if strings.HasPrefix(val, "#") {
-			tags = append(tags, val)
-			continue
+	if _, ok := itemClasses[params[1]]; !ok {
+		panic("Invalid class: " + params[1])
+	}
+	
+	for _, item := range itemClasses[params[1]] {
+		if item.Name == params[0] {
+			item.Rarity = params[2]
+			return ""
 		}
-		classes = append(classes, val)
+	}
+	panic("Invalid item: " + params[0])
+}
+
+func tempUsesItems(params []string) string {
+	if len(params) < 1 {
+		panic("Wrong number of params to #USES_ITEMS.")
 	}
 	
 	permittedItems := make(map[string]*itemClassItem)
 	nameList := make([]string, 0, 20)
-	for _, class := range classes {
-ItemLoop: for _, item := range itemClasses[class] {
-			// if the all of the item tags are present
-			for _, itemtag := range item.Tags {
-				foundTag := false
-				for _, tag := range tags {
-					if itemtag == tag {
-						foundTag = true
-						break
-					}
-				}
-				if !foundTag {
-					continue ItemLoop
-				}
-			}
-			
-			// add item to list
+	for _, class := range params {
+		for _, item := range itemClasses[class] {
 			if _, ok := permittedItems[item.Name]; ok {
-				
 				rtn := new(itemClassItem)
 				rtn.Name = item.Name
 				rtn.Type = item.Type
@@ -274,7 +279,6 @@ ItemLoop: for _, item := range itemClasses[class] {
 				} else {
 					rtn.Rarity = item.Rarity
 				}
-				rtn.Tags = item.Tags
 				permittedItems[item.Name] = rtn
 				nameList = append(nameList, item.Name)
 				continue
@@ -288,41 +292,116 @@ ItemLoop: for _, item := range itemClasses[class] {
 	out := ""
 	for _, name := range nameList {
 		item := permittedItems[name]
-		out += "\n\t[" + item.Type + ":" + item.Name + ":" + item.Rarity + "]"
+		if item.Rarity != "NULL" {
+			out += "\n\t[" + item.Type + ":" + item.Name + ":" + item.Rarity + "]"
+		} else {
+			out += "\n\t[" + item.Type + ":" + item.Name + "]"
+		}
+	}
+	return strings.TrimSpace(out)
+}
+
+var buildingData = make(map[string][]string)
+func tempBuildingWorkshop(params []string) string {
+	if len(params) < 2 {
+		panic("Wrong number of params to BUILDING_WORKSHOP.")
+	}
+	
+	for i := range params[1:] {
+		if _, ok := buildingData[params[i+1]]; !ok {
+			buildingData[params[i+1]] = make([]string, 0, 5)
+		}
+		buildingData[params[i+1]] = append(buildingData[params[i+1]], params[0])
+	}
+	return "[BUILDING_WORKSHOP:" + params[0] + "]"
+}
+
+func tempBuildingFurnace(params []string) string {
+	if len(params) < 2 {
+		panic("Wrong number of params to BUILDING_FURNACE.")
+	}
+	
+	for i := range params[1:] {
+		if _, ok := buildingData[params[i+1]]; !ok {
+			buildingData[params[i+1]] = make([]string, 0, 5)
+		}
+		buildingData[params[i+1]] = append(buildingData[params[i+1]], params[0])
+	}
+	return "[BUILDING_FURNACE:" + params[0] + "]"
+}
+
+func tempUsesBuildings(params []string) string {
+	if len(params) == 0 {
+		panic("Wrong number of params to #USES_TECH_CLASSES.")
+	}
+	
+	// An interesting (ab)use of maps...
+	permittedBuildings := make(map[string]bool, 20)
+	buildingNames := make([]string, 0, 20)
+	for _, tag := range params {
+		if _, ok := buildingData[tag]; ok {
+			for _, name := range buildingData[tag] {
+				if !permittedBuildings[name] {
+					permittedBuildings[name] = true
+					buildingNames = append(buildingNames, name)
+				}
+			}
+		}
+	}
+	
+	sort.Strings(buildingNames)
+	out := ""
+	for _, name := range buildingNames {
+		out += "\n\t[PERMITTED_BUILDING:" + name + "]"
 	}
 	return strings.TrimSpace(out)
 }
 
 var reactionData = make(map[string][]string)
-var buildingData = make(map[string][]string)
-func tempTechClass(params []string) string {
-	if len(params) < 3 {
-		panic("Wrong number of params to TECH_CLASS.")
+func tempReaction(params []string) string {
+	if len(params) < 2 {
+		panic("Wrong number of params to REACTION.")
 	}
 	
-	if params[0] == "REACTION" {
-		for i := range params[2:] {
-			if _, ok := reactionData[params[i+2]]; !ok {
-				reactionData[params[i+2]] = make([]string, 0, 5)
-			}
-			reactionData[params[i+2]] = append(reactionData[params[i+2]], params[1])
+	for i := range params[1:] {
+		if _, ok := reactionData[params[i+1]]; !ok {
+			reactionData[params[i+1]] = make([]string, 0, 5)
 		}
-		return ""
-	} else if params[0] == "BUILDING" {
-		for i := range params[2:] {
-			if _, ok := buildingData[params[i+2]]; !ok {
-				buildingData[params[i+2]] = make([]string, 0, 5)
-			}
-			buildingData[params[i+2]] = append(buildingData[params[i+2]], params[1])
-		}
-		return ""
+		reactionData[params[i+1]] = append(reactionData[params[i+1]], params[0])
 	}
-	panic("Invalid Type:" + params[0])
+	return "[REACTION:" + params[0] + "]"
 }
 
-func tempUsesTechClasses(params []string) string {
+func tempUsesReactions(params []string) string {
 	if len(params) == 0 {
 		panic("Wrong number of params to #USES_TECH_CLASSES.")
+	}
+	
+	// An interesting (ab)use of maps...
+	permittedReactions := make(map[string]bool, 20)
+	reactionNames := make([]string, 0, 20)
+	for _, tag := range params {
+		if _, ok := reactionData[tag]; ok {
+			for _, name := range reactionData[tag] {
+				if !permittedReactions[name] {
+					permittedReactions[name] = true
+					reactionNames = append(reactionNames, name)
+				}
+			}
+		}
+	}
+	
+	sort.Strings(reactionNames)
+	out := ""
+	for _, name := range reactionNames {
+		out += "\n\t[PERMITTED_REACTION:" + name + "]"
+	}
+	return strings.TrimSpace(out)
+}
+
+func tempUsesTech(params []string) string {
+	if len(params) == 0 {
+		panic("Wrong number of params to #USES_TECH.")
 	}
 	
 	// An interesting (ab)use of maps...
@@ -333,29 +412,29 @@ func tempUsesTechClasses(params []string) string {
 	for _, tag := range params {
 		if _, ok := buildingData[tag]; ok {
 			for _, name := range buildingData[tag] {
-				if !permittedReactions[name] {
-					permittedReactions[name] = true
-					reactionNames = append(reactionNames, name)
-				}
-			}
-		}
-		if _, ok := reactionData[tag]; ok {
-			for _, name := range reactionData[tag] {
 				if !permittedBuildings[name] {
 					permittedBuildings[name] = true
 					buildingNames = append(buildingNames, name)
 				}
 			}
 		}
+		if _, ok := reactionData[tag]; ok {
+			for _, name := range reactionData[tag] {
+				if !permittedReactions[name] {
+					permittedReactions[name] = true
+					reactionNames = append(reactionNames, name)
+				}
+			}
+		}
 	}
 	
-	sort.Strings(reactionNames)
 	sort.Strings(buildingNames)
+	sort.Strings(reactionNames)
 	out := ""
-	for _, name := range reactionNames {
+	for _, name := range buildingNames {
 		out += "\n\t[PERMITTED_BUILDING:" + name + "]"
 	}
-	for _, name := range buildingNames {
+	for _, name := range reactionNames {
 		out += "\n\t[PERMITTED_REACTION:" + name + "]"
 	}
 	return strings.TrimSpace(out)
@@ -421,7 +500,7 @@ func tempFortTime(params []string) string {
 	return strconv.FormatInt(int64(amountf), 10)
 }
 
-var sharedInorganicData = make(map[string]bool)
+var sharedInorganicData = make(map[string]bool) // also used for material templates
 // This does not have all the error checking that Blast has, watch out!
 func tempSharedInorganic(params []string) string {
 	if len(params) != 2 {
@@ -437,7 +516,24 @@ func tempSharedInorganic(params []string) string {
 	rtn := "{#_REGISTERED_ORES;" + params[0] + "}\n"
 	rtn += "{#_REGISTERED_REACTION_CLASSES;" + params[0] + "}\n"
 	rtn += "{#_REGISTERED_REACTION_PRODUCTS;" + params[0] + "}\n"
-	return StageParse(strings.TrimSpace(params[1])) + rtn
+	return "[INORGANIC:" + params[0] + "]\n\t" + StageParse(params[1]) + rtn
+}
+
+func tempSharedMaterialTemplate(params []string) string {
+	if len(params) != 2 {
+		panic("Wrong number of params to SHARED_MATERIAL_TEMPLATE.")
+	}
+	
+	if sharedInorganicData[params[0]] {
+		StageParse(params[1])
+		return ""
+	}
+	
+	sharedInorganicData[params[0]] = true
+	rtn := "{#_REGISTERED_ORES;" + params[0] + "}\n"
+	rtn += "{#_REGISTERED_REACTION_CLASSES;" + params[0] + "}\n"
+	rtn += "{#_REGISTERED_REACTION_PRODUCTS;" + params[0] + "}\n"
+	return "[MATERIAL_TEMPLATE:" + params[0] + "]\n\t" + StageParse(params[1]) + rtn
 }
 
 var oreData = make(map[string]map[string]int64)
@@ -580,4 +676,12 @@ func tempSharedItem(params []string) string {
 	
 	sharedItemData[params[0]] = true
 	return StageParse(params[1])
+}
+
+func tempPanic(params []string) string {
+	if len(params) != 1 {
+		panic("Wrong number of params to PANIC (how ironic).")
+	}
+	
+	panic(params[0])
 }

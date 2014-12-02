@@ -6,6 +6,7 @@ type RawFile struct {
 	Namespace string
 }
 
+var RawOrder = make([]string, 0, 100)
 var RawFiles = make(map[string]*RawFile, 100)
 var CurFile string // the name of the file being parsed
 var CurNamespace = "" // used during loading

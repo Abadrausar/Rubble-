@@ -1,0 +1,30 @@
+
+Grow the stack.
+
+	stack:grow handle howmuch
+
+    Returns the new size or an error message. May set the Error flag.
+
+Create a new stack of size 25.
+
+	stack:new
+
+    Returns the stack handle
+
+Pop a value off the stack.
+
+	stack:pop handle
+
+    Returns the value or an error message. May set the Error flag.
+
+Pushe a value onto a stack.
+
+	stack:push handle value
+
+    Returns unchanged or an error message. May set the Error flag.
+
+Get TOS.
+
+	stack:top handle
+
+    Returns the value or an error message. May set the Error flag.

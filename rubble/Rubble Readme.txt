@@ -4,22 +4,24 @@ Rubble: After Blast comes Rubble
 ==============================================
 Overview:
 ==============================================
-Rubble is a raw generator like Blast but better ;)
+Rubble is a raw generator.
 
 Pros:
 	No need for an external runtime
-	Configurable
-	More operating modes to better support different setups
+	Configurable directory structure
 	Addons may override vanilla files
 	Full parser/lexer, not just a bunch of regexes
 	Minimal impact, touch only the minimum amount of files
 	Support for embeding scripts in raw files, do advanced setup right in the raws
+	Simple variable expansion, no more GET_VAR, works in any parse stage
+	Many templates for registering objects and the like are replacements for vanilla raw tags allowing better formating
 
 Cons:
 	Not compatible with any version of Blast
-	No support for handling file name collisions
+	No support for handling file name collisions in any way other than as an override
 	No support for Blast namespaces (@, @@, and @@@)
 	Variables are simple key:value pairs instead of Blasts more powerful system
+	NCA (the scripting language) only has minimal documentation
 
 Rubble comes prebuilt for 32 bit Windows, Linux, and OSX
 
@@ -27,9 +29,7 @@ Rubble comes prebuilt for 32 bit Windows, Linux, and OSX
 Why Another Raw Generator?
 ==============================================
 
-Why another raw generator? Well I really liked Blast but it was far to inflexable. This led me to write GoBlast, a slightly more flexable, Blast compatible, raw generator. That worked for a while but I soon realized that while GoBlast got the job done the design/templates forced by Blast compatibility was making my job harder than it needed to be. Rubble is the result of redesigning GoBlast from the ground up to better fit that way I do things.
-
-At this time Rubble is not finished, only a small fraction of the planed templates are ready and many old ones left over from GoBlast are still in use. This makes Rubble a little hard to use, look for this to improve with newer versions.
+Why another raw generator? Well I really liked Blast but it was far to inflexable and (IMHO) generated ugly output. This led me to write GoBlast, a slightly more flexable, Blast compatible, raw generator. That worked for a while but I soon realized that while GoBlast got the job done the design/templates forced by Blast compatibility was making my job harder than it needed to be. Rubble is the result of redesigning GoBlast from the ground up to better fit that way I do things.
 
 ==============================================
 Install:
@@ -49,14 +49,24 @@ Configure:
 
 Rubble allows you to change its directory settings via command line options. To see these options and their defaults run "rubble -h". 
 
-If you want to use a non-default setting most of the time the best thing to do is make a batch file something like this:
+If you want to use non-default settings most of the time the best thing to do is make a batch file something like this:
 	@rubble -outputdir="./objects" -configdir="./source" -basedir="./source/base" -addonsdir="./source/addons"
 	@pause
 
-All directorys used by Rubble must exist. If Rubble tries to read from a non-existant directory it may crash, in such a case no changes will be made to anything. If Rubble tries to write to a non-existant directory it will silently fail.
-	
+All directorys used by Rubble must exist (if they do not exist nothing bad will happen, Rubble will just quietly fail). SCRIPT templates may be used to check for (and possibly fix-up) proper directory structure.
+
 ==============================================
 Changelog:
 ==============================================
+v1.1
+	Added the NCA4 file system commands
+	Wrote a huge amount of docs
+	Added PANIC template to allow aborting
+	Added panic NCA command
+	Added NCA variables for each directory setting
+	Configuration files are now optional
+	Rewrote item and tech class templates, things should be much cleaner than before
+	Added a base and two example addons
+
 v1.0
 	First version

@@ -1,0 +1,13 @@
+
+Causes a panic.
+
+	panic value
+
+	Returns unchanged.
+
+
+Variables
+	rubble:outputdir
+	rubble:configdir
+	rubble:basedir
+	rubble:addonsdir

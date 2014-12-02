@@ -4,7 +4,7 @@ import "fmt"
 import "strings"
 import "io/ioutil"
 
-func ReadConfig(path, namespace string) {
+func ReadConfig(path string) {
 	fmt.Println("Reading Config File:", path)
 	file, err := ioutil.ReadFile(path)
 	if err != nil {

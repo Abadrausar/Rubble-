@@ -1,0 +1,30 @@
+{VOID;
+{C; Templates used in the base
+This is surounded with a VOID tag to reduce post-generation file size}
+
+{C; Note that keep the output properly formatted templates often have ugly indentation}
+
+{!TEMPLATE;ANIMAL_MAT;
+	{IF;$GENERIC_ANIMAL_MATS;YES;
+	CREATURE_MAT:ANIMAL
+	;
+	LOCAL_CREATURE_MAT
+	}
+}
+
+{!TEMPLATE;#AQUIFER;
+	{IF;$USE_AQUIFERS;YES;
+	[AQUIFER]
+	;
+	Aquifer Disabled
+	}
+}
+
+{!TEMPLATE;BASE_ITEM;type;item;def;
+	{SHARED_ITEM;%item;
+	{ITEM;%type;%item;%type}
+	%def
+	}
+}
+
+}

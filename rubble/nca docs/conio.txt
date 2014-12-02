@@ -1,0 +1,6 @@
+
+Print a list of values.
+
+	print [value...]
+
+    Returns unchanged.

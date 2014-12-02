@@ -1,0 +1,12 @@
+
+Read from file.
+
+	fileio:read path
+
+    Returns file contents or an error message. May set the Error flag.
+
+Write to file.
+
+	fileio:write path contents
+
+    Returns unchanged or an error message. May set the Error flag.

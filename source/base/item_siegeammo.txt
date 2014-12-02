@@ -1,0 +1,6 @@
+[OBJECT:ITEM]
+
+{BASE_ITEM;SIEGEAMMO;ITEM_SIEGEAMMO_BALLISTA;
+	[NAME:ballista arrow:ballista arrows]
+	[CLASS:BALLISTA]
+}

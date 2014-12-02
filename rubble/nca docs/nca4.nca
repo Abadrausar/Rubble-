@@ -1,0 +1,141 @@
+
+'new from v3:
+	Everything moved to the state
+'
+
+'Basics:'
+'all data is stored as a string
+when a numeric value is needed the string is converted to a 64 bit signed integer
+if the string is not a valid number its integer value is 0
+(most of the time, in the case of the count for rshift and lshift it is a 8 bit 
+unsigned integer and the default value is 1)'
+
+'a valid identifier is any string'
+{{[( 
+	'test')]}}
+'is a valid identifier (a very strange and most certainly not a recommended one, but valid)'
+"{[( \n\t\'test\')]}" 'this is the same as the one above'
+'valid escape sequences: \n \r \t \' \" \xff \\'
+
+'For details on any command, read its doc comment.'
+
+'Commas are optional'
+
+(command, param)
+[deref]
+[derefMap, index]
+
+
+'command decleration'
+(command, name, paramName1, ..., paramNameN, code) 'fixed param count'
+'or'
+(command, name, ..., code) 'variable param count'
+'or'
+(command, name, code) 'no params'
+
+
+'example command'
+(command, test, param1, param2, {
+	(add, param1, param2)
+})
+
+(var, name, [value])
+(map, name)
+
+
+(namespace, name)
+
+'names are written like so'
+namespace1:namespace2:name
+
+'namespace example'
+(namespace, dctech)
+(namespace, dctech:nca)
+(var, dctech:nca:version, 3)
+
+
+'Example code:'
+
+'looping'
+(var count 0)
+(loop {
+	(if (lt [count] 5) {
+		(console:print [count])
+		(set count (add [count] 1))
+		(break -1)
+	}{
+		(console:print "\n")
+		(break 0)
+	})
+})
+
+'for loop'
+(command for init test incriment code {
+	(eval [init]) 
+	(loop {
+		(if (run [test]) {
+			(run [code])
+			(run [incriment])
+			(break -1)
+		}{
+			(break 0)
+		})
+	})
+})
+
+'test for loop'
+(for {(var fortest 0)} {(lt [fortest] 5)} {(set fortest (add [fortest] 1))} {
+	(console:print [fortest])
+})(console:print "\n")
+'at this point fortest is not valid'
+
+
+'simple while loop'
+(command while test code {
+	(loop {
+		(if (run [test]) {
+			(run [code])
+			(break -1)
+		}{
+			(break 0)
+		})
+	})
+})
+
+
+'increment variable'
+(command ++ name {
+	(set [name] (add [[name]] 1))
+})
+
+'decrement variable'
+(command -- name {
+	(set [name] (sub [[name]] 1))
+})
+
+'for loop using ++'
+(for {(var fortest 0)}{(lt [fortest] 5)}{(++ fortest)}{
+	(console:print [fortest])
+})(console:print "\n")
+
+
+'include a file'
+'requires the file io commands to be loaded'
+(command include path {
+	(evalinparent (fileio:read [path]))
+})
+
+'nop example
+nop means No OPeration, the nop command itself does nothing. 
+This showcases the rule that if a command returns nothing the return 
+value will be the same as the return value of the previous command to run.
+when used this way nop can be read as "insert the return value of the previous command"'
+(fileio:read "somefile.ini")
+(ini:parse (nop))
+(ini:getvalue (nop) "somesection" "somekey")
+(console:print (nop))
+'The reason return values work like this is because all commands store their 
+return value in a single register in the GDM. 
+That means that if a command returns nothing then the return value is unchanged 
+from the last command that returned something, which could be several commands back.'
+'just another weird-and-wonderful NCAism :p'

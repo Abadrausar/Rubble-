@@ -1,0 +1,36 @@
+
+And two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+
+	and a b
+
+    Returns a & b
+
+Shift the value left. Opperand is converted to a 64 bit integer. Invalid strings are given the value "0" Count is converted to an uint8 with an invalid string getting the value "1".
+
+	lshift a [count]
+
+    Returns the param shifted "count" places
+
+Invert a value. Opperand is converted to a 64 bit integer. Invalid strings are given the value "0"
+
+	not a
+
+    Returns a ^ -1
+
+Or two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+
+	or a b
+
+    Returns a | b
+
+Shift the value right. Opperand is converted to a 64 bit integer. Invalid strings are given the value "0" Count is converted to an uint8 with an invalid string getting the value "1".
+
+	rshift a [count]
+
+    Returns the param shifted "count" places
+
+Xor two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+
+	xor a b
+
+    Returns a ^ b

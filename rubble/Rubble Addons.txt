@@ -25,57 +25,87 @@ Now for the mod itself:
 Broken Arrow nerfs bows and crosbows by changing their stats and the stats of bolts and arrows, lets start with the ammo.
 
 "item_ammo.txt" is really small so I'll just show the whole file:
-	[OBJECT:ITEM]
-	
-	Added optional Broken Arrow mod
-	
-	[ITEM_AMMO:ITEM_AMMO_BOLTS]
-		[NAME:bolt:bolts]
-		[CLASS:BOLT]
-		[SIZE:150]
-		{IF;$USE_BROKEN_ARROW;YES;
-		[ATTACK:EDGE:5:1000:stab:stabs:NO_SUB:1000];
-		[ATTACK:EDGE:2:2000:stab:stabs:NO_SUB:1000]}
-	
-	[ITEM_AMMO:ITEM_AMMO_ARROWS]
-		[NAME:arrow:arrows]
-		[CLASS:ARROW]
-		[SIZE:150]
-		{IF;$USE_BROKEN_ARROW;YES;
-		[ATTACK:EDGE:5:1000:stab:stabs:NO_SUB:1000];
-		[ATTACK:EDGE:2:2000:stab:stabs:NO_SUB:1000]}
-	
-	[ITEM_AMMO:ITEM_AMMO_BLOWDARTS]
-		[NAME:blowdart:blowdarts]
-		[CLASS:BLOWDART]
-		[SIZE:20]
-		[ATTACK:EDGE:1:50:stick:sticks:NO_SUB:1000]
+[OBJECT:ITEM]
+
+Added optional Broken Arrow mod
+
+{ITEM;AMMO;ITEM_AMMO_BOLTS;CROSSBOW}
+	[NAME:bolt:bolts]
+	[CLASS:BOLT]
+	[SIZE:150]
+	{IF;$USE_BROKEN_ARROW;YES;
+	[ATTACK:EDGE:5:1000:stab:stabs:NO_SUB:1000];
+	[ATTACK:EDGE:2:2000:stab:stabs:NO_SUB:1000]}
+
+{ITEM;AMMO;ITEM_AMMO_ARROWS;BOW}
+	[NAME:arrow:arrows]
+	[CLASS:ARROW]
+	[SIZE:150]
+	{IF;$USE_BROKEN_ARROW;YES;
+	[ATTACK:EDGE:5:1000:stab:stabs:NO_SUB:1000];
+	[ATTACK:EDGE:2:2000:stab:stabs:NO_SUB:1000]}
+
+{ITEM;AMMO;ITEM_AMMO_BLOWDARTS;BLOWGUN}
+	[NAME:blowdart:blowdarts]
+	[CLASS:BLOWDART]
+	[SIZE:20]
+	[ATTACK:EDGE:1:50:stick:sticks:NO_SUB:1000]
 
 The first thing to note is the lack of a file id line at the top, Rubble adds this line automaticly so there is no need to do so manually.
-Now check out the IF template in the bolt definition, there is the variable we defined in the configuration file. The '$' that prefixes its name tells Rubble to look up it's value and use it instead of its name. Note that Rubble does not prefix variables created from the configuration file with a namespace or "CONFIG_" unlike Blast. This means that you need to be careful not to collide with other addons.
+Notice how every ammo definition begins with a template? That is the item template. It registers the item under a specific catagory or "class", this makes it easy to setup entity permitted item lists.
+Now check out the IF template in the bolt definition, there is the variable we defined in the configuration file. The '$' that prefixes its name tells Rubble to look up it's value and use it instead of it's name. Note that Rubble does not prefix variables created from the configuration file with a namespace or "CONFIG_" unlike Blast. This means that you need to be careful not to collide with other addons.
 
 In any case we now have a little mod that makes arrows and bolts penatrate less and have a larger contact area, but only if we set USE_BROKEN_ARROW to YES in our config file.
 
 Now for "item_weapon.txt". This file is rather large so I'll show just the entry for the crossbow (the bow entry is nearly the same):
-	[ITEM_WEAPON:ITEM_WEAPON_CROSSBOW]
-		[NAME:crossbow:crossbows]
-		[SIZE:400]
-		[SKILL:HAMMER]
-		[RANGED:CROSSBOW:BOLT]
-		{IF;$USE_BROKEN_ARROW;YES;
-		[SHOOT_FORCE:27]
-		[SHOOT_MAXVEL:200]
-		;
-		[SHOOT_FORCE:1000]
-		[SHOOT_MAXVEL:1000]
-		}
-		[TWO_HANDED:0]
-		[MINIMUM_SIZE:15000]
-		[MATERIAL_SIZE:3]
-		[ATTACK:BLUNT:10000:4000:bash:bashes:NO_SUB:1250]
+{ITEM;WEAPON;ITEM_WEAPON_CROSSBOW;CROSSBOW}
+	[NAME:crossbow:crossbows]
+	[SIZE:400]
+	[SKILL:HAMMER]
+	[RANGED:CROSSBOW:BOLT]
+	{IF;$USE_BROKEN_ARROW;YES;
+	[SHOOT_FORCE:27]
+	[SHOOT_MAXVEL:200]
+	;
+	[SHOOT_FORCE:1000]
+	[SHOOT_MAXVEL:1000]
+	}
+	[TWO_HANDED:0]
+	[MINIMUM_SIZE:15000]
+	[MATERIAL_SIZE:3]
+	[ATTACK:BLUNT:10000:4000:bash:bashes:NO_SUB:1250]
 
-Same basic IF template, nothing really new here, so just make the same changes to your copy of ITEM_WEAPON_BOW as well and lets move on.
+Same basic IF and ITEM templates, nothing really new here, so just make the same changes to your copy of ITEM_WEAPON_BOW as well and lets move on.
 
 Now all you need to do is generate the raws. If you are testing this on a fresh, vanilla DF you can just run Rubble without a base. Rubble (unlike Blast) does not clear your raw/objects directory automaticly so for simple cases like this a base is not needed.
 
 You little addon should work fine, but if not you have just learned an valuable lesson: Just because Rubble (or Blast for that matter) ran without errors does not mean the result is valid raws. Fix any errors and enjoy!
+
+One more thing, as you saw earlier the ITEM template associates an item with a class here is a simple example of how that is used in an entity:
+Code:
+{#USES_ITEMS;CROSSBOW;BOW}
+Output:
+[AMMO:ITEM_AMMO_ARROWS]
+[AMMO:ITEM_AMMO_BOLTS]
+[WEAPON:ITEM_WEAPON_BOW]
+[WEAPON:ITEM_WEAPON_CROSSBOW]
+
+The standard base does not make use of item classes (yet)
+
+If you want to see another way to make the above addon look in "source/addons/__broken_arrow"
+
+SCRIPT Example:
+If you want to start with a fresh slate every time you generate just insert this template call into one of your raw files:
+WARNING! WARNING! THIS CODE WILL DELETE ALL FILES IN YOUR OUTPUT DIRECTORY
+
+{SCRIPT;
+	(file:walkfiles [rubble:outputdir] {
+		(file:del (append [rubble:outputdir] "/" [params 0]))
+		(if (geterror) {
+			(console:print "Error deleting: " [params 0] "\n")
+			(seterror 0)
+		})
+	})
+}
+
+see "raw/rubble/nca docs" for basic documentation on all the nca commands.

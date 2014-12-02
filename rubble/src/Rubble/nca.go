@@ -7,6 +7,7 @@ import "dctech/nca4/cmp"
 import "dctech/nca4/conio"
 import "dctech/nca4/csv"
 import "dctech/nca4/env"
+import "dctech/nca4/file"
 import "dctech/nca4/fileio"
 import "dctech/nca4/ini"
 import "dctech/nca4/math"
@@ -27,13 +28,31 @@ func InitNCA() {
 	conio.Setup(state)
 	csv.Setup(state)
 	env.Setup(state)
+	file.Setup(state)
 	fileio.Setup(state)
 	ini.Setup(state)
 	math.Setup(state)
 	stack.Setup(state)
 	str.Setup(state)
 	
+	state.NewNameSpace("rubble")
+	state.NewVar("rubble:outputdir", nca4.NewValue(OutputDir))
+	state.NewVar("rubble:configdir", nca4.NewValue(ConfigDir))
+	state.NewVar("rubble:basedir", nca4.NewValue(BaseDir))
+	state.NewVar("rubble:addonsdir", nca4.NewValue(AddonsDir))
+	
+	state.NewNativeCommand("panic", CommandPanic)
+	
 	GlobalNCAState = state
 }
 
-// Add commands here
+// Causes a panic.
+// 	panic value
+// Returns unchanged.
+func CommandPanic(state *nca4.State, params []*nca4.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to panic (how ironic).")
+	}
+
+	panic(params[0].String())
+}

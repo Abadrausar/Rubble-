@@ -1,0 +1,34 @@
+
+Append two or more strings together.
+
+	append a b [c...]
+
+    Returns "0" or "-1"
+
+Format a string.
+
+	fmtstr format values...
+
+    valid format "verbs" for fmtstr:
+
+	%% literal percent
+	%s the raw string
+	%d as a decimal number
+	%x as a lowercase hexadecimal number
+	%X as an upercase hexadecimal number
+
+    Returns the formated string
+
+Get char at pos.
+
+	strchar a pos
+
+    Opperand pos is converted to a 64 bit integer. Invalid strings are given
+    the value "0" If the position is out of range returns unchanged and sets
+    the error flag. Returns the character
+
+Get the length of a string.
+
+	strlen a
+
+    Returns the length

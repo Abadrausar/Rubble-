@@ -23,6 +23,7 @@ import "dctech/nca4"
 //	evalinparent
 //	if
 //	loop
+//	foreach
 // The base commands are more or less required.
 func Setup(state *nca4.State) {
 	state.NewNativeCommand("nop", CommandNop)
@@ -30,7 +31,7 @@ func Setup(state *nca4.State) {
 	state.NewNativeCommand("exit", CommandExit)
 	state.NewNativeCommand("break", CommandBreak)
 	state.NewNativeCommand("seterror", CommandSetError)
-	state.NewNativeCommand("geterror", CommandSetError)
+	state.NewNativeCommand("geterror", CommandGetError)
 	state.NewNativeCommand("command", CommandCommand)
 	state.NewNativeCommand("namespace", CommandNamespace)
 	state.NewNativeCommand("var", CommandVar)
@@ -43,6 +44,7 @@ func Setup(state *nca4.State) {
 	state.NewNativeCommand("evalinparent", CommandEvalInParent)
 	state.NewNativeCommand("if", CommandIf)
 	state.NewNativeCommand("loop", CommandLoop)
+	state.NewNativeCommand("foreach", CommandForEach)
 }
 
 // Does nothing.
@@ -319,6 +321,30 @@ func CommandLoop(state *nca4.State, params []*nca4.Value) {
 		if !state.RetVal.Bool() {
 			return
 		}
+	}
+	panic("CommandLoop: unreachable")
+}
+
+// Runs code as command for each entry in a map.
+// 	foreach map code
+// Params for code:
+//	code key value
+// If code returns false foreach aborts.
+// Returns the return value of the last command in code.
+func CommandForEach(state *nca4.State, params []*nca4.Value) {
+	if len(params) != 2 {
+		panic("Wrong number of params to foreach.")
+	}
+
+	for i, val := range state.GetMap(params[0].String()) {
+		state.Code.AddLexer(params[1].AsLexer())
+		state.Envs.Add(nca4.NewEnvironment())
+		state.AddParams(i, val.String())
+		state.Exec()
+		if !state.RetVal.Bool() {
+			return
+		}
+		state.Envs.Remove()
 	}
 	panic("CommandLoop: unreachable")
 }

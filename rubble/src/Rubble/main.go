@@ -24,7 +24,11 @@ func main() {
 	CurWalkDir = BaseDir
 	CurNamespace = "base"
 	filepath.Walk(CurWalkDir, ListFiles)
-	ReadConfig(ConfigDir + "/base.ini", "base")
+	
+	_, err := os.Lstat(ConfigDir + "/base.ini")
+	if err == nil {
+		ReadConfig(ConfigDir + "/base.ini")
+	}
 
 	// Load addon files
 	filepath.Walk(AddonsDir, ListAddonNames)
@@ -32,12 +36,16 @@ func main() {
 		CurWalkDir = AddonsDir + "/" + AddonNames[i]
 		CurNamespace = AddonNames[i]
 		filepath.Walk(CurWalkDir, ListFiles)
-		ReadConfig(ConfigDir + "/" + CurNamespace + ".ini", CurNamespace)
+		
+		_, err := os.Lstat(ConfigDir + "/" + CurNamespace + ".ini")
+		if err == nil {
+			ReadConfig(ConfigDir + "/" + CurNamespace + ".ini")
+		}
 	}
 	
 	// Test lexer
 	if LexTest {
-		for i := range RawFiles {
+		for _, i := range RawOrder {
 			lex := NewLexer(RawFiles[i].Content)
 			for lex.Advance() {
 				fmt.Println(lex.Current, ":", lex.Current.Lexeme)
@@ -48,7 +56,7 @@ func main() {
 	
 	// preparse
 	fmt.Println("Preparsing...")
-	for i := range RawFiles {
+	for _, i := range RawOrder {
 		fmt.Println(i)
 		CurFile = i
 		RawFiles[i].Content = PreParse(RawFiles[i].Content)
@@ -57,7 +65,7 @@ func main() {
 	
 	// parse
 	fmt.Println("Parsing...")
-	for i := range RawFiles {
+	for _, i := range RawOrder {
 		fmt.Println(i)
 		CurFile = i
 		RawFiles[i].Content = Parse(RawFiles[i].Content)
@@ -66,7 +74,7 @@ func main() {
 	
 	// postparse
 	fmt.Println("Postparsing...")
-	for i := range RawFiles {
+	for _, i := range RawOrder {
 		fmt.Println(i)
 		CurFile = i
 		RawFiles[i].Content = PostParse(RawFiles[i].Content)
@@ -75,7 +83,7 @@ func main() {
 	
 	// Write files out
 	fmt.Println("Writing files...")
-	for i := range RawFiles {
+	for _, i := range RawOrder {
 		file := []byte(RawFiles[i].Name + "\n\n" + RawFiles[i].Content)
 		ioutil.WriteFile(OutputDir + "/" + RawFiles[i].Name + ".txt", file, 0600)
 	}
@@ -101,6 +109,10 @@ func ListFiles(path string, info os.FileInfo, err error) error {
 	rawfile.Name = StripExt(filepath.Base(path))
 	rawfile.Content = string(file)
 	rawfile.Namespace = CurNamespace
+	
+	if _, ok := RawFiles[path]; !ok {
+		RawOrder = append(RawOrder, path)
+	}
 	
 	RawFiles[path] = rawfile
 	
