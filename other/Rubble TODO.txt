@@ -8,3 +8,14 @@ Make a "package server", where raws are served to the world and generating makes
 	Would require some fancy footwork where AXIS is concerned.
 	Could run more-or-less in batch mode, as there would be no need to support anything other than simple generation.
 	Not a high priority unless there is a place to host it (app engine?).
+
+Provide a way for external client to get low level access to Rubble's internals.
+	This would allow external clients to use Rubble for just a few files, for example loading a Rubble addon into a non-Rubble raw set.
+	
+	This mostly just requires existing bits to be put together in new ways, basically you would end up with something like prep, but for a single addon and it's dependencies.
+	
+	Requirements:
+		An API for access to the Rex state (for template support)
+			This will likely require stopping after each step and asking the client if it wants a peek.
+			Clients will HAVE to know at least a little about the templates they are supporting!
+		Support for processing a single addon in an interruptible manner (require the client to keep state?)

@@ -1,5 +1,9 @@
 
-There are some tutorials in the file "How To Rubble.txt", I suggest you read them as they explain the basics in some detail.
+There are some tutorials in the file "How To Rubble.txt", I suggest you read at least the first two as they explain the basics in some detail.
+
+Despite the name this file deals with some very advanced topics! Basically anything that needed to be documented but didn't deserve it's own file got a section here. If you do not understand something just skip it, chances are it is written for advanced users about a feature added to solve a rare problem you have no need to solve :p
+
+That said you should at least skim over everything so you have some idea what is possible.
 
 ==============================================
 Template Prefixes Explained:
@@ -11,11 +15,25 @@ Prefix	Meaning
 !		Preparse, a template with this prefix will run in the preparse stage.
 none	Parse, a template with no prefix will run in the parse stage.
 #		Postparse, a template with this prefix will run in the postparse stage.
-@		ASAP, a template with this prefix will run in the earliest possible parse stage.
+@		Any, a template with this prefix will run in the earliest possible parse stage.
 
-@ templates are usually run in preparse but could be run in any stage depending on when it is parsed (parsing can be delayed by nesting in a later parse stage template for example).
+@ templates are usually run in preparse but could be run in any stage depending on when it is parsed (parsing can be delayed by nesting in a later parse stage template for example). This prefix is used for templates that may be run in any stage, if you need to control when these templates are parsed use !ECHO, ECHO, or #ECHO.
 
 The template prefix is part of the template's name, you cannot change a template's parse stage by calling it with a different prefix (unless you rename the template)
+
+==============================================
+User Template Parse Sequence:
+==============================================
+
+The following details how templates created with the !TEMPLATE template are parsed.
+
+	If the last param is "..." then append the params of the last template call to this call
+	All leading and trailing whitespace is striped from the params
+	All variables are expanded in the params
+	The template's body is loaded and these transforms are run on it:
+		Text of the forms $<NAME> or ${<NAME>} that is not in a child template is replaced with the value of the variable <NAME>
+		Text of the forms %<NAME> or %{<NAME>} is replaced with the value of the param named <NAME> or the default value specified for that param
+	The template body is passed to the stage parser and the result is returned
 
 ==============================================
 The Configuration File:

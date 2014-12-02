@@ -2,6 +2,24 @@
 ==============================================
 Changelog:
 ==============================================
+v5.1 (for DF 40.13)
+	Updated the base to DF 40.13
+		40.12's change log lists certain changes that are listed in 40.13's change log as being made in 40.13.
+		Did Toady jump the gun? Anyway the base is now up to date.
+	Fixed "User/Saurian/DFHack/Transform", forgot to update the creature body for 40.x, oops.
+	Added default values to the saurian entity.
+		They are really big on martial prowess and value other things that seemed appropriate at least a little.
+	Fixed a minor JS error that stopped the web UI's regeneration mode addon list page from working.
+	When running a regeneration cycle in the web UI configuration variable default values are now read from genconfig.ini.
+		This was the case before when you chose to go straight to generation, but now it works for when you
+		choose to edit the variables manually as well.
+	Fixed the bone shafts reaction in "User/Archery" to use the proper number of bones.
+	Fixed the default "User/Saurian" bone item reactions to use the proper number of bones.
+	Added "User/DFHack/Spatter" and "User/DFHack/Steam" from BD (based on DFHack example mods).
+		Somehow I forgot to included these earlier, anyway here they are.
+	Added "User/Metallurgy/Aluminum Bronze", a better bronze for those with extra aluminum.
+	Fixed a bunch of outdated documentation.
+
 v5.0 (for DF 40.12)
 	Rubble has been restructured as a library.
 		This change makes it possible (even easy) to make multiple different user interfaces.

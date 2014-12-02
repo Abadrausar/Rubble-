@@ -59,6 +59,7 @@ import "rubble/rblutil"
 // (all the listed versions are assumed to be backwards compatible)
 // Index 0 MUST be the current version!
 var Versions = []string{
+	"5.1",
 	"5.0",
 	"4.7",
 	"4.6",

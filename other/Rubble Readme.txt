@@ -23,17 +23,20 @@ Where to Find Help:
 
 All documentation is in the "other" directory, this includes tutorials, template documentation, script documentation, and basic documentation of Rubble's internals.
 
+General users have no need to read ANYTHING except this readme and the addon list! Everything most users need to know (aside from things like how to install Rubble) can be found in the web UI addon description pages.
+
+Most of the documentation assumes you know what you are doing as far as general DF modding goes, please do not read documentation that is above your level and then complain that "Rubble is too hard".
+I do assume that modders will have at least some knowledge of programming (I apologize for this, as I know that not everyone does). If you do not know anything about programming most of the scripting stuff will be hard (if not impossible) to follow, but if you stick to using templates you will be fine (scripting is only used for advanced stuff anyway, most people will never need it).
+
 For examples of what all is possible with Rubble see the included addons, they cover a broad range of possibilities. Sadly comments explaining what is being done and why are often lacking, so if you cannot figure out why something was done a certain way just ask.
 
-If you do not plan on doing any modding with Rubble you only need to read this readme and the addon list, everything else is for modders.
-
-Modders will additionally want to read the following (in most-important-first order):
-	HowTo Rubble - Tutorials
-	Rubble Basics - Lots of stuff about addons and Rubble in general
-	Rubble Base Templates - The template documentation for the "Base/Templates" addon
-	Rubble Native Templates - The documentation for the built-in template
+Modders will want to read the following (in most-important-first order):
+	HowTo Rubble - Tutorials, read at least the first two! Feel free to skip the others.
+	Rubble Native Templates - The documentation for the built-in !TEMPLATE template
+	Rubble Base Templates - The template documentation for the "Base/Templates" addon, this stuff is VERY important!
 	Rubble Libs Templates - The template documentation for the library addons
-	Everything in "Rex Docs" - the Rex documentation, NEEDED if you plan to do any scripting
+	Rubble Basics - Lots of stuff about addons and Rubble in general, some of this stuff is really advanced!
+	Everything in "Rex Docs" - the Rex documentation, feel free to skip this if you are not interested in scripting
 	The included addons - A little short on comments but full of great examples
 
 ==============================================
@@ -50,18 +53,6 @@ See the appropriate "Running Rubble" section below.
 Now you are good to go!
 
 If you use OSX or Linux, 32 bit binaries for these OSes can be found in the "rubble/other" directory. If you want 64 bit binaries you can compile them yourself, source code is in "rubble/other/src" (along with basic build instructions).
-
-==============================================
-Running Rubble (GUI, Windows, Depreciated!):
-==============================================
-
-The GUI is Windows only.
-
-This UI is depreciated and will be removed in the near future.
-
-All common Rubble tasks have a tab in the GUI, in most cases what each thing does is self explanatory.
-
-This GUI does not interface with Rubble in the same way as the others (it is a layer on to of the CLI interface), so things tend to not work quite as well. For example support for the Rubble config file is spotty and the GUI needs it's own custom config file to handle things that Rubble native interfaces don't need to worry about.
 
 ==============================================
 Running Rubble (Web UI, all OSes):
@@ -126,6 +117,9 @@ Known Issues (non-bug):
 		IMHO this is better than sometimes not having all the armor pieces (which is what happened before).
 
 Bugs:
+	
+	Web UI server does not always shutdown immediately when told to.
+		Sometimes when you click "Quit" the server does not shut down, but as soon as you close the exit page/tab/whatever the server closes. It acts almost like it was waiting for browser (which should not be the case). I have no idea what causes this, but it is intermittent and doesn't really cause any problems, so I am unlikely to dig too much either.
 	
 	Several vanilla bugs make themselves known:
 		Adventure mode reactions do not always work the same as fortress mode reactions:

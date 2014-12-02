@@ -34,9 +34,9 @@ Why Another Raw Generator?
 
 Blast is too... narrow. It allows you to do all kinds of stuff but is too hard (for me) to extend. Basically I just wanted something that allowed me to do most of the things I could do with Blast, but with less fuss and more power (well that and Blast generated really ugly output, if you need a pretty printer to make your generated output look good you are doing something wrong).
 
-Of course if you know Perl and don't want to learn Rex (Rubble's scripting language) you will be in the same situation I was in with Blast, just in reverse ;)
+Of course if you know Perl and don't want to learn Rex (Rubble's scripting language) you will be in the same situation I was in with Blast, just in reverse and with a much better standard library ;)
 
-I have put a huge amount of effort into making Rubble as flexible and powerful as possible, so newer features like tweak scripts and the addon loader make Blast look like a toy.
+I have put a huge amount of effort into making Rubble as flexible and powerful as possible, so newer features like tweak scripts, the addon loader, the web UI, and addon.meta make Blast look like a toy.
 A cool, powerful toy, but a toy nonetheless.
 
-Blast is still a good utility, but if you don't mind learning a new scripting language (and even if you do) Rubble is far more powerful.
+Blast is still a good utility, but Rubble is far more powerful.

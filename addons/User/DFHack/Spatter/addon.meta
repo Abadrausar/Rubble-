@@ -1,0 +1,11 @@
+<rubble:addonmeta
+	header=`A streamlined version of the DFHack spatter example mod.`
+	
+	description=`
+Allows you to coat weapons and ammo with extracts.
+(Note that some extracts have no military value.)
+Uses the wax worker skill.
+`
+	
+	activates="Libs/Base"
+>

@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`The DFHack steam engine example mod.`
+	
+	description=`
+See the DFHack readme for details.
+`
+	
+	activates="Libs/Base"
+>

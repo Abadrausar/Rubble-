@@ -425,7 +425,7 @@ var regenaddonsPage = template.Must(template.New("regenaddons").Parse(loadOr("re
 				} else {
 					document.write("<input type=\"checkbox\" value=\"true\" name=\"" + items[i].Name + "\">")
 				}
-				document.write("&nbsp;<a href="./addondata?addon=" + items[i].Name + "\">" + items[i].Name + "</a>")
+				document.write("&nbsp;<a href=\"./addondata?addon=" + items[i].Name + "\">" + items[i].Name + "</a>")
 				document.write("</td><td>")
 				document.write(items[i].Meta.Header)
 				document.write("</td></tr>")

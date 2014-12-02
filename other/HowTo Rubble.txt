@@ -6,7 +6,7 @@ The tutorials in this file are marked up with BBCode, as it makes them easer to 
 
 Tutorial 1: Basics
 
-This tutorial introduces a few of the basic [url=http://www.bay12forums.com/smf/index.php?topic=128013.0]Rubble[/url] templates and explains how to create a simple addon.
+This tutorial introduces a few of the basic Rubble templates and explains how to create a simple addon.
 
 In this tutorial I will be recreating the Better Dorfs Bonfire addon.
 
@@ -152,7 +152,7 @@ That call will expand into the following:
 As you can see it is just a straight forward variable expansion. 
 One thing sharp-eyed readers may have noticed is that there was never a value defined for "count", if you will look up to the template definition you will see that count is followed by an equals sign (=). If a parameter name is followed by an equals sign whatever is after the equals sign is used as the default value for that parameter, so in this case count defaults to "1".
 
-There are a few more interesting things that standard templates like this can do, but most of them have been replaced by the much more flexible rubble:template script command (which is too advanced to detail here). For more on how templates work, and how they interact with other parts of Rubble, see "Rubble Addons.txt" and the last section of "Rubble Process.txt".
+There are a few more interesting things that standard templates like this can do, but most of them have been replaced by the much more flexible rubble:template script command (which is too advanced to detail here). For more on how templates work, and how they interact with other parts of Rubble, see "Rubble Basics".
 
 (The templates/items/materials used in this tutorial come from the (no longer available) "Better Dorfs/Saurian/Warcrafter" addon)
 
@@ -307,7 +307,7 @@ To set things like track tiles you use OPEN_D_INIT, EDIT_D_INIT, CLOSE_D_INIT, a
 Note that CLOSE_D_INIT will set ALL tileset related init settings to their defaults unless a call to EDIT_D_INIT has explicitly set that value! This is so that it is easy to reset values changed by other tilesets you may have installed before. 
 If you use all default init settings all you need to do is call D_INIT_TO_DEFAULTS to make sure a different tileset didn't clobber your settings.
 
-If you want to provide prep support (highly recommended!) you will need to include a couple of other scripts in your addon, see "Tilesets/MLC/Normal" for an example.
+If you want to provide prep support (highly recommended!) you will need to include a couple of other scripts in your addon, see "User/Tilesets/MLC/Normal" for an example.
 
 ========================================================
 
@@ -318,7 +318,7 @@ This tutorial will introduce tweak scripts and attempt to show some uses for the
 I personally use tweak scripts all over the place in my addons, as (by design) tweak scripts are incredibly flexible.
 
 The original use I had in mind for tweak scripts was allowing you to "tweak" the raws after generation in ways that are hard for templates to do.
-For example, the addon "Zap Aquifers", this addon consists of a single "post script" (a tweak script that runs after generation) that disables all AQUIFER tags in inorganic materials.
+For example, the addon "User/Zap Aquifers", this addon consists of a single "post script" (a tweak script that runs after generation) that disables all AQUIFER tags in inorganic materials.
 Here is the whole script that I will be dissecting:
 [code]
 
@@ -353,11 +353,11 @@ var aquifercounttotal = 0
 
 (foreach [rubble:raws] block name content {
 	...
-};)
+})
 [/code]
 The two variables are for logging, they keep track of how many aquifer tags we found in the current file and in all the files together.
 rubble:raws is an indexable that contains all the files in all the (active) addons indexable by name.
-The block declaration is needed so foreach has some variables to populate, two of them to be exact (a block declaration is basically a anonymous command, they are used where you need variables with having formal variable declarations).
+The block declaration is needed so foreach has some variables to populate, two of them to be exact (a block declaration is basically a anonymous command, they are used where you need variables without having formal variable declarations).
 
 Now for the body of the foreach loop:
 [code]
@@ -409,17 +409,14 @@ Now for the meat of the script, the few lines that actually DO something.
 First we check if the tag id equals "AQUIFER" and disable the tag if so (disabling a tag just replaces it's square brackets with dashes). Also we increment the current aquifer count.
 Finally at the end, after all files are processed we print a message saying how many aquifers we found total in all files.
 
-One of the other big uses for tweak scripts is checking dependencies, for example:
+One of the other big uses for tweak scripts is declaring templates.
+Script templates are far more flexible than normal templates, and the entire standard library is implemented this way.
+Most script templates are declared in pre scripts (scripts that run before generation).
 [code]
-(rubble:requireaddon "Some/Addon" "Some/Other/Addon")
+(rubble:template @TEST block a b c {
+	(str:add "You passed: " [a] ", " [b] ", and " [c] " to the @TEST template!")
+})
 [/code]
-Will abort generation with the message:
-[code]
-The "Some/Addon" addon requires that the "Some/Other/Addon" addon be active!
-Please activate that addon and try again.
-[/code]
-(There is also a command for specifying incompatible addons)
-Most of the time you would want your dependency checks to be in prescripts, so as to abort as soon as possible.
 
 "So how does Rubble know what is a postscript and what is a prescript?" you ask. Simple, the file extension. Rubble "knows" a file ending in .pre.rex is a prescript and a file ending in .post.rex is a post script.
 
@@ -525,49 +522,3 @@ Raws: [FOO][NEW:TAG][BAZ]
 [/code]
 
 While I have been calling them the "fast" and "slow" parsers, this is not necessarily true, most of what makes the "slow" parser slow lies in df:raw:dump, so if you are not going to modify the raws and then write them out it may actually be faster, testing is needed.
-
-========================================================
-
-Tutorial 7: Setting up a Development Rubble Install
-
-Rubble is a great tool for transforming raws and doing other repetitive development tasks of that sort, this tutorial aims to show you how to setup a minimal environment for when you don't need to have DF available.
-
-Why should you use Rubble instead of writing a script in your favorite scripting language?
-Here are a few reasons:
-	Rubble already "knows" how to load files and run scripts, saving a lot of overhead
-	Rubble comes with not one but TWO raw parsers, no need to roll your own
-	Rubble comes with an extensive library of ready to go addons that can, when properly used, save you a lot of time
-
-In any case this tutorial is not here to teach you how to write a script to do what you need, this is just here to tell you how to setup Rubble as a standalone tool for working with raws without needing DF.
-
-Basically you need a separate Rubble installation that lacks the "user" addons and is not affiliated with a copy of DF. This is simple to setup, just unpack Rubble somewhere and create a directory beside the addons directory (I'll assume you named it "out"). 
-
-Now start the GUI, it will complain about not finding the "saves" directory and quit, this is normal. Open the "gui.ini" that was created, it should look like this:
-[code]
-[general]
-otheroptions=
-rubble_bin=rubble.exe
-rubble_cwd=.
-[/code]
-Add "minimal=true" at the bottom of the file.
-
-Now create a file named "rubble.ini" and add these contents:
-[code]
-[rubble]
-dfdir=rubble:out
-outputdir=rubble:out
-[/code]
-Feel free to add any other options you like, for a full list run "rubble -h".
-
-Now run the GUI again, it should start properly this time, just without the "Prep" and "Regen" tabs.
-
-Go ahead and delete any addons you don't need (which should be most of them) this will shorten the list and make it easier to find stuff. DO NOT DELETE "Libs/Base" or any ".init.rex" files! They contain valuable commands you will need, if not now then later.
-Most of contents of the "other" directory can be deleted as well, the only things I would suggest you keep are the documents.
-
-Now you should have a copy of Rubble ready to use for various development tasks.
-
-Most of the time when using Rubble this way you will be working with temporary addons that contain only a few files and only activating 3-4 addons when generating. A common task will go like this: First you create a temporary addon with your working files (the ones containing the data you need to manipulate), then you create a new addon that contains the script(s) you will be using (this makes it easier to reuse them later) once you are finished writing the script(s) activate the needed addons and generate. Most of the time when I do this I am not after the generated files, instead the files I want are written out by the scripts as a side effect of generation, but this depends on how your scripts are written.
-
-An excellent example of an addon meant to be used with a setup like this is "Dev/Tileset/Insert", it is less than useful for end users, but invaluable for developers. For example when using "Dev/Tileset/Insert" with the "DEV_TILESET_INSERT_EXPORT" config variable set it works best on a minimal setup like this, otherwise you trash your default settings and/or send too much time wading around other things you may have installed.
-
-If you really want to get fancy you can install go (golang.org) and build "rexsh" as directed in "other/src/Building.txt", this is an invaluable tool when trying to learn how to script with Rubble, and makes testing small code snippets a breeze. Unfortunately while building a go program is absurdly easy compared to building programs written in most languages it is still something best left to advanced users.

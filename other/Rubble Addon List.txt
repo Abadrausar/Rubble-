@@ -9,12 +9,9 @@ If you want to generate the Rubble version of "vanilla DF" you will need to acti
 
 All addons will automatically activate any dependencies, so don't worry if the addon list that is generated is a little different from what you selected.
 
-All of the DFHack stuff is made under the assumption that what worked with 34.11 and DFHack r5e1 will work with the 40.x DFHack when it is available.
-If this is not true some or all of the DFHack related addons will not work.
-
 A few of the addons allow you to make gloves via reactions, unfortunately these gloves will be unusable (it's a vanilla bug). If you have DFHack this will be fixed automatically.
 
-This list is not perfect, it may be slightly out of date and/or be slightly wrong about something. For the latest information on each addon see its description page in the Web UI.
+This list is not perfect, it may be slightly out of date and/or be slightly wrong about something. For the latest information on each addon see its description page in the Web UI (the description page includes more detail and is guaranteed to be up to date).
 
 Base:
 	The standard base addon. Contains Rubblized versions of the vanilla raw files. 
@@ -230,6 +227,14 @@ User:
 		An automatic powered version of the "DFHack/Obsidian Caster" addon.
 		This addon works exactly the same as "DFHack/Obsidian Caster", just without dwarf labor.
 	
+	User/DFHack/Spatter:
+		A streamlined version of the DFHack spatter example mod. Allows you to coat weapons and ammo with extracts.
+		(Note that some extracts have no military value.)
+		Uses the wax worker skill.
+	
+	User/DFHack/Steam:
+		The DFHack steam engine example mod neatly packed as a Rubble addon. See the DFHack readme for details.
+		
 	User/Diggable Slade:
 		Allows you to dig slade, once you get past it's guardians that is...
 		Digging slade may lead to bugs, so be careful.
@@ -310,6 +315,10 @@ User:
 	User/Metallurgy:
 		Adds an "Alloy Furnace" that can be used to make alloys.
 		All alloys are made from bars using the smelting skill. Does not effect the smelter in any way.
+	
+	User/Metallurgy/Aluminum Bronze:
+		Make a bronze from aluminum and copper, makes a good decorative metal and can be made into armor and weapons as well.
+		Finally, an armor material worthy of your nobles :p
 	
 	User/Metallurgy/Bloomery:
 		Adds a "Bloomery" that can be used to make iron and steel in a more realistic manner.

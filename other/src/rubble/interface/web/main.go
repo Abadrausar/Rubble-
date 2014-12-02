@@ -475,7 +475,16 @@ func main() {
 		for _, name := range addons {
 			addon := state.AddonsTbl[name]
 			for i := range addon.Meta.Vars {
-				vars[i] = addon.Meta.Vars[i]
+				data, ok := state.VariableData[i]
+				if !ok {
+					vars[i] = addon.Meta.Vars[i]
+					continue
+				}
+				val := new(rubble.MetaVar)
+				val.Name = addon.Meta.Vars[i].Name
+				val.Val = data
+				val.Choices = addon.Meta.Vars[i].Choices
+				vars[i] = val
 			}
 		}
 
