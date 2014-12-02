@@ -35,6 +35,7 @@ raw_string
 [deref]
 [derefMap, index]
 
+'Trying to read a non-existant map key will return the empty string'
 
 'command decleration'
 (command, name, paramName1, ..., paramNameN, code) 'fixed param count'
@@ -43,16 +44,24 @@ raw_string
 'or'
 (command, name, code) 'no params'
 
-
 'example command'
-(command, test, param1, param2, {
-	(add, param1, param2)
+(command, test, __param1__, __param2__, {
+	(add, __param1__, __param2__)
 })
 
+'Note that a variable param count command has a special map named "params" that stores its parameters
+eg.'
+(command, test, ..., {
+	(add, [params 0], [params 1])
+})
+
+'It is recomended that command param names be pre and postfixed by double underscores so as to be less likely to collide with user variable names. eg __name__'
+
+'variables and maps'
 (var, name, [value])
 (map, name)
 
-
+'namespace'
 (namespace, name)
 
 'names are written like so'
@@ -80,12 +89,12 @@ namespace1:namespace2:name
 })
 
 'for loop'
-(command for init test incriment code {
-	(eval [init]) 
+(command for __init__ __test__ __incriment__ __code__ {
+	(eval [__init__]) 
 	(loop {
-		(if (run [test]) {
-			(run [code])
-			(run [incriment])
+		(if (run [__test__]) {
+			(run [__code__])
+			(run [__incriment__])
 			(break -1)
 		}{
 			(break 0)
@@ -101,10 +110,10 @@ namespace1:namespace2:name
 
 
 'simple while loop'
-(command while test code {
+(command while __test__ __code__ {
 	(loop {
-		(if (run [test]) {
-			(run [code])
+		(if (run [__test__]) {
+			(run [__code__])
 			(break -1)
 		}{
 			(break 0)
@@ -114,13 +123,13 @@ namespace1:namespace2:name
 
 
 'increment variable'
-(command ++ name {
-	(set [name] (add [[name]] 1))
+(command ++ __name__ {
+	(set [__name__] (add [[__name__]] 1))
 })
 
 'decrement variable'
-(command -- name {
-	(set [name] (sub [[name]] 1))
+(command -- __name__ {
+	(set [__name__] (sub [[__name__]] 1))
 })
 
 'for loop using ++'
@@ -131,8 +140,8 @@ namespace1:namespace2:name
 
 'include a file'
 'requires the file io commands to be loaded'
-(command include path {
-	(evalinparent (fileio:read [path]))
+(command include __pat__h {
+	(evalinparent (fileio:read [__path__]))
 })
 
 'nop example

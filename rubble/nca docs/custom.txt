@@ -22,7 +22,20 @@ Get the value of a Rubble variable.
 	
 	rubble:getvar name
 	
-	Returns the vlaue.
+	Returns the value.
+
+Parse Rubble code.
+	
+	rubble:stageparse code
+	
+	Note that how code is parsed depends on the parse stage.
+	Returns the result of running code through the stage parser.
+
+Call a Rubble template.
+
+	rubble:calltemplate name [params...]
+	
+	Returns the templates return value.
 
 Variables
 	rubble:outputdir

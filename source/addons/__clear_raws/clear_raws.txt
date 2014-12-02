@@ -1,4 +1,4 @@
-To activate this behavior remove the leading double underscores ("__") from the addon name
+'To activate this behavior remove the leading double underscores ("__") from the addon name'
 
 {!SCRIPT;
 	(file:walkfiles [rubble:outputdir] {

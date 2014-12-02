@@ -18,6 +18,7 @@ import "dctech/nca4"
 //	map
 //	delmap
 //	set
+//	exists
 //	run
 //	eval
 //	evalinparent
@@ -39,6 +40,7 @@ func Setup(state *nca4.State) {
 	state.NewNativeCommand("map", CommandMap)
 	state.NewNativeCommand("delmap", CommandDelMap)
 	state.NewNativeCommand("set", CommandSet)
+	state.NewNativeCommand("exists", CommandExists)
 	state.NewNativeCommand("run", CommandRun)
 	state.NewNativeCommand("eval", CommandEval)
 	state.NewNativeCommand("evalinparent", CommandEvalInParent)
@@ -233,6 +235,38 @@ func CommandSet(state *nca4.State, params []*nca4.Value) {
 	state.RetVal = params[1]
 }
 
+// Returns true (-1) if variable or map name (and possible index) exists.
+// 	exists name [index]
+// Returns 0 or -1.
+func CommandExists(state *nca4.State, params []*nca4.Value) {
+	if len(params) != 1 && len(params) != 2 {
+		panic("Wrong number of params to exists.")
+	}
+	
+	if len(params) == 1 {
+		if state.VarExists(params[0].String()) {
+			state.RetVal = nca4.NewValue("-1")
+			return
+		}
+		if state.MapExists(params[0].String()) {
+			state.RetVal = nca4.NewValue("-1")
+			return
+		}
+		state.RetVal = nca4.NewValue("0")
+		return
+	}
+	
+	if state.MapExists(params[0].String()) {
+		data := state.GetMap(params[0].String())
+		if _, ok := data[params[1].String()]; ok {
+			state.RetVal = nca4.NewValue("-1")
+			return
+		}
+	}
+	state.RetVal = nca4.NewValue("0")
+	return
+}
+
 // Runs code as a user command.
 // 	run code [params...]
 // Returns the return value of the last command in the code it runs.
@@ -346,5 +380,4 @@ func CommandForEach(state *nca4.State, params []*nca4.Value) {
 		}
 		state.Envs.Remove()
 	}
-	panic("CommandLoop: unreachable")
 }

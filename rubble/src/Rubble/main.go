@@ -105,7 +105,7 @@ func main() {
 			continue
 		}
 		
-		file := []byte(i + "\n\n" + RawFiles[i].Content)
+		file := []byte(i + "\n\n" + ExpandVars(RawFiles[i].Content))
 		ioutil.WriteFile(OutputDir + "/" + i + ".txt", file, 0600)
 	}
 	fmt.Println("Done.")

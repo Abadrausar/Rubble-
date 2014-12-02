@@ -1,28 +1,17 @@
 package main
 
-import "fmt"
+//import "fmt"
 import "strings"
 import "strconv"
 import "sort"
-import "regexp"
 import "dctech/nca4"
 
 func SetupBuiltins() {
 	NewNativeTemplate("!TEMPLATE", tempTemplate)
-	NewNativeTemplate("ONCE", tempOnce)
-	NewNativeTemplate("STATIC", tempStatic)
-	NewNativeTemplate("COMMENT", tempComment)
-	NewNativeTemplate("C", tempComment)
-	NewNativeTemplate("VOID", tempVoid)
-	
-	NewNativeTemplate("SET", tempSet)
-	NewNativeTemplate("IF", tempIf)
 	
 	NewNativeTemplate("!SCRIPT", tempScript)
 	NewNativeTemplate("SCRIPT", tempScript)
 	NewNativeTemplate("#SCRIPT", tempScript)
-	
-	NewNativeTemplate("#ADVENTURE_TIER", tempAdventureTier)
 	
 	NewNativeTemplate("ITEM", tempItem)
 	NewNativeTemplate("ITEM_RARITY", tempItemRarity)
@@ -38,9 +27,6 @@ func SetupBuiltins() {
 	NewNativeTemplate("#ADV_TIME", tempAdvTime)
 	NewNativeTemplate("#FORT_TIME", tempFortTime)
 	
-	NewNativeTemplate("SHARED_INORGANIC", tempSharedInorganic)
-	NewNativeTemplate("SHARED_MATERIAL_TEMPLATE", tempSharedMaterialTemplate)
-	
 	NewNativeTemplate("REGISTER_ORE", tempRegisterOre)
 	NewNativeTemplate("#_REGISTERED_ORES", tempRegisteredOres)
 	NewNativeTemplate("REGISTER_REACTION_CLASS", tempRegisterReactionClass)
@@ -48,10 +34,7 @@ func SetupBuiltins() {
 	NewNativeTemplate("REGISTER_REACTION_PRODUCT", tempRegisterReactionProduct)
 	NewNativeTemplate("#_REGISTERED_REACTION_PRODUCTS", tempRegisteredReationProducts)
 	
-	NewNativeTemplate("SHARED_ITEM", tempSharedItem)
-	
-	NewNativeTemplate("PANIC", tempPanic)
-	
+	// Do not port, used by the lexer only
 	NewNativeTemplate("#_CHAR_DELIMITER", tempCharDelimiter)
 	NewNativeTemplate("#_CHAR_TAG_OPEN", tempCharTagOpen)
 	NewNativeTemplate("#_CHAR_TAG_CLOSE", tempCharTagClose)
@@ -63,7 +46,7 @@ func tempTemplate(params []string) string {
 	}
 	
 	name := params[0]
-	text := strings.TrimSpace(params[len(params)-1])
+	text := params[len(params)-1]
 	paramNames := params[1:len(params)-1]
 	
 	parsedParams := make([]*TemplateParam, 0, len(paramNames))
@@ -83,72 +66,6 @@ func tempTemplate(params []string) string {
 	
 	NewUserTemplate(name, text, parsedParams)
 	
-	return ""
-}
-
-var onceData = make(map[string]bool)
-func tempOnce(params []string) string {
-	if len(params) != 2 {
-		panic("Wrong number of params to ONCE.")
-	}
-	
-	if onceData[params[0]] {
-		return ""
-	}
-	onceData[params[0]] = true
-	return StageParse(strings.TrimSpace(params[1]))
-}
-
-var staticData = make(map[string]string)
-func tempStatic(params []string) string {
-	if len(params) != 2 {
-		panic("Wrong number of params to STATIC.")
-	}
-	
-	if staticData[params[0]] != "" {
-		return staticData[params[0]]
-	}
-	rtn := StageParse(strings.TrimSpace(params[1]))
-	staticData[params[0]] = rtn
-	return rtn
-}
-
-func tempComment(params []string) string {
-	return ""
-}
-
-func tempVoid(params []string) string {
-	for _, val := range params {
-		StageParse(val)
-	}
-	return ""
-}
-
-var varNameValidateRegEx = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
-func tempSet(params []string) string {
-	if len(params) != 2 {
-		panic("Wrong number of params to SET.")
-	}
-	
-	if !varNameValidateRegEx.MatchString(params[0]) {
-		panic("Variable name supplied to SET is invalid.")
-	}
-	
-	VariableData[params[0]] = params[1]
-	return ""
-}
-
-func tempIf(params []string) string {
-	if len(params) != 3 && len(params) != 4 {
-		panic("Wrong number of params to IF.")
-	}
-	
-	if strings.ToLower(params[0]) == strings.ToLower(params[1]) {
-		return StageParse(params[2])
-	}
-	if len(params) == 4 {
-		return StageParse(params[3])
-	}
 	return ""
 }
 
@@ -175,13 +92,6 @@ func tempScript(params []string) string {
 		return ""
 	}
 	return rtn.String()
-}
-
-var advTier = 0
-func tempAdventureTier(params []string) string {
-	rtn := fmt.Sprint("[ADVENTURE_TIER:", advTier, "]")
-	advTier++
-	return rtn
 }
 
 var itemTypes = map[string]bool {
@@ -250,9 +160,9 @@ func tempItemRarity(params []string) string {
 	if len(params) != 3 {
 		panic("Wrong number of params to ITEM_RARITY.")
 	}
-	
-	if _, ok := itemClasses[params[1]]; !ok {
-		panic("Invalid class: " + params[1])
+	class := params[1]
+	if _, ok := itemClasses[class]; !ok {
+		panic("Invalid class: " + class)
 	}
 	
 	for _, item := range itemClasses[params[1]] {
@@ -311,11 +221,11 @@ func tempBuildingWorkshop(params []string) string {
 		panic("Wrong number of params to BUILDING_WORKSHOP.")
 	}
 	
-	for i := range params[1:] {
-		if _, ok := buildingData[params[i+1]]; !ok {
-			buildingData[params[i+1]] = make([]string, 0, 5)
+	for _, name := range params[1:] {
+		if _, ok := buildingData[name]; !ok {
+			buildingData[name] = make([]string, 0, 5)
 		}
-		buildingData[params[i+1]] = append(buildingData[params[i+1]], params[0])
+		buildingData[name] = append(buildingData[name], params[0])
 	}
 	return "[BUILDING_WORKSHOP:" + params[0] + "]"
 }
@@ -325,11 +235,11 @@ func tempBuildingFurnace(params []string) string {
 		panic("Wrong number of params to BUILDING_FURNACE.")
 	}
 	
-	for i := range params[1:] {
-		if _, ok := buildingData[params[i+1]]; !ok {
-			buildingData[params[i+1]] = make([]string, 0, 5)
+	for _, name := range params[1:] {
+		if _, ok := buildingData[name]; !ok {
+			buildingData[name] = make([]string, 0, 5)
 		}
-		buildingData[params[i+1]] = append(buildingData[params[i+1]], params[0])
+		buildingData[name] = append(buildingData[name], params[0])
 	}
 	return "[BUILDING_FURNACE:" + params[0] + "]"
 }
@@ -367,11 +277,11 @@ func tempReaction(params []string) string {
 		panic("Wrong number of params to REACTION.")
 	}
 	
-	for i := range params[1:] {
-		if _, ok := reactionData[params[i+1]]; !ok {
-			reactionData[params[i+1]] = make([]string, 0, 5)
+	for _, class := range params[1:] {
+		if _, ok := reactionData[class]; !ok {
+			reactionData[class] = make([]string, 0, 5)
 		}
-		reactionData[params[i+1]] = append(reactionData[params[i+1]], params[0])
+		reactionData[class] = append(reactionData[class], params[0])
 	}
 	return "[REACTION:" + params[0] + "]"
 }
@@ -504,42 +414,6 @@ func tempFortTime(params []string) string {
 	return strconv.FormatInt(int64(amountf), 10)
 }
 
-var sharedInorganicData = make(map[string]bool) // also used for material templates
-// This does not have all the error checking that Blast has, watch out!
-func tempSharedInorganic(params []string) string {
-	if len(params) != 2 {
-		panic("Wrong number of params to SHARED_INORGANIC.")
-	}
-	
-	if sharedInorganicData[params[0]] {
-		StageParse(params[1])
-		return ""
-	}
-	
-	sharedInorganicData[params[0]] = true
-	rtn := "{#_REGISTERED_ORES;" + params[0] + "}\n"
-	rtn += "{#_REGISTERED_REACTION_CLASSES;" + params[0] + "}\n"
-	rtn += "{#_REGISTERED_REACTION_PRODUCTS;" + params[0] + "}\n"
-	return "[INORGANIC:" + params[0] + "]\n\t" + StageParse(params[1]) + rtn
-}
-
-func tempSharedMaterialTemplate(params []string) string {
-	if len(params) != 2 {
-		panic("Wrong number of params to SHARED_MATERIAL_TEMPLATE.")
-	}
-	
-	if sharedInorganicData[params[0]] {
-		StageParse(params[1])
-		return ""
-	}
-	
-	sharedInorganicData[params[0]] = true
-	rtn := "{#_REGISTERED_ORES;" + params[0] + "}\n"
-	rtn += "{#_REGISTERED_REACTION_CLASSES;" + params[0] + "}\n"
-	rtn += "{#_REGISTERED_REACTION_PRODUCTS;" + params[0] + "}\n"
-	return "[MATERIAL_TEMPLATE:" + params[0] + "]\n\t" + StageParse(params[1]) + rtn
-}
-
 var oreData = make(map[string]map[string]int64)
 func tempRegisterOre(params []string) string {
 	if len(params) != 3 {
@@ -664,30 +538,6 @@ func tempRegisteredReationProducts(params []string) string {
 		out += "\n\t[MATERIAL_REACTION_PRODUCT:" + val.Name + ":" + val.Mat + "]"
 	}
 	return out
-}
-
-var sharedItemData = make(map[string]bool)
-// This does not have all the error checking that Blast has, watch out!
-func tempSharedItem(params []string) string {
-	if len(params) != 2 {
-		panic("Wrong number of params to SHARED_ITEM.")
-	}
-	
-	if sharedItemData[params[0]] {
-		StageParse(params[1])
-		return ""
-	}
-	
-	sharedItemData[params[0]] = true
-	return StageParse(params[1])
-}
-
-func tempPanic(params []string) string {
-	if len(params) != 1 {
-		panic("Wrong number of params to PANIC (how ironic).")
-	}
-	
-	panic(params[0])
 }
 
 func tempCharDelimiter(params []string) string {

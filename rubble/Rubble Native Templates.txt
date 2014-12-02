@@ -1,5 +1,6 @@
 	
 Rubble Template Documentation
+Built-in Native Templates
 
 ==============================================
 {!TEMPLATE;<NAME>;<CODE>}
@@ -10,8 +11,6 @@ Rubble Template Documentation
 	Calling {<NAME>;<ARGUMENT_1>;<ARGUMENT_2>} will replace instances of %<PARAM_1>, %{<PARAM_1>}, or %1 with <ARGUMENT_1>, instances of %<PARAM_2>, %{<PARAM_2>}, or %2 with <ARGUMENT_2>, etcetera. Default values may be specified for parameters.
 	
 	If a parameters value has the form $<VALUE> or ${<VALUE>} <VALUE> will be treated as a variable name and replaced with the variables value, the same also holds for any such string found in <CODE>
-	
-	Note that <NAME> may not be a global identifier.
 	
 	Example:
 		{!TEMPLATE;FOO;bar}
@@ -34,48 +33,10 @@ Rubble Template Documentation
 		Hello ‼Fun‼!
 
 ==============================================
-{ONCE;<KEY>;<PRERAWS>}
-	Parses and returns <PRERAWS> unless a ONCE block with the same <KEY> has been parsed earlier.
-
-==============================================
-{STATIC;<KEY>;<PRERAWS>}
-	If this template is the first to be evaluated with key <KEY>, then <PRERAWS> are parsed and returned. Subsequent STATIC calls with the same <KEY> will return the result of the first parse instead without parsing anything else before that.
-
-==============================================
-{COMMENT;<STUFF>...}
-{C;<STUFF>...}
-	Doesn't parse or return anything.
-
-==============================================
-{VOID;<PRERAWS>...}
-	Parses <PRERAWS>, but doesn't return anything.
-
-==============================================
-{SET;<NAME>;<VALUE>}
-	Sets a variable of name <NAME> to value <VALUE>. Returns nothing.
-
-==============================================
-{IF;<STRING1>;<STRING2>;<THEN_PRERAWS>}
-{IF;<STRING1>;<STRING2>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
-	If <STRING1> and <STRING2> are equal, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned. This is very useful with variables.
-	
-	Example:
-		{IF;$TEST_VAR;YES;[FOO];[BAR]}
-
-
-==============================================
 {!SCRIPT;<NCACODE>} or {!SCRIPT;<NCACODE>;<PARAMS>...}
 {SCRIPT;<NCACODE>} or {SCRIPT;<NCACODE>;<PARAMS>...}
 {#SCRIPT;<NCACODE>} or {#SCRIPT;<NCACODE>;<PARAMS>...}
-	Run a NCA4 script as a command and returns whatever the script returns.
-
-==============================================
-{#ADVENTURE_TIER}
-	Returns a new unique [ADVENTURE_TIER:X] tag every time it is processed.
-	
-	Example (assuming {#ADVENTURE_TIER} wasn't previously called):
-		{#ADVENTURE_TIER} -> [ADVENTURE_TIER:1]
-		{#ADVENTURE_TIER} -> [ADVENTURE_TIER:2]
+	Runs a NCA4 script as a command and returns whatever the script returns.
 
 ==============================================
 {ITEM;<TYPE>;<ITEM>;<RARITY>;<CLASS>...} or {ITEM;<TYPE>;<ITEM>;<CLASS>...}
@@ -153,18 +114,6 @@ Rubble Template Documentation
 		{#FORT_TIME;1;YEAR} -> 403200
 
 ==============================================
-{SHARED_INORGANIC;<NAME>;<DEFINITION>}
-	Adds a common inorganic to the dictionary. <DEFINITION> should be a complete inorganic stone entry, EXCLUDING the [INORGANIC:<NAME>] tag. If this template call is the first to define this inorganic, then the given <DEFINITION> will be used in the finished raws. 
-	
-	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_ORE, REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
-
-==============================================
-{SHARED_MATERIAL_TEMPLATE;<NAME>;<DEFINITION>}
-	Adds a common material template to the dictionary. <DEFINITION> should be a complete template entry, EXCLUDING the [MATERIAL_TEMPLATE:<NAME>] tag. If this template call is the first to define this material template, then the given <DEFINITION> will be used in the finished raws. 
-	
-	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
-
-==============================================
 {REGISTER_ORE;<ORE>;<METAL>;<AMOUNT>}
 	Adds a [METAL_ORE:<METAL>:<AMOUNT>] tag to the definition of <ORE>. For this to work, <ORE> must be registered as a SHARED_INORGANIC. If this is called multiple times with the same <ORE> and <METAL>, the highest <AMOUNT> is used.
 
@@ -175,13 +124,3 @@ Rubble Template Documentation
 ==============================================
 {REGISTER_REACTION_PRODUCT;<INORGANIC>;<CLASS>;<PRODUCT>}
 	Adds a [MATERIAL_REACTION_PRODUCT:<CLASS>:<PRODUCT>] tag to the definition of <INORGANIC>. For this to work, <INORGANIC> must be registered as a SHARED_INORGANIC.
-
-==============================================
-{SHARED_ITEM;<NAME>;<DEFINITION>}
-	Adds a common item of name <NAME> to the item dictionary. <DEFINITION> should be a complete item entry, including the [ITEM_<TYPE>:<NAME>] tag. If this template call is the first to define this item, then the given <DEFINITION> will be used in the finished raws.
-	
-	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws.
-
-==============================================
-{PANIC;<MESSAGE>}
-	Forces Rubble to exit, <MESSAGE> is displayed.

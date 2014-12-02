@@ -5,10 +5,16 @@ import "dctech/nca4"
 import "io/ioutil"
 import "os"
 
-// Adds the file io commands to the state.
-// The file io commands are:
-//	fileio:read
-//	fileio:write
+// Adds the file system commands to the state.
+// The file system commands are:
+//	file:deldir
+//	file:deltree
+//	file:newdir
+//	file:del
+//	file:exists
+//	file:direxists
+//	file:walkfiles
+//	file:walkdirs
 func Setup(state *nca4.State) {
 	state.NewNameSpace("file")
 	state.NewNativeCommand("file:deldir", CommandFile_DelDir)

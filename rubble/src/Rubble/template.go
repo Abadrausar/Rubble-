@@ -31,15 +31,27 @@ var repTokenNameRegEx = regexp.MustCompile("%[a-zA-Z_]+")
 var repTokenNumberRegEx = regexp.MustCompile("%[1-9]+")
 
 var varNameRegEx = regexp.MustCompile("^\\$\\{?([a-zA-Z_][a-zA-Z0-9_]*)\\}?$")
-var varNameSimpleRegEx = regexp.MustCompile("\\$[a-zA-Z_][a-zA-Z0-9_]*")
 
-// Call runs a template. The output is run through the parser for the active stage.
+// Call runs a template. The output is run through the stage parser.
 func (this *Template) Call(params []string) string {
 	// prep params
+	if len(params) != 0 {
+		if params[len(params)-1] == "..." {
+			params = append(params[:len(params)-1], PrevParams...)
+		} else {
+			PrevParams = make([]string, len(params))
+			copy(PrevParams, params)
+		}
+	} else {
+		PrevParams = make([]string, 0)
+	}
+	
+	
 	for i := range params {
 		params[i] = strings.TrimSpace(params[i])
 		
-		// If the param is a variable nmae replace with value
+		// If the param is a variable name replace with value
+		// Does not replace variables embeded in other text
 		name := varNameRegEx.FindStringSubmatch(params[i])
 		if name != nil {
 			params[i] = varNameRegEx.ReplaceAllString(params[i], VariableData[name[1]])
@@ -52,21 +64,7 @@ func (this *Template) Call(params []string) string {
 	}
 
 	// User template
-	
-	// Variables
-	out := this.Text
-	for i := range VariableData {
-		out = strings.Replace(out, "${" + i + "}", VariableData[i], -1)
-	}
-	out = varNameSimpleRegEx.ReplaceAllStringFunc(out, func(in string) string {
-		in = strings.TrimLeft(in, "$")
-		for i := range VariableData {
-			if i == in {
-				return VariableData[i]
-			}
-		}
-		return "$" + in
-	})
+	out := ExpandVars(this.Text)
 	
 	// Named replacement tokens
 	for i := range this.Params {

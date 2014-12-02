@@ -76,6 +76,24 @@ func (this *State) DeleteVar(name string) *Value {
 	return rtn
 }
 
+// VarExists returns true if variable "name" exists.
+func (this *State) VarExists(name string) bool {
+	space, itemname := this.ParseName(name)
+	if space == nil {
+		for i := len(*this.Envs) - 1; i >= 0; i-- {
+			if _, ok := (*this.Envs)[i].Vars[itemname]; ok {
+				return true
+			}
+		}
+		return false
+	}
+
+	if _, ok := space.Vars[itemname]; ok {
+		return true
+	}
+	return false
+}
+
 // NewMap creates a new map.
 func (this *State) NewMap(name string) {
 	space, itemname := this.ParseName(name)
@@ -158,14 +176,20 @@ func (this *State) GetValueMap(name, index string) *Value {
 	if space == nil {
 		for i := len(*this.Envs) - 1; i >= 0; i-- {
 			if _, ok := (*this.Envs)[i].Maps[itemname]; ok {
-				return (*this.Envs)[i].Maps[itemname][index]
+				if _, ok := (*this.Envs)[i].Maps[itemname][index]; ok {
+					return (*this.Envs)[i].Maps[itemname][index]
+				}
+				return NewValue("")
 			}
 		}
 		panic(fmt.Sprintf("Undeclared map: \"%v\"", name))
 	}
 
 	if _, ok := space.Maps[itemname]; ok {
-		return space.Maps[itemname][index]
+		if _, ok := space.Maps[itemname][index]; ok {
+			return space.Maps[itemname][index]
+		}
+		return NewValue("")
 	}
 	panic(fmt.Sprintf("Undeclared map: \"%v\"", name))
 }
@@ -206,6 +230,24 @@ func (this *State) GetMap(name string) map[string]*Value {
 		return space.Maps[itemname]
 	}
 	panic(fmt.Sprintf("Undeclared map: \"%v\"", name))
+}
+
+// MapExists returns true if map "name" exists.
+func (this *State) MapExists(name string) bool {
+	space, itemname := this.ParseName(name)
+	if space == nil {
+		for i := len(*this.Envs) - 1; i >= 0; i-- {
+			if _, ok := (*this.Envs)[i].Maps[itemname]; ok {
+				return true
+			}
+		}
+		return false
+	}
+
+	if _, ok := space.Maps[itemname]; ok {
+		return true
+	}
+	return false
 }
 
 // AddParams creates the special "params" map using strings.

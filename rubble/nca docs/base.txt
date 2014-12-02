@@ -136,3 +136,9 @@ Run code as command for each entry in a map.
 	
 	If code returns false foreach aborts.
 	Returns the return value of the last command in code.
+
+Returns true (-1) if variable or map name (and possible index) exists.
+	
+	exists name [index]
+	
+	Returns 0 or -1.

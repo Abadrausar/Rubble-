@@ -21,3 +21,5 @@ var ParseStage = 0
 
 // This is where template variables and config options are stored
 var VariableData = make(map[string]string)
+
+var PrevParams = make([]string, 0)

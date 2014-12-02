@@ -3,6 +3,7 @@ package main
 import "fmt"
 import "strings"
 import "io/ioutil"
+import "regexp"
 
 func ReadConfig(path string) {
 	fmt.Println("Reading Config File:", path)
@@ -31,6 +32,7 @@ func ReadConfig(path string) {
 	}
 }
 
+// This is the stage parser
 func StageParse(input string) string {
 	if ParseStage == 0 {
 		return PreParse(input)
@@ -169,4 +171,20 @@ func PostParse(input string) string {
 	}
 	
 	return out
+}
+
+var varNameSimpleRegEx = regexp.MustCompile("\\$[a-zA-Z_][a-zA-Z0-9_]*")
+
+func ExpandVars(input string) string {
+	for i := range VariableData {
+		input = strings.Replace(input, "${" + i + "}", VariableData[i], -1)
+	}
+	input = varNameSimpleRegEx.ReplaceAllStringFunc(input, func(in string) string {
+		in = strings.TrimLeft(in, "$")
+		if _, ok := VariableData[in]; ok {
+			return VariableData[in]
+		}
+		return "$" + in
+	})
+	return input
 }

@@ -1,5 +1,7 @@
 
+==============================================
 How to Write a Rubble Addon
+==============================================
 
 A Rubble addon is like a Blast addon except for 4 things:
 	1) All files use Rubble syntax and templates
@@ -92,25 +94,24 @@ Output:
 
 The standard base does not make use of item classes (yet)
 
-If you want to see another way to make the above addon look in "source/addons/__broken_arrow"
+If you want to see another (better) way to make the above addon look in "source/addons/__broken_arrow"
 
-Other random information:
+==============================================
+Other Random Information:
+==============================================
 
 If you want to allow an item, reaction, or building with a minimum of fuss register it as class "ADDON_HOOK_MOUNTAIN". Addon hooks also exist for the other entities.
 
-SCRIPT Example:
-If you want to start with a fresh slate every time you generate, just insert this template call into one of your raw files:
-WARNING! WARNING! THIS CODE WILL DELETE ALL FILES IN YOUR OUTPUT DIRECTORY
-
-{!SCRIPT;
-	(file:walkfiles [rubble:outputdir] {
-		(file:del (append [rubble:outputdir] "/" [params 0]))
-		(if (geterror) {
-			(console:print "Error deleting: " [params 0] "\n")
-			(seterror 0)
-		})
-	})
-}
-
-see the "clear_raws" addon for an example.
-see "raw/rubble/nca docs" for basic documentation on all the nca commands.
+If you are making a template that takes a variable number of params and you want to impliment it via a NCA script you may need the ... param.
+Example:
+	{!TEMPLATE;VOID;
+		{SCRIPT;
+			(foreach params {
+				'Note that params here is NOT the same map as the params passed to foreach'
+				(rubble:stageparse [params 1])
+				(break -1)
+			})
+			(ret "")
+		;...}
+	}
+If Rubble finds a template call where the last param is ... it append the params from the previous template call to the current templates params.

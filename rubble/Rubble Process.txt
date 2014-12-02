@@ -22,7 +22,7 @@ Anatomy of a Template Call
 
 	All leading and trailing whitespace is striped from the params
 		If a param is of the form $<NAME> or ${<NAME>} then it is treated like a variable name and replaced with it's value
-	If the template is a native template then its handler is called and the template manager returns
+	If the template is a native template then it's handler is called and the template manager returns
 	The templates body is loaded and these transforms are run on it:
 		Text of the forms $<NAME> or ${<NAME>} is replaced with the value of the variable <NAME>
 		Text of the forms %<NAME> or %{<NAME>} is replaced with the value of the param named <NAME> or the default value specifyed for that param
