@@ -21,12 +21,40 @@ func Command_Exists(script *rex.Script, params []*rex.Value)
 
     Returns true or false.
 
+func Command_GetChild(script *rex.Script, params []*rex.Value)
+    Get an AXIS DataSource from an AXIS Collection by path.
+
+	axis:getchild collection path
+
+    Returns the DataSource or an error message. May set the Error flag.
+
 func Command_IsDir(script *rex.Script, params []*rex.Value)
     Is a AXIS file a directory?
 
 	axis:isdir ds path
 
     Returns true or false.
+
+func Command_Mount(script *rex.Script, params []*rex.Value)
+    Mount an AXIS DataSource on an AXIS Collection.
+
+	axis:mount collection path ds
+
+    Returns unchanged.
+
+func Command_NewDir(script *rex.Script, params []*rex.Value)
+    Create a new empty AXIS logical directory.
+
+	axis:newdir
+
+    Returns a reference to the new directory.
+
+func Command_NewFile(script *rex.Script, params []*rex.Value)
+    Create a new read/write AXIS logical file.
+
+	axis:newfile content
+
+    Returns a reference to the new file.
 
 func Command_Read(script *rex.Script, params []*rex.Value)
     Read from a AXIS file.

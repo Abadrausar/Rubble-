@@ -36,6 +36,26 @@ func (fs FileSystem) Mount(loc string, ds DataSource) {
 	fs[loc] = append(fs[loc], ds)
 }
 
+func (fs FileSystem) GetChild(path string) (DataSource, error) {
+	path, err := Sanitize(path)
+	if err != nil {
+		return nil, NewError(ErrBadPath, path)
+	}
+	
+	locID, path := StripLoc(path)
+	if locID == "" {
+		return fs, nil
+	}
+	
+	for x := range fs[locID] {
+		ds := fs[locID][x]
+		if col, ok := ds.(Collection); ok {
+			return col.GetChild(path)
+		}
+	}
+	return nil, NewError(ErrNotFound, path)
+}
+
 func (fs FileSystem) IsDir(path string) bool {
 	path, err := Sanitize(path)
 	if err != nil {
@@ -114,8 +134,8 @@ func (fs FileSystem) ListDir(path string) []string {
 		rtn[i] = x
 		i++
 	}
-	sort.Strings(rtn)
 	
+	sort.Strings(rtn)
 	return rtn
 }
 
@@ -138,8 +158,8 @@ func (fs FileSystem) ListFile(path string) []string {
 		rtn[i] = x
 		i++
 	}
-	sort.Strings(rtn)
 	
+	sort.Strings(rtn)
 	return rtn
 }
 
@@ -185,9 +205,6 @@ func (fs FileSystem) Write(path string) (io.WriteCloser, error) {
 			return ds.Write(path)
 		}
 	}
-	if len(fs[locID]) > 0 {
-		return fs[locID][0].Write(path)
-	}
 	return nil, NewError(ErrNotFound, path)
 }
 
@@ -202,9 +219,6 @@ func (fs FileSystem) WriteAll(path string, content []byte) error {
 		if ds.Exists(path) {
 			return ds.WriteAll(path, content)
 		}
-	}
-	if len(fs[locID]) > 0 {
-		return fs[locID][0].WriteAll(path, content)
 	}
 	return NewError(ErrNotFound, path)
 }

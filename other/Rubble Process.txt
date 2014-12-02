@@ -14,10 +14,12 @@ Detailed Order of Execution
 	Config file is loaded (if present)
 	Commandline options are processed
 	
-	AXIS VFS is setup.
+	AXIS VFS is setup
 	
 	If -profile is set:
 		Profiling is started
+	
+	First-stage scripting is setup
 	
 	If -prep or -install are not set:
 		All addons are loaded
@@ -43,6 +45,8 @@ Detailed Order of Execution
 				Rubble Exits
 		
 		Addons are activated based on info from the active addons list
+		
+		All loader scripts are run
 		
 		If no addons are active:
 			Rubble Exits
@@ -72,7 +76,7 @@ Detailed Order of Execution
 		For each key/value:
 			Set config variable "key" to "value"
 	
-	Scripting is initialized
+	Second-stage scripting is initialized
 	
 	If -install is set:
 		The AXIS "install" location is initialized
@@ -93,7 +97,7 @@ Detailed Order of Execution
 	
 	Builtin templates are loaded
 	
-	All init scripts for all addons (including the inactive ones) are run
+	All init scripts are run
 	
 	All pre tweak scripts are run
 	All .txt and .rbl files are preparsed

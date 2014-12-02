@@ -43,7 +43,7 @@ func PrepModeRun(region string) {
 	FS.Mount("prep", fs)
 
 	LogPrintln("Loading Prep Files...")
-	prep := loadPrep(region)
+	prep := loadAddon(FS, region + "/Prep", "prep:")
 
 	// A hack, but a hack that keeps everything working correctly.
 	prep.Active = true
@@ -51,40 +51,16 @@ func PrepModeRun(region string) {
 
 	LogPrintln("Running Prep Scripts...")
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || !Files.Files[i].PrepScript {
+		if Files.Data[i].Tags["Skip"] || !Files.Data[i].Tags["PrepFile"] {
 			continue
 		}
 
-		CurrentFile = i
-		LogPrintln("  " + Files.Files[i].Path)
+		CurrentFile = Files.Data[i].Name
+		LogPrintln("  " + Files.Data[i].Name)
 
-		_, err := GlobalScriptState.CompileAndRun(string(Files.Files[i].Content), i)
+		_, err := GlobalScriptState.CompileAndRun(string(Files.Data[i].Content), Files.Data[i].Name)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
 	}
-}
-
-func loadPrep(region string) *Addon {
-	addon := NewAddon(region + "/Prep")
-
-	for _, filepath := range FS.ListFile("prep:") {
-
-		//LogPrintln("  " + filepath)
-
-		file := new(AddonFile)
-		file.Path = filepath
-
-		content, err := FS.ReadAll("prep:" + filepath)
-		if err != nil {
-			panic(err)
-		}
-		file.Content = content
-
-		// Most of classifyFile is useless here, but there is no good reason to
-		// write a subset for just prep addons
-		classifyFile(file, filepath)
-		addon.Files[filepath] = file
-	}
-	return addon
 }

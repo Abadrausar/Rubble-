@@ -56,6 +56,18 @@ Really advanced users may want to look at the tweak script that drives "Dev/Tile
 It is easy to forget that Rubble can be used for far more than just generating raws, it also works well for processing them.
 
 ==============================================
+Patches:
+==============================================
+
+Rubble provides (very) basic support for applying diff patches to files (or any arbitrary chunk of text really).
+
+This ability is primarily for use by bugfixes and minor updates and is not meant as a general modding tool, but there may be a few case where it will come in handy. The primary problem with Rubble's patch support is that it is fragile, eg even relatively small changes can stop the patch from applying. This behavior is intended.
+
+In general it is better not to use patches, save them for use in loader scripts and even their only use them to apply small changes.
+
+(see the rubble:patch script command)
+
+==============================================
 Tweak Scripts:
 ==============================================
 
@@ -86,6 +98,45 @@ Init scripts also work well for automatic dependency management. If your addon r
 Init scripts have a very narrow use-case and should be used with care.
 
 Init scripts are still loaded as "user data" if their containing addon contains any parseables!
+
+==============================================
+Loader Scripts:
+==============================================
+
+Loader scripts are a lot like initialization scripts, just that they run earlier.
+
+Loader scripts only do one thing that init scripts can't do better: they can modify the activation state of addons. Since loader scripts run just after addons have been activated but before the active file list has been generated you can examine what addons are active and change this list if need be. This is particularly useful for automatically activating addon dependencies.
+
+Like init scripts, loader scripts are global and pay no attention to their containing addon.
+Loader scripts are only run during normal generation cycles.
+
+Loader scripts make a great place to apply patches and force activate dependencies.
+
+==============================================
+File Tags:
+==============================================
+
+Rubble keeps track of file type and other attributes via "file tags", simple boolean flags that can be set at will.
+
+File tags default to false and can be changed at any time, any string can be used as a tag ID.
+
+To modify and/or read file tags the rubble:filetag command is used:
+	To read a tag:
+		(rubble:filetag "file.name" "TagID")
+	To set a tag:
+		(rubble:filetag "file.name" "TagID" true)
+
+Hard Coded File Tags:
+	Tag ID			Use
+	PreScript		Marks the file as a pre script.
+	PostScript		Marks the file as a post script.
+	PrepFile		The file should be written to the prep addon, or (during prep mode) the file is a prep script.
+	InstScript		Marks the file as an install script, only useful during install mode.
+	RawFile			Marks the file as parseable raw text.
+	NoWrite			Used with RawFile, marks the file as not to be written to the objects folder.
+	Skip			The file is to be ignored.
+
+There are a few additional hard coded tags, but they are only used on global script files (load and init scripts) and as such they are never visible to the user.
 
 ==============================================
 The prep "addon":

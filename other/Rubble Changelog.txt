@@ -2,6 +2,47 @@
 ==============================================
 Changelog:
 ==============================================
+v4.4 (for DF 40.8)
+	Updated the "Base" addon to DF 40.8
+	All addons in the "Libs" group are now automatically activated if needed.
+	Changed all addons that use bones to use more realistic amounts.
+	Added "User/DFHack/Fill Barrel", fill barrels and buckets with water at the still.
+	Added "User/Metallurgy", better access to alloys.
+	Added "User/Metallurgy/Mithril", a new high performance weapons grade alloy (great for blades and armor).
+	Added "User/Metallurgy/DFHack/Volcanic", a new high performance weapons grade alloy (great for hammers and maces).
+	Added "User/Metallurgy/Bloomery", more realistic iron and steel production.
+	Added "User/Metallurgy/Smelter", more realistic (and more streamlined) smelting.
+	Added "User/Metallurgy/Smelter/Remove Alloys", remove the alloy reactions from the smelter.
+	Added "User/Fix/Gays", by default this only fixes humans and dwarves.
+		The list of creatures to fix can be modified via config variable, see the script header for details.
+	Added "User/Smoked Meat", dwarven emergency rations!
+	Removed "User/Block/Bone".
+	Added "User/Bonecarver", finally, bone furniture (as well as blocks, crafts, and a few other items).
+	Saurians are now strictly "straight".
+	Removed "User/Add CHILD Tags" as it is no longer needed.
+	AXIS VFS has been updated to the latest version, this change is fully backwards compatible.
+	Rex (specifically the GenII sub-system) has been updated, this allows extended capabilities for a few script variables.
+	The scripting subsystem initialization now takes place in two stages.
+		This will allow scripts to be run (with slightly reduced functionality) immediately after Rubble starts.
+	The way file type is handled internally has changed significantly (the new system is more flexible).
+	Added a new type of script: loader scripts run immediately after the addon activation finishes.
+		Loader scripts allow you to do things like load patches and modify addon state before the file list is generated.
+		Like init scripts loader scripts are run even if their containing addon is not active or loaded.
+	The rubble:activate_addon and rubble:add_file script commands have been removed.
+		Loader scripts are more flexible and less error-prone, so this hack is no longer required.
+	The "Libs/Base" and "Libs/Castes" addons are now forced active via loader script.
+		This is far better than the old way as the addons in question are truly active.
+	The way addons are activated (internally) has changed slightly to allow loader scripts to run at the most useful time.
+	Some of the standard user script commands have been moved to a loader script (dependency checks mostly).
+	Added a new standard user script command to fetch addons by name for use with loader scripts: rubble:fetchaddon.
+	Added a new standard user script command to force an addon active: rubble:activateaddon.
+		If the addon does not exist an nicely formated error message is printed.
+	Added a new native script command: rubble:patch, allows applying patches to strings.
+		Patch support is almost certainly buggy! What I tested worked, but I only tested the simplest uses.
+	Added two new naive commands for making "virtual addons": rubble:newaddon and rubble:newfile.
+		This commands allow you to create new addons in loader scripts.
+	Added a new native script command: rubble:filetag, allows reading and editing file tags.
+
 v4.3 (for DF 40.5)
 	Fixed "User/Fix/Human Diplomats", two small bugs bugs in it's script kept it from working.
 	Fixed "User/Cat Damper", I really should test these things better.

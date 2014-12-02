@@ -33,18 +33,18 @@ func NewIndexableRaws() rex.EditIndexable {
 }
 
 func (this IndexableRaws) Get(index string) *rex.Value {
-	if _, ok := Files.Files[index]; ok {
-		if !Files.Files[index].Skip {
-			return rex.NewValueString(string(Files.Files[index].Content))
+	if _, ok := Files.Data[index]; ok {
+		if !Files.Data[index].Tags["Skip"] {
+			return rex.NewValueString(string(Files.Data[index].Content))
 		}
 	}
 	return rex.NewValueString("")
 }
 
 func (this IndexableRaws) Set(index string, value *rex.Value) bool {
-	if _, ok := Files.Files[index]; ok {
-		if !Files.Files[index].Skip {
-			Files.Files[index].Content = []byte(value.String())
+	if _, ok := Files.Data[index]; ok {
+		if !Files.Data[index].Tags["Skip"] {
+			Files.Data[index].Content = []byte(value.String())
 			return true
 		}
 	}
@@ -52,8 +52,8 @@ func (this IndexableRaws) Set(index string, value *rex.Value) bool {
 }
 
 func (this IndexableRaws) Exists(index string) bool {
-	if _, ok := Files.Files[index]; ok {
-		if !Files.Files[index].Skip {
+	if _, ok := Files.Data[index]; ok {
+		if !Files.Data[index].Tags["Skip"] {
 			return true
 		}
 	}
@@ -63,7 +63,7 @@ func (this IndexableRaws) Exists(index string) bool {
 func (this IndexableRaws) Len() int64 {
 	var length int64
 	for _, key := range Files.Order {
-		if Files.Files[key].Skip {
+		if Files.Data[key].Tags["Skip"] {
 			continue
 		}
 		length++
@@ -74,7 +74,7 @@ func (this IndexableRaws) Len() int64 {
 func (this IndexableRaws) Keys() []string {
 	rtn := make([]string, 0, this.Len())
 	for _, key := range Files.Order {
-		if Files.Files[key].Skip {
+		if Files.Data[key].Tags["Skip"] {
 			continue
 		}
 		rtn = append(rtn, key)

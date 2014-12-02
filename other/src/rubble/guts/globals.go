@@ -29,6 +29,7 @@ import "dctech/axis"
 // (all the listed versions are assumed to be backwards compatible)
 // Index 0 MUST be the current version!
 var RubbleVersions = []string{
+	"4.4",
 	"4.3",
 	"4.2",
 	"4.1",
@@ -37,17 +38,17 @@ var RubbleVersions = []string{
 }
 
 var FS axis.Collection
+var ExAddonsFS axis.Collection
 
 // All the addons are loaded to here.
-var Addons []*Addon
+var Addons = make([]*Addon, 0, 64)
 
 // Files is filled with all the active addon files at the end of the addon activation stage.
 // Files is mapped to the Raptor indexable rubble:raws.
 var Files *FileList
 
-// Force initialization scripts.
-var ForcedInit = make(map[string][]byte, 20)
-var ForcedInitOrder = make([]string, 0, 20)
+// Filled by the addonloader with all init and load scripts.
+var GlobalFiles = NewFileList(nil)
 
 // Parse stage constants
 const (
@@ -78,27 +79,20 @@ var CurrentFile string
 
 // AddonFile represents any file in an addon.
 type AddonFile struct {
-	Path       string
-	Source     string // Addon name.
+	Name       string // File name.
+	Source     string // Addon name (including loc ids).
 	Content    []byte
-	PreScript  bool
-	PostScript bool
-	PrepScript bool
-	InstScript bool
-	UserData   bool // any unparsable file, eg. images for tileset addons.
-	Graphics   bool // Graphics file raw text
-	Skip       bool // Do not parse or otherwise process this file
-	NoWrite    bool // Do not write this file out
+	Tags       map[string]bool
 }
 
-// IsRaw returns true if the addon file is a raw file or rbl file.
-func (this *AddonFile) IsRaw() bool {
-	return !this.PreScript && !this.PostScript && !this.PrepScript && !this.UserData && !this.Graphics
-}
-
-// IsGraphic returns true if the addon file is a creature graphics raw file.
-func (this *AddonFile) IsGraphic() bool {
-	return this.Graphics
+// NewAddonFile creates a new addon with the specified name.
+func NewAddonFile(name string, source string, content []byte) *AddonFile {
+	file := new(AddonFile)
+	file.Name = name
+	file.Source = source
+	file.Content = content
+	file.Tags = make(map[string]bool)
+	return file
 }
 
 // Addon represents an addon.
@@ -119,30 +113,35 @@ func NewAddon(name string) *Addon {
 // FileList stores an ordered list of AddonFiles.
 type FileList struct {
 	Order []string
-	Files map[string]*AddonFile
+	Data map[string]*AddonFile
 }
 
 // NewFileList creates a FileList from the files of all the active addons passed in.
 // Inactive addons are ignored.
+// If the addon list is nil an empty (but valid) FileList is returned.
 func NewFileList(data []*Addon) *FileList {
-	this := new(FileList)
-	this.Order = make([]string, 0, 100)
-	this.Files = make(map[string]*AddonFile, 100)
+	list := new(FileList)
+	list.Order = make([]string, 0, 100)
+	list.Data = make(map[string]*AddonFile, 100)
 
+	if data == nil {
+		return list
+	}
+	
 	for _, addon := range data {
 		if addon.Active {
 			for name, file := range addon.Files {
-				if _, ok := this.Files[name]; !ok {
-					this.Order = append(this.Order, name)
+				if _, ok := list.Data[name]; !ok {
+					list.Order = append(list.Order, name)
 				}
-				this.Files[name] = file
+				list.Data[name] = file
 			}
 		}
 	}
 
-	sort.Strings(this.Order)
+	sort.Strings(list.Order)
 
-	return this
+	return list
 }
 
 func DumpConfig(path string) {
@@ -156,6 +155,13 @@ func DumpConfig(path string) {
 }
 
 func WriteFile(path string, content []byte) {
+	if !FS.Exists(path) {
+		err := FS.Create(path)
+		if err != nil {
+			panic("Write Error: " + err.Error())
+		}
+	}
+	
 	err := FS.WriteAll(path, content)
 	if err != nil {
 		panic("Write Error: " + err.Error())

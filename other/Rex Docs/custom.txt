@@ -15,30 +15,6 @@ func Command_Abort(script *rex.Script, params []*rex.Value)
 
     Returns unchanged.
 
-func Command_ActivateAddon(script *rex.Script, params []*rex.Value)
-    Activates an addon.
-
-	rubble:activate_addon name
-
-    THIS COMMAND IS EXTREMELY DANGEROUS! The addon is not really activated,
-    but it's files are added to the file list, this makes this command
-    exceptionally dangerous and not to be used except for special cases by
-    users who know what they are doing. It is best to only use this command
-    from an init script (or maybe a pre script). Does nothing if the addon
-    is already active. Returns unchanged.
-
-func Command_AddFile(script *rex.Script, params []*rex.Value)
-    Adds a file.
-
-	rubble:add_file name contents
-
-    THIS COMMAND IS EXTREMELY DANGEROUS! Depending on when the file is added
-    parsing could end up in a broken state! I have no idea what kind of bugs
-    could be created by using this command, but I am sure they are legion.
-    It is best to only use this command from an init script (or maybe a pre
-    script). If the file already exists it's contents are replaced, just
-    like an normal override. Returns unchanged.
-
 func Command_CallTemplate(script *rex.Script, params []*rex.Value)
     Calls a Rubble template.
 
@@ -60,12 +36,34 @@ func Command_ExpandVars(script *rex.Script, params []*rex.Value)
 
     Returns the raws with all Rubble variables expanded.
 
+func Command_FileTag(script *rex.Script, params []*rex.Value)
+    Manages file tags.
+
+	rubble:filetag filename tag [value]
+
+    Returns the tag's state (if called without a value) or returns
+    unchanged.
+
 func Command_GetVar(script *rex.Script, params []*rex.Value)
     Gets the value of a Rubble variable.
 
 	rubble:getvar name
 
     Returns the value.
+
+func Command_NewAddon(script *rex.Script, params []*rex.Value)
+    Creates an empty addon object and adds it to the addon list.
+
+	rubble:newaddon name
+
+    Does nothing if the addon already exists. Returns the addon.
+
+func Command_NewFile(script *rex.Script, params []*rex.Value)
+    Adds a new file to an addon.
+
+	rubble:newfile addon name contents
+
+    Fails silently if the addon does not exist. Returns unchanged.
 
 func Command_Parse(script *rex.Script, params []*rex.Value)
     Parses Rubble code.
@@ -82,6 +80,13 @@ func Command_Parse(script *rex.Script, params []*rex.Value)
 
     The other stage numbers are not valid for the stage parser. Returns the
     result of running code through the stage parser.
+
+func Command_Patch(script *rex.Script, params []*rex.Value)
+    Applies a patch to a string.
+
+	rubble:patch string patch
+
+    Returns the patched text.
 
 func Command_SetVar(script *rex.Script, params []*rex.Value)
     Sets a Rubble variable.

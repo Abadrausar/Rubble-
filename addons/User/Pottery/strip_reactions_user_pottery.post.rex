@@ -1,54 +1,44 @@
 
+# Generic programmable reaction zapper script.
+
 var curEntity = ""
 
-(if (exists [rubble:raws] "entity_default.txt"){}{(ret "")})
-[rubble:raws "entity_default.txt" = (df:raw:walk [rubble:raws "entity_default.txt"] block tag {
-	(if (str:cmp [tag "id"] "ENTITY") {
-		(if (int:eq (len [tag]) 1) {
-			[curEntity = [tag 0]]
-		}{
-			(rubble:abort "Error: invalid param count to ENTITY raw tag in entity_default.txt")
-		})
-	})
-	
-	(if (str:cmp [curEntity] "MOUNTAIN") {
-		(if (str:cmp [tag id] "PERMITTED_REACTION") {
-			(if (int:eq (len [tag]) 1) {
-				(if (str:cmp [tag 0] "MAKE_CLAY_JUG") {
-					[tag disable = true]
-				})
-				(if (str:cmp [tag 0] "MAKE_CLAY_BRICKS") {
-					[tag disable = true]
-				})
-				(if (str:cmp [tag 0] "MAKE_CLAY_STATUE") {
-					[tag disable = true]
-				})
-				(if (str:cmp [tag 0] "MAKE_LARGE_CLAY_POT") {
-					[tag disable = true]
-				})
-				(if (str:cmp [tag 0] "MAKE_CLAY_CRAFTS") {
-					[tag disable = true]
-				})
-				(if (str:cmp [tag 0] "MAKE_CLAY_HIVE") {
-					[tag disable = true]
-				})
-				(if (str:cmp [tag 0] "GLAZE_JUG") {
-					[tag disable = true]
-				})
-				(if (str:cmp [tag 0] "GLAZE_STATUE") {
-					[tag disable = true]
-				})
-				(if (str:cmp [tag 0] "GLAZE_LARGE_POT") {
-					[tag disable = true]
-				})
-				(if (str:cmp [tag 0] "GLAZE_CRAFT") {
-					[tag disable = true]
-				})
-			}{
-				(rubble:abort "Error: invalid param count to PERMITTED_REACTION raw tag in entity_default.txt")
+var entities = <smap
+	MOUNTAIN = true
+	SWAMP = true
+>
+
+var strip = <smap
+	MAKE_CLAY_JUG=true
+	MAKE_CLAY_BRICKS=true
+	MAKE_CLAY_STATUE=true
+	MAKE_LARGE_CLAY_POT=true
+	MAKE_CLAY_CRAFTS=true
+	MAKE_CLAY_HIVE=true
+	GLAZE_JUG=true
+	GLAZE_STATUE=true
+	GLAZE_LARGE_POT=true
+	GLAZE_CRAFT=true
+>
+
+(foreach [rubble:raws] block name content {
+	(if (str:cmp "entity_" (str:left [name] 7)) {
+		(console:print "    " [name] "\n")
+		
+		[rubble:raws [name] = (df:raw:walk [content] block tag {
+			(if (str:cmp [tag "id"] "ENTITY") {
+				[curEntity = [tag 0]]
 			})
-		})
+			
+			(if [entities [curEntity]] {
+				(if (str:cmp [tag id] "PERMITTED_REACTION") {
+					(if [strip [tag 0]] {
+						[tag disable = true]
+					})
+				})
+			})
+			
+			(break true)
+		})]
 	})
-	
-	(break true)
-})]
+})

@@ -28,6 +28,10 @@ import "dctech/axis"
 
 // Adds the AXIS VFS commands to the state.
 // The AXIS VFS commands are:
+//	axis:newdir
+//	axis:newfile
+//	axis:mount
+//	axis:getchild
 //	axis:read
 //	axis:write
 //	axis:exists
@@ -49,6 +53,11 @@ func Setup(state *rex.State) (err error) {
 	}()
 	
 	mod := state.RegisterModule("axis")
+	mod.RegisterCommand("newdir", Command_NewDir)
+	mod.RegisterCommand("newfile", Command_NewFile)
+	mod.RegisterCommand("mount", Command_Mount)
+	mod.RegisterCommand("getchild", Command_GetChild)
+	
 	mod.RegisterCommand("read", Command_Read)
 	mod.RegisterCommand("write", Command_Write)
 	
@@ -61,6 +70,67 @@ func Setup(state *rex.State) (err error) {
 	mod.RegisterCommand("walkfiles", Command_WalkFiles)
 	
 	return nil
+}
+
+// Create a new empty AXIS logical directory.
+// 	axis:newdir
+// Returns a reference to the new directory.
+func Command_NewDir(script *rex.Script, params []*rex.Value) {
+	script.RetVal = rex.NewValueUser(axis.NewLogicalDir())
+}
+
+// Create a new read/write AXIS logical file.
+// 	axis:newfile content
+// Returns a reference to the new file.
+func Command_NewFile(script *rex.Script, params []*rex.Value) {
+	if len(params) != 1 {
+		rex.ErrorParamCount("axis:newfile", "1")
+	}
+	
+	script.RetVal = rex.NewValueUser(axis.NewLogicalFile([]byte(params[0].String()), true))
+}
+
+// Mount an AXIS DataSource on an AXIS Collection.
+// 	axis:mount collection path ds
+// Returns unchanged.
+func Command_Mount(script *rex.Script, params []*rex.Value) {
+	if len(params) != 3 {
+		rex.ErrorParamCount("axis:mount", "3")
+	}
+	
+	col, ok := params[0].Data.(axis.Collection)
+	if !ok {
+		rex.ErrorGeneralCmd("axis:mount", "Param 0 is not an axis.Collection")
+	}
+	
+	ds, ok := params[2].Data.(axis.DataSource)
+	if !ok {
+		rex.ErrorGeneralCmd("axis:mount", "Param 2 is not an axis.DataSource")
+	}
+
+	col.Mount(params[1].String(), ds)
+}
+
+// Get an AXIS DataSource from an AXIS Collection by path.
+// 	axis:getchild collection path
+// Returns the DataSource or an error message. May set the Error flag.
+func Command_GetChild(script *rex.Script, params []*rex.Value) {
+	if len(params) != 2 {
+		rex.ErrorParamCount("axis:getchild", "2")
+	}
+	
+	col, ok := params[0].Data.(axis.Collection)
+	if !ok {
+		rex.ErrorGeneralCmd("axis:getchild", "Param 0 is not an axis.Collection")
+	}
+	
+	ds, err := col.GetChild(params[1].String())
+	if err != nil {
+		script.Error = true
+		script.RetVal = rex.NewValueString(err.Error())
+		return
+	}
+	script.RetVal = rex.NewValueUser(ds)
 }
 
 // Read from a AXIS file.
@@ -79,7 +149,7 @@ func Command_Read(script *rex.Script, params []*rex.Value) {
 	file, err := ds.ReadAll(params[1].String())
 	if err != nil {
 		script.Error = true
-		script.RetVal = rex.NewValueString("error:" + err.Error())
+		script.RetVal = rex.NewValueString(err.Error())
 		return
 	}
 	script.RetVal = rex.NewValueString(string(file))
@@ -102,13 +172,13 @@ func Command_Write(script *rex.Script, params []*rex.Value) {
 	err := ds.Create(params[1].String())
 	if err != nil {
 		script.Error = true
-		script.RetVal = rex.NewValueString("error:" + err.Error())
+		script.RetVal = rex.NewValueString(err.Error())
 		return
 	}
 	err = ds.WriteAll(params[1].String(), []byte(params[2].String()))
 	if err != nil {
 		script.Error = true
-		script.RetVal = rex.NewValueString("error:" + err.Error())
+		script.RetVal = rex.NewValueString(err.Error())
 		return
 	}
 }

@@ -21,11 +21,13 @@ I hope Rubble fills your needs for a general content installer and modding tool 
 Where to Find Help:
 ==============================================
 
-All documentation is in the "other" directory:
+All documentation is in the "other" directory, this includes tutorials, template documentation, script documentation, and basic documentation of Rubble's internals.
 
-If you do not plan on doing any modding with Rubble the only things you need to read are this readme (particularly the "Install" section) and "Rubble Addon List.txt".
+For examples of what all is possible with Rubble see the included addons, they cover a broad range of possibilities. Sadly comments explaining what is being done and why are often lacking, so if you cannot figure out why something was done a certain way just ask.
 
-Modders will want to read the following (in most-important-first order):
+If you do not plan on doing any modding with Rubble you only need to read this readme and the addon list, everything else is for modders.
+
+Modders will additionally want to read the following (in most-important-first order):
 	HowTo Rubble - Tutorials
 	Rubble Basics - Lots of stuff about addons and Rubble in general
 	Rubble Base Templates - The template documentation for the "Base/Templates" addon
@@ -33,8 +35,6 @@ Modders will want to read the following (in most-important-first order):
 	Rubble Libs Templates - The template documentation for the library addons
 	Everything in "Rex Docs" - the Rex documentation, NEEDED if you plan to do any scripting
 	The included addons - A little short on comments but full of great examples
-
-The changelog is in "Rubble Changelog.txt", and a full list of all addons is in "Rubble Addon List.txt".
 
 ==============================================
 Install:
@@ -93,7 +93,7 @@ BUGS (and other issues):
 Known Issues (non-bug):
 	
 	You should not use the extension .txt for readme files, as this will cause Rubble to parse those files.
-		See "Rubble Addons.txt" for more details.
+		See "Rubble Basics.txt" for more details.
 	
 	It may be possible (depending on your addons) to see FBs made from "caste transformation", there is nothing I can do about this as autoSyndrome requires the use of inorganic materials.
 	

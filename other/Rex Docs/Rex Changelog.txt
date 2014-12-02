@@ -1,3 +1,7 @@
 
+v1.1
+	It should now be possible to replace GenII objects with others of exactly the same type that are stored in user values.
+	GenII now comes with a simple command to create a byte slice from a string.
+
 v1.0
 	First version.

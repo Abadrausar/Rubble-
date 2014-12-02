@@ -89,6 +89,9 @@ type Collection interface {
 	// Mount a DataSource at the specified location, the name may be used as a location ID or
 	// file/directory name, depending on context.
 	Mount(name string, ds DataSource)
+	
+	// GetChild attempts to lookup a child DataSource by path.
+	GetChild(path string) (DataSource, error)
 }
 
 // The functions below this point are common utilities for working with AXIS paths.

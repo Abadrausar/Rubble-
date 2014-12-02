@@ -23,9 +23,10 @@ misrepresented as being the original software.
 package axis
 
 import "io"
+import "sort"
 
 // LogicalDir is a simple logical directory Collection that serves it's mounted DataSources as files or child directories.
-type LogicalDir map[string]DataSource
+type LogicalDir map[string][]DataSource
 
 // NewOSFile creates a new logical AXIS directory.
 func NewLogicalDir() Collection {
@@ -33,7 +34,27 @@ func NewLogicalDir() Collection {
 }
 
 func (dir LogicalDir) Mount(loc string, ds DataSource) {
-	dir[loc] = ds
+	dir[loc] = append(dir[loc], ds)
+}
+
+func (dir LogicalDir) GetChild(path string) (DataSource, error) {
+	path, err := Sanitize(path)
+	if err != nil {
+		return nil, NewError(ErrBadPath, path)
+	}
+	
+	locID, path := StripDir(path)
+	if locID == "" {
+		return dir, nil
+	}
+	
+	for x := range dir[locID] {
+		ds := dir[locID][x]
+		if col, ok := ds.(Collection); ok {
+			return col.GetChild(path)
+		}
+	}
+	return nil, NewError(ErrNotFound, path)
 }
 
 func (dir LogicalDir) IsDir(path string) bool {
@@ -48,11 +69,14 @@ func (dir LogicalDir) IsDir(path string) bool {
 	
 	locID, path := StripDir(path)
 	if path == "" {
-		return false
+		return true
 	}
 	
-	if dir[locID].Exists(path) {
-		return dir[locID].Exists(path)
+	for x := range dir[locID] {
+		ds := dir[locID][x]
+		if ds.Exists(path) {
+			return ds.IsDir(path)
+		}
 	}
 	return false
 }
@@ -76,108 +100,199 @@ func (dir LogicalDir) Exists(path string) bool {
 		return false
 	}
 	
-	if dir[locID].Exists(path) {
-		return true
+	for x := range dir[locID] {
+		ds := dir[locID][x]
+		if ds.Exists(path) {
+			return true
+		}
 	}
 	return false
 }
 
 func (dir LogicalDir) Delete(path string) error {
+	path, err := Sanitize(path)
+	if err != nil {
+		return NewError(ErrBadPath, path)
+	}
+	
 	locID, path := StripDir(path)
 	if locID == "" {
 		return NewError(ErrBadPath, path)
 	}
 	
-	if dir[locID].Exists(path) {
-		return dir[locID].Delete(path)
+	for x := range dir[locID] {
+		ds := dir[locID][x]
+		if ds.Exists(path) {
+			return ds.Delete(path)
+		}
 	}
 	return NewError(ErrNotFound, path)
 }
 
 func (dir LogicalDir) Create(path string) error {
+	path, err := Sanitize(path)
+	if err != nil {
+		return NewError(ErrBadPath, path)
+	}
+	
 	locID, path := StripDir(path)
 	if locID == "" {
 		return NewError(ErrBadPath, path)
 	}
 	
-	if dir[locID].Exists(path) {
-		return dir[locID].Create(path)
+	// This should try all mounted locations.
+	if _, ok := dir[locID]; ok && len(dir[locID]) > 0 {
+		return dir[locID][0].Create(path)
 	}
 	return NewError(ErrReadOnly, path)
 }
 
 func (dir LogicalDir) ListDir(path string) []string {
+	path, err := Sanitize(path)
+	if err != nil {
+		return []string{}
+	}
+	
 	locID, path := StripDir(path)
 	if locID == "" {
 		rtn := make([]string, 0, 25)
 		for item := range dir {
 			rtn = append(rtn, item)
 		}
+		
+		sort.Strings(rtn)
 		return rtn
 	}
 
-	rtn := make([]string, 0, 25)
-	if dir[locID].Exists(path) {
-		for _, item := range dir[locID].ListDir(path) {
-			rtn = append(rtn, item)
+	tmp := make(map[string]bool)
+	for x := range dir[locID] {
+		ds := dir[locID][x]
+		if ds.Exists(path) {
+			for _, y := range ds.ListDir(path) {
+				tmp[y] = true
+			}
 		}
 	}
+	
+	rtn := make([]string, len(tmp))
+	i := 0
+	for x := range tmp {
+		rtn[i] = x
+		i++
+	}
+	
+	sort.Strings(rtn)
 	return rtn
 }
 
 func (dir LogicalDir) ListFile(path string) []string {
-	locID, path := StripDir(path)
-	if locID == "" {
-		return make([]string, 0)
+	path, err := Sanitize(path)
+	if err != nil {
+		return []string{}
 	}
 	
-	rtn := make([]string, 0, 25)
-	if dir[locID].Exists(path) {
-		for _, item := range dir[locID].ListFile(path) {
-			rtn = append(rtn, item)
+	locID, path := StripDir(path)
+	if locID == "" {
+		return []string{}
+	}
+	
+	tmp := make(map[string]bool, 50)
+	for x := range dir[locID] {
+		ds := dir[locID][x]
+		if ds.Exists(path) {
+			for _, y := range ds.ListFile(path) {
+				tmp[y] = true
+			}
 		}
 	}
+	
+	rtn := make([]string, len(tmp))
+	i := 0
+	for x := range tmp {
+		rtn[i] = x
+		i++
+	}
+	
+	sort.Strings(rtn)
 	return rtn
 }
 
 func (dir LogicalDir) Read(path string) (io.ReadCloser, error) {
+	path, err := Sanitize(path)
+	if err != nil {
+		return nil, NewError(ErrBadPath, path)
+	}
+	
 	locID, path := StripDir(path)
 	if path == "" || locID == "" {
 		return nil, NewError(ErrBadPath, path)
 	}
 	
-	if dir[locID].Exists(path) {
-		return dir[locID].Read(path)
+	for x := range dir[locID] {
+		ds := dir[locID][x]
+		if ds.Exists(path) {
+			return ds.Read(path)
+		}
 	}
 	return nil, NewError(ErrNotFound, path)
 }
 
 func (dir LogicalDir) ReadAll(path string) ([]byte, error) {
+	path, err := Sanitize(path)
+	if err != nil {
+		return nil, NewError(ErrBadPath, path)
+	}
+	
 	locID, path := StripDir(path)
 	if path == "" || locID == "" {
 		return nil, NewError(ErrBadPath, path)
 	}
 	
-	if dir[locID].Exists(path) {
-		return dir[locID].ReadAll(path)
+	for x := range dir[locID] {
+		ds := dir[locID][x]
+		if ds.Exists(path) {
+			return ds.ReadAll(path)
+		}
 	}
 	return nil, NewError(ErrNotFound, path)
 }
 
 func (dir LogicalDir) Write(path string) (io.WriteCloser, error) {
+	path, err := Sanitize(path)
+	if err != nil {
+		return nil, NewError(ErrBadPath, path)
+	}
+	
 	locID, path := StripDir(path)
 	if path == "" || locID == "" {
 		return nil, NewError(ErrBadPath, path)
 	}
 	
-	return dir[locID].Write(path)
+	for x := range dir[locID] {
+		ds := dir[locID][x]
+		if ds.Exists(path) {
+			return ds.Write(path)
+		}
+	}
+	return nil, NewError(ErrNotFound, path)
 }
 
 func (dir LogicalDir) WriteAll(path string, content []byte) error {
+	path, err := Sanitize(path)
+	if err != nil {
+		return NewError(ErrBadPath, path)
+	}
+	
 	locID, path := StripDir(path)
 	if path == "" || locID == "" {
 		return NewError(ErrBadPath, path)
 	}
 	
-	return dir[locID].WriteAll(path, content)
+	for x := range dir[locID] {
+		ds := dir[locID][x]
+		if ds.Exists(path) {
+			return ds.WriteAll(path, content)
+		}
+	}
+	return NewError(ErrNotFound, path)
 }

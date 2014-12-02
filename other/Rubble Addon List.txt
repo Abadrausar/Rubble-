@@ -3,7 +3,7 @@
 Included Addons:
 ==============================================
 
-Rubble 4 includes all kinds of useful addons, some for developers and some for end users. These addons are included in an attempt to ensure that Rubble has something for everyone, and to provide a broad base of examples for aspiring addon developers.
+Rubble includes all kinds of useful addons, some for developers and some for end users. These addons are included in an attempt to ensure that Rubble has something for everyone, and to provide a broad base of examples for aspiring addon developers.
 
 If you want to generate the Rubble version of "vanilla DF" you will need to activate the "Base" addon, this addon is already active in the default addonlist.ini ("Libs/Base" and "Libs/Castes" are also required, but those addons are forced active so you do not need to worry about them).
 
@@ -27,7 +27,6 @@ Base:
 		#ADVENTURE_TIER tags have been added to all adventure mode playable entities.
 		Vermin creatures have #TILE and #COLOR templates inserted.
 		All file IDs have been stripped.
-	Requires "Libs/Base" and "Libs/Castes" (both of which are automatically activated.)
 
 Dev:
 	The addons in this group are for addon developers, most people may safely ignore them.
@@ -56,20 +55,18 @@ Dev:
 Libs:
 	The addons in this group are libraries, eg they provide functionality used by other addons.
 	Any templates added by these addons are fully documented, see "Rubble Libs Templates.txt" and "Rubble Base Templates.txt".
+	All of the addons in this group are forced active if they are needed, so there is no need to activate them manually.
 
 	Libs/Base:
 		All the base templates and other such stuff, critical to normal operation.
 		This addon is a "critical addon" meaning that it is needed by the base for normal operation.
-		You do not need to activate this addon as it is automatically forced active.
 	
 	Libs/Castes:
 		Adds support for dynamically adding castes to a creature.
 		This addon is a "critical addon" meaning that it is needed by the base for normal operation.
-		You do not need to activate this addon as it is automatically forced active.
 	
 	Libs/Castes/DFHack/Transform:
 		Adds support for transforming castes via autoSyndrome and syndromeTrigger.
-		Requires the "Libs/Castes" addon.
 	
 	Libs/Crates:
 		Adds infrastructure for "crates", eg bars that can be bought from caravans and then "unpacked" via special reactions into items.
@@ -77,16 +74,15 @@ Libs:
 	
 	Libs/DFHack/Add Reaction:
 		Allows you to add reactions to buildings that are normally not possible to add reactions to, also allows you to remove all hardcoded reactions from a building.
-		Requires the "Base/Templates" addon.
 		WARNING! Largely untested!
 	
 	Libs/DFHack/Announcement:
 		This addon provides templates for displaying announcements to the player.
 		The announcements work via specialized variants of the DFHACK_REACTION and DFHACK_REACTION_BIND templates.
-		The templates added by this addon is always available (even when the addon is not active).
+		The templates added by this addon are always available (even when the addon is not active).
 	
 	Libs/DFHack/Fluids:
-		Adds the extremely useful rubble_fluids DFHack Lua library and command.
+		Installs the extremely useful rubble_fluids DFHack Lua library and command.
 		(adds no templates)
 	
 	Libs/Macro:
@@ -101,15 +97,10 @@ Libs:
 		This is the old research addon from Better Dorfs, reworked as a library.
 		All templates now take a "class" (basically a group id) and the reaction generator takes a building name, skill id, and reaction class. These changes allow modders to use the same framework for multiple different research buildings.
 		The templates for adding new research topics are always active, so optional support for addons that use this library is easy to add to your industry mods.
-		Many default addons register topics to the class "RESEARCH_GENERIC", so handle that class to if you want to support these addons topics (nothing bad will happen if you don't).
+		Many default addons register topics to the class "RESEARCH_GENERIC", so handle that class to if you want to support these addon's topics (nothing bad will happen if you don't).
 
 User:
 	All the addons in this group are things that are of interest only to end users.
-	
-	User/Add CHILD Tags:
-		Adds a CHILD tag to every creature that does not already have one, thereby allowing them to breed in fortress mode.
-		(Note that sexless creatures will still not breed)
-		DOES_NOT_EXIST, NOT_LIVING, and EQUIPMENT_WAGON count as CHILD tags for the purpose of this script, vermin are also skipped.
 	
 	User/Adv Reactions:
 		Adds some basic adventure mode crafting reactions, mostly useful to help jump-start use of advfort.
@@ -118,11 +109,6 @@ User:
 	
 	User/Block:
 		This addon provides materials used by the other addons in this group, you do not need to worry about it, if it is needed it will be activated automatically.
-	
-	User/Block/Bone:
-		Good for really intimidating statues over the entry.
-		For those who just want "bone blocks" instead of "goblin bone blocks" or "elf bone blocks" (that BTW, cannot be stockpiled) there is an extra reaction that allows you to make blocks from a "bone" stone instead of the actual bone material.
-		You can also make "treated bone blocks" that are fire safe, but you only get half as many per reaction.
 	
 	User/Block/Boulder:
 		For the OCD among us, I present the boulder press. The boulder press allows you to recolor boulders via the wonders of dwarven masonry. 
@@ -141,6 +127,10 @@ User:
 	User/Bone Flux:
 		Bake bones at the kiln to make calcite, a flux stone.
 		Very useful for steel making in flux-poor locations.
+	
+	User/Bonecarver:
+		Adds a workshop for advanced shaping of bone, allows you to make basic furniture and some items from your choice of bone or a fake "bone" stone (to allow better stockpiling).
+		Blocks may also be made from a fire safe "treated bone" material, this makes item-less embarks a little less dependent upon caravans.
 	
 	User/Bonfire:
 		Start a fire and burn them goblins! Either start a short wood fueled fire or start a longer coke fueled one.
@@ -173,7 +163,6 @@ User:
 		To fill a minecart it needs to be adjacent to or on top of the filler, the minecart is NOT used as a reagent in the reaction. The best way to use the filler is to place it next to a minecart stop (or stops) and a cistern, this allows you to fill minecarts and send them on their way with a minimum of fuss.
 		The amount of liquid used is determined by the minecart capacity, but at least 4/7 fluid is needed for the filler to function at all.
 		Uses the pump operator skill (to fill carts) and mechanics (to build the filler).
-		Requires the "Libs/DFHack/Fluids" default Rubble addon.
 	
 	User/DFHack/Cart Filler/Powered:
 		An automatic mechanically powered version of the "DFHack/Cart Filler" addon.
@@ -184,23 +173,28 @@ User:
 			If no minecarts are present nothing happens
 			If no fluids are present an announcement is printed
 		(If these rules cause announcement spam they may need to be changed)
-		Requires the "Libs/DFHack/Fluids" default Rubble addon.
 	
 	User/DFHack/Dragon Engine:
 		A direct port of the dragon engines from the DFHack r5 mini-mod pack.
 		Dragon engines are basically machines that take magma and spit it out as dragon fire, very deadly short range siege engines.
+	
+	User/DFHack/Fill Barrel:
+		Fill barrels from nearby water at the still, works like the cart filler as far as finding the water goes.
+		Also allows you to fill water buckets for use in the hospital.
+		This addon is most for use in biomes where water freezes in the winter (so you can have water reserves).
+		Please note that AFAIK water barrels are not stockpilable.
+		Note that unlike most DFHack addons this one will still work without DFHack, it just won't require/use water.
+		Why the still? Well the water needs to be purified somewhere right?
 	
 	User/DFHack/Magma/Extractor:
 		Extract minerals from magma, get all kinds of rare and valuable metals! (but only rarely)
 		A magma extractor can be very profitable, provided you can feed it enough magma.
 		Each cycle uses 2/7 magma and at least 4/7 magma needs to be available.
 		Uses the furnace operator skill.
-		Requires the "Libs/DFHack/Fluids" default Rubble addon.
 	
 	User/DFHack/Magma/Extractor/Powered:
 		An automatic powered version of the "DFHack/Magma/Extractor" addon.
 		This addon works exactly the same as "DFHack/Magma/Extractor", just without dwarf labor.
-		Requires the "Libs/DFHack/Fluids" default Rubble addon.
 	
 	User/DFHack/Magma/Melter:
 		Melt rocks into magma! 
@@ -209,18 +203,15 @@ User:
 		DO NOT BUILD THIS BUILDING NEXT TO YOUR MAIN STAIRWELL!
 		It is possible to enable magma workshops/furnaces here as well, so if you don't have a volcano there is no need to dig to the magma sea if you don't wish to.
 		Uses the furnace operator skill.
-		Requires the "Libs/DFHack/Fluids" default Rubble addon.
 	
 	User/DFHack/Obsidian Caster:
 		The obsidian caster makes obsidian boulders directly from adjacent water and magma, which needs to be on the level below and accessible via downward passable tiles.
 		4/7 water and magma are used for every boulder (so clever engineers can still be more efficient).
 		Uses the pump operator skill (to operate) and mechanics (to build the caster).
-		Requires the "Libs/DFHack/Fluids" default Rubble addon.
 	
 	User/DFHack/Obsidian Caster/Powered:
 		An automatic powered version of the "DFHack/Obsidian Caster" addon.
 		This addon works exactly the same as "DFHack/Obsidian Caster", just without dwarf labor.
-		Requires the "Libs/DFHack/Fluids" default Rubble addon.
 	
 	User/Diggable Slade:
 		Allows you to dig slade, once you get past it's guardians that is...
@@ -245,12 +236,17 @@ User:
 		Raises fish vermin populations to the max.
 		This should stop you from fishing out a lake or ocean ever again! (unless you catch ~30,000 fish...)
 	
+	User/Fix/Gays:
+		Makes humans and dwarves have a strictly straight orientation.
+		The list of creatures can be modified via config variable, but this should only be done with care, as indiscriminate modification of the variable in question may clobber changes made by other addons (this is not an issue with the default addons).
+		For details on how to modify the creature list see the comments in this addon's script.
+	
 	User/Fix/Human Diplomats:
 		Adds trade representatives and diplomats to the humans.
 	
 	User/Fix/Undead Melt:
 		Fixes bad temperature values in material_template_default.
-		Replaces material_template_default with a new copy, but the only changes are the temperature values.
+		I think all bad values are fixed, but this addon has not received extensive testing!.
 		In any case this should make it possible to melt undead with magma.
 	
 	User/Fix/Usable Chitin:
@@ -285,6 +281,44 @@ User:
 		Glue wooden planks together to make laminated logs, which are more valuable than most generic woods.
 		Uses the alchemy skill.
 	
+	User/Metallurgy:
+		Adds an "Alloy Furnace" that can be used to make alloys.
+		All alloys are made from bars using the smelting skill. Does not effect the smelter in any way.
+	
+	User/Metallurgy/Bloomery:
+		Adds a "Bloomery" that can be used to make iron and steel in a more realistic manner.
+		This completely replaces vanilla iron and steel production.
+		Sadly this required removing the metal ore tags from iron ores (which breaks the metal ore embark indicator and ore stockpiles).
+		This addon is loosely based on parts of the Realistic 14th Century Metallurgy Mod.
+		To refine iron or make steel you need to make a bloom and hammer impurities out of it multiple times, if you have flux you can cut the time required in half and save some fuel (by skipping the first two hammer steps).
+		Blooms will self destruct in a few weeks, so you need to keep on top of the process.
+		Cost Table:
+			Iron ore -> 4 bars (no flux): 4.25 fuel per bar, 0 with magma, 4.25 steps per bar
+			Iron ore -> 4 bars (with flux): 2.25 fuel per bar, 0 with magma, 2.25 steps per bar
+			Iron bar -> steel bar (no flux): 6 fuel per bar, 1 with magma, 5 steps per bar
+			Iron bar -> steel bar (with flux): 4 fuel per bar, 1 with magma, 3 steps per bar
+		For consistency I suggest using this addon together with "User/Metallurgy/Smelter".
+	
+	User/Metallurgy/DFHack/Volcanic:
+		Made from a mix of metals carefully steeped in specially prepared magma, volcanic metal has some very odd properties. Volcanic metal is always slightly warm to the touch and is very heavy, it is also far stronger than its components. 
+		Volcanic metal is made from platinum and iron in roughly equal parts (plus lots of magma).
+		Note that this reaction is only possible at the magma version of the alloy furnace and that it USES UP 4/7 magma!
+		Requires the "User/Metallurgy" Addon.
+	
+	User/Metallurgy/Mithril:
+		Stretch your precious Adamantine supply, make mithril.
+		Mithril is a very light and sharp alloy that is made from steel and aluminum with a small admixture of adamantine, thereby greatly extending your adamantine supply (at the cost of slightly worse performance). 
+		Mithril is a little better than steel grade plus it is lighter and sharper.
+		Requires the "User/Metallurgy" Addon.
+	
+	User/Metallurgy/Smelter:
+		Replaces the default ore smelting reactions with a better set.
+		Unfortunately this addon completely breaks the metal ore embark indicator and stockpiles (use economic stone stockpiles instead)
+		Galena and tetrahedrite may only be smelted to one metal at a time, so you need to decide which metal is more important to your needs.
+	
+	User/Metallurgy/Smelter/Remove Alloys:
+		Removes all the vanilla alloy reactions, it is not a good idea to use this without "User/Metallurgy"!
+	
 	User/Pottery:
 		Replace the vanilla pottery system with a MUCH expanded version. 
 		Glazing is done via powders ground at a millstone or quern from ash. For more glaze types see the "User/Pottery/Glaze" addon.
@@ -316,7 +350,28 @@ User:
 		Build a laboratory and research advanced workshops.
 		Handles the research class "RESEARCH_GENERIC", which is used by many of the default addons.
 		You may also copy any research discovery here (for free). Uses the alchemy skill.
-		Requires "Libs/Research".
+	
+	User/Saurian:
+		A new race to play as, see the Saurian guide in "Rubble Addon Extras.txt" for more details.
+		This addon only includes the saurian creature and entity as well as saurian sized weapons and some basic reactions. Nothing else is included.
+		It is HIGHLY recommended to activate at least the "User/Quarry", "User/Glass Forge", "User/Sawmill", "User/Warcrafter" and "User/Pottery" addons.
+		To dig as saurians you need to buy a pick and resize it at the craftsaurian.
+		If this addon is activated dwarves are unplayable and the dwarven outpost liaison becomes a trade rep (unless you activate "Saurian/Unplayable").
+		Requires the "Glass Forge" addon.
+	
+	User/Saurian/Basic Castes:
+		Adds some basic castes to the saurians.
+		See the saurian guide for details.
+		Requires the "User/Saurian" addon.
+	
+	User/Saurian/Basic Castes/DFHack/Transform:
+		Allows you to change the cast of your saurians at the new meditation circle workshop.
+		Meditating takes from 1/2 to 3 seasons (depending on what the result caste is).
+		Requires the "User/Saurian" and "User/Saurian/Basic Castes" addons.
+	
+	User/Saurian/Unplayable:
+		If you just want saurians as an extra race to trade with the dwarves, activate this addon.
+		Requires the "User/Saurian" addon.
 	
 	User/Sawmill:
 		Farmable wood plants and advanced wood processing, makes aboveground and/or treeless forts a lot easier.
@@ -328,30 +383,9 @@ User:
 			lumber bamboo	non freezing	1/2 year		Brown		Edible seeds
 			stalkshroom		caves lvl 1-2	1 year			Dark Gray	Heavy and slightly more valuable
 	
-	User/Saurian:
-		A new race to play as, see the Saurian guide in "Rubble Addon Extras.txt" for more details.
-		This addon only includes the saurian creature and entity as well as saurian sized weapons and some basic reactions. Nothing else is included.
-		It is HIGHLY recommended to activate at least the "User/Quarry", "User/Glass Forge", "User/Sawmill", "User/Warcrafter" and "User/Pottery" addons.
-		To dig as saurians you need to buy a pick and resize it at the craftsaurian.
-		If this addon is activated dwarves are unplayable and the dwarven outpost liaison becomes a trade rep (unless you activate "Saurian/Unplayable").
-		Requires the "Glass Forge" addon.
-		Requires the "Libs/Castes" default Rubble addon.
-	
-	User/Saurian/Basic Castes:
-		Adds some basic castes to the saurians.
-		See the saurian guide for details.
-		Requires the "User/Saurian" addon.
-		Requires the "Libs/Castes" default Rubble addon.
-	
-	User/Saurian/Basic Castes/DFHack/Transform:
-		Allows you to change the cast of your saurians at the new meditation circle workshop.
-		Meditating takes from 1/2 to 3 seasons (depending on what the result caste is).
-		Requires the "User/Saurian" and "User/Saurian/Basic Castes" addons.
-		Requires the "Libs/Castes" and "Libs/Castes/DFHack/Transform" default Rubble addons.
-	
-	User/Saurian/Unplayable:
-		If you just want saurians as an extra race to trade with the dwarves, activate this addon.
-		Requires the "User/Saurian" addon.
+	User/Smoked Meat:
+		Allows you to smoke meat at the kitchen to preserve it (inedible to vermin and will not rot).
+		Does not improve value.
 	
 	User/Tanning:
 		Makes creatures give skin "globs" instead of "skins" when butchered, this allows large animals to produce more than one piece of leather once tanned. 

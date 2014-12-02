@@ -43,6 +43,7 @@ func Setup(state *rex.State) (err error) {
 	
 	mod := state.RegisterModule("genii")
 	mod.RegisterCommand("bytes_string", Command_BytesToString)
+	mod.RegisterCommand("string_bytes", Command_StringToBytes)
 	
 	return nil
 }
@@ -51,7 +52,7 @@ func Setup(state *rex.State) (err error) {
 // 	genii:bytes_string GenII:Array
 // Returns the string.
 func Command_BytesToString(script *rex.Script, params []*rex.Value) {
-	if len(params) < 1 {
+	if len(params) != 1 {
 		rex.ErrorParamCount("genii:bytes_string", "1")
 	}
 	if _, ok := params[0].Data.(*Array); !ok {
@@ -64,5 +65,17 @@ func Command_BytesToString(script *rex.Script, params []*rex.Value) {
 	}
 	
 	script.RetVal = rex.NewValueString(string(val.Bytes()))
+	return
+}
+
+// Converts a string to a byte slice.
+// 	genii:string_bytes string
+// Returns the byte slice in a user value.
+func Command_StringToBytes(script *rex.Script, params []*rex.Value) {
+	if len(params) != 1 {
+		rex.ErrorParamCount("genii:string_bytes", "1")
+	}
+	
+	script.RetVal = rex.NewValueUser([]byte(params[0].String()))
 	return
 }

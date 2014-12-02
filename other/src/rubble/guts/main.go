@@ -27,7 +27,6 @@ import "strings"
 import "os"
 import "runtime/pprof"
 import "time"
-import "sort"
 
 func Main() {
 	timeStart := time.Now()
@@ -65,16 +64,18 @@ func Main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	
+	LogPrintln("Initializing Scripting Subsystem (Early).")
+	InitScriptingEarly()
+	InitScriptingPatch()
+	
 	// If we are in prep or install mode do not load any addon (or do any other addon type stuff)
 	if PrepRegion == "" && Installer == "" {
-		LogPrintln("=============================================")
 		LogPrintln("Loading Addons...")
 
-		Addons = LoadAddons()
-
-		LogPrintln("=============================================")
-		LogPrintln("Activating Addons...")
-
+		LoadAddons(&Addons)
+		
+		LogPrintln("Generating Active Addon List...")
 		addonNames := make([]string, 0, 10)
 		if len(*AddonsList) == 0 {
 			LogPrintln("No Addons Specified via Command Line.")
@@ -103,27 +104,40 @@ func Main() {
 			}
 		}
 
-		if len(addonNames) == 0 {
-			LogPrintln("No Addons Marked Active")
-			LogPrintln("Updating the Addon List File...")
-			UpdateAddonList("addons:dir:addonlist.ini", Addons)
-			LogPrintln("Rubble has no files to parse, aborting.")
-			os.Exit(1)
-		}
-
 		addonNameLookupTbl := make(map[string]bool)
 		for _, name := range addonNames {
 			addonNameLookupTbl[name] = true
 		}
 
-		LogPrintln("Active Addons:")
+		LogPrintln("Activating Addons...")
 		for i := range Addons {
 			if addonNameLookupTbl[Addons[i].Name] {
 				Addons[i].Active = true
+			}
+		}
+		
+		LogPrintln("Running Loader Scripts...")
+		for _, i := range GlobalFiles.Order {
+			if GlobalFiles.Data[i].Tags["Skip"] || !GlobalFiles.Data[i].Tags["LoaderScript"] {
+				continue
+			}
+			
+			CurrentFile = GlobalFiles.Data[i].Name
+			LogPrintln("  " + GlobalFiles.Data[i].Name)
+	
+			_, err := GlobalScriptState.CompileAndRun(string(GlobalFiles.Data[i].Content), GlobalFiles.Data[i].Name)
+			if err != nil {
+				panic("Script Error: " + err.Error())
+			}
+		}
+		
+		LogPrintln("Active Addons:")
+		for i := range Addons {
+			if Addons[i].Active {
 				LogPrintln("  " + Addons[i].Name)
 			}
 		}
-
+		
 		LogPrintln("Updating the Addon List File...")
 		UpdateAddonList("addons:dir:addonlist.ini", Addons)
 
@@ -136,11 +150,11 @@ func Main() {
 			return
 		}
 
-		// Convert Addons to File List
+		LogPrintln("Generating Sorted Active File List...")
 		Files = NewFileList(Addons)
 
 		if len(Files.Order) == 0 {
-			LogPrintln("Files list is empty. (no active addons have parseable files)")
+			LogPrintln("Active files list is empty. (no active addons have parseable files)")
 			LogPrintln("Rubble has no files to parse, aborting.")
 			if Bench {
 				LogPrintln("Run time: ", time.Since(timeStart))
@@ -151,6 +165,9 @@ func Main() {
 
 	LogPrintln("=============================================")
 	LogPrintln("Initializing...")
+
+	LogPrintln("Initializing Scripting Subsystem (Late)...")
+	InitScriptingLate()
 
 	LogPrintln("Loading Config Variables...")
 	if len(*ConfigList) != 0 {
@@ -174,9 +191,6 @@ func Main() {
 		LogPrintln("  No value(s) specified.")
 	}
 
-	LogPrintln("Initializing Scripting Subsystem.")
-	InitScripting()
-
 	if Installer != "" {
 		InstallModeRun(Installer)
 		if Bench {
@@ -195,17 +209,20 @@ func Main() {
 		return
 	}
 
-	LogPrintln("Adding Builtins.")
+	LogPrintln("Adding Builtins...")
 	NewNativeTemplate("!TEMPLATE", tempTemplate)
 
 	LogPrintln("=============================================")
 	LogPrintln("Running Init Scripts...")
-	sort.Strings(ForcedInitOrder)
-	for _, i := range ForcedInitOrder {
-		CurrentFile = i
-		LogPrintln("  " + i)
+	for _, i := range GlobalFiles.Order {
+		if GlobalFiles.Data[i].Tags["Skip"] || !GlobalFiles.Data[i].Tags["InitScript"] {
+			continue
+		}
+		
+		CurrentFile = GlobalFiles.Data[i].Name
+		LogPrintln("  " + GlobalFiles.Data[i].Name)
 
-		_, err := GlobalScriptState.CompileAndRun(string(ForcedInit[i]), i)
+		_, err := GlobalScriptState.CompileAndRun(string(GlobalFiles.Data[i].Content), GlobalFiles.Data[i].Name)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
@@ -215,14 +232,14 @@ func Main() {
 	LogPrintln("Running Prescripts...")
 	ParseStage = stgPreScripts
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || !Files.Files[i].PreScript {
+		if Files.Data[i].Tags["Skip"] || !Files.Data[i].Tags["PreScript"] {
 			continue
 		}
 
-		CurrentFile = i
-		LogPrintln("  " + Files.Files[i].Path)
+		CurrentFile = Files.Data[i].Name
+		LogPrintln("  " + Files.Data[i].Name)
 
-		_, err := GlobalScriptState.CompileAndRun(string(Files.Files[i].Content), i)
+		_, err := GlobalScriptState.CompileAndRun(string(Files.Data[i].Content), Files.Data[i].Name)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
@@ -232,66 +249,66 @@ func Main() {
 	LogPrintln("Preparsing...")
 	ParseStage = stgPreParse
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || (!Files.Files[i].IsRaw() && !Files.Files[i].IsGraphic()) {
+		if Files.Data[i].Tags["Skip"] || !Files.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		CurrentFile = i
-		LogPrintln("  " + Files.Files[i].Path)
-		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent, NewPosition(1, Files.Files[i].Path))
+		CurrentFile = Files.Data[i].Name
+		LogPrintln("  " + Files.Data[i].Name)
+		Files.Data[i].Content = Parse(Files.Data[i].Content, stgUseCurrent, NewPosition(1, Files.Data[i].Name))
 	}
 
 	LogPrintln("=============================================")
 	LogPrintln("Parsing...")
 	ParseStage = stgParse
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || (!Files.Files[i].IsRaw() && !Files.Files[i].IsGraphic()) {
+		if Files.Data[i].Tags["Skip"] || !Files.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		CurrentFile = i
-		LogPrintln("  " + Files.Files[i].Path)
-		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent, NewPosition(1, Files.Files[i].Path))
+		CurrentFile = Files.Data[i].Name
+		LogPrintln("  " + Files.Data[i].Name)
+		Files.Data[i].Content = Parse(Files.Data[i].Content, stgUseCurrent, NewPosition(1, Files.Data[i].Name))
 	}
 
 	LogPrintln("=============================================")
 	LogPrintln("Postparsing...")
 	ParseStage = stgPostParse
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || (!Files.Files[i].IsRaw() && !Files.Files[i].IsGraphic()) {
+		if Files.Data[i].Tags["Skip"] || !Files.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		CurrentFile = i
-		LogPrintln("  " + Files.Files[i].Path)
-		Files.Files[i].Content = Parse(Files.Files[i].Content, stgUseCurrent, NewPosition(1, Files.Files[i].Path))
+		CurrentFile = Files.Data[i].Name
+		LogPrintln("  " + Files.Data[i].Name)
+		Files.Data[i].Content = Parse(Files.Data[i].Content, stgUseCurrent, NewPosition(1, Files.Data[i].Name))
 	}
 
 	LogPrintln("=============================================")
 	LogPrintln("Expanding Variables...")
 	ParseStage = stgGlobalExpand
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || (!Files.Files[i].IsRaw() && !Files.Files[i].IsGraphic()) {
+		if Files.Data[i].Tags["Skip"] || !Files.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		CurrentFile = i
-		LogPrintln("  " + Files.Files[i].Path)
-		Files.Files[i].Content = []byte(ExpandVars(string(Files.Files[i].Content)))
+		CurrentFile = Files.Data[i].Name
+		LogPrintln("  " + Files.Data[i].Name)
+		Files.Data[i].Content = []byte(ExpandVars(string(Files.Data[i].Content)))
 	}
 
 	LogPrintln("=============================================")
 	LogPrintln("Running Postscripts...")
 	ParseStage = stgPostScripts
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || !Files.Files[i].PostScript {
+		if Files.Data[i].Tags["Skip"] || !Files.Data[i].Tags["PostScript"] {
 			continue
 		}
 
-		CurrentFile = i
-		LogPrintln("  " + Files.Files[i].Path)
+		CurrentFile = Files.Data[i].Name
+		LogPrintln("  " + Files.Data[i].Name)
 
-		_, err := GlobalScriptState.CompileAndRun(string(Files.Files[i].Content), i)
+		_, err := GlobalScriptState.CompileAndRun(string(Files.Data[i].Content), Files.Data[i].Name)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
@@ -300,40 +317,40 @@ func Main() {
 	LogPrintln("=============================================")
 	LogPrintln("Writing files...")
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || Files.Files[i].NoWrite || !Files.Files[i].IsRaw() {
+		if Files.Data[i].Tags["Skip"] || Files.Data[i].Tags["NoWrite"] || Files.Data[i].Tags["GraphicsFile"] || !Files.Data[i].Tags["RawFile"] {
 			continue
 		}
 
-		LogPrintln("  " + Files.Files[i].Path)
+		LogPrintln("  " + Files.Data[i].Name)
 
-		file := []byte(StripExt(i) + "\n\n# Automatically generated, do not edit!\n# Source: " +
-			Files.Files[i].Source + "/" + Files.Files[i].Path + "\n\n" + string(Files.Files[i].Content))
-		WriteFile("out:objects/"+i, file)
+		file := []byte(StripExt(Files.Data[i].Name) + "\n\n# Automatically generated, do not edit!\n# Source: " +
+			Files.Data[i].Source + "/" + Files.Data[i].Name + "\n\n" + string(Files.Data[i].Content))
+		WriteFile("out:objects/" + Files.Data[i].Name, file)
 	}
 
 	LogPrintln("Writing graphics files...")
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || Files.Files[i].NoWrite || !Files.Files[i].IsGraphic() {
+		if Files.Data[i].Tags["Skip"] || Files.Data[i].Tags["NoWrite"] || !Files.Data[i].Tags["GraphicsFile"] {
 			continue
 		}
 
-		LogPrintln("  " + Files.Files[i].Path)
+		LogPrintln("  " + Files.Data[i].Name)
 
-		file := []byte(StripExt(i) + "\n\n# Automatically generated, do not edit!\n# Source: " +
-			Files.Files[i].Source + "/" + Files.Files[i].Path + "\n\n" + string(Files.Files[i].Content))
-		WriteFile("out:graphics/"+i, file)
+		file := []byte(StripExt(Files.Data[i].Name) + "\n\n# Automatically generated, do not edit!\n# Source: " +
+			Files.Data[i].Source + "/" + Files.Data[i].Name + "\n\n" + string(Files.Data[i].Content))
+		WriteFile("out:graphics/" + Files.Data[i].Name, file)
 	}
 
 	LogPrintln("Writing prep files...")
 	os.Mkdir(OutputDir+"/prep", 0600)
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || Files.Files[i].NoWrite || !Files.Files[i].PrepScript {
+		if Files.Data[i].Tags["Skip"] || Files.Data[i].Tags["NoWrite"] || !Files.Data[i].Tags["PrepFile"] {
 			continue
 		}
 
-		LogPrintln("  " + Files.Files[i].Path)
+		LogPrintln("  " + Files.Data[i].Name)
 
-		WriteFile("out:prep/"+i, Files.Files[i].Content)
+		WriteFile("out:prep/" + Files.Data[i].Name, Files.Data[i].Content)
 	}
 
 	LogPrintln("Writing addon list to raw directory...")

@@ -1,6 +1,4 @@
 
-(rubble:requireaddon "Libs/Castes/DFHack/Transform" "Libs/Castes")
-
 (rubble:dfhack_runcommand <sarray autoSyndrome enable>)
 (rubble:dfhack_runcommand <sarray syndromeTrigger enable>)
 

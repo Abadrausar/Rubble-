@@ -49,7 +49,7 @@ func InstallModeRun(pack string) {
 	FS.Mount("install", instFS)
 
 	LogPrintln("Loading Install Files...")
-	install := loadInst(pack)
+	install := loadAddon(FS, pack + "/Install", "install:files:")
 
 	// A hack, but a hack that keeps everything working correctly.
 	install.Active = true
@@ -57,38 +57,16 @@ func InstallModeRun(pack string) {
 
 	LogPrintln("Running Install Scripts...")
 	for _, i := range Files.Order {
-		if Files.Files[i].Skip || !Files.Files[i].InstScript {
+		if Files.Data[i].Tags["Skip"] || !Files.Data[i].Tags["InstScript"] {
 			continue
 		}
 
-		CurrentFile = i
-		LogPrintln("  " + Files.Files[i].Path)
+		CurrentFile = Files.Data[i].Name
+		LogPrintln("  " + Files.Data[i].Name)
 
-		_, err := GlobalScriptState.CompileAndRun(string(Files.Files[i].Content), i)
+		_, err := GlobalScriptState.CompileAndRun(string(Files.Data[i].Content), Files.Data[i].Name)
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
 	}
-}
-
-func loadInst(pack string) *Addon {
-	addon := NewAddon(pack + "/Install")
-
-	for _, filepath := range FS.ListFile("install:files:") {
-
-		file := new(AddonFile)
-		file.Path = filepath
-
-		content, err := FS.ReadAll("install:files:" + filepath)
-		if err != nil {
-			panic(err)
-		}
-		file.Content = content
-
-		// Most of classifyFile is useless here, but there is no good reason to
-		// write a subset for just prep addons
-		classifyFile(file, filepath)
-		addon.Files[filepath] = file
-	}
-	return addon
 }

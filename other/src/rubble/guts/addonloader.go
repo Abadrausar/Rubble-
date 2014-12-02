@@ -24,20 +24,17 @@ package guts
 
 import "strings"
 import "dctech/axis"
+import "sort"
 
-func LoadAddons() []*Addon {
-	addonlist := make([]*Addon, 0, 20)
-
-	loadInit(FS, "addons:dir:")
+func LoadAddons(addons *[]*Addon)  {
+	loadGlobals(FS, "addons:dir:")
 	for _, dir := range FS.ListDir("addons:dir:") {
-		addonlist = loadDir(FS, dir, "addons:dir:" + dir, addonlist)
+		*addons = loadDir(FS, dir, "addons:dir:" + dir, *addons)
 	}
 
 	for _, dir := range FS.ListDir("addons:zip:") {
-		addonlist = loadDir(FS, dir, "addons:zip:" + dir, addonlist)
+		*addons = loadDir(FS, dir, "addons:zip:" + dir, *addons)
 	}
-
-	return addonlist
 }
 
 func loadDir(source axis.DataSource, addonname, path string, addons []*Addon) []*Addon {
@@ -46,8 +43,8 @@ func loadDir(source axis.DataSource, addonname, path string, addons []*Addon) []
 		path += "/"
 	}
 
-	// Load a init script if any.
-	loadInit(source, dirpath)
+	// Load any init or load scripts.
+	loadGlobals(source, dirpath)
 
 	if containsParseable(source, dirpath) {
 		addons = append(addons, loadAddon(source, addonname, dirpath))
@@ -63,28 +60,18 @@ func loadDir(source axis.DataSource, addonname, path string, addons []*Addon) []
 func loadAddon(source axis.DataSource, addonname, path string) *Addon {
 	addon := NewAddon(addonname)
 
-	// This just bloats the log for no great gain.
-	//LogPrintln(addonname)
-
 	dirpath := path
-	if path != "" {
+	if path != "" && path[len(path) - 1] != ':' {
 		path += "/"
 	}
 
 	for _, filepath := range source.ListFile(dirpath) {
-
-		//LogPrintln("  " + path + filepath)
-
-		file := new(AddonFile)
-		file.Path = filepath
-		file.Source = dirpath
-
 		content, err := source.ReadAll(path + filepath)
 		if err != nil {
 			panic(err)
 		}
-		file.Content = content
 
+		file := NewAddonFile(filepath, dirpath, content)
 		classifyFile(file, filepath)
 		addon.Files[filepath] = file
 	}
@@ -93,43 +80,38 @@ func loadAddon(source axis.DataSource, addonname, path string) *Addon {
 
 func classifyFile(file *AddonFile, filename string) {
 	if strings.HasSuffix(filename, ".pre.rex") {
-		// is pre script
-		file.PreScript = true
+		file.Tags["PreScript"] = true
 		return
 	}
+	
 	if strings.HasSuffix(filename, ".post.rex") {
-		// is post script
-		file.PostScript = true
+		file.Tags["PostScript"] = true
 		return
 	}
+	
 	if strings.HasSuffix(filename, ".prep.rex") {
-		// is prep script
-		file.PrepScript = true
+		file.Tags["PrepFile"] = true
 		return
 	}
 
 	if strings.HasSuffix(filename, ".inst.rex") {
-		// is install script
-		file.InstScript = true
+		file.Tags["InstScript"] = true
 		return
 	}
 
 	if strings.HasSuffix(filename, ".rbl") {
-		// is rubble code (do not write out after parse)
-		file.NoWrite = true
+		file.Tags["RawFile"] = true
+		file.Tags["NoWrite"] = true
 		return
 	}
 
 	if strings.HasSuffix(filename, ".txt") {
-		// is raw file
+		file.Tags["RawFile"] = true
 		return
 	}
-
-	file.UserData = true
-	return
 }
 
-func loadInit(source axis.DataSource, path string) {
+func loadGlobals(source axis.DataSource, path string) {
 	dirpath := path
 	if path != "" {
 		path += "/"
@@ -141,30 +123,45 @@ func loadInit(source axis.DataSource, path string) {
 			if err != nil {
 				panic(err)
 			}
-			ForcedInit[filepath] = content
-			ForcedInitOrder = append(ForcedInitOrder, filepath)
+			
+			GlobalFiles.Data[filepath] = NewAddonFile(filepath, dirpath, content)
+			GlobalFiles.Data[filepath].Tags["InitScript"] = true
+			GlobalFiles.Order = append(GlobalFiles.Order, filepath)
+			continue
+		}
+		
+		if strings.HasSuffix(filepath, ".load.rex") {
+			content, err := source.ReadAll(path + filepath)
+			if err != nil {
+				panic(err)
+			}
+			
+			GlobalFiles.Data[filepath] = NewAddonFile(filepath, dirpath, content)
+			GlobalFiles.Data[filepath].Tags["LoaderScript"] = true
+			GlobalFiles.Order = append(GlobalFiles.Order, filepath)
 			continue
 		}
 	}
-
+	
+	sort.Strings(GlobalFiles.Order)
 	return
 }
 
 func containsParseable(source axis.DataSource, path string) bool {
 	for _, filename := range source.ListFile(path) {
-		if strings.HasSuffix(filename, ".init.rex") || strings.HasSuffix(filename, ".inst.rex") {
-			continue
+		if strings.HasSuffix(filename, ".pre.rex") {
+			return true
 		}
-		if strings.HasSuffix(filename, ".rex") {
-			// is script
+		if strings.HasSuffix(filename, ".post.rex") {
+			return true
+		}
+		if strings.HasSuffix(filename, ".prep.rex") {
 			return true
 		}
 		if strings.HasSuffix(filename, ".rbl") {
-			// is rubble code
 			return true
 		}
 		if strings.HasSuffix(filename, ".txt") {
-			// is raw file
 			return true
 		}
 	}

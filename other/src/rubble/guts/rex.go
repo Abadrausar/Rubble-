@@ -45,12 +45,11 @@ import "dctech/dfrex/dfraw"
 import "dctech/axis/axisrex"
 
 import "regexp"
-import gosort "sort"
 import "os"
 
 var GlobalScriptState *rex.State
 
-func InitScripting() {
+func InitScriptingEarly() {
 	state := rex.NewState()
 
 	state.NoRecover = NoRecover
@@ -89,33 +88,39 @@ func InitScripting() {
 	}
 	rbl.RegisterVar("versions", rex.NewValueIndex(rex.NewStaticMap(versions)))
 
-	rbl.RegisterVar("addons", genii.New(Addons))
-	rbl.RegisterVar("files", genii.New(Files))
-
 	rbl.RegisterVar("fs", rex.NewValueUser(FS))
 
-	rbl.RegisterVar("raws", rex.NewValueIndex(NewIndexableRaws()))
-
+	rbl.RegisterVar("addons", genii.New(&Addons))
+	
 	rbl.RegisterCommand("abort", Command_Abort)
-
-	rbl.RegisterCommand("currentfile", Command_CurrentFile)
 
 	rbl.RegisterCommand("setvar", Command_SetVar)
 	rbl.RegisterCommand("getvar", Command_GetVar)
 
-	rbl.RegisterCommand("stageparse", Command_Parse)
-	rbl.RegisterCommand("calltemplate", Command_CallTemplate)
-	rbl.RegisterCommand("expandvars", Command_ExpandVars)
-
-	rbl.RegisterCommand("template", Command_Template)
+	rbl.RegisterCommand("filetag", Command_FileTag)
 	
-	rbl.RegisterCommand("activate_addon", Command_ActivateAddon)
-	rbl.RegisterCommand("add_file", Command_AddFile)
-
+	rbl.RegisterCommand("newaddon", Command_NewAddon)
+	rbl.RegisterCommand("newfile", Command_NewFile)
+	
 	// Redirect output to logger
 	state.Output = logFile
 
 	GlobalScriptState = state
+}
+
+func InitScriptingLate() {
+	rbl := GlobalScriptState.FetchModule("rubble")
+
+	rbl.RegisterVar("files", genii.New(&Files))
+
+	rbl.RegisterVar("raws", rex.NewValueIndex(NewIndexableRaws()))
+
+	rbl.RegisterCommand("currentfile", Command_CurrentFile)
+
+	rbl.RegisterCommand("template", Command_Template)
+	rbl.RegisterCommand("stageparse", Command_Parse)
+	rbl.RegisterCommand("calltemplate", Command_CallTemplate)
+	rbl.RegisterCommand("expandvars", Command_ExpandVars)
 }
 
 // Causes rubble to abort with an error, use for correctable errors like configuration problems.
@@ -123,7 +128,7 @@ func InitScripting() {
 // Returns unchanged.
 func Command_Abort(script *rex.Script, params []*rex.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to rubble:abort (how ironic).")
+		rex.ErrorParamCount("rubble:abort", "1")
 	}
 
 	LogPrintln("Abort:", params[0].String())
@@ -144,11 +149,11 @@ var varNameValidateRegEx = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 // Returns unchanged.
 func Command_SetVar(script *rex.Script, params []*rex.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to rubble:setvar.")
+		rex.ErrorParamCount("rubble:setvar", "2")
 	}
 
 	if !varNameValidateRegEx.MatchString(params[0].String()) {
-		panic("Variable name supplied to rubble:setvar is invalid.")
+		rex.ErrorGeneralCmd("rubble:setvar", "Config variable name is invalid.")
 	}
 
 	VariableData[params[0].String()] = params[1].String()
@@ -159,7 +164,7 @@ func Command_SetVar(script *rex.Script, params []*rex.Value) {
 // Returns the value.
 func Command_GetVar(script *rex.Script, params []*rex.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to rubble:getvar.")
+		rex.ErrorParamCount("rubble:getvar", "1")
 	}
 
 	if _, ok := VariableData[params[0].String()]; !ok {
@@ -181,7 +186,7 @@ func Command_GetVar(script *rex.Script, params []*rex.Value) {
 // Returns the result of running code through the stage parser.
 func Command_Parse(script *rex.Script, params []*rex.Value) {
 	if len(params) != 1 && len(params) != 2 {
-		panic("Wrong number of params to rubble:stageparse.")
+		rex.ErrorParamCount("rubble:stageparse", "1 or 2")
 	}
 
 	if len(params) == 2 {
@@ -199,7 +204,7 @@ func Command_Parse(script *rex.Script, params []*rex.Value) {
 // Returns the templates return value.
 func Command_CallTemplate(script *rex.Script, params []*rex.Value) {
 	if len(params) < 1 {
-		panic("Wrong number of params to rubble:calltemplate.")
+		rex.ErrorParamCount("rubble:calltemplate", ">0")
 	}
 	name := params[0].String()
 
@@ -210,7 +215,7 @@ func Command_CallTemplate(script *rex.Script, params []*rex.Value) {
 	}
 
 	if _, ok := Templates[name]; !ok {
-		panic("Invalid template: " + name)
+		rex.ErrorGeneralCmd("rubble:calltemplate", "Invalid template: " + name)
 	}
 
 	script.RetVal = Templates[name].Call(strParams).Script()
@@ -221,13 +226,73 @@ func Command_CallTemplate(script *rex.Script, params []*rex.Value) {
 // Returns the raws with all Rubble variables expanded.
 func Command_ExpandVars(script *rex.Script, params []*rex.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to rubble:expandvars.")
+		rex.ErrorParamCount("rubble:expandvars", "1")
 	}
 
 	pos := params[0].Pos
 	val := rex.NewValueString(ExpandVars(params[0].String()))
 	val.Pos = pos
 	script.RetVal = val
+}
+
+// Manages file tags.
+// 	rubble:filetag filename tag [value]
+// Returns the tag's state (if called without a value) or returns unchanged.
+func Command_FileTag(script *rex.Script, params []*rex.Value) {
+	if len(params) != 2 && len(params) != 3 {
+		rex.ErrorParamCount("rubble:filetag", "2 or 3")
+	}
+	
+	if len(params) == 2 {
+		
+		if file, ok := Files.Data[params[0].String()]; ok {
+			script.RetVal = rex.NewValueBool(file.Tags[params[1].String()])
+		} else {
+			script.RetVal = rex.NewValueBool(false)
+		}
+		return
+	}
+
+	if file, ok := Files.Data[params[0].String()]; ok {
+		file.Tags[params[1].String()] = params[2].Bool()
+	}
+}
+
+// Creates an empty addon object and adds it to the addon list.
+// 	rubble:newaddon name
+// Does nothing if the addon already exists.
+// Returns the addon.
+func Command_NewAddon(script *rex.Script, params []*rex.Value) {
+	if len(params) != 1 {
+		rex.ErrorParamCount("rubble:newaddon", "1")
+	}
+
+	name := params[0].String()
+	for _, addon := range Addons {
+		if addon.Name == name {
+			return
+		}
+	}
+	Addons = append(Addons, NewAddon(name))
+}
+
+// Adds a new file to an addon.
+// 	rubble:newfile addon name contents
+// Fails silently if the addon does not exist.
+// Returns unchanged.
+func Command_NewFile(script *rex.Script, params []*rex.Value) {
+	if len(params) != 3 {
+		rex.ErrorParamCount("rubble:newfile", "3")
+	}
+
+	name := params[0].String()
+	for _, addon := range Addons {
+		if addon.Name == name {
+			addon.Files[params[1].String()] = NewAddonFile(params[1].String(), "(from script: " + CurrentFile + ") ", []byte(params[2].String()))
+			return
+		}
+	}
+	
 }
 
 // Defines a Rubble script template.
@@ -237,75 +302,8 @@ func Command_ExpandVars(script *rex.Script, params []*rex.Value) {
 // Returns unchanged.
 func Command_Template(script *rex.Script, params []*rex.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to rubble:template.")
+		rex.ErrorParamCount("rubble:template", "2")
 	}
 
 	NewScriptTemplate(params[0].String(), params[1])
-}
-
-// Activates an addon.
-// 	rubble:activate_addon name
-// THIS COMMAND IS EXTREMELY DANGEROUS!
-// The addon is not really activated, but it's files are added to the file list,
-// this makes this command exceptionally dangerous and not to be used except for
-// special cases by users who know what they are doing.
-// It is best to only use this command from an init script (or maybe a pre script).
-// Does nothing if the addon is already active.
-// Returns unchanged.
-func Command_ActivateAddon(script *rex.Script, params []*rex.Value) {
-	if len(params) != 1 {
-		panic("Wrong number of params to rubble:activate_addon.")
-	}
-
-	for _, addon := range Addons {
-		if addon.Name == params[0].String() {
-			if addon.Active {
-				break
-			}
-			
-			for name, file := range addon.Files {
-				if _, ok := Files.Files[name]; !ok {
-					Files.Order = append(Files.Order, name)
-				}
-				Files.Files[name] = file
-			}
-			break
-		}
-	}
-
-	gosort.Strings(Files.Order)
-}
-
-// Adds a file.
-// 	rubble:add_file name contents
-// THIS COMMAND IS EXTREMELY DANGEROUS!
-// Depending on when the file is added parsing could end up in a broken state!
-// I have no idea what kind of bugs could be created by using this command,
-// but I am sure they are legion.
-// It is best to only use this command from an init script (or maybe a pre script).
-// If the file already exists it's contents are replaced, just like an normal override. 
-// Returns unchanged.
-func Command_AddFile(script *rex.Script, params []*rex.Value) {
-	if len(params) != 2 {
-		panic("Wrong number of params to rubble:add_file.")
-	}
-
-	name := params[0].String()
-	contents := []byte(params[0].String())
-	
-	if _, ok := Files.Files[name]; !ok {
-		file := new(AddonFile)
-		file.Path = name
-		file.Source = "rubble:add_file"
-		file.Content = contents
-		Files.Files[name] = file
-		Files.Order = append(Files.Order, name)
-		gosort.Strings(Files.Order)
-		return
-	}
-	file := new(AddonFile)
-	file.Path = name
-	file.Source = "rubble:add_file"
-	file.Content = contents
-	Files.Files[name] = file
 }

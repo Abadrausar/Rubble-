@@ -81,7 +81,7 @@ func NewLexer(input string, pos *Position) *Lexer {
 }
 
 // advance retrieves the next token from the stream.
-// For most purposes use Gettoken instead.
+// For most purposes use getcurrent instead.
 func (lex *Lexer) advance() {
 	lex.current = lex.look
 	if lex.eof {

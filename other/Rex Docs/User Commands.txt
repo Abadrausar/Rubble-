@@ -1,5 +1,57 @@
 
-User Commands (loaded by the init script in the "Base" addon):
+User Commands
+
+============================================================
+Loaded by an init script in the "Libs" addon:
+
+Generate a place holder template.
+	
+	rubble:placeholder name
+	
+	Creates a template named <name> that returns a simple placeholder message,
+	may be overridden by later definitions.
+
+Makes Rubble skip a file.
+	
+	rubble:skipfile name
+	
+	name is the file's BASE NAME not it's path!
+	Returns unchanged.
+	
+Makes Rubble not write a file out after generation..
+	
+	rubble:nowritefile name
+	
+	name is the file's BASE NAME not it's path!
+	Returns unchanged.
+
+Marks a file as containing creature graphics.
+	
+	rubble:graphicsfile name
+	
+	name is the file's BASE NAME not it's path!
+	Returns unchanged.
+
+Marks a file as a prep file.
+	
+	rubble:prepfile name
+	
+	name is the file's BASE NAME not it's path!
+	Returns unchanged.
+
+============================================================
+Loaded by a loader script in the "Libs" addon:
+
+Retrives an addon by name.
+	
+	rubble:fetchaddon
+	
+	Only useful from loader scripts.
+	Example:
+	
+	[(rubble:fetchaddon "Libs/Base") Active = true]
+	
+	Returns the addon (nil if addon not found).
 
 Checks if a named addon is active.
 	
@@ -8,13 +60,6 @@ Checks if a named addon is active.
 	name needs to be the FULL name of the addon! (for example "Base/Files")
 	The name check is case-sensitive!
 	Returns true or false.
-
-Generate a place holder template.
-	
-	rubble:placeholder name
-	
-	Creates a template named <name> that returns a simple placeholder message,
-	may be overridden by later definitions.
 
 Rubble version check, aborts if the current version is not the same as or newer than the requested version.
 	
@@ -59,31 +104,3 @@ Group dependency check.
 	rubble:groupincompatible me addon
 	
 	Same as rubble:incompatibleaddon except me should be an addon group.
-
-Makes Rubble skip a file.
-	
-	rubble:skipfile name
-	
-	name is the file's BASE NAME not it's path!
-	Returns unchanged.
-	
-Makes Rubble not write a file out after generation..
-	
-	rubble:nowritefile name
-	
-	name is the file's BASE NAME not it's path!
-	Returns unchanged.
-
-Marks a file as containing creature graphics.
-	
-	rubble:graphicsfile name
-	
-	name is the file's BASE NAME not it's path!
-	Returns unchanged.
-
-Marks a file as a prep file.
-	
-	rubble:prepfile name
-	
-	name is the file's BASE NAME not it's path!
-	Returns unchanged.
