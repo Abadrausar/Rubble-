@@ -3,8 +3,8 @@
 IDI_ICON1               ICON    DISCARDABLE     "./Rubble.ico"
 
 1 VERSIONINFO
-    FILEVERSION     4,4,0,0
-    PRODUCTVERSION  4,4,0,0
+    FILEVERSION     4,5,0,0
+    PRODUCTVERSION  4,5,0,0
     FILEOS          VOS_NT
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -17,13 +17,13 @@ IDI_ICON1               ICON    DISCARDABLE     "./Rubble.ico"
         {
 			// Don't forget to change the version number in the header!
             VALUE "CompanyName", "Double Click Technologies"
-            VALUE "FileDescription", "Rubble v4.4"
-            VALUE "FileVersion", "4.4"
+            VALUE "FileDescription", "Rubble v4.5"
+            VALUE "FileVersion", "4.5"
             VALUE "InternalName", "Rubble"
             VALUE "LegalCopyright", "2013-2014 Milo Christiansen"
             VALUE "OriginalFilename", "rubble.exe"
-            VALUE "ProductName", "Rubble v4.4"
-            VALUE "ProductVersion", "4.4"
+            VALUE "ProductName", "Rubble v4.5"
+            VALUE "ProductVersion", "4.5"
         }
     }
     BLOCK "VarFileInfo"

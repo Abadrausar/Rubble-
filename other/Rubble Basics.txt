@@ -139,6 +139,49 @@ Hard Coded File Tags:
 There are a few additional hard coded tags, but they are only used on global script files (load and init scripts) and as such they are never visible to the user.
 
 ==============================================
+The Rubble File Encoder:
+==============================================
+
+Rubble comes with a simple command line utility for encoding files for posting on the forum. This utility compresses and encodes files so that they are forum postable (eg they contain no unprintable characters).
+
+To encode or decode a file just drag and drop it on the encoder binary (if you want to use the command prompt just run "encoder filename").
+
+The encoder will examine the file extension to decide what to do:
+	Extension		Action
+	.zip.b64		Base 64 decode
+	.zip			Base 64 encode
+	.b64			Base 64 decode and DEFLATE uncompress
+	anything else	DEFLATE compress and base 64 encode
+The output file will have ".b64" added or removed from it's extension as appropriate.
+
+Encoded zip files can be decoded by any base 64 decoder (base 64 is used for many things so it is not hard to find decoders), but other encoded files will also need to be decompressed (they are raw DEFLATE compressed blocks, so it may be a little hard to find a ready made tool for processing them). While it is possible to decode one of these files using third party utilities, there is no real need as the encoder application can both decode and encode files without issues.
+
+In any case Rubble can read these files natively, so there is no need for users to decode them before use (but there is no reason why you can't, after all this utility could be very useful for non-Rubble applications).
+
+Please note that for files that are already compressed (for example zip files and most images) the encoder will inflate the file size, this is because base 64 encoding adds 2 bits per byte. In most cases this is fine as this encoding is designed for use with ASCII text and other uncompressed data, but don't be surprised when your zip file gets ~25% larger (it would be exactly 25%, but I add a newline every 80 characters to enhance clarity).
+
+There are two basic ways this encoded text can be used:
+	As encoded zip files.
+	As encoded files uncompressed by a load script.
+
+Encoded zip files (.zip.b64) can be read directly by Rubble, use them exactly like normal zip files (just put them in your addons folder).
+
+Other encoded files need to be uncompressed by a load script before use, most of the time the encoded file is packaged into a simple script as a string. To decode a string use the rubble:decompress script command, this will decode and uncompress the string, if the file was not stored in the script as a string then you will need to load the file first.
+
+Loading then decompressing a file can be done like this:
+	var content = (genii:bytes_string [(rubble:fetchaddon "Addon/Name") Files "file.name.b64" Content])
+	(rubble:newfile "Addon/Name" "file.name" (rubble:decompress [content]))
+This will result in the addon having two files, one compressed (that was there before) and one uncompressed (which the above code added)
+
+The following would replace the file's contents with the uncompressed version:
+	var addon = (rubble:fetchaddon "Addon/Name")
+	var content = (genii:bytes_string [addon Files "test compressed.txt" Content])
+	[addon Files "test compressed.txt" Content = (genii:string_bytes (rubble:decompress [content]))]
+Note that if you choose to do things this way you cannot use the .b64 extension unless you want to fix the file tags!
+
+All in all it is much easier to store the file in the script as a string, as in that case you only need to do half as much.
+
+==============================================
 The prep "addon":
 ==============================================
 

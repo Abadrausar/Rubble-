@@ -217,6 +217,13 @@ User:
 		Allows you to dig slade, once you get past it's guardians that is...
 		Digging slade may lead to bugs, so be careful.
 	
+	User/Dwarf/Castes:
+		Adds more dwarf castes.
+		See the entry in "Rubble Addon Extras.txt" for more details, including descriptions and detailed population ratios.
+	
+	User/Dwarf/Ranged Weapons:
+		Allows dwarves to use bows and blowguns (and make ammo for them), very simple.
+	
 	User/Edible Vermin:
 		Allows you to cook vermin at the kitchen to get cheap meat, a good emergency food source.
 		(urist likes vermin for their great taste.)

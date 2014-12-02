@@ -25,12 +25,12 @@ command rubble:addonactive name {
 }
 
 command rubble:activateaddon me addon {
-	var addonref = (rubble:fetchaddon [addon])
-	(if (isnil [addonref]) {
-		(rubble:abort (str:add "The \"" [me] "\" addon requires the \"" [addon] "\" addon!\n"
-		"The required addon is not currently installed, please install the required addon and try again."))
-	}{
-		(if (rubble:addonactive [me]) {
+	(if (rubble:addonactive [me]) {
+		var addonref = (rubble:fetchaddon [addon])
+		(if (isnil [addonref]) {
+			(rubble:abort (str:add "The \"" [me] "\" addon requires the \"" [addon] "\" addon!\n"
+			"The required addon is not currently installed, please install the required addon and try again."))
+		}{
 			[addonref Active = true]
 		})
 	})

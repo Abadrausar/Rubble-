@@ -2,6 +2,23 @@
 ==============================================
 Changelog:
 ==============================================
+v4.5 (for DF 40.8)
+	Fixed DFHACK_REACTION, it should now work as expected.
+	Added the ability to add custom stuff to the init.lua and onLoad.init files (via scripts).
+	The script indexable rubble:raws now properly returns nil for non-existent keys.
+	Fixed a bug that stopped "User/DFHack/Fill Barrel" from working.
+	Fixed non-working block reaction in "User/Bonecarver".
+	Fixed the rubble:activateaddon script command.
+	Added script commands rubble:compress and rubble:decompress, compress and decompress strings.
+		The result is still plain text, so it can be posted on the forums, great for small addons and bug fixes!
+	It is now possible to load base 64 encoded zip files, use the extension ".zip.b64".
+		This makes it possible to post zipped addons on the forum as text.
+	Rubble now comes with a simple command line utility for decoding and encoding files.
+		This utility will decide how to process the file based on extension,
+		just drag a single file onto encoder.exe to run.
+	Added "User/Dwarf/Castes", an expanded port of the old BD addon, adds profession castes for the dwarves.
+	Added "User/Dwarf/Ranged Weapons", allows dwarves to use all ranged weapons (and make ammo for them!).
+
 v4.4 (for DF 40.8)
 	Updated the "Base" addon to DF 40.8
 	All addons in the "Libs" group are now automatically activated if needed.

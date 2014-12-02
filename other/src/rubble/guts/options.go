@@ -210,7 +210,14 @@ func ParseCommandLine() {
 	for _, file := range zips {
 		if !file.IsDir() {
 			if strings.HasSuffix(file.Name(), ".zip") {
-				fs, err := axiszip.New(AddonsDir + "/" + file.Name())
+				fs, err := axiszip.NewFile(AddonsDir + "/" + file.Name())
+				if err != nil {
+					panic(err)
+				}
+				zipFS.Mount(StripExt(file.Name()), fs)
+			}
+			if strings.HasSuffix(file.Name(), ".zip.b64") {
+				fs, err := axiszip.NewFile64(AddonsDir + "/" + file.Name())
 				if err != nil {
 					panic(err)
 				}

@@ -1,5 +1,46 @@
 
 ---------------------------------------------------
+User/Dwarf/Castes
+
+Ratios	Normal	Farmer	Warrior	Priest	Smith	Crafter	Engineer	Miner
+Female	50		10		5		1		5		10		10			5
+Male	50		5		20		1		5		5		5			5
+
+Normal - 1 for every 1.92 dwarves
+	Your normal dwarf with nothing special.
+
+Farmer - 1 for every 12.8 dwarves
+	Learns butcher, tanner, brewing, milling, plant processing, cheese making, milking, cooking, planting, and plant gathering at 125% normal rate 
+	Farmers are 2/3 more likely to be female
+
+Warrior - 1 for every 7.68 dwarves
+	Learn axe, sword, hammer, mace, spear, crossbow, armor user, dodge, and shield user at 125% normal rate
+	Warriors are 4/5 more likely to be male
+
+Priest - 1 for every 96 dwarves
+	Priests have a range of useful spells to help you and hinder your enemy. Priests also serve as doctors and prepare the holy metal adamantine for your smiths.
+	Learn all medical skills at 125% normal rate
+	Learns strand extractor at 300% normal rate
+	Start with level 2 in all medical skills
+	Spells:
+		Weaken
+			Causes dizziness, drowsiness, slowness, and impaired function of limbs.
+		Blood
+			Causes bleeding, almost always leading to death.
+
+Smith - 1 for every 19.2 dwarves
+	Learn weapon forging, armor forging, blacksmithing, metal crafting, mechanics, and architect at 125% normal rate
+
+Crafter - 1 for every 12.8 dwarves
+	Learn weaving, clothes making, gem cutting, gem encrusting, wood crafting, stone crafting, glass making, leather working, bone carving, carpentry, and masonry at 125% normal rate
+
+Engineer - 1 for every 12.8 dwarves
+	Learn mechanics, architecture, siege crafter, siege operator, and pump operator at 125% normal rate
+
+Miner - 1 for every 19.2 dwarves
+	Learn mining and engraving at 125% normal rate
+
+---------------------------------------------------
 User/Saurians
 
 ==============================================
@@ -9,7 +50,7 @@ Saurians Overview:
 Saurians are a small (size 20000) reptilian race of swamp dwellers with mildly venomous bites (causes pain).
 Saurians cannot dig at embark, but if a pick were to be bought (and resized to fit smaller hands) digging, even down to the magma sea and below, should be possible.
 
-While saurians are not very tough, they are FAST little buggers and can quickly run down and kill foes many times their size with the proper equipment and training, often before the enemy can get a blow in. Of course if the enemy CAN get a blow in the saurian is often in trouble!
+While saurians are not very tough, they are FAST and can quickly run down and kill foes many times their size with the proper equipment and training, often before the enemy can get a blow in. Of course if the enemy CAN get a blow in the saurian is often in trouble!
 In keeping with their small size and speed saurian armor tends to be tough and light.
 
 It is generally assumed that you will activate at least the "User/Quarry", "User/Sawmill", "User/Glass Forge", "User/Warcrafter" and "User/Pottery" addons when playing saurians, as saurians may lack industries without at least those addons.
@@ -80,6 +121,7 @@ Saurian Tips:
 	
 	Start a lumber bamboo farm as soon as (or before) you have a sawmill.
 		It's hard to see the need for a lumber bamboo farm in the early game (after clear cutting the entire surface of the map for the second or third time you should have hundreds of logs), but you need wood for fuel, building, furniture, and mechanisms, it really doesn't take long to run out. Lumber bamboo farms are low maintenance, so just make a huge farm plot somewhere and start planting.
+		This is much less critical with 40.x and the huge amounts of wood that can be had from the new trees, but if you go nuts with wood powered industry lumber bamboo is still VERY useful for when the wood starts to run low.
 	
 	Buy rare items like gems, silk and stone ASAP (unless you like failed moods).
 		If you need raw gems you can "uncut" large gems you trade for at the craftsaurian's workshop, if you need cut gems you can use glass. Stone boulders can be pressed from blocks at the craftsaurian's workshop, fired from clay at the kiln and batch kiln, or dug up at a quarry. Silk cloth is (generally) only available from trade, if you get lucky and have some aboveground web vermin in the area pen up the cats!
@@ -98,7 +140,7 @@ Saurian Recommended Addon List:
 
 Saurians have very little in the way of built-in industries, so you will want to activate some of the other addons to flesh them out some.
 Here is a list of the ones I think most important:
-	User/Block/Bone
+	User/Bonecarver
 	User/Block/Kiln
 	User/Bone Flux
 	User/Fix/Fish Pops
@@ -120,26 +162,27 @@ Saurian Item-less Embark Plan:
 ==============================================
 
 Required addons:
-	User/Block/Bone
+	User/Bonecarver
 	User/Glass Forge
-	User/Quarry
 	User/Warcrafter
 
+Helpful addons:
+	User/Quarry
+
 Start gathering plants, you need some rope reeds for later and this step can take a while (plus you need the food). 
-If you want, build a makeshift quarry and start mining clay, you will need the quarry for later and clay is always useful.
 Deconstruct your wagon.
 Build a butcher shop and butcher one of your wagon pullers, you need a stack of bones.
-Deconstruct your butcher shop and build a craftsaurian's workshop.
-Make a units of 2 treated bone blocks at the craftsaurian's workshop.
-Use your treated blocks to build a glass furnace and wood furnace.
+Deconstruct your butcher shop and build a bonecarver.
+Make a unit of treated bone blocks at the bonecarver.
+Use your treated block to build a wood furnace.
 Make two units of charcoal.
 Deconstruct your wood furnace.
 By now you should have some rope reeds, build a farmers workshop and spin some thread.
 Deconstruct your farmers workshop and build a loom.
 Weave at least one unit of cloth and then deconstruct your loom.
 Build a clothier and make one or more bags, deconstruct the clothier.
-Dig for sand at your makeshift quarry until you get a bag full.
-Make a hunk of raw green glass at your glass furnace.
+Get a bag full of sand, if you have sand accessible from the surface then just build a glass furnace and gather sand, but if you lack sand you will need to use a makeshift quarry (requires the "User/Quarry" addon).
+Build a glass furnace and make a hunk of raw green glass.
 Build a Warcrafter and make a small green glass axe.
 Now on to your regularly scheduled program... (Wooden training axes are for wusses!)
 

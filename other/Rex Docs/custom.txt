@@ -22,12 +22,26 @@ func Command_CallTemplate(script *rex.Script, params []*rex.Value)
 
     Returns the templates return value.
 
+func Command_Compress(script *rex.Script, params []*rex.Value)
+    Compresses a string.
+
+	rubble:compress string
+
+    Returns the encoded text.
+
 func Command_CurrentFile(script *rex.Script, params []*rex.Value)
     Returns the name of the current file.
 
 	rubble:currentfile
 
     Returns the file name.
+
+func Command_Decompress(script *rex.Script, params []*rex.Value)
+    Decompresses a Rubble encoded string.
+
+	rubble:decompress string
+
+    Returns the decoded text.
 
 func Command_ExpandVars(script *rex.Script, params []*rex.Value)
     Expands Rubble variables.

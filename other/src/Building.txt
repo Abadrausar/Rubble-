@@ -10,6 +10,9 @@ One you have Go installed add <rubbledir>/other to your GOPATH or copy the conte
 Now all you need to do is fire up a command prompt and run:
 	go build rubble
 
+To build the file encoder:
+	go build rubble/encoder
+
 When learning Rex it is very helpful to have the interactive shell available, to build the Rex shell:
 	go build dctech/rex/rexsh
 

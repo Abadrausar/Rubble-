@@ -1,2 +1,2 @@
 
-(rubble:dfhack_loadscript "dfhack_fill_barrel.lua")
+(rubble:dfhack_loadscript "user_dfhack_fill_barrel.lua")

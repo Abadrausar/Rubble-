@@ -24,22 +24,83 @@ package axiszip
 
 import "dctech/axis"
 
+import "os"
 import "io"
 import "io/ioutil"
+import "bytes"
 import "strings"
 import "archive/zip"
 import "path"
 import "path/filepath"
+import "encoding/base64"
 
 type Data struct {
-	zip *zip.ReadCloser
+	zip *zip.Reader
 }
 
-// New creates a read-only AXIS DataSource backed by a zip file.
-func New(path string) (axis.DataSource, error) {
+// NewFile creates a read-only AXIS DataSource backed by a zip file.
+func NewFile(path string) (axis.DataSource, error) {
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	
+	file := bytes.NewReader(content)
+	this := new(Data)
+	this.zip, err = zip.NewReader(file, int64(file.Len()))
+	if err != nil {
+		return nil, err
+	}
+	return this, nil
+}
+
+// NewFile64 creates a read-only AXIS DataSource backed by a zip file encoded in base 64.
+func NewFile64(path string) (axis.DataSource, error) {
+	content, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer content.Close()
+	
+	bc := base64.NewDecoder(base64.StdEncoding, content)
+	data, err := ioutil.ReadAll(bc)
+	if err != nil {
+		return nil, err
+	}
+	
+	file := bytes.NewReader(data)
+	this := new(Data)
+	this.zip, err = zip.NewReader(file, int64(file.Len()))
+	if err != nil {
+		return nil, err
+	}
+	return this, nil
+}
+
+// NewRaw creates a read-only AXIS DataSource backed by a zip file read into a byte slice.
+func NewRaw(content []byte) (axis.DataSource, error) {
+	file := bytes.NewReader(content)
 	this := new(Data)
 	var err error
-	this.zip, err = zip.OpenReader(path)
+	this.zip, err = zip.NewReader(file, int64(file.Len()))
+	if err != nil {
+		return nil, err
+	}
+	return this, nil
+}
+
+// NewRaw64 creates a read-only AXIS DataSource backed by a zip file read into a byte slice and encoded in base 64.
+func NewRaw64(content []byte) (axis.DataSource, error) {
+	b := bytes.NewReader(content)
+	bc := base64.NewDecoder(base64.StdEncoding, b)
+	data, err := ioutil.ReadAll(bc)
+	if err != nil {
+		return nil, err
+	}
+	
+	file := bytes.NewReader(data)
+	this := new(Data)
+	this.zip, err = zip.NewReader(file, int64(file.Len()))
 	if err != nil {
 		return nil, err
 	}

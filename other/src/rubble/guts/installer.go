@@ -41,7 +41,7 @@ func InstallModeRun(pack string) {
 	}
 	instFS.Mount("raw", fs)
 	
-	fs, err = axiszip.New(path)
+	fs, err = axiszip.NewFile(path)
 	if err != nil {
 		panic(err)
 	}

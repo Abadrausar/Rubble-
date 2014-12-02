@@ -38,7 +38,7 @@ func (this IndexableRaws) Get(index string) *rex.Value {
 			return rex.NewValueString(string(Files.Data[index].Content))
 		}
 	}
-	return rex.NewValueString("")
+	return rex.NewValue()
 }
 
 func (this IndexableRaws) Set(index string, value *rex.Value) bool {

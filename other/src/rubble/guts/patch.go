@@ -26,11 +26,21 @@ import "dctech/rex"
 import "dctech/patch"
 
 import "fmt"
+import "strings"
+import "bytes"
+import "io/ioutil"
+
+import "compress/flate"
+import "encoding/base64"
+
+// Script commands related to patching and loading addons from scripts.
 
 func InitScriptingPatch() {
 	rbl := GlobalScriptState.FetchModule("rubble")
 
 	rbl.RegisterCommand("patch", Command_Patch)
+	rbl.RegisterCommand("decompress", Command_Decompress)
+	rbl.RegisterCommand("compress", Command_Compress)
 }
 
 // Applies a patch to a string.
@@ -59,4 +69,57 @@ func Command_Patch(script *rex.Script, params []*rex.Value) {
 	}
 	
 	script.RetVal = rex.NewValueString(text)
+}
+
+// Decompresses a Rubble encoded string.
+// 	rubble:decompress string
+// Returns the decoded text.
+func Command_Decompress(script *rex.Script, params []*rex.Value) {
+	if len(params) != 1 {
+		rex.ErrorParamCount("rubble:decompress", "1")
+	}
+
+	a := strings.NewReader(params[0].String())
+	ac := base64.NewDecoder(base64.StdEncoding, a)
+	datac, err := ioutil.ReadAll(ac)
+	if err != nil {
+		rex.ErrorGeneralCmd("rubble:decompress", err.Error())
+	}
+	
+	b := bytes.NewReader(datac)
+	bc := flate.NewReader(b)
+	data, err := ioutil.ReadAll(bc)
+	if err != nil {
+		rex.ErrorGeneralCmd("rubble:decompress", err.Error())
+	}
+	bc.Close()
+	
+	script.RetVal = rex.NewValueString(string(data))
+}
+
+// Compresses a string.
+// 	rubble:compress string
+// Returns the encoded text.
+func Command_Compress(script *rex.Script, params []*rex.Value) {
+	if len(params) != 1 {
+		rex.ErrorParamCount("rubble:compress", "1")
+	}
+
+	a := new(bytes.Buffer)
+	ac, _ := flate.NewWriter(a, 9)
+	_, err := ac.Write([]byte(params[0].String()))
+	if err != nil {
+		rex.ErrorGeneralCmd("rubble:compress", err.Error())
+	}
+	ac.Close()
+	
+	b := new(bytes.Buffer)
+	bc := base64.NewEncoder(base64.StdEncoding, b)
+	_, err = bc.Write(a.Bytes())
+	if err != nil {
+		rex.ErrorGeneralCmd("rubble:compress", err.Error())
+	}
+	bc.Close()
+	
+	script.RetVal = rex.NewValueString(b.String())
 }
