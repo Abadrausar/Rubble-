@@ -1,13 +1,13 @@
-{VOID;
-	{C; To activate this behavior remove the leading double underscores ("__") from the addon name}
-	
-	{SCRIPT;
-		(file:walkfiles [rubble:outputdir] {
-			(file:del (append [rubble:outputdir] "/" [params 0]))
-			(if (geterror) {
-				(console:print "Error deleting: " [params 0] "\n")
-				(seterror 0)
-			})
+To activate this behavior remove the leading double underscores ("__") from the addon name
+
+{!SCRIPT;
+	(file:walkfiles [rubble:outputdir] {
+		(file:del (append [rubble:outputdir] "/" [params 0]))
+		(if (geterror) {
+			(console:print "Error deleting: " [params 0] "\n")
+			(seterror 0)
 		})
-	}
+	})
+	
+	(rubble:skipfile "clear_raws")
 }

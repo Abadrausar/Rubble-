@@ -1,14 +1,24 @@
 
 'new from v3:
-	Everything moved to the state
+	Everything moved to the state, no more GDM/Env divide, no more parser object
+	Many more commands
 '
+
+'comment'
+
+'To any poor sucker trying to make sense of this file: Sorry about the mess :p but this 
+is all the documentation that exists for the basic syntax of NCA v4'
 
 'Basics:'
 'all data is stored as a string
 when a numeric value is needed the string is converted to a 64 bit signed integer
 if the string is not a valid number its integer value is 0
-(most of the time, in the case of the count for rshift and lshift it is a 8 bit 
-unsigned integer and the default value is 1)'
+(most of the time, the commands docs will say so if it is different)'
+
+"double qoute\n\tstring"
+{nested/code 
+	{string}}
+raw_string
 
 'a valid identifier is any string'
 {{[( 
@@ -29,7 +39,7 @@ unsigned integer and the default value is 1)'
 'command decleration'
 (command, name, paramName1, ..., paramNameN, code) 'fixed param count'
 'or'
-(command, name, ..., code) 'variable param count'
+(command, name, ..., code) 'variable param count, note that in this case the ... is literal'
 'or'
 (command, name, code) 'no params'
 
@@ -127,15 +137,16 @@ namespace1:namespace2:name
 
 'nop example
 nop means No OPeration, the nop command itself does nothing. 
-This showcases the rule that if a command returns nothing the return 
+This example showcases the rule that if a command returns nothing the return 
 value will be the same as the return value of the previous command to run.
-when used this way nop can be read as "insert the return value of the previous command"'
+when used this way nop can be read as "insert the return value of the previous command".
+This rule allows "un-nesting" commands without the use of variables.'
 (fileio:read "somefile.ini")
 (ini:parse (nop))
 (ini:getvalue (nop) "somesection" "somekey")
 (console:print (nop))
 'The reason return values work like this is because all commands store their 
-return value in a single register in the GDM. 
+return value in a single register in the state. 
 That means that if a command returns nothing then the return value is unchanged 
 from the last command that returned something, which could be several commands back.'
 'just another weird-and-wonderful NCAism :p'

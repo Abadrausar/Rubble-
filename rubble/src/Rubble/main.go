@@ -5,6 +5,7 @@ import "os"
 import "io/ioutil"
 import "path/filepath"
 import "strings"
+import "sort"
 
 func main() {
 	fmt.Println("Rubble v1.0")
@@ -43,6 +44,9 @@ func main() {
 		}
 	}
 	
+	// This is needed to interleave addon and base files
+	sort.Strings(RawOrder)
+	
 	// Test lexer
 	if LexTest {
 		for _, i := range RawOrder {
@@ -57,7 +61,12 @@ func main() {
 	// preparse
 	fmt.Println("Preparsing...")
 	for _, i := range RawOrder {
-		fmt.Println(i)
+		if RawFiles[i].Skip {
+			fmt.Println("Skipping File:", RawFiles[i].Path)
+			continue
+		}
+		
+		fmt.Println(RawFiles[i].Path)
 		CurFile = i
 		RawFiles[i].Content = PreParse(RawFiles[i].Content)
 	}
@@ -66,7 +75,11 @@ func main() {
 	// parse
 	fmt.Println("Parsing...")
 	for _, i := range RawOrder {
-		fmt.Println(i)
+		if RawFiles[i].Skip {
+			continue
+		}
+		
+		fmt.Println(RawFiles[i].Path)
 		CurFile = i
 		RawFiles[i].Content = Parse(RawFiles[i].Content)
 	}
@@ -75,7 +88,11 @@ func main() {
 	// postparse
 	fmt.Println("Postparsing...")
 	for _, i := range RawOrder {
-		fmt.Println(i)
+		if RawFiles[i].Skip {
+			continue
+		}
+		
+		fmt.Println(RawFiles[i].Path)
 		CurFile = i
 		RawFiles[i].Content = PostParse(RawFiles[i].Content)
 	}
@@ -84,8 +101,12 @@ func main() {
 	// Write files out
 	fmt.Println("Writing files...")
 	for _, i := range RawOrder {
-		file := []byte(RawFiles[i].Name + "\n\n" + RawFiles[i].Content)
-		ioutil.WriteFile(OutputDir + "/" + RawFiles[i].Name + ".txt", file, 0600)
+		if RawFiles[i].Skip {
+			continue
+		}
+		
+		file := []byte(i + "\n\n" + RawFiles[i].Content)
+		ioutil.WriteFile(OutputDir + "/" + i + ".txt", file, 0600)
 	}
 	fmt.Println("Done.")
 }
@@ -105,16 +126,17 @@ func ListFiles(path string, info os.FileInfo, err error) error {
 		return err
 	}
 	
+	name := StripExt(filepath.Base(path))
 	rawfile := new(RawFile)
-	rawfile.Name = StripExt(filepath.Base(path))
+	rawfile.Path = path
 	rawfile.Content = string(file)
 	rawfile.Namespace = CurNamespace
 	
-	if _, ok := RawFiles[path]; !ok {
-		RawOrder = append(RawOrder, path)
+	if _, ok := RawFiles[name]; !ok {
+		RawOrder = append(RawOrder, name)
 	}
 	
-	RawFiles[path] = rawfile
+	RawFiles[name] = rawfile
 	
 	return nil
 }

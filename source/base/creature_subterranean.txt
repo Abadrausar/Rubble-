@@ -1467,7 +1467,7 @@
 	[DESCRIPTION:A tiny larva which is prized for its milk.]
 	[NAME:purring maggot:purring maggots:purring maggot]
 	[CASTE_NAME:purring maggot:purring maggots:purring maggot]
-	[CREATURE_TILE:123][COLOR:7:0:1][ALTTILE:125]
+	[CREATURE_TILE:'{'][COLOR:7:0:1][ALTTILE:'}']
 	[PETVALUE:10]
 	[PET_EXOTIC]
 	[VERMIN_GROUNDER][VERMIN_NOROAM][VERMIN_HATEABLE]

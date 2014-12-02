@@ -727,9 +727,9 @@ Also found a more accurate source, which gives a range of 13000-16000 -- http://
 	[ITEMS_BARRED]
 	[ITEMS_SCALED]
 	[STATE_COLOR:ALL_SOLID:WHITE]
+}
 
-temperature values unknown, used nickel}
-
+temperature values unknown, used nickel
 {SHARED_INORGANIC;NICKEL_SILVER;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
 	[STATE_NAME_ADJ:ALL_SOLID:nickel silver]
@@ -768,9 +768,9 @@ temperature values unknown, used nickel}
 	[ITEMS_BARRED]
 	[ITEMS_SCALED]
 	[STATE_COLOR:ALL_SOLID:SILVER]
+}
 
-temperature values unknown, used copper}
-
+temperature values unknown, used copper
 {SHARED_INORGANIC;BILLON;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
 	[STATE_NAME_ADJ:ALL_SOLID:billon]
@@ -809,10 +809,10 @@ temperature values unknown, used copper}
 	[ITEMS_BARRED]
 	[ITEMS_SCALED]
 	[STATE_COLOR:ALL_SOLID:PALE_BROWN]
+}
 
 temperature values unknown, used silver
-value is weighted average of 3 silver and 1 copper}
-
+value is weighted average of 3 silver and 1 copper
 {SHARED_INORGANIC;STERLING_SILVER;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
 	[STATE_NAME_ADJ:ALL_SOLID:sterling silver]
@@ -851,13 +851,13 @@ value is weighted average of 3 silver and 1 copper}
 	[ITEMS_BARRED]
 	[ITEMS_SCALED]
 	[STATE_COLOR:ALL_SOLID:WHITE]
+}
 
 temperature values unknown, used copper
 also called shakudo or hepatizon depending on the proportions (some have no silver)
 	got the name from black corinthian bronze, though these proportions are more like regular corinthian bronze/brass
 		I just wanted the liver-colored one, dropped "corinthian" because it sounds too location/culture specific
-value of 11 is the weighted average value of 2copper/1silver/1gold components}
-
+value of 11 is the weighted average value of 2copper/1silver/1gold components
 {SHARED_INORGANIC;BLACK_BRONZE;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
 	[STATE_NAME_ADJ:ALL_SOLID:black bronze]
@@ -896,10 +896,10 @@ value of 11 is the weighted average value of 2copper/1silver/1gold components}
 	[ITEMS_BARRED]
 	[ITEMS_SCALED]
 	[STATE_COLOR:ALL_SOLID:BLACK] (actually dark blue, but this is less confusing)
+}
 
 temperature values unknown, used gold
-value is weighted average of 3 gold and 1 copper}
-
+value is weighted average of 3 gold and 1 copper
 {SHARED_INORGANIC;ROSE_GOLD;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
 	[STATE_NAME_ADJ:ALL_SOLID:rose gold]
@@ -938,9 +938,9 @@ value is weighted average of 3 gold and 1 copper}
 	[ITEMS_BARRED]
 	[ITEMS_SCALED]
 	[STATE_COLOR:ALL_SOLID:PINK]
+}
 
-bismuth itself is brittle, but you can alloy it with tin/copper to make a light-colored bronze}
-
+bismuth itself is brittle, but you can alloy it with tin/copper to make a light-colored bronze
 {SHARED_INORGANIC;BISMUTH;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
 	[STATE_NAME_ADJ:ALL_SOLID:bismuth]
@@ -975,9 +975,9 @@ bismuth itself is brittle, but you can alloy it with tin/copper to make a light-
 	[BENDING_STRAIN_AT_YIELD:94]
 	[MAX_EDGE:10000]
 	[STATE_COLOR:ALL_SOLID:HELIOTROPE]
+}
 
-you can make a lighter colored bronze by adding bismuth, used temp values from bronze, used by incas, at least according to one source ha ha}
-
+you can make a lighter colored bronze by adding bismuth, used temp values from bronze, used by incas, at least according to one source ha ha
 {SHARED_INORGANIC;BISMUTH_BRONZE;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
 	[STATE_NAME_ADJ:ALL_SOLID:bismuth bronze]

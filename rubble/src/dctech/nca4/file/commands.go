@@ -23,7 +23,7 @@ func Setup(state *nca4.State) {
 
 // Delete an empty directory.
 // 	file:deldir path
-// Returns unchanged. Sets the Error flag if dir is not empty.
+// Returns unchanged or an error message. May set the Error flag.
 func CommandFile_DelDir(state *nca4.State, params []*nca4.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:deldir.")
@@ -47,23 +47,34 @@ func CommandFile_DelDir(state *nca4.State, params []*nca4.Value) {
 
 // Delete a directory and all sub dirs and files.
 // 	file:deltree path
-// Returns unchanged. Sets the Error flag if dir is not empty.
+// Returns unchanged or an error message. May set the Error flag.
 func CommandFile_DelTree(state *nca4.State, params []*nca4.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:deltree.")
 	}
 	
-	
-	err := os.RemoveAll(params[0].String())
+	info, err := os.Lstat(params[0].String())
 	if err != nil {
+		state.RetVal = nca4.NewValue(err.Error())
 		state.Error = true
+		return
 	}
+	if info.IsDir() {
+		err := os.RemoveAll(params[0].String())
+		if err != nil {
+			state.RetVal = nca4.NewValue(err.Error())
+			state.Error = true
+		}
+		return
+	}
+	state.RetVal = nca4.NewValue("File not a directory.")
+	state.Error = true
 	return
 }
 
 // Create a new directory.
 // 	file:newdir path
-// Returns unchanged. 
+// Returns unchanged or an error message. May set the Error flag.
 func CommandFile_NewDir(state *nca4.State, params []*nca4.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:newdir.")
@@ -71,6 +82,7 @@ func CommandFile_NewDir(state *nca4.State, params []*nca4.Value) {
 	
 	err := os.Mkdir(params[0].String(), 0600)
 	if err != nil {
+		state.RetVal = nca4.NewValue(err.Error())
 		state.Error = true
 	}
 	return
@@ -78,7 +90,7 @@ func CommandFile_NewDir(state *nca4.State, params []*nca4.Value) {
 
 // Delete a file.
 // 	file:del path
-// Returns unchanged. May set the Error flag.
+// Returns unchanged or an error message. May set the Error flag.
 func CommandFile_Del(state *nca4.State, params []*nca4.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:del.")
@@ -86,21 +98,24 @@ func CommandFile_Del(state *nca4.State, params []*nca4.Value) {
 	
 	info, err := os.Lstat(params[0].String())
 	if err != nil {
+		state.RetVal = nca4.NewValue(err.Error())
 		state.Error = true
 		return
 	}
 	if !info.IsDir() {
 		err := os.Remove(params[0].String())
 		if err != nil {
+			state.RetVal = nca4.NewValue(err.Error())
 			state.Error = true
 		}
 		return
 	}
+	state.RetVal = nca4.NewValue("File is a directory.")
 	state.Error = true
 	return
 }
 
-// Checks if a fileexists.
+// Checks if a file exists.
 // 	file:exists path
 // Returns 0 or -1.
 func CommandFile_Exists(state *nca4.State, params []*nca4.Value) {
@@ -180,7 +195,7 @@ func CommandFile_WalkFiles(state *nca4.State, params []*nca4.Value) {
 // 	file:walkdirs path code
 // Calles code (as a command) for every directory found:
 //	code path
-// Returns nil.
+// Returns nil or an error message. May set the Error flag.
 func CommandFile_WalkDirs(state *nca4.State, params []*nca4.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to file:walkdirs.")

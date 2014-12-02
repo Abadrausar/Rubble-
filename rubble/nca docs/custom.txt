@@ -1,10 +1,28 @@
 
 Causes a panic.
-
+	
 	panic value
 
 	Returns unchanged.
 
+Makes Rubble skip a file.
+	
+	rubble:skipfile name
+	
+	name is the file's BASE NAME not it's path!
+	Returns unchanged.
+	
+Set a Rubble variable.
+	
+	rubble:setvar name value
+	
+	Returns unchanged.
+
+Get the value of a Rubble variable.
+	
+	rubble:getvar name
+	
+	Returns the vlaue.
 
 Variables
 	rubble:outputdir

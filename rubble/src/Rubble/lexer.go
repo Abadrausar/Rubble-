@@ -1,6 +1,7 @@
 package main
 
 //import "fmt"
+import "strings"
 
 // Lexer states
 const (
@@ -23,17 +24,21 @@ type Lexer struct {
 func NewLexer(input string) *Lexer {
 	out := make(chan *Token)
 
+	// Brute force fix some char literals. Ugly, ugly, ugly, but it works.
+	input = strings.Replace(input, "';'", "{#_CHAR_DELIMITER}", -1)
+	input = strings.Replace(input, "'{'", "{#_CHAR_TAG_OPEN}", -1)
+	input = strings.Replace(input, "'}'", "{#_CHAR_TAG_CLOSE}", -1)
+	
 	go func() {
 		
 		token := tknString
 
 		state := stReadString
 		
-		lexeme := make([]rune, 0, 20)
+		lexeme := make([]byte, 0, 20)
 		commandDepth := 0
 
-		for _, val := range input {
-			
+		for _, val := range []byte(input) {
 			if val == ';' {
 				if state == stReadString || commandDepth > 0 {
 					lexeme = append(lexeme, val)

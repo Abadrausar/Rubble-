@@ -51,6 +51,10 @@ func SetupBuiltins() {
 	NewNativeTemplate("SHARED_ITEM", tempSharedItem)
 	
 	NewNativeTemplate("PANIC", tempPanic)
+	
+	NewNativeTemplate("#_CHAR_DELIMITER", tempCharDelimiter)
+	NewNativeTemplate("#_CHAR_TAG_OPEN", tempCharTagOpen)
+	NewNativeTemplate("#_CHAR_TAG_CLOSE", tempCharTagClose)
 }
 
 func tempTemplate(params []string) string {
@@ -162,7 +166,7 @@ func tempScript(params []string) string {
 	
 	rtn, err := GlobalNCAState.Run()
 	if err != nil {
-		panic("Script Error:" + err.Error())
+		panic("Script Error: " + err.Error())
 	}
 	
 	GlobalNCAState.Envs.Remove()
@@ -627,7 +631,7 @@ func tempRegisterReactionProduct(params []string) string {
 	
 	inorganic := params[0]
 	class := params[1]
-	mat := params[2]
+	mat := StageParse(params[2])
 	
 	if _, ok := reactionProductData[inorganic]; !ok {
 		reactionProductData[inorganic] = make([]*reactionProduct, 0, 5)
@@ -684,4 +688,16 @@ func tempPanic(params []string) string {
 	}
 	
 	panic(params[0])
+}
+
+func tempCharDelimiter(params []string) string {
+	return "';'"
+}
+
+func tempCharTagOpen(params []string) string {
+	return "'{'"
+}
+
+func tempCharTagClose(params []string) string {
+	return "'}'"
 }

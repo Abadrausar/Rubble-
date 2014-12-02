@@ -1,8 +1,6 @@
 	
 Rubble Template Documentation
 
-Template are about to go through a major rewrite, the stuff here is mostly leftovers from GoBlast.
-
 ==============================================
 {!TEMPLATE;<NAME>;<CODE>}
 {!TEMPLATE;<NAME>;<PARAM_1>;<PARAM_2>;...;<CODE>}

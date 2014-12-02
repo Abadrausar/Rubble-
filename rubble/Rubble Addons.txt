@@ -94,11 +94,15 @@ The standard base does not make use of item classes (yet)
 
 If you want to see another way to make the above addon look in "source/addons/__broken_arrow"
 
+Other random information:
+
+If you want to allow an item, reaction, or building with a minimum of fuss register it as class "ADDON_HOOK_MOUNTAIN". Addon hooks also exist for the other entities.
+
 SCRIPT Example:
-If you want to start with a fresh slate every time you generate just insert this template call into one of your raw files:
+If you want to start with a fresh slate every time you generate, just insert this template call into one of your raw files:
 WARNING! WARNING! THIS CODE WILL DELETE ALL FILES IN YOUR OUTPUT DIRECTORY
 
-{SCRIPT;
+{!SCRIPT;
 	(file:walkfiles [rubble:outputdir] {
 		(file:del (append [rubble:outputdir] "/" [params 0]))
 		(if (geterror) {
@@ -108,4 +112,5 @@ WARNING! WARNING! THIS CODE WILL DELETE ALL FILES IN YOUR OUTPUT DIRECTORY
 	})
 }
 
+see the "clear_raws" addon for an example.
 see "raw/rubble/nca docs" for basic documentation on all the nca commands.

@@ -43,6 +43,10 @@ func InitNCA() {
 	
 	state.NewNativeCommand("panic", CommandPanic)
 	
+	state.NewNativeCommand("rubble:skipfile", CommandRubble_SkipFile)
+	state.NewNativeCommand("rubble:setvar", CommandRubble_SetVar)
+	state.NewNativeCommand("rubble:getvar", CommandRubble_GetVar)
+	
 	GlobalNCAState = state
 }
 
@@ -55,4 +59,50 @@ func CommandPanic(state *nca4.State, params []*nca4.Value) {
 	}
 
 	panic(params[0].String())
+}
+
+// Makes Rubble skip a file.
+// 	rubble:skipfile name
+// name is the file's BASE NAME not it's path!
+// Returns unchanged.
+func CommandRubble_SkipFile(state *nca4.State, params []*nca4.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to rubble:skipfile.")
+	}
+
+	if _, ok := RawFiles[params[0].String()]; !ok {
+		panic("rubble:skipfile: \"" + params[0].String() + "\" is not the name of a loaded raw file.")
+	}
+	
+	RawFiles[params[0].String()].Skip = true
+}
+
+// Sets a Rubble variable.
+// 	rubble:setvar name value
+// Returns unchanged.
+func CommandRubble_SetVar(state *nca4.State, params []*nca4.Value) {
+	if len(params) != 2 {
+		panic("Wrong number of params to rubble:setvar.")
+	}
+	
+	if !varNameValidateRegEx.MatchString(params[0].String()) {
+		panic("Variable name supplied to rubble:setvar is invalid.")
+	}
+	
+	VariableData[params[0].String()] = params[1].String()
+}
+
+// Gets the value of a Rubble variable.
+// 	rubble:getvar name
+// Returns the vlaue.
+func CommandRubble_GetVar(state *nca4.State, params []*nca4.Value) {
+	if len(params) != 1 {
+		panic("Wrong number of params to rubble:getvar.")
+	}
+	
+	if _, ok := VariableData[params[0].String()]; !ok {
+		panic("Rubble variable " + params[0].String() + " does not exist.")
+	}
+	
+	state.RetVal = nca4.NewValue(VariableData[params[0].String()])
 }

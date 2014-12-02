@@ -1,9 +1,10 @@
 package main
 
 type RawFile struct {
-	Name string
+	Path string
 	Content string
 	Namespace string
+	Skip bool
 }
 
 var RawOrder = make([]string, 0, 100)

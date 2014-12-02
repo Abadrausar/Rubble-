@@ -3,7 +3,7 @@ Append two or more strings together.
 
 	append a b [c...]
 
-    Returns "0" or "-1"
+    Returns a string made up of all the params stuck together
 
 Format a string.
 

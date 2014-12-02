@@ -15,6 +15,7 @@ Pros:
 	Support for embeding scripts in raw files, do advanced setup right in the raws
 	Simple variable expansion, no more GET_VAR, works in any parse stage
 	Many templates for registering objects and the like are replacements for vanilla raw tags allowing better formating
+	Using scripting some files may be parsed but not included in the generated raws
 
 Cons:
 	Not compatible with any version of Blast
@@ -43,13 +44,15 @@ Now you are good to go! Documentation (as you have obviously discovered) is in t
 
 If you use OSX or linux, 32 bit binarys for these OSes can be found in the "raw/rubble" directory. If you want 64 bit binarys you can compile them yourself (or you can ask very, very nicly and I may do it for you ;) ).
 
+Docs for all NCA4 script commands are in "raw/rubble/nca docs", the file "NCA4.nca" is syntax/code examples.
+
 ==============================================
 Configure:
 ==============================================
 
 Rubble allows you to change its directory settings via command line options. To see these options and their defaults run "rubble -h". 
 
-If you want to use non-default settings most of the time the best thing to do is make a batch file something like this:
+If you want to use non-default settings more than once, the best thing to do is make a batch file something like this:
 	@rubble -outputdir="./objects" -configdir="./source" -basedir="./source/base" -addonsdir="./source/addons"
 	@pause
 
@@ -58,6 +61,18 @@ All directorys used by Rubble must exist (if they do not exist nothing bad will 
 ==============================================
 Changelog:
 ==============================================
+v1.2
+	Added rubble:skipfile NCA command
+	Added rubble:getvar NCA command
+	Added rubble:setvar NCA command
+	Made REGISTER_REACTION_PRODUCT parse it's material
+	Added addon tech and item hooks to entities
+	Made the lexer handle some char literals (';', '{', and '}')
+	Updated the base and addons to use the new abilities
+	Fixed some minor bugs in NCA4 and updated docs to match
+	Fixed bug that made files process in the wrong order
+	Stoped Rubble from mangling special chars
+
 v1.1
 	Added the NCA4 file system commands
 	Wrote a huge amount of docs

@@ -3,19 +3,19 @@ Delete a file.
 
 	file:del path
 
-    Returns unchanged. May set the Error flag.
+    Returns unchanged or an error message. May set the Error flag.
 
 Delete an empty directory.
 
 	file:deldir path
 
-    Returns unchanged. Sets the Error flag if dir is not empty.
+    Returns unchanged or an error message. May set the Error flag.
 
 Delete a directory and all sub dirs and files.
 
 	file:deltree path
 
-    Returns unchanged. Sets the Error flag if dir is not empty.
+    Returns unchanged or an error message. May set the Error flag.
 
 Check if a directory exists.
 
@@ -23,7 +23,7 @@ Check if a directory exists.
 
     Returns 0 or -1.
 
-Check if a fileexists.
+Check if a file exists.
 
 	file:exists path
 
@@ -33,7 +33,7 @@ Create a new directory.
 
 	file:newdir path
 
-    Returns unchanged.
+    Returns unchanged or an error message. May set the Error flag.
 
 Iterate over all the directories in a directory.
 
@@ -43,7 +43,7 @@ Iterate over all the directories in a directory.
 
 	code path
 
-    Returns nil.
+    Returns nil or an error message. May set the Error flag.
 
 Iterate over all the files in a directory.
 

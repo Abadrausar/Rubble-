@@ -1,8 +1,7 @@
-{VOID;
-{C; Templates used in the base
-This is surounded with a VOID tag to reduce post-generation file size}
 
-{C; Note that keep the output properly formatted templates often have ugly indentation}
+Templates used in the base
+
+Note that to keep the output properly formatted templates often have ugly indentation
 
 {!TEMPLATE;ANIMAL_MAT;
 	{IF;$GENERIC_ANIMAL_MATS;YES;
@@ -27,4 +26,4 @@ This is surounded with a VOID tag to reduce post-generation file size}
 	}
 }
 
-}
+{!SCRIPT;(rubble:skipfile "base_templates")}
