@@ -41,7 +41,7 @@ func Setup(state *raptor.State) {
 // Returns file contents or an error message. May set the Error flag.
 func CommandFileIO_Read(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to fileio:read.")
+		panic(script.BadParamCount("1"))
 	}
 
 	file, err := ioutil.ReadFile(params[0].String())
@@ -58,7 +58,7 @@ func CommandFileIO_Read(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged or an error message. May set the Error flag.
 func CommandFileIO_Write(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to fileio:write.")
+		panic(script.BadParamCount("2"))
 	}
 
 	// I have no idea what "0600" means but I saw it in an example.

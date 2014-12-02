@@ -1,0 +1,25 @@
+[OBJECT:CREATURE]
+
+[CREATURE:LIBS_CRATES_CREATURE]
+	[NAME:::]
+	
+	{#SCRIPT;
+		(var out "")
+		(foreach [rubble:libs_crates:data] {
+			(str:add
+				[out] "\n\n"
+				"\t[USE_MATERIAL_TEMPLATE:" [params 0] ":CRATE_TEMPLATE]\n"
+				"\t\t[STATE_NAME_ADJ:ALL_SOLID:" [[params 1] name] " crate]\n"
+				"\t\t[STATE_NAME_ADJ:LIQUID:melted " [[params 1] name] " crate]\n"
+				"\t\t[STATE_NAME_ADJ:GAS:boiling " [[params 1] name] " crate]\n"
+				"\t\t[PREFIX:NONE]\n"
+				"\t\t[MATERIAL_VALUE:" [[params 1] value] "]"
+			)
+			(set out (nop))
+			(break -1)
+		})
+		(str:trimspace [out])
+	}
+	
+	[ARENA_RESTRICTED]
+	[DOES_NOT_EXIST]

@@ -257,7 +257,7 @@ func (this *Value) Int64() int64 {
 	panic("Int64: Script Value has invalid Type.")
 }
 
-// Int64 converts a Value to an int64.
+// Float64 converts a Value to an float64.
 // Objects and invalid strings are always 0.0.
 func (this *Value) Float64() float64 {
 	switch this.Type {

@@ -25,9 +25,10 @@ package main
 import "sort"
 
 // Update this!
-var RubbleVersion = "3.8"
+var RubbleVersion = "3.9"
 var RubbleCompat = map[string]bool{
 	"3.8": true,
+	"3.9": true,
 }
 
 // All the addons are loaded to here.

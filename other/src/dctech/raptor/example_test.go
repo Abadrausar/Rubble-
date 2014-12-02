@@ -17,8 +17,8 @@ func Example() {
 
 	// Add the program code to the script.
 	script.Code.AddString(`
-	# nothing for now....
-	`, raptor.NewPosition(37, 28, "example_test.go"))
+	# nothing for now... (as we have no commands loaded)
+	`, raptor.NewPosition(19, 28, "example_test.go"))
 
 	// Run!
 	// Note that Run removes the code it executes from the BlockStore 

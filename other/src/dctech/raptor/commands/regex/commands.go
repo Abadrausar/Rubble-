@@ -39,7 +39,7 @@ func Setup(state *raptor.State) {
 // Returns input with all strings matching regex replaced with replace.
 func CommandRegEx_Replace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 3 {
-		panic("Wrong number of params to regex:replace.")
+		panic(script.BadParamCount("3"))
 	}
 
 	regEx := regexp.MustCompile(params[0].String())

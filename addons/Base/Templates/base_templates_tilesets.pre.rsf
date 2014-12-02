@@ -150,7 +150,7 @@
 	(if (exists [rubble:init_defaults] [setting]) {
 		(set [rubble:init_settings] [setting] [value])
 	}{
-		(panic "Attempt to use invalid init setting, only tileset related settings allowed.")
+		(rubble:abort "Error: Attempt to use invalid init setting, only tileset related settings allowed.")
 	})
 	
 	(ret "")

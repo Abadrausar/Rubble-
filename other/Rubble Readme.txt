@@ -137,6 +137,11 @@ Generic Animal Mats:
 	Make animal mats such as meat and leather generic. This is mostly for those who have FPS issues.
 	This addon is packed as a zip to demo how that is done.
 
+Libs/Crates:
+	Adds infrastructure for "crates", eg bars that can be bought from caravans and then "unpacked" via special reactions into items.
+	This templates added by this addon are always available (even when the addon is not active). If the addon is not active then the templates will not actually do anything.
+	The main reason for having always active templates is so that adding crate support in many addons is very easy.
+
 Libs/DFHack/Add Reaction:
 	Allows you to add reactions to buildings that are normally not possible to add reactions to, also allows you to remove all hardcoded reactions from a building.
 	Requires the "Base/Templates" addon.
@@ -146,6 +151,7 @@ Libs/DFHack/Announcement:
 	This addon is a modders resource for displaying announcements to the player.
 	Requires "Libs/DFHack/Command".
 	This addon also provides a Raptor command for advanced usage.
+	This templates added by this addon are always available (even when the addon is not active). If the addon is not active then the templates will not actually do anything.
 
 Libs/DFHack/Command:
 	This addon is a modders resource for running DFHack commands from reactions.
@@ -179,7 +185,7 @@ Zap Aquifers:
 	This addon is stand-alone, as it uses no outside templates.
 
 ==============================================
-BUGS:
+BUGS (and other issues):
 ==============================================
 
 Known Issues (non-bug):
@@ -189,9 +195,25 @@ Known Issues (non-bug):
 When making an error report please post the FULL log file! Posting just a few line tells me almost nothing about the problem, after all I made Rubble write all that stuff for a reason :)
 If you really want to be helpful run "rubble -norecover" and post that log IN ADDITION TO the normal log. To do this from the GUI just add "-norecover" to the "Extra options" box at the bottom.
 
+If any of the documentation is not 100% clear just ask. 
+I know everything there is to know about how Rubble works and so I tend to forget to put 
+"obvious" stuff in the docs. A reminder that I forgot something is more a help than a hindrance.
+
 ==============================================
 Changelog:
 ==============================================
+v3.9
+	Fixed lots of cases where Raptor error handlers still used panic, oops.
+	Updated some of the docs.
+	Moved "Libs/Crates" from BD2 to Rubble.
+	Changed "Libs/Crates" to use "always active" templates.
+	Changed "Libs/DFHack/Announcement" to use "always active" templates.
+		"always active" templates are always available, they just return a placeholder string when the addon is not active.
+	"Libs/DFHack/Command" now adds [SPECIAL] to it's generated inorganics.
+		This should stop command stone FBs from generating.
+	Added rubble:placeholder to help with creating always active templates.
+	Updated to Raptor 3.1, this includes only minor changes and bug fixes.
+
 v3.8
 	Updated to Raptor 3.0
 		This update is strictly an internal refactoring, no commands have changed.

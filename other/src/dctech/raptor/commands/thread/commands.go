@@ -51,7 +51,7 @@ func Setup(state *raptor.State) {
 // Returns unchanged.
 func CommandThread_New(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 1 {
-		panic("Wrong number of params to thread:new.")
+		panic(script.BadParamCount(">=1"))
 	}
 	
 	scr := raptor.NewScript()
@@ -75,7 +75,7 @@ func CommandThread_New(script *raptor.Script, params []*raptor.Value) {
 // Returns the new channel.
 func CommandThread_Channel(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
-		panic("Wrong number of params to thread:channel.")
+		panic(script.BadParamCount("0 or 1"))
 	}
 	
 	if len(params) == 0 {
@@ -93,11 +93,11 @@ func CommandThread_Channel(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged.
 func CommandThread_Send(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to thread:send.")
+		panic(script.BadParamCount("2"))
 	}
 	
 	if _, ok := params[0].Data.(chan *raptor.Value); !ok {
-		panic("thread:send's Param 0 is not a channel.")
+		panic(script.GeneralCmdError("Parameter 0 is not a channel."))
 	}
 	channel := params[0].Data.(chan *raptor.Value)
 	channel <- params[1]
@@ -111,11 +111,11 @@ func CommandThread_Send(script *raptor.Script, params []*raptor.Value) {
 // Returns the received value.
 func CommandThread_Receive(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to thread:receive.")
+		panic(script.BadParamCount("1"))
 	}
 	
 	if _, ok := params[0].Data.(chan *raptor.Value); !ok {
-		panic("thread:receive's Param 0 is not a channel.")
+		panic(script.GeneralCmdError("Parameter 0 is not a channel."))
 	}
 	channel := params[0].Data.(chan *raptor.Value)
 	script.RetVal = <-channel
@@ -127,12 +127,12 @@ func CommandThread_Receive(script *raptor.Script, params []*raptor.Value) {
 // 	thread:close channel
 // Returns unchanged.
 func CommandThread_Close(script *raptor.Script, params []*raptor.Value) {
-	if len(params) != 2 {
-		panic("Wrong number of params to thread:close.")
+	if len(params) != 1 {
+		panic(script.BadParamCount("1"))
 	}
 	
 	if _, ok := params[0].Data.(chan *raptor.Value); !ok {
-		panic("thread:close's Param 0 is not a channel.")
+		panic(script.GeneralCmdError("Parameter 0 is not a channel."))
 	}
 	channel := params[0].Data.(chan *raptor.Value)
 	close(channel)

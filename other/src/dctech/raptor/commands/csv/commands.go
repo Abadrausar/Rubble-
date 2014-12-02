@@ -42,7 +42,7 @@ func Setup(state *raptor.State) {
 // Returns the csv file or an error message. May set the Error flag.
 func CommandCsv_Parse(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to csv.parse.")
+		panic(script.BadParamCount("1"))
 	}
 
 	csvreader := bytes.NewBuffer([]byte(params[0].String()))

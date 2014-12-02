@@ -83,7 +83,7 @@ func (this IndexableRaws) Keys() []string {
 }
 
 func (this IndexableRaws) String() string {
-	return raptor.GenericIndexableToString("rubble:Raws", this)
+	return raptor.GenericIndexableToString("rubble:raws", this)
 }
 
 func (this IndexableRaws) CodeString() string {

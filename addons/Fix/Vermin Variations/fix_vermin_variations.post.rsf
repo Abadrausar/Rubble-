@@ -125,7 +125,7 @@
 			})
 			
 		}{
-			(panic "invalid param count to CREATURE_VARIATION raw tag in c_variation_default.txt")
+			(rubble:abort "Error: invalid param count to CREATURE_VARIATION raw tag in c_variation_default.txt")
 		})
 	})
 	

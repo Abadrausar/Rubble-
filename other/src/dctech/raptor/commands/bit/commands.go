@@ -49,7 +49,7 @@ func Setup(state *raptor.State) {
 // Returns the param shifted "count" places
 func CommandBit_LShift(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 && len(params) != 2 {
-		panic("Wrong number of params to bit:lshift.")
+		panic(script.BadParamCount("1 or 2"))
 	}
 
 	opp2 := uint64(1)
@@ -72,7 +72,7 @@ func CommandBit_LShift(script *raptor.Script, params []*raptor.Value) {
 // Returns the param shifted "count" places
 func CommandBit_RShift(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 && len(params) != 2 {
-		panic("Wrong number of params to bit:rshift.")
+		panic(script.BadParamCount("1 or 2"))
 	}
 
 	opp2 := uint64(1)
@@ -94,7 +94,7 @@ func CommandBit_RShift(script *raptor.Script, params []*raptor.Value) {
 // Returns a & b
 func CommandBit_And(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to bit:and.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(params[0].Int64() & params[1].Int64())
@@ -106,7 +106,7 @@ func CommandBit_And(script *raptor.Script, params []*raptor.Value) {
 // Returns a | b
 func CommandBit_Or(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to bit:or.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(params[0].Int64() | params[1].Int64())
@@ -118,7 +118,7 @@ func CommandBit_Or(script *raptor.Script, params []*raptor.Value) {
 // Returns a ^ b
 func CommandBit_Xor(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to bit:xor.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(params[0].Int64() ^ params[1].Int64())
@@ -130,7 +130,7 @@ func CommandBit_Xor(script *raptor.Script, params []*raptor.Value) {
 // Returns a ^ -1
 func CommandBit_Not(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to bit:not.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(params[0].Int64() ^ -1)

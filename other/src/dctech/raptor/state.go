@@ -84,7 +84,6 @@ func (this *State) NewNativeCommand(name string, handler NativeCommand) {
 	space, itemname := this.ParseName(name)
 	
 	rtn := new(Command)
-	rtn.Native = true
 	rtn.Handler = handler
 	
 	if space != nil {
@@ -101,7 +100,7 @@ func (this *State) NewUserCommand(name string, code *Value, params []*Value) {
 	rtn.Code = code.Code()
 
 	if params == nil {
-		rtn.VarParams = true
+		rtn.Params = nil
 	} else {
 		for _, val := range params {
 			rtn.Params = append(rtn.Params, val.String())
@@ -262,18 +261,11 @@ func (this *State) RunCommand(script *Script, command string, params ...*Value) 
 		}
 		
 		// Normal Cleanup
-		script.Code.Clear()
-		script.Envs.Clear()
-		script.Host = nil
-		//script.RetVal = NewValue()
-		script.This = NewValue()
-		script.Exit = false
-		script.Return = false
-		script.Break = false
-		script.BreakLoop = false
+		script.ClearMost()
 	}()
 
-	this.GetCommand(command).Call(script, params)
+	
+	this.GetCommand(command).Call(command, script, params)
 	return // Required :(
 }
 
@@ -304,15 +296,7 @@ func (this *State) Run(script *Script) (ret *Value, err error) {
 		}
 		
 		// Normal Cleanup
-		script.Code.Clear()
-		script.Envs.Clear()
-		script.Host = nil
-		//script.RetVal = NewValue()
-		script.This = NewValue()
-		script.Exit = false
-		script.Return = false
-		script.Break = false
-		script.BreakLoop = false
+		script.ClearMost()
 	}()
 
 	script.Exec()
@@ -320,7 +304,7 @@ func (this *State) Run(script *Script) (ret *Value, err error) {
 }
 
 // RunShell executes a Raptor script, but does not completely clear the environment.
-// You must NEVER, NEVER, NEVER nest calls to Run unless you make the nested calls with a new Script.
+// You must NEVER, NEVER, NEVER nest calls to RunShell unless you make the nested calls with a new Script.
 func (this *State) RunShell(script *Script) (ret *Value, err error) {
 	// Most of this function is identical to RunCommand
 	// It's just easier to copy than refactor
@@ -346,15 +330,7 @@ func (this *State) RunShell(script *Script) (ret *Value, err error) {
 		}
 		
 		// Normal Cleanup
-		script.Code.Clear()
-		script.Envs.ClearAllButRoot()
-		script.Host = nil
-		//script.RetVal = NewValue()
-		script.This = NewValue()
-		script.Exit = false
-		script.Return = false
-		script.Break = false
-		script.BreakLoop = false
+		script.ClearSome()
 	}()
 
 	script.Exec()

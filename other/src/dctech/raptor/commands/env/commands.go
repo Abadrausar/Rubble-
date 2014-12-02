@@ -49,7 +49,7 @@ func Setup(state *raptor.State) {
 // Returns unchanged.
 func CommandEnv_Exec(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 1 {
-		panic("Wrong number of params to env:exec.")
+		panic(script.BadParamCount(">1"))
 	}
 
 	strparams := make([]string, len(params)-1)
@@ -78,7 +78,7 @@ func CommandEnv_Exec(script *raptor.Script, params []*raptor.Value) {
 // Returns the variables value.
 func CommandEnv_GetVar(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to getenv.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueString(os.Getenv(params[0].String()))
@@ -89,7 +89,7 @@ func CommandEnv_GetVar(script *raptor.Script, params []*raptor.Value) {
 // Returns the old value.
 func CommandEnv_SetVar(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to setenv.")
+		panic(script.BadParamCount("2"))
 	}
 	rtn := raptor.NewValueString(os.Getenv(params[0].String()))
 	err := os.Setenv(params[0].String(), params[1].String())
@@ -116,7 +116,7 @@ func CommandEnv_GetWD(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged.
 func CommandEnv_SetWD(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to env:setwd.")
+		panic(script.BadParamCount("1"))
 	}
 
 	err := syscall.Chdir(params[0].String())

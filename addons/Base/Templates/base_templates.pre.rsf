@@ -301,7 +301,7 @@
 # Tech Templates
 (var rubble:building_data <map>)
 (rubble:template "BUILDING_WORKSHOP" ... {
-	(if (int:lt (len [params]) 2){(panic "Invalid param count to BUILDING_WORKSHOP.")})
+	(if (int:lt (len [params]) 2){(rubble:abort "Error: Invalid param count to BUILDING_WORKSHOP.")})
 	
 	(var id [params 0])
 	(for {(var count 1)}{(int:lt [count] (len [params]))}{(++ count)}{
@@ -317,7 +317,7 @@
 	(str:add "[BUILDING_WORKSHOP:" [id] "]")
 })
 (rubble:template "BUILDING_FURNACE" ... {
-	(if (int:lt (len [params]) 2){(panic "Invalid param count to BUILDING_FURNACE.")})
+	(if (int:lt (len [params]) 2){(rubble:abort "Error: Invalid param count to BUILDING_FURNACE.")})
 	
 	(var id [params 0])
 	(for {(var count 1)}{(int:lt [count] (len [params]))}{(++ count)}{
@@ -333,7 +333,7 @@
 	(str:add "[BUILDING_FURNACE:" [id] "]")
 })
 (rubble:template "#USES_BUILDINGS" ... {
-	(if (int:lt (len [params]) 1){(panic "Invalid param count to #USES_BUILDINGS.")})
+	(if (int:lt (len [params]) 1){(rubble:abort "Error: Invalid param count to #USES_BUILDINGS.")})
 	
 	(var buildings <map>)
 	(var buildingnames <array>)
@@ -363,7 +363,7 @@
 
 (var rubble:reaction_data <map>)
 (rubble:template "REACTION" ... {
-	(if (int:lt (len [params]) 2){(panic "Invalid param count to REACTION.")})
+	(if (int:lt (len [params]) 2){(rubble:abort "Error: Invalid param count to REACTION.")})
 	
 	(var id [params 0])
 	(for {(var count 1)}{(int:lt [count] (len [params]))}{(++ count)}{
@@ -379,7 +379,7 @@
 	(str:add "[REACTION:" [id] "]")
 })
 (rubble:template "#USES_REACTIONS" ... {
-	(if (int:lt (len [params]) 1){(panic "Invalid param count to #USES_REACTIONS.")})
+	(if (int:lt (len [params]) 1){(rubble:abort "Error: Invalid param count to #USES_REACTIONS.")})
 	
 	(var reactions <map>)
 	(var reactionnames <array>)
@@ -408,7 +408,7 @@
 })
 
 (rubble:template "#USES_TECH" ... {
-	(if (int:lt (len [params]) 1){(panic "Invalid param count to #USES_TECH.")})
+	(if (int:lt (len [params]) 1){(rubble:abort "Error: Invalid param count to #USES_TECH.")})
 	
 	(var buildings <map>)
 	(var buildingnames <array>)
@@ -494,7 +494,7 @@
 	
 	(if (exists [rubble:item_types] [type]){
 	}{
-		(panic "Invalid item type passed to SHARED_ITEM.")
+		(rubble:abort "Error: Invalid item type passed to SHARED_ITEM.")
 	})
 	
 	(regex:replace "\\[TILE:([0-9]+|'.')\\]" [def] (str:add "[TILE:{#TILE;" [id] ";$1}]"))
@@ -534,7 +534,7 @@
 					(set class [params 2])
 					(set rarity [params 3])
 				}{
-					(panic "Invalid param count to ITEM_CLASS.")
+					(rubble:abort "Error: Invalid param count to ITEM_CLASS.")
 				})
 			})
 			
@@ -543,7 +543,7 @@
 	
 	(if (exists [rubble:item_rarities] [rarity]){
 	}{
-		(panic "Invalid item rarity passed to ITEM_CLASS.")
+		(rubble:abort "Error: Invalid item rarity passed to ITEM_CLASS.")
 	})
 	
 	(if (exists [rubble:item_data] [class]){

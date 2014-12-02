@@ -1,4 +1,13 @@
 
+v3.1
+	Fixed base:map not returning nil for bad keys.
+	Added functions for clearing the script (mostly for use by the state)
+	Added support for getting the name of the currently running native command.
+		Note that this is not 100%, there are specific cases where this will not work
+		(namely for nested commands it will only work for the last one called)
+	Added error message generators for use by native commands.
+	Changed all native commands to use new error generators.
+
 v3.0
 	The great refactoring!
 	Position info should be at least a little more accurate.

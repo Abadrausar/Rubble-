@@ -41,6 +41,13 @@
 
 # Rubble specific commands
 
+# Placeholder template generator.
+(command rubble:placeholder name {
+	(rubble:template [name] ... {
+		"Library template addon disabled."
+	})
+})
+
 # Dependency checks
 
 (command rubble:requireaddon me addon {

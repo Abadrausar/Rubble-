@@ -6,7 +6,7 @@
 # pass in an array of the command name followed by any params, including special autosyndrome commands if you want.
 (command rubble:libs_dfhack_command:getmat params {
 	(if (int:lt (len [params]) 1) {
-		(panic "Wrong param count to rubble:libs_dfhack_command:getmat")
+		(rubble:abort "Error: Wrong param count to rubble:libs_dfhack_command:getmat")
 	})
 	
 	(var id "")
@@ -19,6 +19,7 @@
 		(set [rubble:libs_dfhack_command:mats] [id] (str:add
 			"[INORGANIC:DFHACK_COMMAND" [id] "]\n"
 			"\t[USE_MATERIAL_TEMPLATE:COMMAND_STONE_TEMPLATE]\n"
+			"\t[SPECIAL]\n"
 			"\t[SYNDROME]\n"
 			"\t\t[SYN_CLASS:\\COMMAND]\n"
 		))

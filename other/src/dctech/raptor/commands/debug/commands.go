@@ -111,7 +111,7 @@ func CommandDebug_Shell(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged.
 func CommandDebug_Value(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to debug:value.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.Println("+-------------------------------------------+")
@@ -198,7 +198,7 @@ func CommandDebug_List(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged.
 func CommandDebug_NameSpace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to debug:namespace.")
+		panic(script.BadParamCount("1"))
 	}
 
 	namespace := script.ParseNameSpaceName(params[0].String())

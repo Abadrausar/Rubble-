@@ -50,7 +50,7 @@ func Setup(state *raptor.State) {
 // Returns the values type.
 func CommandConvert_Type(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to convert:int.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueString(params[0].TypeString())
@@ -62,7 +62,7 @@ func CommandConvert_Type(script *raptor.Script, params []*raptor.Value) {
 // Returns the converted value.
 func CommandConvert_Int(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to convert:int.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(params[0].Int64())
@@ -74,7 +74,7 @@ func CommandConvert_Int(script *raptor.Script, params []*raptor.Value) {
 // Returns the converted value.
 func CommandConvert_Float(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to convert:float.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueFloat64(params[0].Float64())
@@ -86,7 +86,7 @@ func CommandConvert_Float(script *raptor.Script, params []*raptor.Value) {
 // Returns the converted value.
 func CommandConvert_Bool(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to convert:bool.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueBool(params[0].Bool())
@@ -98,7 +98,7 @@ func CommandConvert_Bool(script *raptor.Script, params []*raptor.Value) {
 // Returns the converted value.
 func CommandConvert_String(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to convert:string.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueString(params[0].String())
@@ -110,7 +110,7 @@ func CommandConvert_String(script *raptor.Script, params []*raptor.Value) {
 // Returns the converted value.
 func CommandConvert_Command(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to convert:command.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueCommand(params[0].String())
@@ -122,7 +122,7 @@ func CommandConvert_Command(script *raptor.Script, params []*raptor.Value) {
 // Returns a properly escaped string representaion of value.
 func CommandConvert_Escape(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to convert:escape.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueString(params[0].CodeString())

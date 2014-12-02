@@ -1,0 +1,54 @@
+
+Future Plans and General ToDo List
+
+==============================================
+Ideas
+==============================================
+
+Default Command Parameters:
+	Default parameters would be VERY useful sometimes, but currently there is no support for such a thing.
+	Basically this would require a slight extension to the Command type and the "command" base command (plus the needed supports in Script and State)
+
+Error Handling:
+	A safer version of the trap command would allow for better error handling, currently the main problem is that
+	the state and/or script may be royally messed up after trap returns as the normal cleanup code MUST
+	be bypassed for trap to work.
+	If there was some way to make errors a little less "fatal" to the script (or at least an effort to 
+	separate those that are truly unrecoverable from the merely very bad).
+	Basically there needs to be a way to signal if the script or state are messed up or not (if such cases can be detected).
+	This goal is probably impossible (or at least not worth the effort)
+
+Debugger:
+	Once upon a time I had debugging hooks, but they were (almost) useless so I removed them.
+	Redo the debugger with a proper API
+	Hooks Needed:
+		Lots.
+	API:
+		Name			Description
+		Step			Step to the next item of any kind
+		StepOver		Step to the beginning of the next item on the same level as the current item
+		StepIn			Step to the beginning of the next item on a lower level from the current item
+		StepOut			Step to the beginning of the next item on a higher level from the current item
+		Break			Stop at the first item on a specified line
+	
+	The debugger will need the following controls:
+		An interactive console (implemented as a raptor console probably)
+			The console will need commands to control stepping and breakpoints (in the debug namespace most likely)
+			The normal Raptor console will not work (without a rewrite anyway)
+		A control file listing preset breakpoints
+			Maybe use Raptor, this would mean that the control file is "free"
+				(debug:breakpoints
+					123
+					456
+				)
+	This is sort-of a long term goal, as pretty good debugging is possible via debug:shell (but loops are hell...)
+
+==============================================
+Random Rambles
+==============================================
+
+Distributed Scanner
+	I could possibly gain some speed by ditching the traditional scanner/tokenizer, going with a more distributed system instead.
+		The main issue I can see would be Code objects, distributed scanning may not work with the current CodeSource system.
+		It may be possible to rewrite raptor to use a "compiler" that would reduce the source first, the main issue with such a system would be that it would be very hard (if not impossible) to separate normal strings from identifiers.
+			If classifying strings proved to be too hard I would just be adding overhead for no real gain.

@@ -50,7 +50,7 @@ func Setup(state *raptor.State) {
 // Returns a + b
 func CommandFloat_Add(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to float:add.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueFloat64(params[0].Float64() + params[1].Float64())
@@ -62,7 +62,7 @@ func CommandFloat_Add(script *raptor.Script, params []*raptor.Value) {
 // Returns a - b
 func CommandFloat_Sub(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to float:sub.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueFloat64(params[0].Float64() - params[1].Float64())
@@ -74,7 +74,7 @@ func CommandFloat_Sub(script *raptor.Script, params []*raptor.Value) {
 // Returns a / b
 func CommandFloat_Div(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to float:div.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueFloat64(params[0].Float64() / params[1].Float64())
@@ -86,7 +86,7 @@ func CommandFloat_Div(script *raptor.Script, params []*raptor.Value) {
 // Returns a * b
 func CommandFloat_Mul(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to float:mul.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueFloat64(params[0].Float64() * params[1].Float64())
@@ -98,7 +98,7 @@ func CommandFloat_Mul(script *raptor.Script, params []*raptor.Value) {
 // Returns true or false.
 func CommandFloat_Gt(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to float:gt.")
+		panic(script.BadParamCount("2"))
 	}
 
 	result := params[0].Float64() > params[1].Float64()
@@ -114,7 +114,7 @@ func CommandFloat_Gt(script *raptor.Script, params []*raptor.Value) {
 // Returns true or false.
 func CommandFloat_Lt(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to float:lt.")
+		panic(script.BadParamCount("2"))
 	}
 
 	result := params[0].Float64() < params[1].Float64()
@@ -130,7 +130,7 @@ func CommandFloat_Lt(script *raptor.Script, params []*raptor.Value) {
 // Returns true or false.
 func CommandFloat_Eq(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to float:eq.")
+		panic(script.BadParamCount("2"))
 	}
 
 	result := params[0].Float64() == params[1].Float64()

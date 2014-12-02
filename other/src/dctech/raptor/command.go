@@ -7,44 +7,38 @@ package raptor
 // NativeCommand is the function signature for a native command handler.
 type NativeCommand func(*Script, []*Value)
 
-// TODO: Add support for default params.
-
 // A Command stores a native or user script command. Used by State and NameSpace.
 type Command struct {
-	// Is this a native command?
-	Native bool
-
-	// The native command handler
+	// The native command handler, if non-nil all other fields are ignored.
 	Handler NativeCommand
 
-	// The user command code,
+	// The user command code.
 	Code *Code
 
-	// Does this user command have a variable number of params?
-	VarParams bool
-
-	// Param names for user commands
+	// Parameter names, if this is nil the command has a variable parameter count.
 	Params []string
 }
 
 // Call runs a command.
-func (this *Command) Call(script *Script, params []*Value) {
+func (this *Command) Call(name string, script *Script, params []*Value) {
 	// Native command
-	if this.Native {
+	if this.Handler != nil {
+		script.RunningCmd = name
 		this.Handler(script, params)
+		script.RunningCmd = ""
 		return
 	}
 
 	// User command
-	if !this.VarParams {
+	if this.Params != nil {
 		if len(this.Params) != len(params) {
-			panic("Invalid param count to user command.")
+			panic("Invalid param count to user command:" + name + ".")
 		}
 	}
 
 	script.Envs.Add(NewEnvironment())
 
-	if !this.VarParams {
+	if this.Params != nil {
 		for i := range this.Params {
 			script.NewVar(this.Params[i], params[i])
 		}

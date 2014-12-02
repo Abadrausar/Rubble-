@@ -42,7 +42,7 @@ func Setup(state *raptor.State) {
 // Returns a && b
 func CommandBool_And(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to bool:and.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueBool(params[0].Bool() && params[1].Bool())
@@ -54,7 +54,7 @@ func CommandBool_And(script *raptor.Script, params []*raptor.Value) {
 // Returns a || b
 func CommandBool_Or(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to bool:or.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueBool(params[0].Bool() || params[1].Bool())
@@ -66,7 +66,7 @@ func CommandBool_Or(script *raptor.Script, params []*raptor.Value) {
 // Returns !a
 func CommandBool_Not(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to bool:not.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueBool(!params[0].Bool())

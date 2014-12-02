@@ -48,7 +48,7 @@ func (this ScriptMap) Get(index string) *raptor.Value {
 	if _, ok := this[index]; ok {
 		return this[index]
 	}
-	return raptor.NewValueInt64(0)
+	return raptor.NewValue()
 }
 
 func (this ScriptMap) Set(index string, value *raptor.Value) bool {

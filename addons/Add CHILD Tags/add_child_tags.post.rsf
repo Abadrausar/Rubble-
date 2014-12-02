@@ -38,7 +38,7 @@
 					(set curCreature [tag 0])
 					(set haschild false)
 				}{
-					(panic "invalid param count to CREATURE raw tag in last file.")
+					(rubble:abort "Error: invalid param count to CREATURE raw tag in last file.")
 				})
 			})
 			
@@ -113,7 +113,7 @@
 						(++ fixedcount)
 					})
 				}{
-					(panic "invalid param count to CREATURE raw tag in last file.")
+					(rubble:abort "Error: invalid param count to CREATURE raw tag in last file.")
 				})
 			})
 			

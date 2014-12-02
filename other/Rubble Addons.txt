@@ -125,12 +125,15 @@ Pitfalls to keep in mind:
 		To put it simply, you can't. Or rather you can, but Rubble will crash with an error on the next iteration. Remember to declare your variables ahead of time and if you REALLY don't want them around after the loop exits just delvar them away or surround the whole mess in a call to evalinnew.
 
 ==============================================
-FInitialization Scripts:
+Initialization Scripts:
 ==============================================
 
 Init scripts are very limited, but also very useful. Basically they are Raptor scripts that ALWAYS run, even when their containing addon is not active.
 Forced init scripts have the extension ".init.rsf" (or .rbf, .rsf takes precedence).
 Use init scripts to do setup that may be shared by multiple addons and HAS to be done. For example an excellent use for a forced init script is adding namespaces and global variables shared by a bunch of addons in an addon pack.
+
+Another fine use of init scripts is "always active" templates, basically you add a template stub in an init script an the override it with a full version in a pre tweak script. This way clients of your addon can just assume that your addon's template are present allowing you to skip checking to see if it is active. 
+(please note that you really only want to do this within an addon pack so that you can be sure the other addon is installed)
 
 Init scripts have a very narrow use-case and should be used with care.
 
@@ -180,7 +183,7 @@ So why do you (the modder) need to know all this? To put it simply you need to k
 
 Do you want to use multiple small addons or just one large one? Do you want all of your mod's addons in one large directory, or do you want to group related things together? These decisions are important part of deciding how you want to package your mod and how you want the addon list presented to users.
 
-For example Better Dorfs, a mod of mine, groups all of its addons into the "Better Dorfs" addon. This means that users see, for example the Saurians addon, as "Better Dorfs/Saurians". If I was to add a saurian specific addon I would probably put the new addon in "Better Dorfs/Saurians/<new addon name>". This grouping helps make it obvious what goes with what, making the lives of your users a little more pleasant.
+For example Better Dorfs, a mod of mine, groups all of its addons into the "Better Dorfs" addon. This means that users see, for example the Saurians addon, as "Better Dorfs/Saurians". When I add a saurian specific addon I put the new addon in "Better Dorfs/Saurians/<new addon name>". This grouping helps make it obvious what goes with what, making the lives of your users a little more pleasant.
 
 ==============================================
 Other Random Information:
@@ -193,10 +196,11 @@ Example:
 	{!TEMPLATE;E;
 		{ECHO;...}
 	}
-If Rubble finds a template call where the last param is ... it appends the params from the previous template call to the current template's params. This trick is good for aliases.
+If Rubble finds a template call where the last param is ... it appends the params from the previous template call to the current template's params. This trick is good for aliases and the like.
 
 There is no check for infinite recursion, so make sure you never recurse without breaking out at some point (unless you want to cause an infinite loop and eat all your memory until Rubble crashes). 
 The reason there is no recursion check is that there are valid reasons to have deep recursion, and any infinite loops created by recursion like this are errors that should caught in testing. If you are too lazy to do proper testing it is not my job to hold your hand, plus just how many programming languages have you used that had such a check? 
 
-If any of the documentation is not 100% clear just ask. I know everything there is to know about how Rubble works and so I tend to forget to put "obvious" stuff in the docs. A reminder that I forgot something is more a help than a hindrance.
-But please don't ask for help until you have read everything!
+The Raptor command documentation is automatically generated every time I build Rubble, this make it easy for me to keep everything up to date, but the formatting leaves much to be desired.
+The problem is that the app that generates the docs is made for go programmers, not Raptor programmers, so a lot of information that has nothing to do with the commands makes it's way to these docs.
+Sometime when I'm really bored I need to write a program to automatically reformat these files ;)

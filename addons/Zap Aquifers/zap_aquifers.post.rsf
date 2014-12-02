@@ -15,7 +15,7 @@
 			(if (raw:valid [file]){}{(breakloop false)})
 			
 			(if (str:cmp [tag id] "AQUIFER") {
-				(raw:disable)
+				(raw:disable [file])
 				(++ aquifercount)
 			})
 			

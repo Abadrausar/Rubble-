@@ -23,7 +23,14 @@ type Script struct {
 	Envs       *EnvStore    // The script environments, you should not need to touch this.
 	Code       *BlockStore  // This is where script code is stored.
 	Output     io.Writer    // Normally set to nil (in which case the global value is used)
-	Host       *State
+	Host       *State       // Set to nil unless this Script is being run, then it is the host State.
+	
+	// Set to "" unless a _NATIVE_ command is running, then it is the string command name. 
+	// Note that if another native command is called by a native command (eg in loop commands) this value can 
+	// get trashed (for the first command). This could be a stack, but in practice it's not needed, 
+	// just make sure you don't use it in a command after calling another command.
+	// (this means don't use the error generators after you start such a loop)
+	RunningCmd string
 }
 
 // NewScript creates (and initializes) a new state.
@@ -204,6 +211,26 @@ func (this *Script) DeleteCommand(name string) {
 	this.Host.DeleteCommand(name)
 }
 
+// Native Command Parameter Checking
+
+// GeneralCmdError generates an error message for general command errors.
+//	"test:cmd": some error message
+func (this *Script) GeneralCmdError(msg string) string {
+	return "\"" + this.RunningCmd + "\": " + msg
+}
+
+// BadParamCount generates an error message for incorrect parameter count errors.
+//	"test:cmd": Incorrect parameter count: 1 parameter(s) required.
+// If hint is set to "" it leaves that part off.
+//	"test:cmd": Incorrect parameter count.
+// Hint should be something like "5" or ">2".
+func (this *Script) BadParamCount(hint string) string {
+	if hint != "" {
+		return this.GeneralCmdError("Incorrect parameter count: " + hint + " parameter(s) required.")
+	}
+	return this.GeneralCmdError("Incorrect parameter count.")
+}
+
 // Indexables
 
 // RegisterType registers a new Indexable or the like with a specific name.
@@ -300,6 +327,41 @@ func (this *Script) ExitFlags() bool {
 	return (this.Exit || this.Return || this.Break || this.BreakLoop)
 }
 
+// Clears the script.
+func (this *Script) Clear() {
+	this.ClearMost()
+	this.RetVal = NewValue()
+}
+
+// Clears the script.
+// Does not modify the RetVal register.
+func (this *Script) ClearMost() {
+	this.Code.Clear()
+	this.Envs.Clear()
+	this.Host = nil
+	this.This = NewValue()
+	this.Exit = false
+	this.Return = false
+	this.Break = false
+	this.BreakLoop = false
+	this.RunningCmd = ""
+}
+
+// Clears the script.
+// Does not modify the RetVal register.
+// Leaves the "root" environment.
+func (this *Script) ClearSome() {
+	this.Code.Clear()
+	this.Envs.ClearAllButRoot()
+	this.Host = nil
+	this.This = NewValue()
+	this.Exit = false
+	this.Return = false
+	this.Break = false
+	this.BreakLoop = false
+	this.RunningCmd = ""
+}
+
 // Script Execution
 
 // Exec is exported for the use of commands ONLY!
@@ -371,7 +433,7 @@ func (this *Script) execCommand() {
 
 	GetToken(this.Code.Last(), TknCmdEnd)
 
-	this.GetCommand(name.String()).Call(this, params)
+	this.GetCommand(name.String()).Call(name.String(), this, params)
 }
 
 func (this *Script) derefVar() {
@@ -568,7 +630,7 @@ func (this *Script) validateCommand() {
 	if this.Host != nil {
 		// Check params and command existence
 		command := this.GetCommand(name.String())
-		if !command.VarParams || !command.Native {
+		if command.Params != nil || command.Handler != nil {
 			paramcount = len(command.Params)
 		}
 	}

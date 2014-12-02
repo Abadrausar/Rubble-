@@ -40,12 +40,12 @@ func Setup(state *raptor.State) {
 // Returns a new ordered map with the same keys/values as the old one.
 func CommandSort_Map(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to sort:map.")
+		panic(script.BadParamCount("1"))
 	}
 	
 	value := params[0].Indexable()
 	if value == nil {
-		panic("Non-Indexable value passed to sort:map.")
+		panic(script.GeneralCmdError("Parameter 0 is not Indexable."))
 	}
 	script.RetVal = raptor.NewValueObject(NewOrderedMapFromIndexable(value))
 }
@@ -55,9 +55,5 @@ func CommandSort_Map(script *raptor.Script, params []*raptor.Value) {
 // Ordered maps are also thread safe.
 // Returns a new (empty) ordered map.
 func CommandSort_New(script *raptor.Script, params []*raptor.Value) {
-	if len(params) != 0 {
-		panic("Wrong number of params to sort:new.")
-	}
-
 	script.RetVal = raptor.NewValueObject(NewOrderedMap())
 }

@@ -54,7 +54,7 @@ func CommandIni_Create(script *raptor.Script, params []*raptor.Value) {
 // Returns the ini file or an error message. May set the Error flag.
 func CommandIni_Parse(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to ini:parse.")
+		panic(script.BadParamCount("1"))
 	}
 
 	file, err := ini.Parse(params[0].String())
@@ -72,14 +72,14 @@ func CommandIni_Parse(script *raptor.Script, params []*raptor.Value) {
 // Returns the string representation of the ini file or an error message. May set the Error flag.
 func CommandIni_Format(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to ini:format.")
+		panic(script.BadParamCount("1"))
 	}
 
 	if params[0].Type != raptor.TypObject {
-		panic("Non-Object Param 0 passed to ini:format.")
+		panic(script.GeneralCmdError("Parameter 0 is not an Object."))
 	}
 	if _, ok := params[0].Data.(*ini.File); !ok {
-		panic("ini:format's Param 0 is not an *ini.File.")
+		panic(script.GeneralCmdError("Parameter 0 is not an *ini.File"))
 	}
 	file := params[0].Data.(*ini.File)
 	script.RetVal = raptor.NewValueString(ini.Format(file))
@@ -90,14 +90,14 @@ func CommandIni_Format(script *raptor.Script, params []*raptor.Value) {
 // Returns the value or an error message. May set the Error flag.
 func CommandIni_GetValue(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 3 {
-		panic("Wrong number of params to ini:getvalue.")
+		panic(script.BadParamCount("3"))
 	}
 
 	if params[0].Type != raptor.TypObject {
-		panic("Non-Object Param 0 passed to ini:getvalue.")
+		panic(script.GeneralCmdError("Parameter 0 is not an Object."))
 	}
 	if _, ok := params[0].Data.(*ini.File); !ok {
-		panic("ini:getvalue's Param 0 is not an *ini.File.")
+		panic(script.GeneralCmdError("Parameter 0 is not an *ini.File"))
 	}
 	file := params[0].Data.(*ini.File)
 
@@ -115,14 +115,14 @@ func CommandIni_GetValue(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged or an error message. May set the Error flag.
 func CommandIni_SetValue(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 4 {
-		panic("Wrong number of params to ini:setvalue.")
+		panic(script.BadParamCount("4"))
 	}
 
 	if params[0].Type != raptor.TypObject {
-		panic("Non-Object Param 0 passed to ini:setvalue.")
+		panic(script.GeneralCmdError("Parameter 0 is not an Object."))
 	}
 	if _, ok := params[0].Data.(*ini.File); !ok {
-		panic("ini:setvalue's Param 0 is not an *ini.File.")
+		panic(script.GeneralCmdError("Parameter 0 is not an *ini.File"))
 	}
 	file := params[0].Data.(*ini.File)
 

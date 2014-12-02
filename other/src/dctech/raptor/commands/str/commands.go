@@ -67,8 +67,8 @@ func Setup(state *raptor.State) {
 // 	str:add a b [c...]
 // Returns the result of appending all parameters together.
 func CommandStr_Add(script *raptor.Script, params []*raptor.Value) {
-	if len(params) <= 1 {
-		panic("str:add needs at least two params.")
+	if len(params) < 2 {
+		panic(script.BadParamCount(">=2"))
 	}
 
 	result := ""
@@ -85,7 +85,7 @@ func CommandStr_Add(script *raptor.Script, params []*raptor.Value) {
 // Returns str with leading and trailing whitespace removed.
 func CommandStr_TrimSpace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong param count to str:trimspace.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueString(strings.TrimSpace(params[0].String()))
@@ -97,7 +97,7 @@ func CommandStr_TrimSpace(script *raptor.Script, params []*raptor.Value) {
 // Returns the length.
 func CommandStr_Len(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong param count to str:len.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(int64(len(params[0].String())))
@@ -111,7 +111,7 @@ func CommandStr_Len(script *raptor.Script, params []*raptor.Value) {
 // Returns the character.
 func CommandStr_Char(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong param count to str:char.")
+		panic(script.BadParamCount("2"))
 	}
 
 	pos := params[1].Int64()
@@ -135,7 +135,7 @@ func CommandStr_Char(script *raptor.Script, params []*raptor.Value) {
 // Returns the formatted string.
 func CommandStr_Fmt(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 2 {
-		panic("Wrong param count to str:fmt.")
+		panic(script.BadParamCount("2"))
 	}
 
 	paramcount := len(params) - 1
@@ -156,7 +156,7 @@ func CommandStr_Fmt(script *raptor.Script, params []*raptor.Value) {
 		if escape && val == 's' {
 			escapecount++
 			if paramcount < escapecount {
-				panic("More format codes than params to str:fmt.")
+				panic(script.GeneralCmdError("More format codes than parameters."))
 			}
 			output = append(output, []rune(params[escapecount].String())...)
 			escape = false
@@ -166,7 +166,7 @@ func CommandStr_Fmt(script *raptor.Script, params []*raptor.Value) {
 		if escape && val == 'd' {
 			escapecount++
 			if paramcount < escapecount {
-				panic("More format codes than params to str:fmt.")
+				panic(script.GeneralCmdError("More format codes than parameters."))
 			}
 			temp := strconv.FormatInt(params[escapecount].Int64(), 10)
 			output = append(output, []rune(temp)...)
@@ -177,7 +177,7 @@ func CommandStr_Fmt(script *raptor.Script, params []*raptor.Value) {
 		if escape && val == 'x' {
 			escapecount++
 			if paramcount < escapecount {
-				panic("More format codes than params to str:fmt.")
+				panic(script.GeneralCmdError("More format codes than parameters."))
 			}
 			temp := strconv.FormatInt(params[escapecount].Int64(), 16)
 			//output = append(output, '0', 'x')
@@ -189,7 +189,7 @@ func CommandStr_Fmt(script *raptor.Script, params []*raptor.Value) {
 		if escape && val == 'X' {
 			escapecount++
 			if paramcount < escapecount {
-				panic("More format codes than params to str:fmt.")
+				panic(script.GeneralCmdError("More format codes than parameters."))
 			}
 			temp := strconv.FormatInt(params[escapecount].Int64(), 16)
 			//output = append(output, '0', 'X')
@@ -199,7 +199,7 @@ func CommandStr_Fmt(script *raptor.Script, params []*raptor.Value) {
 		}
 
 		if escape {
-			panic("Invalid format code: %" + string(val) + " to str:fmt.")
+			panic(script.GeneralCmdError("Invalid format code: \"%" + string(val) + "\"."))
 		}
 
 		output = append(output, val)
@@ -214,7 +214,7 @@ func CommandStr_Fmt(script *raptor.Script, params []*raptor.Value) {
 // Returns true or false.
 func CommandStr_Cmp(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong param count to str:cmp.")
+		panic(script.BadParamCount("2"))
 	}
 
 	result := params[0].String() == params[1].String()
@@ -226,7 +226,7 @@ func CommandStr_Cmp(script *raptor.Script, params []*raptor.Value) {
 // Returns the position of the substring or -1 if the substring is not present.
 func CommandStr_Find(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong param count to str:find.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(int64(strings.Index(params[0].String(), params[1].String())))
@@ -237,7 +237,7 @@ func CommandStr_Find(script *raptor.Script, params []*raptor.Value) {
 // Returns the new string or (if the index is out of range) returns the string and sets the error flag.
 func CommandStr_Left(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong param count to str:left.")
+		panic(script.BadParamCount("2"))
 	}
 
 	index := int(params[1].Int64())
@@ -255,7 +255,7 @@ func CommandStr_Left(script *raptor.Script, params []*raptor.Value) {
 // Returns the new string or (if the index is out of range) returns the string and sets the error flag.
 func CommandStr_TrimLeft(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong param count to str:trimleft.")
+		panic(script.BadParamCount("2"))
 	}
 
 	index := int(params[1].Int64())
@@ -273,7 +273,7 @@ func CommandStr_TrimLeft(script *raptor.Script, params []*raptor.Value) {
 // Returns the new string or (if the index is out of range) returns the string and sets the error flag.
 func CommandStr_Right(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong param count to str:right.")
+		panic(script.BadParamCount("2"))
 	}
 
 	index := int(params[1].Int64())
@@ -291,7 +291,7 @@ func CommandStr_Right(script *raptor.Script, params []*raptor.Value) {
 // Returns the new string or (if the index is out of range) returns the string and sets the error flag.
 func CommandStr_TrimRight(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong param count to str:trimright.")
+		panic(script.BadParamCount("2"))
 	}
 
 	index := int(params[1].Int64())
@@ -310,7 +310,7 @@ func CommandStr_TrimRight(script *raptor.Script, params []*raptor.Value) {
 // result as possible and sets the error flag.
 func CommandStr_Mid(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 3 {
-		panic("Wrong param count to str:mid.")
+		panic(script.BadParamCount("3"))
 	}
 
 	start := int(params[1].Int64())
@@ -336,7 +336,7 @@ func CommandStr_Mid(script *raptor.Script, params []*raptor.Value) {
 // Returns the new string.
 func CommandStr_Replace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 4 {
-		panic("Wrong param count to str:replace.")
+		panic(script.BadParamCount("4"))
 	}
 
 	tmp := strings.Replace(params[0].String(), params[1].String(), params[2].String(), int(params[3].Int64()))
@@ -348,7 +348,7 @@ func CommandStr_Replace(script *raptor.Script, params []*raptor.Value) {
 // Returns the string with all letters converted to lower case.
 func CommandStr_ToLower(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong param count to str:tolower.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueString(strings.ToLower(params[0].String()))
@@ -359,7 +359,7 @@ func CommandStr_ToLower(script *raptor.Script, params []*raptor.Value) {
 // Returns the string with all letters converted to upper case.
 func CommandStr_ToUpper(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong param count to str:toupper.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueString(strings.ToUpper(params[0].String()))

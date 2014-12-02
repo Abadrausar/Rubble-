@@ -103,7 +103,7 @@ func CommandNop(script *raptor.Script, params []*raptor.Value) {
 // Returns value or unchanged.
 func CommandRet(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
-		panic("Wrong number of params to ret.")
+		panic(script.BadParamCount("0 or 1"))
 	}
 
 	script.Return = true
@@ -117,7 +117,7 @@ func CommandRet(script *raptor.Script, params []*raptor.Value) {
 // Returns value or unchanged.
 func CommandExit(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
-		panic("Wrong number of params to exit.")
+		panic(script.BadParamCount("0 or 1"))
 	}
 
 	script.Exit = true
@@ -133,7 +133,7 @@ func CommandExit(script *raptor.Script, params []*raptor.Value) {
 // Returns value or unchanged.
 func CommandBreak(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
-		panic("Wrong number of params to break.")
+		panic(script.BadParamCount("0 or 1"))
 	}
 
 	script.Break = true
@@ -147,7 +147,7 @@ func CommandBreak(script *raptor.Script, params []*raptor.Value) {
 // Returns value or unchanged.
 func CommandBreakLoop(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
-		panic("Wrong number of params to breakloop.")
+		panic(script.BadParamCount("0 or 1"))
 	}
 
 	script.BreakLoop = true
@@ -162,7 +162,7 @@ func CommandBreakLoop(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged or the value of the error flag.
 func CommandError(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
-		panic("Wrong number of params to error.")
+		panic(script.BadParamCount("0 or 1"))
 	}
 
 	if len(params) == 0 {
@@ -177,7 +177,7 @@ func CommandError(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged.
 func CommandCommand(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 2 {
-		panic("Wrong number of params to command.")
+		panic(script.BadParamCount(">=2"))
 	}
 	if len(params) == 2 {
 		// no params
@@ -197,7 +197,7 @@ func CommandCommand(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged.
 func CommandDelCommand(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to delcommand.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.DeleteCommand(params[0].String())
@@ -209,7 +209,7 @@ func CommandDelCommand(script *raptor.Script, params []*raptor.Value) {
 // Returns a reference to the command.
 func CommandGetCommand(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to getcommand.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.RetVal = raptor.NewValueCommand(params[0].String())
@@ -220,7 +220,7 @@ func CommandGetCommand(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged.
 func CommandNamespace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to namespace.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.NewNameSpace(params[0].String())
@@ -233,7 +233,7 @@ func CommandNamespace(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged.
 func CommandDelNamespace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to delnamespace.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.DeleteNameSpace(params[0].String())
@@ -244,7 +244,7 @@ func CommandDelNamespace(script *raptor.Script, params []*raptor.Value) {
 // Returns value or unchanged.
 func CommandVar(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 && len(params) != 2 {
-		panic("Wrong number of params to var.")
+		panic(script.BadParamCount("1 or 2"))
 	}
 
 	if len(params) > 1 {
@@ -260,7 +260,7 @@ func CommandVar(script *raptor.Script, params []*raptor.Value) {
 // Returns the deleted vars value.
 func CommandDelVar(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to delvar.")
+		panic(script.BadParamCount("1"))
 	}
 	script.RetVal = script.DeleteVar(params[0].String())
 }
@@ -272,7 +272,7 @@ func CommandDelVar(script *raptor.Script, params []*raptor.Value) {
 // Returns the new value.
 func CommandCopy(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to copy.")
+		panic(script.BadParamCount("1"))
 	}
 	
 	val := new(raptor.Value)
@@ -322,7 +322,7 @@ func CommandThis(script *raptor.Script, params []*raptor.Value) {
 // Returns value.
 func CommandSet(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 && len(params) != 3 {
-		panic("Wrong number of params to set.")
+		panic(script.BadParamCount("2 or 3"))
 	}
 
 	if len(params) == 2 {
@@ -333,11 +333,11 @@ func CommandSet(script *raptor.Script, params []*raptor.Value) {
 
 	val := params[0].EditIndexable()
 	if val == nil {
-		panic("Non-EditIndexable object passed to set.")
+		panic(script.GeneralCmdError("Attempt to use non-EditIndexable object with indexing form."))
 	}
 
 	if !val.Set(params[1].String(), params[2]) {
-		panic("Attempt to write to readonly index with set.")
+		panic(script.GeneralCmdError("Attempt to write to readonly index."))
 	}
 	script.RetVal = params[2]
 }
@@ -348,7 +348,7 @@ func CommandSet(script *raptor.Script, params []*raptor.Value) {
 // Returns true or false.
 func CommandExists(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 && len(params) != 2 {
-		panic("Wrong number of params to exists.")
+		panic(script.BadParamCount("1 or 2"))
 	}
 
 	if len(params) == 1 {
@@ -362,7 +362,7 @@ func CommandExists(script *raptor.Script, params []*raptor.Value) {
 
 	val := params[0].Indexable()
 	if val == nil {
-		panic("Non-Indexable object passed to exists.")
+		panic(script.GeneralCmdError("Attempt to use non-Indexable object with indexing form."))
 	}
 
 	if val.Exists(params[1].String()) {
@@ -377,12 +377,12 @@ func CommandExists(script *raptor.Script, params []*raptor.Value) {
 // Returns the element count.
 func CommandLen(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to len.")
+		panic(script.BadParamCount("1"))
 	}
 
 	val := params[0].Indexable()
 	if val == nil {
-		panic("Non-Indexable object passed to exists.")
+		panic(script.GeneralCmdError("Attempt to fetch non-Indexable object's size."))
 	}
 
 	script.RetVal = raptor.NewValueInt64(val.Len())
@@ -393,7 +393,7 @@ func CommandLen(script *raptor.Script, params []*raptor.Value) {
 // Returns the return value of the last command in the code it runs.
 func CommandRun(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 1 {
-		panic("Wrong number of params to run.")
+		panic(script.BadParamCount(">=1"))
 	}
 
 	script.Envs.Add(raptor.NewEnvironment())
@@ -411,7 +411,7 @@ func CommandRun(script *raptor.Script, params []*raptor.Value) {
 // Returns the return value of the last command in the code it runs.
 func CommandEval(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to eval.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.Code.Add(params[0].CodeSource())
@@ -423,10 +423,10 @@ func CommandEval(script *raptor.Script, params []*raptor.Value) {
 // Returns the return value of the last command in the code it runs.
 func CommandEvalInParent(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to evalinparent.")
+		panic(script.BadParamCount("1"))
 	}
 	if len(*script.Envs) <= 1 {
-		panic("Call to evalinparent from code running in root env.")
+		panic(script.GeneralCmdError("The code is running in root environment."))
 	}
 
 	script.Code.Add(params[0].CodeSource())
@@ -440,7 +440,7 @@ func CommandEvalInParent(script *raptor.Script, params []*raptor.Value) {
 // Returns the return value of the last command in the code it runs.
 func CommandEvalInNew(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to evalinnew.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.Code.Add(params[0].CodeSource())
@@ -457,7 +457,7 @@ func CommandEvalInNew(script *raptor.Script, params []*raptor.Value) {
 // flag and returns a string describing the error..
 func CommandTrap(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to trap.")
+		panic(script.BadParamCount("1"))
 	}
 
 	script.Code.Add(params[0].CodeSource())
@@ -473,7 +473,7 @@ func CommandTrap(script *raptor.Script, params []*raptor.Value) {
 // Returns the return value of the last command in the code it runs or unchanged.
 func CommandIf(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 && len(params) != 3 {
-		panic("Wrong number of params to if.")
+		panic(script.BadParamCount("2 or 3"))
 	}
 
 	if params[0].Bool() {
@@ -495,7 +495,7 @@ func CommandIf(script *raptor.Script, params []*raptor.Value) {
 // exited with ret (In which case the return value is unusable by the command calling loop anyway).
 func CommandLoop(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to loop.")
+		panic(script.BadParamCount("1"))
 	}
 
 	code := params[0].Code()
@@ -519,12 +519,12 @@ func CommandLoop(script *raptor.Script, params []*raptor.Value) {
 // Returns the return value of the last command in code.
 func CommandForEach(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to foreach.")
+		panic(script.BadParamCount("2"))
 	}
 
 	val := params[0].Indexable()
 	if val == nil {
-		panic("Non-Indexable object passed to foreach.")
+		panic(script.GeneralCmdError("Attempt to range non-Indexable object."))
 	}
 
 	code := params[1].Code()

@@ -52,7 +52,7 @@ func Setup(state *raptor.State) {
 // Returns a + b
 func CommandInt_Add(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to int:add.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(params[0].Int64() + params[1].Int64())
@@ -64,7 +64,7 @@ func CommandInt_Add(script *raptor.Script, params []*raptor.Value) {
 // Returns a - b
 func CommandInt_Sub(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to int:sub.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(params[0].Int64() - params[1].Int64())
@@ -76,7 +76,7 @@ func CommandInt_Sub(script *raptor.Script, params []*raptor.Value) {
 // Returns a / b
 func CommandInt_Div(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to int:div.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(params[0].Int64() / params[1].Int64())
@@ -88,7 +88,7 @@ func CommandInt_Div(script *raptor.Script, params []*raptor.Value) {
 // Returns a % b
 func CommandInt_Mod(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to int:mod.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(params[0].Int64() % params[1].Int64())
@@ -100,7 +100,7 @@ func CommandInt_Mod(script *raptor.Script, params []*raptor.Value) {
 // Returns a * b
 func CommandInt_Mul(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to int:mul.")
+		panic(script.BadParamCount("2"))
 	}
 
 	script.RetVal = raptor.NewValueInt64(params[0].Int64() * params[1].Int64())
@@ -112,7 +112,7 @@ func CommandInt_Mul(script *raptor.Script, params []*raptor.Value) {
 // Returns true or false.
 func CommandInt_Gt(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to int:gt.")
+		panic(script.BadParamCount("2"))
 	}
 
 	result := params[0].Int64() > params[1].Int64()
@@ -128,7 +128,7 @@ func CommandInt_Gt(script *raptor.Script, params []*raptor.Value) {
 // Returns true or false.
 func CommandInt_Lt(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to int:lt.")
+		panic(script.BadParamCount("2"))
 	}
 
 	result := params[0].Int64() < params[1].Int64()
@@ -144,7 +144,7 @@ func CommandInt_Lt(script *raptor.Script, params []*raptor.Value) {
 // Returns true or false.
 func CommandInt_Eq(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to int:eq.")
+		panic(script.BadParamCount("2"))
 	}
 
 	result := params[0].Int64() == params[1].Int64()

@@ -54,7 +54,7 @@ func Setup(state *raptor.State) {
 // Returns unchanged or an error message. May set the Error flag.
 func CommandFile_DelDir(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to file:deldir.")
+		panic(script.BadParamCount("1"))
 	}
 
 	info, err := os.Lstat(params[0].String())
@@ -78,7 +78,7 @@ func CommandFile_DelDir(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged or an error message. May set the Error flag.
 func CommandFile_DelTree(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to file:deltree.")
+		panic(script.BadParamCount("1"))
 	}
 
 	info, err := os.Lstat(params[0].String())
@@ -105,7 +105,7 @@ func CommandFile_DelTree(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged or an error message. May set the Error flag.
 func CommandFile_NewDir(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to file:newdir.")
+		panic(script.BadParamCount("1"))
 	}
 
 	err := os.Mkdir(params[0].String(), 0600)
@@ -121,7 +121,7 @@ func CommandFile_NewDir(script *raptor.Script, params []*raptor.Value) {
 // Returns unchanged or an error message. May set the Error flag.
 func CommandFile_Del(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to file:del.")
+		panic(script.BadParamCount("1"))
 	}
 
 	info, err := os.Lstat(params[0].String())
@@ -148,7 +148,7 @@ func CommandFile_Del(script *raptor.Script, params []*raptor.Value) {
 // Returns true or false.
 func CommandFile_Exists(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to file:exists.")
+		panic(script.BadParamCount("1"))
 	}
 
 	info, err := os.Lstat(params[0].String())
@@ -168,7 +168,7 @@ func CommandFile_Exists(script *raptor.Script, params []*raptor.Value) {
 // Returns true or false.
 func CommandFile_DirExists(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
-		panic("Wrong number of params to file:direxists.")
+		panic(script.BadParamCount("1"))
 	}
 
 	info, err := os.Lstat(params[0].String())
@@ -191,7 +191,7 @@ func CommandFile_DirExists(script *raptor.Script, params []*raptor.Value) {
 // Returns nil or an error message. May set the Error flag.
 func CommandFile_WalkFiles(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
-		panic("Wrong number of params to file:walkfiles.")
+		panic(script.BadParamCount("2"))
 	}
 
 	files, err := ioutil.ReadDir(params[0].String())
@@ -225,8 +225,8 @@ func CommandFile_WalkFiles(script *raptor.Script, params []*raptor.Value) {
 //	code path
 // Returns nil or an error message. May set the Error flag.
 func CommandFile_WalkDirs(script *raptor.Script, params []*raptor.Value) {
-	if len(params) != 1 {
-		panic("Wrong number of params to file:walkdirs.")
+	if len(params) != 2 {
+		panic(script.BadParamCount("2"))
 	}
 
 	files, err := ioutil.ReadDir(params[0].String())

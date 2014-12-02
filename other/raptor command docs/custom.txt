@@ -1,13 +1,7 @@
 
 Built-in Natives:
 
-Causes a panic.
-	
-	panic value
-
-	Returns unchanged.
-
-Causes rubble to abort with an error, use for correctable errors like configuration problems.
+Causes rubble to abort with an error.
 	
 	rubble:abort msg
 	
@@ -81,6 +75,13 @@ Include a file.
 	
 	include path
 
+Generate a place holder template.
+	
+	rubble:placeholder name
+	
+	Creates a template named <name> that returns a simple placeholder message,
+	may be overridden by later definitions.
+
 Dependency check.
 	
 	rubble:requireaddon me addon
@@ -109,6 +110,8 @@ Group dependency check.
 
 Variables:
 	rubble:version		The Rubble version
+	rubble:compat		Rubble version compatibility information, index with version, 
+							true if this version is compatible with checked version, false if not compatible, nil if unknown.
 	rubble:dfdir		The Dwarf Fortress directory
 	rubble:outputdir	The Rubble output directory
 	rubble:addonsdir	The directory where any addons may be found
