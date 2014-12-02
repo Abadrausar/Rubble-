@@ -2,7 +2,7 @@
 
 Many colors contributed by Bohandas
 
-Uristocrat Lots of density data was taken from http//www.csgnetwork.com/gemchar.html
+Uristocrat: Lots of density data was taken from http//www.csgnetwork.com/gemchar.html
 There are a few misc. oddball gems, but many of these can be sorted
 into broader families like this
  
@@ -243,8 +243,8 @@ I'm leaving this data here in case it can someday be used to organize things in 
 [MATERIAL_VALUE:2][DISPLAY_COLOR:6:7:0][TILE:15][IS_GEM:smoky quartz:smoky quartzes:OVERWRITE_SOLID]
 [ENVIRONMENT:ALL_STONE:CLUSTER_SMALL:100]
 [SOLID_DENSITY:2650]  Common to quartz gems
-[STATE_COLOR:ALL_SOLID:OLIVE]
-}  Often nearly black.
+[STATE_COLOR:ALL_SOLID:OLIVE]  Often nearly black.
+}
 
 {SHARED_INORGANIC;WAX OPAL;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
@@ -299,16 +299,16 @@ I'm leaving this data here in case it can someday be used to organize things in 
 [MATERIAL_VALUE:2][DISPLAY_COLOR:6:7:1][TILE:15][IS_GEM:tigereye:STP:OVERWRITE_SOLID]
 [ENVIRONMENT:SEDIMENTARY:CLUSTER_SMALL:100]
 [SOLID_DENSITY:2650]  Common to quartz gems
-[STATE_COLOR:ALL_SOLID:LEMON]
-}  Actually, has shiny yellow bands on a black (or very, very dark yellow) background.
+[STATE_COLOR:ALL_SOLID:LEMON]  Actually, has shiny yellow bands on a black (or very, very dark yellow) background.
+}
 
 {SHARED_INORGANIC;TIGER IRON;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
 [MATERIAL_VALUE:2][DISPLAY_COLOR:6:7:1][TILE:15][IS_GEM:tiger iron:STP:OVERWRITE_SOLID]
 [ENVIRONMENT:SEDIMENTARY:CLUSTER_SMALL:100]
 [SOLID_DENSITY:2600]
-[STATE_COLOR:ALL_SOLID:GOLDEN_YELLOW]
-}  Bands of many colors, often red, but can be variable.
+[STATE_COLOR:ALL_SOLID:GOLDEN_YELLOW]  Bands of many colors, often red, but can be variable.
+}
 
 {SHARED_INORGANIC;SUNSTONE;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
@@ -316,24 +316,24 @@ I'm leaving this data here in case it can someday be used to organize things in 
 [ENVIRONMENT_SPEC:BASALT:CLUSTER_SMALL:100]
 [ENVIRONMENT_SPEC:GNEISS:CLUSTER_SMALL:100]
 [SOLID_DENSITY:2655]  Common to feldspars.  Range is 2550 - 2760
-[STATE_COLOR:ALL_SOLID:PUMPKIN]
-}  Is actually red with shiny yellow flecks in it.
+[STATE_COLOR:ALL_SOLID:PUMPKIN]  Is actually red with shiny yellow flecks in it.
+}
 
 {SHARED_INORGANIC;RESIN OPAL;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
 [MATERIAL_VALUE:10][DISPLAY_COLOR:6:7:1][TILE:15][IS_GEM:resin opal:STP:OVERWRITE_SOLID]
 [ENVIRONMENT:ALL_STONE:CLUSTER_SMALL:10]
 [SOLID_DENSITY:2115]  Common to opals.  Range is 1980 - 2250
-[STATE_COLOR:ALL_SOLID:YELLOW]
-}  The base is usually white, but opals change depending on how they're viewed.
+[STATE_COLOR:ALL_SOLID:YELLOW]  The base is usually white, but opals change depending on how they're viewed.
+}
 
 {SHARED_INORGANIC;PYRITE;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
 [MATERIAL_VALUE:2][DISPLAY_COLOR:6:7:1][TILE:15][IS_GEM:pyrite:STP:OVERWRITE_SOLID]
 [ENVIRONMENT:ALL_STONE:CLUSTER_SMALL:100]
 [SOLID_DENSITY:4890]
-[STATE_COLOR:ALL_SOLID:SILVER]
-}  Ironically, the color silver is closer to pyrite's color than silver's.  Real silver shines brighter.
+[STATE_COLOR:ALL_SOLID:SILVER]  Ironically, the color silver is closer to pyrite's color than silver's.  Real silver shines brighter.
+}
 
 {SHARED_INORGANIC;CLEAR TOURMALINE;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
@@ -361,8 +361,8 @@ I'm leaving this data here in case it can someday be used to organize things in 
 [BASIC_COLOR:7:0]
 [ENVIRONMENT:SEDIMENTARY:CLUSTER_SMALL:20]
 [SOLID_DENSITY:2650]  Common to quartz gems
-[STATE_COLOR:ALL_SOLID:IVORY]
-}  Mostly white with very dark green patterns.
+[STATE_COLOR:ALL_SOLID:IVORY]  Mostly white with very dark green patterns.
+}
 
 {SHARED_INORGANIC;SHELL OPAL;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
@@ -370,8 +370,8 @@ I'm leaving this data here in case it can someday be used to organize things in 
 [BASIC_COLOR:7:0]
 [ENVIRONMENT:ALL_STONE:CLUSTER_SMALL:10]
 [SOLID_DENSITY:2115]  Common to opals.  Range is 1980 - 2250
-[STATE_COLOR:ALL_SOLID:IVORY]
-}  Milky colored and shines in various colors like all opals.
+[STATE_COLOR:ALL_SOLID:IVORY]  Milky colored and shines in various colors like all opals.
+}
 
 {SHARED_INORGANIC;BONE OPAL;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
@@ -395,8 +395,8 @@ I'm leaving this data here in case it can someday be used to organize things in 
 [MATERIAL_VALUE:2][DISPLAY_COLOR:7:7:1][TILE:15][IS_GEM:fortification agate:STP:OVERWRITE_SOLID]
 [ENVIRONMENT:SEDIMENTARY:CLUSTER_SMALL:20]
 [SOLID_DENSITY:2650]  Common to quartz gems
-[STATE_COLOR:ALL_SOLID:CARDINAL]
-}  Has a circular banded pattern.  Can be almost any color, really.
+[STATE_COLOR:ALL_SOLID:CARDINAL]  Has a circular banded pattern.  Can be almost any color, really.
+}
 
 {SHARED_INORGANIC;MILK QUARTZ;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
@@ -411,8 +411,8 @@ I'm leaving this data here in case it can someday be used to organize things in 
 [MATERIAL_VALUE:2][DISPLAY_COLOR:7:7:1][TILE:15][IS_GEM:moonstone:STP:OVERWRITE_SOLID]
 [ENVIRONMENT:METAMORPHIC:CLUSTER_SMALL:100]
 [SOLID_DENSITY:2655]  Common to feldspars.  Range is 2550 - 2760
-[STATE_COLOR:ALL_SOLID:IVORY]
-}  It shines a beautful blue in some lighting.
+[STATE_COLOR:ALL_SOLID:IVORY]  It shines a beautful blue in some lighting.
+}
 
 {SHARED_INORGANIC;WHITE JADE;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
@@ -427,16 +427,16 @@ I'm leaving this data here in case it can someday be used to organize things in 
 [MATERIAL_VALUE:10][DISPLAY_COLOR:7:7:1][TILE:15][IS_GEM:jasper opal:STP:OVERWRITE_SOLID]
 [ENVIRONMENT:ALL_STONE:CLUSTER_SMALL:10]
 [SOLID_DENSITY:2115]  Common to opals.  Range is 1980 - 2250
-[STATE_COLOR:ALL_SOLID:MAROON]
-}  It's red jasper with opal in it, so a mix of red & white with opalescense.
+[STATE_COLOR:ALL_SOLID:MAROON]  It's red jasper with opal in it, so a mix of red & white with opalescense.
+}
 
 {SHARED_INORGANIC;PINEAPPLE OPAL;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
 [MATERIAL_VALUE:10][DISPLAY_COLOR:7:7:1][TILE:15][IS_GEM:pineapple opal:STP:OVERWRITE_SOLID]
 [ENVIRONMENT:ALL_STONE:CLUSTER_SMALL:10]
 [SOLID_DENSITY:2115]  Common to opals.  Range is 1980 - 2250
-[STATE_COLOR:ALL_SOLID:BEIGE]
-}  Sort of a yellowish-white, but shines in every color under light due to opalescense.
+[STATE_COLOR:ALL_SOLID:BEIGE]  Sort of a yellowish-white, but shines in every color under light due to opalescense.
+}
 
 {SHARED_INORGANIC;ONYX OPAL;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
@@ -596,8 +596,8 @@ green garnet found with chromium ores
 [ENVIRONMENT_SPEC:SCHIST:CLUSTER_SMALL:100]
 [ENVIRONMENT_SPEC:MARBLE:CLUSTER_SMALL:100]
 [SOLID_DENSITY:2770]  Common to beryls.  Range 2630 - 2910
-[STATE_COLOR:ALL_SOLID:GREEN-YELLOW]
-}  These are usually yellow, not green, but variable.
+[STATE_COLOR:ALL_SOLID:GREEN-YELLOW]  These are usually yellow, not green, but variable.
+}
 
 {SHARED_INORGANIC;PERIDOT;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
@@ -823,7 +823,7 @@ source of lithium (LiAlSi2O6)
 
 {SHARED_INORGANIC;TOPAZ;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
-[MATERIAL_VALUE:20][DISPLAY_COLOR:6:7:1][TILE:15][IS_GEM:topaz:STP:OVERWRITE_SOLID]
+[MATERIAL_VALUE:20][DISPLAY_COLOR:6:7:1][TILE:15][IS_GEM:topaz:topazes:OVERWRITE_SOLID]
 [ENVIRONMENT_SPEC:GRANITE:CLUSTER_SMALL:100]
 [SOLID_DENSITY:3550]  Range of 3500 - 3600
 [STATE_COLOR:ALL_SOLID:GOLDENROD]
@@ -938,8 +938,8 @@ type of andradite, a garnet
 [TILE:15][IS_GEM:precious fire opal:STP:OVERWRITE_SOLID][DISPLAY_COLOR:4:7:1][MATERIAL_VALUE:20]
 [ENVIRONMENT:ALL_STONE:CLUSTER_SMALL:8]
 [SOLID_DENSITY:2115]  Common to opals.  Range is 1980 - 2250
-[STATE_COLOR:ALL_SOLID:RED]
-}  As always, opals vary in color a lot.
+[STATE_COLOR:ALL_SOLID:RED]  As always, opals vary in color a lot.
+}
 
 {SHARED_INORGANIC;OPAL_REDFLASH;
 [USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]

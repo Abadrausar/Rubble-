@@ -1,12 +1,12 @@
 [OBJECT:INORGANIC]
 
-Significant melting/boiling point contributions by
+Significant melting/boiling point contributions by:
 
 Jan-Willem "Great Cthulhu" van den Broek
 Stakudomer
 Kidiri
 
-Uristocrat Density values from the research thread
+Uristocrat: Density values from the research thread:
 http//www.bay12forums.com/smf/index.php?topic=80022.0
 
 {SHARED_INORGANIC;SANDSTONE;
@@ -31,8 +31,8 @@ http//www.bay12forums.com/smf/index.php?topic=80022.0
 	[STATE_NAME_ADJ:ALL_SOLID:mudstone][DISPLAY_COLOR:6:7:0][TILE:247]
 	[SEDIMENTARY]
 	[IS_STONE]
-	[SOLID_DENSITY:2510]
-}  New research says it's more dense than shale.
+	[SOLID_DENSITY:2510]  New research says it's more dense than shale.
+}
 
 {SHARED_INORGANIC;SHALE;
 	[USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
@@ -173,14 +173,32 @@ http//www.bay12forums.com/smf/index.php?topic=80022.0
 
 {SHARED_INORGANIC;OBSIDIAN;
 	[USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]
-		[MELTING_POINT:13600]
-		[BOILING_POINT:16000]
+	[MELTING_POINT:13600]
+	[BOILING_POINT:16000]
+	[IMPACT_YIELD:1000000] from glass
+	[IMPACT_FRACTURE:1000000]
+	[IMPACT_STRAIN_AT_YIELD:2222]
+	[COMPRESSIVE_YIELD:1000000]
+	[COMPRESSIVE_FRACTURE:1000000]
+	[COMPRESSIVE_STRAIN_AT_YIELD:2222]
+	[TENSILE_YIELD:35000]
+	[TENSILE_FRACTURE:35000]
+	[TENSILE_STRAIN_AT_YIELD:114]
+	[TORSION_YIELD:35000]
+	[TORSION_FRACTURE:35000]
+	[TORSION_STRAIN_AT_YIELD:114]
+	[SHEAR_YIELD:35000]
+	[SHEAR_FRACTURE:35000]
+	[SHEAR_STRAIN_AT_YIELD:114] shear modulus 30.7 GPa
+	[BENDING_YIELD:35000]
+	[BENDING_FRACTURE:35000]
+	[BENDING_STRAIN_AT_YIELD:114]
 	[STATE_NAME_ADJ:ALL_SOLID:obsidian][DISPLAY_COLOR:0:7:1][TILE:177][LAVA]
 	[MAX_EDGE:20000]
 	[IGNEOUS_EXTRUSIVE]
 	[MATERIAL_VALUE:3]
 	[IS_STONE]
-	MELTING_POINT11818 <-- I think this is from the data collected by the contributors above and is more accurate than the numbers we're using, but we're using a high melting point until environmental lava effects are further along.
+	MELTING_POINT:11818 <-- I think this is from the data collected by the contributors above and is more accurate than the numbers we're using, but we're using a high melting point until environmental lava effects are further along.
 	[SOLID_DENSITY:2650]
 }
 
@@ -208,8 +226,8 @@ http//www.bay12forums.com/smf/index.php?topic=80022.0
 	[BASIC_COLOR:7:0]
 	[METAMORPHIC]
 	[IS_STONE]
-	[SOLID_DENSITY:2800]
-}  This may be slightly dense.  Value was for "dense Ordovician phyllites."
+	[SOLID_DENSITY:2800]  This may be slightly dense.  Value was for "dense Ordovician phyllites."
+}
 
 {SHARED_INORGANIC;SCHIST;
 	[USE_MATERIAL_TEMPLATE:STONE_TEMPLATE]

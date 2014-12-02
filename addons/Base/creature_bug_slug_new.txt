@@ -19,7 +19,6 @@ Damselflies were sponsored by the generous contributions of the Bay 12 community
 	[FLIER]
 	[DIURNAL]
 	[NO_SLEEP]
-	[HOMEOTHERM:10071]
 	[APPLY_CREATURE_VARIATION:STANDARD_FLYING_GAITS:900:750:600:439:1900:2900] 20 kph, NO DATA
 	[APPLY_CREATURE_VARIATION:STANDARD_WALKING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
@@ -76,7 +75,7 @@ Damselflies were sponsored by the generous contributions of the Bay 12 community
 	[GO_TO_START]
 	[NAME:damselfly man:damselfly men:damselfly man]
 	[DESCRIPTION:A person with the wings and head of a damselfly.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:2:5]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'d']
@@ -128,7 +127,6 @@ Moths were sponsored by the generous contributions of the Bay 12 community.
 	[BENIGN][FLIER]
 	[NOCTURNAL]
 	[NO_SLEEP]
-	[HOMEOTHERM:10071]
 	[APPLY_CREATURE_VARIATION:STANDARD_FLYING_GAITS:900:750:600:439:1900:2900] 20 kph, NO DATA
 	[APPLY_CREATURE_VARIATION:STANDARD_WALKING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
@@ -185,7 +183,7 @@ Moths were sponsored by the generous contributions of the Bay 12 community.
 	[GO_TO_START]
 	[NAME:moth man:moth men:moth man]
 	[DESCRIPTION:A person with the head and wings of a moth.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:5]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'m']
@@ -237,7 +235,6 @@ Grasshoppers were sponsored by the generous contributions of the Bay 12 communit
 	[PREFSTRING:great leaps]
 	[BENIGN][ALL_ACTIVE]
 	[NO_SLEEP]
-	[HOMEOTHERM:10071]
 	[APPLY_CREATURE_VARIATION:STANDARD_WALKING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[MUNDANE]
@@ -290,7 +287,7 @@ Grasshoppers were sponsored by the generous contributions of the Bay 12 communit
 	[GO_TO_START]
 	[NAME:grasshopper man:grasshopper men:grasshopper man]
 	[DESCRIPTION:A person with the head and legs of a grasshopper.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'g']
@@ -348,7 +345,6 @@ Bark scorpions were sponsored by the generous contributions of the Bay 12 commun
 	[NO_SLEEP]
 	[MUNDANE]
 	[CANNOT_JUMP]
-	[HOMEOTHERM:10040]
 	[APPLY_CREATURE_VARIATION:STANDARD_WALKING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CLIMBING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
@@ -390,7 +386,6 @@ Bark scorpions were sponsored by the generous contributions of the Bay 12 commun
 	[PUS:LOCAL_CREATURE_MAT:PUS:LIQUID]
 	[BODY_SIZE:0:0:3]
 	[MAXAGE:2:10]
-	[HOMEOTHERM:10040]
 	[APPLY_CREATURE_VARIATION:TAIL_STING_VENOM_ATTACK]
 	[APPLY_CREATURE_VARIATION:PINCER_ATTACK]
 	[CASTE:FEMALE]
@@ -423,7 +418,7 @@ Bark scorpions were sponsored by the generous contributions of the Bay 12 commun
 	[GO_TO_START]
 	[NAME:bark scorpion man:bark scorpion men:bark scorpion man]
 	[DESCRIPTION:A person with the head, pincers and tail of a bark scorpion.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'s']
@@ -532,7 +527,7 @@ Mantises were sponsored by the generous contributions of the Bay 12 community.
 	[GO_TO_START]
 	[NAME:mantis man:mantis men:mantis man]
 	[DESCRIPTION:A green person with the head and arms of a mantis.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'m']
@@ -641,7 +636,7 @@ Ticks were sponsored by the generous contributions of the Bay 12 community.
 	[GO_TO_START]
 	[NAME:tick man:tick men:tick man]
 	[DESCRIPTION:A person with the head and legs of a tick.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'t']
@@ -693,7 +688,6 @@ Lice were sponsored by the generous contributions of the Bay 12 community.
 	[ALL_ACTIVE]
 	[NO_SLEEP]
 	[CANNOT_JUMP]
-	[HOMEOTHERM:10071]
 	[APPLY_CREATURE_VARIATION:STANDARD_WALKING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CLIMBING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
@@ -749,7 +743,7 @@ Lice were sponsored by the generous contributions of the Bay 12 community.
 	[GO_TO_START]
 	[NAME:louse man:louse men:louse man]
 	[DESCRIPTION:A person with the head and legs of a louse.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'l']
@@ -800,7 +794,6 @@ Thrips were sponsored by the generous contributions of the Bay 12 community.
 	[ALL_ACTIVE]
 	[BENIGN][FLIER]
 	[NO_SLEEP]
-	[HOMEOTHERM:10071]
 	[APPLY_CREATURE_VARIATION:STANDARD_FLYING_GAITS:900:750:600:439:1900:2900] 20 kph, NO DATA
 	[APPLY_CREATURE_VARIATION:STANDARD_WALKING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
@@ -858,7 +851,7 @@ Thrips were sponsored by the generous contributions of the Bay 12 community.
 	[GO_TO_START]
 	[NAME:thrips man:thrips men:thrips man]
 	[DESCRIPTION:A person with the head and wings of a thrips.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:5:10]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'t']
@@ -947,7 +940,7 @@ Slugs were sponsored by the generous contributions of the Bay 12 community.
 	[NAME:slug man:slug men:slug man]
 	[CASTE_NAME:slug man:slug men:slug man]
 	[DESCRIPTION:A great slug with the torso of a man.  It pulls itself across the ground with its hands for greater speed.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'s']
@@ -998,7 +991,6 @@ Mosquitos were sponsored by the generous contributions of the Bay 12 community.
 	[FLIER]
 	[CREPUSCULAR]
 	[NO_SLEEP]
-	[HOMEOTHERM:10071]
 	[APPLY_CREATURE_VARIATION:STANDARD_FLYING_GAITS:900:750:600:439:1900:2900] 20 kph, NO DATA
 	[APPLY_CREATURE_VARIATION:STANDARD_WALKING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
@@ -1057,7 +1049,7 @@ Mosquitos were sponsored by the generous contributions of the Bay 12 community.
 	[GO_TO_START]
 	[NAME:mosquito man:mosquito men:mosquito man]
 	[DESCRIPTION:A person with the head and wings of a mosquito.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'m']
@@ -1110,7 +1102,6 @@ Jumping spiders were sponsored by the generous contributions of the Bay 12 commu
 	[PREFSTRING:ability to leap]
 	[ALL_ACTIVE]
 	[NO_SLEEP]
-	[HOMEOTHERM:10040]
 	[APPLY_CREATURE_VARIATION:STANDARD_WALKING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[MUNDANE]
@@ -1135,7 +1126,6 @@ Jumping spiders were sponsored by the generous contributions of the Bay 12 commu
 	[PUS:LOCAL_CREATURE_MAT:PUS:LIQUID]
 	[BODY_SIZE:0:0:1]
 	[MAXAGE:2:3]
-	[HOMEOTHERM:10040]
 	[CASTE:FEMALE]
 		[FEMALE]
 	[CASTE:MALE]
@@ -1166,7 +1156,7 @@ Jumping spiders were sponsored by the generous contributions of the Bay 12 commu
 	[GO_TO_START]
 	[NAME:jumping spider man:jumping spider men:jumping spider man]
 	[DESCRIPTION:A person with the head and arms of a jumping spider.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'j']
@@ -1341,7 +1331,7 @@ Moon snails were sponsored by the generous contributions of the Bay 12 community
 	[GO_TO_START]
 	[NAME:moon snail man:moon snail men:moon snail man]
 	[DESCRIPTION:A colorful person with the head and shell of a moon snail.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'s']
@@ -1392,7 +1382,6 @@ Brown recluse spiders were sponsored by the generous contributions of the Bay 12
 	[PREFSTRING:venomous bite]
 	[ALL_ACTIVE]
 	[NO_SLEEP]
-	[HOMEOTHERM:10040]
 	[APPLY_CREATURE_VARIATION:STANDARD_WALKING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[APPLY_CREATURE_VARIATION:STANDARD_CRAWLING_GAITS:9000:8900:8825:8775:9500:9900] 1 kph
 	[MUNDANE]
@@ -1439,7 +1428,6 @@ Brown recluse spiders were sponsored by the generous contributions of the Bay 12
 	[PUS:LOCAL_CREATURE_MAT:PUS:LIQUID]
 	[BODY_SIZE:0:0:1]
 	[MAXAGE:1:2]
-	[HOMEOTHERM:10040]
 	[CASTE:FEMALE]
 		[FEMALE]
 	[CASTE:MALE]
@@ -1487,7 +1475,7 @@ Brown recluse spiders were sponsored by the generous contributions of the Bay 12
 	[GO_TO_START]
 	[NAME:brown recluse spider man:brown recluse spider men:brown recluse spider man]
 	[DESCRIPTION:A person with the head and arms of a brown recluse spider.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'s']
@@ -1601,7 +1589,7 @@ Snails were sponsored by the generous contributions of the Bay 12 community.
 	[NAME:snail man:snail men:snail man]
 	[CASTE_NAME:snail man:snail men:snail man]
 	[DESCRIPTION:A creature with the shape of a man, but with stalks for eyes, and a great shell on its back.]
-	[POPULATION_NUMBER:30:50]
+	[POPULATION_NUMBER:5:10]
 	[CLUSTER_NUMBER:1:3]
 	[MAXAGE:60:80]
 	[CREATURE_TILE:'s']

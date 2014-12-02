@@ -20,7 +20,7 @@
 	[MINIMUM_SIZE:42500]
 	[MATERIAL_SIZE:4]
 	
-	The format is ATTACKEDGE/BLUNTcontact areapenetration sizeverb2ndverb3rdnounvelocity multiplier
+	The format is ATTACK:EDGE/BLUNT:contact area:penetration size:verb2nd:verb3rd:noun:velocity multiplier
 	Penetration size currently only matters for edged attacks.
 	
 	[ATTACK:EDGE:40000:6000:hack:hacks:NO_SUB:1250]
@@ -90,7 +90,7 @@
 	[SKILL:HAMMER]
 	[RANGED:CROSSBOW:BOLT]
 	[SHOOT_FORCE:1000]
-	[SHOOT_MAXVEL:1000]  This is just to make sure a near-weightless object doesn't go faster than the string could possibly go.
+	[SHOOT_MAXVEL:200]  This is just to make sure a near-weightless object doesn't go faster than the string could possibly go.
 	[TWO_HANDED:0]
 	[MINIMUM_SIZE:15000]
 	[MATERIAL_SIZE:3]
@@ -115,7 +115,7 @@
 	[SKILL:SWORD]
 	[RANGED:BOW:ARROW]
 	[SHOOT_FORCE:1000]
-	[SHOOT_MAXVEL:1000]
+	[SHOOT_MAXVEL:200]
 	[TWO_HANDED:0]
 	[MINIMUM_SIZE:15000]
 	[MATERIAL_SIZE:3]

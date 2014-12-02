@@ -157,37 +157,6 @@ Libs\DFHack\Announcement
 	If the addon is not active then this template does nothing.
 
 **********************************************
-Libs\DFHack\Spawn
-
-==============================================
-{DFHACK_SPAWN_CREATURE;<CREATURE>;<CASTE>;<NAME>}
-	Returns a reaction product line to spawn a creature.
-	Example:
-		{DFHACK_SPAWN_CREATURE;CAT;0;Fuzzy}
-
-==============================================
-{DFHACK_REACTION_SPAWN;<ID>;<CLASS>;<CREATURE>;<CASTE>;<NAME>}
-	Spawns a creature when the reaction completes, works exactly like the REACTION base template.
-	
-	Example:
-		{DFHACK_REACTION_SPAWN;SPAWN_CAT_M;ADDON_HOOK_PLAYABLE;CAT;0;Fuzzy}
-			[NAME:spawn a cat (male)]
-			[BUILDING:CRAFTSMAN:NONE]
-	
-		{DFHACK_REACTION_SPAWN;SPAWN_CAT_F;ADDON_HOOK_PLAYABLE;CAT;0;Furry}
-			[NAME:spawn a cat (female)]
-			[BUILDING:CRAFTSMAN:NONE]
-	
-==============================================
-{DFHACK_SPAWN;<CREATURE>;<CASTE>;<NAME>;[<ID>=""]}
-	Spawns a creature when the reaction <ID> completes, works exactly like the DFHACK_REACTION_BIND base template.
-	If <ID> is "" then the ID of the last reaction defined by a REACTION template is used.
-	(Specialized variants of REACTION, such as DFHACK_REACTION, work as well)
-	
-	Example:
-		{DFHACK_SPAWN;CAT;0;Fuzzy;EXAMPLE_REACTION}
-
-**********************************************
 Libs\Research
 
 ==============================================

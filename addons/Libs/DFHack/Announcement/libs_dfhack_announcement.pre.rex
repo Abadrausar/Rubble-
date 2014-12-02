@@ -2,8 +2,8 @@
 # Announcement Template and Script Install
 
 # Example:
-# As a reaction product line:
-# {DFHACK_ANNOUNCEMENT;You have unleashed a dragon!;COLOR_LIGHTRED}
+# In a reaction:
+# {DFHACK_ANNOUNCE;You have unleashed a dragon!;COLOR_LIGHTRED}
 # (the color defaults to white)
 #
 
@@ -27,7 +27,6 @@
 })
 
 # Install the script.
-(axis:write [rubble:fs] "df:hack/scripts/rubble_announce.lua" [rubble:raws "libs_dfhack_announcement.lua"])
-(rubble:prepfile "libs_dfhack_announcement.lua")
+(axis:write [rubble:fs] "out:scripts/rubble_announce.lua" [rubble:raws "libs_dfhack_announcement.lua"])
 
 (ret "")

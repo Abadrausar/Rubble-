@@ -4,7 +4,7 @@
 	[NAME:bolt:bolts]
 	[CLASS:BOLT]
 	[SIZE:150]
-	[ATTACK:EDGE:2:2000:stab:stabs:NO_SUB:1000]
+	[ATTACK:EDGE:5:1000:stab:stabs:NO_SUB:1000]
 		[ATTACK_PREPARE_AND_RECOVER:3:3]
 }
 
@@ -12,7 +12,7 @@
 	[NAME:arrow:arrows]
 	[CLASS:ARROW]
 	[SIZE:150]
-	[ATTACK:EDGE:2:2000:stab:stabs:NO_SUB:1000]
+	[ATTACK:EDGE:5:1000:stab:stabs:NO_SUB:1000]
 		[ATTACK_PREPARE_AND_RECOVER:3:3]
 }
 

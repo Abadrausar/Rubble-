@@ -84,10 +84,10 @@ Rubble 4 includes all kinds of useful addons, some for developers and some for e
 
 If you want to generate the Rubble version of "vanilla DF" you will need to activate the "Base" addon, this addon is already active in the default addonlist.ini ("Libs/Base" and "Libs/Castes" are also required, but those addons are forced active so you do not need to worry about them).
 
-All of the DFHack stuff is made under the assumption that what worked with 34.11 and DFHack r5 will work with the 40.x DFHack when it is available.
+All of the DFHack stuff is made under the assumption that what worked with 34.11 and DFHack r5e1 will work with the 40.x DFHack when it is available.
 If this is not true some or all of the DFHack related addons will not work.
 
-A few of the addons allow you to make gloves via reactions, unfortunately these gloves will be unusable (it's a vanilla bug). To make these gloves usable you need a special DFHack script to set the glove handedness (one should come with DFHack).
+A few of the addons allow you to make gloves via reactions, unfortunately these gloves will be unusable (it's a vanilla bug). To make these gloves usable you need a DFHack script to set the glove handedness.
 
 Base:
 	The standard base addon. Contains Rubblized versions of the vanilla raw files. 
@@ -164,10 +164,6 @@ Libs:
 		Adds the extremely useful rubble_fluids DFHack Lua library and command.
 		(adds no templates)
 	
-	Libs/DFHack/Spawn:
-		This addon provides templates for spawning creatures via DFHack.
-		Activating this addon installs a creature spawner script and adds a pair of templates to streamline its usage.
-	
 	Libs/Macro:
 		A modders resource for generating macros from scripts.
 		Adds no templates, only script commands.
@@ -227,6 +223,9 @@ User:
 	
 	User/Cast Anvil:
 		Gives playable races a reaction to cast an iron anvil from 5 iron bars.
+	
+	User/Cat Damper:
+		Removes ADOPTS_OWNER and RETURNS_VERMIN_KILLS_TO_OWNER from the cat, preventing catsplosion and widespread miasma.
 	
 	User/Cave Color:
 		Changes color and availability of cave "grasses". Level 1 is green, yellow and brown, level 2 is mostly blue and cyan, and level 3 is red and gray. 
@@ -318,6 +317,9 @@ User:
 		Raises fish vermin populations to the max.
 		This should stop you from fishing out a lake or ocean ever again! (unless you catch ~30,000 fish...)
 	
+	User/Fix/Human Diplomats:
+		Adds trade representatives and diplomats to the humans.
+	
 	User/Fix/Undead Melt:
 		Fixes bad temperature values in material_template_default.
 		Replaces material_template_default with a new copy, but the only changes are the temperature values.
@@ -338,6 +340,14 @@ User:
 			Replaces all pool biome tags in giant and animal-man creatures with the correct lake biome.
 		This is useful to make variations on vermin appear in game and to help them live long enough to be interesting.
 	
+	User/Fix/Whips:
+		Nerfs whips and scourges so they are not deadly anti-armor weapons.
+		
+	User/Generic Animal Mats:
+		This addon attempts to make all animal materials generic.
+		It works fine with the standard addons, but it may not work with all third party addons!
+		AFAIK all the standard addons are compatible with this one.
+	
 	User/Glass Forge:
 		The glass forge allows you to make armor and weapons from all three kinds of glass.
 		Green glass is a little under iron grade, clear glass is equivalent to iron, and crystal glass is a little under steel.
@@ -346,12 +356,6 @@ User:
 	User/Lamination:
 		Glue wooden planks together to make laminated logs, which are more valuable than most generic woods.
 		Uses the alchemy skill.
-	
-	User/Nerf/Ranged:
-		A simple addon that nerfs bows and crossbows, uses the stats from the popular Broken Arrow mod.
-	
-	User/Nerf/Whips:
-		Nerfs whips and scourges so they are not deadly anti-armor weapons.
 	
 	User/Pottery:
 		Replace the vanilla pottery system with a MUCH expanded version. 
@@ -497,8 +501,6 @@ Known Issues (non-bug):
 	
 	The scalemail armor from the "User/Warcrafter" addon is always marked "Foreign" in the equipment screen, you will have to explicitly assign it.
 		IMHO this is better than sometimes not having all the armor pieces (which is what happened before).
-	
-	The creature spawn script used by the "Libs/DFHack/Spawn" addon is really, really old. I strongly suggest that you do not use this addon until I update the script.
 
 Bugs:
 	
@@ -518,12 +520,22 @@ I know everything there is to know about how Rubble works and so I tend to forge
 "obvious" stuff in the docs. A reminder that I forgot something is more a help than a hindrance.
 
 In the event that I cannot be contacted on the Bay12 forums (user name "milo christiansen"), my email address is:
-	milo.christiansen (at) gmail.com
+	milo.christiansen (at) gmail (dot) com
 Please wait 1-4 weeks before giving up hope, as my Internet access is VERY irregular (and I check my email even less often).
 
 ==============================================
 Changelog:
 ==============================================
+v4.2 (for DF 40.5)
+	Updated the "Base" addon to 40.5.
+	Removed "User/Nerf/Ranged" (it's changes are now part of vanilla!).
+	Moved "User/Nerf/Whips" to "User/Fix/Whips".
+	Added "User/Generic Animal Mats", generic animal materials for all!
+	Tweaked the DFHack support a little.
+	Removed "Libs/DFHack/Spawn", as 40.x DFHack will come with a unit spawn script there is no need for it.
+	Added "User/Cat Damper", slightly less annoying cats.
+	Added "User/Fix/Human Diplomats", adds trade reps and diplomats to the humans.
+
 v4.1 (for DF 40.3)
 	Added "Libs/Research", library support for a research reaction system.
 	Moved all "user" addons to the "User" group.
