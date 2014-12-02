@@ -74,6 +74,7 @@ func InitScripting() {
 	thread.Setup(state)
 	
 	state.NewNameSpace("rubble")
+	state.NewNamespacedVar("rubble:version", raptor.NewValueString(RubbleVersion))
 	state.NewNamespacedVar("rubble:dfdir", raptor.NewValueString(DFDir))
 	state.NewNamespacedVar("rubble:outputdir", raptor.NewValueString(OutputDir))
 	state.NewNamespacedVar("rubble:addonsdir", raptor.NewValueString(AddonsDir))
@@ -184,7 +185,7 @@ func CommandRubble_GetVar(script *raptor.Script, params []*raptor.Value) {
 // 	rubble:stageparse code [stage]
 // Note that how code is parsed depends on the parse stage.
 // Valid values for stage are:
-//	0 (or just leave it off) for use the current stage
+//	0 (or just leave it off) to use the current stage
 //	3 for preparse
 //	4 for parse
 //	5 for postparse
@@ -203,7 +204,7 @@ func CommandRubble_Parse(script *raptor.Script, params []*raptor.Value) {
 	script.RetVal = raptor.NewValueString(string(Parse([]byte(params[0].String()), stgUseCurrent)))
 }
 
-// Calles a Rubble template.
+// Calls a Rubble template.
 // 	rubble:calltemplate name [params...]
 // Returns the templates return value.
 func CommandRubble_CallTemplate(script *raptor.Script, params []*raptor.Value) {

@@ -232,7 +232,7 @@ func (this *CompiledLexer) LookAhead() *Token {
 	return this.Token(this.currentToken + 1)
 }
 
-// Advance retrives the next token from the stream.
+// Advance retrieves the next token from the stream.
 // For most purposes use GetToken instead.
 func (this *CompiledLexer) Advance() {
 	this.currentToken++

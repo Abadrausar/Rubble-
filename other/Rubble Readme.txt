@@ -46,10 +46,12 @@ If you use OSX or Linux, 32 bit binaries for these OSes can be found in the "rub
 Configure:
 ==============================================
 
-Rubble allows you to change its directory settings via command line options or a config file. To see these options and their defaults run "rubble -h". 
+Rubble allows you to change its settings via command line options or a config file. To see these options and their defaults run "rubble -h".
 
-Rubble tries to read the file "./rubble.ini", if this does not fail Rubble will load directory setting from here before processing command line options (command line options always take precedence).
-Example "rubble.ini" (using the defaults):
+ALL command line options may also be specified in the config file.
+
+Rubble tries to read the file "./rubble.ini", if this does not fail Rubble will load settings from here before processing command line options (command line options always take precedence).
+Example "rubble.ini" (using some of the defaults):
 	[path]
 	dfdir = ..
 	outputdir = ../raw/objects
@@ -108,7 +110,7 @@ Dev/Dummy Reactions:
 	These reactions are empty by default, use if you want to add new content after worldgen.
 
 Fix/Butcher Inorganic:
-	Allows you to butcher creatures made from inorganics, FB stone walls anyone?
+	Allows you to butcher creatures made from (some) inorganics, FB stone walls anyone?
 
 Fix/Undead Melt:
 	Fixes bad temperature values in material_template_default.
@@ -132,7 +134,6 @@ Fix/Vermin Variations:
 	
 Generic Animal Mats:
 	Make animal mats such as meat and leather generic. This is mostly for those who have FPS issues.
-	As a special bonus :p this addon should work with most any mod, even total conversions.
 	This addon is packed as a zip to demo how that is done.
 
 Libs/DFHack/Announcement:
@@ -185,6 +186,22 @@ If you really want to be helpful run "rubble -norecover" and post that log as we
 ==============================================
 Changelog:
 ==============================================
+v3.7
+	Made some template changes to "Base/Templates":
+		Added @IF_ACTIVE
+		Added @IF_CODE
+		Changed IF to @IF
+		Changed SET to @SET
+		(use the various versions of ECHO and VOID to force a parse stage with @ templates)
+	There is now a builtin version variable exposed to scripts: rubble:version
+		(type string, set to "3.7" this version)
+	ALL command line parameters may now be listed in the config file.
+	The way variables in template parameters are handled has changed a little:
+		All variables in parameters are now expanded before the template is called.
+	Fixed lots of little errors in the docs.
+	Some very minor bugfixes.
+	Updated the Notepad++ UDL
+
 v3.6
 	Updated to Raptor 2.2
 		Changes:
@@ -202,7 +219,7 @@ v3.6
 		This should resolve issues with files overriding each other when they shouldn't.
 		WARNING! This change will break some tweak scripts! (it's an easy fix)
 	Updated the tweak scripts to handle the changes to rubble:raws and the raw parser.
-	Forced init scripts are now ust called "init scripts" and no longer need to be named "forced_init".
+	Forced init scripts are now called "init scripts" and no longer need to be named "forced_init".
 		Now they use the extension ".init.rsf", functionality is unchanged.
 	Renamed the Base init script to "base.init.rsf"
 	The "Add CHILD Tags" addon is a little more discriminating.

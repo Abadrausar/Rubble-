@@ -60,7 +60,7 @@ Anatomy of a Template Call
 ==============================================
 
 	All leading and trailing whitespace is striped from the params
-		If a param is of the form $<NAME> or ${<NAME>} then it is treated like a variable name and replaced with it's value
+	All variables are expanded in the params
 	If the template is a native template then it's handler is called and the handler's return value is returned
 	If the template is a script template then the script is run and the script's return value is converted to a string and returned
 	Else the template's body is loaded and these transforms are run on it:

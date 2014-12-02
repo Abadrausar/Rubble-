@@ -78,12 +78,16 @@ func (this *Template) Call(params []string) string {
 	for i := range params {
 		params[i] = strings.TrimSpace(params[i])
 
+		// Old way
 		// If the param is a variable name replace with value
 		// Does not replace variables embeded in other text
-		name := varNameRegEx.FindStringSubmatch(params[i])
-		if name != nil {
-			params[i] = varNameRegEx.ReplaceAllString(params[i], VariableData[name[1]])
-		}
+		//name := varNameRegEx.FindStringSubmatch(params[i])
+		//if name != nil {
+		//	params[i] = varNameRegEx.ReplaceAllString(params[i], VariableData[name[1]])
+		//}
+		
+		// New way, just expand everything
+		params[i] = ExpandVars(params[i])
 	}
 
 	// Native template

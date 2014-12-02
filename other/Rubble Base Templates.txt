@@ -44,15 +44,26 @@ User Templates defined in the "Base/Templates" addon.
 	Appends the result of parsing <PRERAWS> to the end of SHARED_OBJECT <ID>. If that shared object does not exist it saves the result to append to any definition that may come later.
 
 ==============================================
-{IF;<STRING1>;<STRING2>;<THEN_PRERAWS>}
-{IF;<STRING1>;<STRING2>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
+{@IF;<STRING1>;<STRING2>;<THEN_PRERAWS>}
+{@IF;<STRING1>;<STRING2>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
 	If <STRING1> and <STRING2> are equal, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned. This is very useful with variables.
 	
 	Example:
 		{IF;$TEST_VAR;YES;[FOO];[BAR]}
 
 ==============================================
-{SET;<NAME>;<VALUE>}
+{@IF_ACTIVE;<ADDON>;<THEN_PRERAWS>}
+{@IF_ACTIVE;<ADDON>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
+	If <ADDON> is active, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
+
+==============================================
+{@IF_CODE;<CODE>;<THEN_PRERAWS>}
+{@IF_CODE;<CODE>;<THEN_PRERAWS>;<ELSE_PRERAWS>}
+	If <CODE> returns true, then <THEN_PRERAWS> are parsed and returned. Else, <ELSE_PRERAWS> are parsed and returned.
+	(<CODE> may be any valid Raptor code)
+
+==============================================
+{@SET;<NAME>;<VALUE>}
 	Sets a variable of name <NAME> to value <VALUE>. Returns nothing.
 
 ==============================================

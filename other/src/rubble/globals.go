@@ -24,6 +24,9 @@ package main
 
 import "sort"
 
+// Update this!
+var RubbleVersion = "3.7"
+
 // All the addons are loaded to here.
 var Addons []*Addon
 

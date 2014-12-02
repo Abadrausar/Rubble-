@@ -24,6 +24,7 @@ package raptor
 
 import "fmt"
 import "io"
+import "os"
 import "errors"
 import "strings"
 
@@ -258,24 +259,42 @@ func (this *Script) ParseNameSpaceName(name string) *NameSpace {
 
 // Output
 
+// Printf writes to the script output if set, else writes to the host output if the host is set, else defaults to Stdout.
 func (this *Script) Printf(format string, msg ...interface{}) {
 	if this.Output == nil {
+		if this.Host == nil {
+			fmt.Fprintf(os.Stdout, format, msg...)
+			return
+		}
+		
 		fmt.Fprintf(this.Host.Output, format, msg...)
 		return
 	}
 	fmt.Fprintf(this.Output, format, msg...)
 }
 
+// Println writes to the script output if set, else writes to the host output if the host is set, else defaults to Stdout.
 func (this *Script) Println(msg ...interface{}) {
 	if this.Output == nil {
+		if this.Host == nil {
+			fmt.Fprintln(os.Stdout, msg...)
+			return
+		}
+		
 		fmt.Fprintln(this.Host.Output, msg...)
 		return
 	}
 	fmt.Fprintln(this.Output, msg...)
 }
 
+// Print writes to the script output if set, else writes to the host output if the host is set, else defaults to Stdout.
 func (this *Script) Print(msg ...interface{}) {
 	if this.Output == nil {
+		if this.Host == nil {
+			fmt.Fprint(os.Stdout, msg...)
+			return
+		}
+		
 		fmt.Fprint(this.Host.Output, msg...)
 		return
 	}

@@ -102,7 +102,7 @@ func NewLexer(input string, startline, startcolumn int) *Lexer {
 	return this
 }
 
-// Advance retrives the next token from the stream.
+// Advance retrieves the next token from the stream.
 // For most purposes use GetToken instead.
 func (this *Lexer) Advance() {
 

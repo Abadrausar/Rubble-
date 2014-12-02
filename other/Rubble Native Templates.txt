@@ -37,12 +37,12 @@ Built-in Native Templates
 {!SCRIPT_TEMPLATE;<NAME>;...;<CODE>}
 {!SCRIPT_TEMPLATE;<NAME>;<PARAM>...;<CODE>}
 {!SCRIPT_TEMPLATE;<NAME>;<PARAM>=<DEFAULT_VALUE>...;<CODE>}
-	Exactly like !TEMPLATE except <CODE> should be a NCA script and any params are declared as NCA variables.
+	Exactly like !TEMPLATE except <CODE> should be a Raptor script and any params are declared as Raptor variables.
 	
 	Example:
 		{!SCRIPT_TEMPLATE;FOO;(ret "bar")}
-		{!TEMPLATE;GREET;__thing__;(str:add Hello [__thing__] !)}
-		{!TEMPLATE;LIST;...;
+		{!SCRIPT_TEMPLATE;GREET;__thing__;(str:add Hello [__thing__] !)}
+		{!SCRIPT_TEMPLATE;LIST;...;
 			(var tmp)
 			(foreach params {
 				(set tmp (str:add [tmp] ", " [params 1]))

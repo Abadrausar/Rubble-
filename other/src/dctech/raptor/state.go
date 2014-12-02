@@ -177,7 +177,7 @@ func (this *State) RegisterType(name string, handler ObjectFactory) {
 	this.Types.Store(itemname, handler)
 }
 
-// GetType retrieves a named types ObjectFactory.
+// GetType retrieves a named type's ObjectFactory.
 func (this *State) GetType(name string) ObjectFactory {
 	space, itemname := this.ParseName(name)
 	if space != nil {

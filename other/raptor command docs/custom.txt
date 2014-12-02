@@ -1,4 +1,6 @@
 
+Built-in Natives:
+
 Causes a panic.
 	
 	panic value
@@ -57,7 +59,56 @@ Checks if a named addon is active.
 	The name check is case-sensitive!
 	Returns true or false.
 
-Variables
+User Commands (loaded by init script in "Base" addon):
+
+Increment a variable (by name).
+	
+	++ name
+
+Decrement a variable (by name).
+	
+	-- name
+
+For loop.
+	
+	for init test incriment code
+
+While loop.
+	
+	while test code
+
+Include a file.
+	
+	include path
+
+Dependency check.
+	
+	rubble:requireaddon me addon
+	
+	me and addon both need to be the full addon names! 
+	me should be the addon doing the checking, addon should be the one checked.
+
+Dependency check.
+	
+	rubble:incompatibleaddon me addon
+	
+	Same as rubble:requireaddon, just for incompatibilities instead of requirements.
+
+Group dependency check.
+	
+	rubble:grouprequires me addon
+	
+	Same as rubble:requireaddon except me should be an addon group.
+
+Group dependency check.
+	
+	rubble:groupincompatible me addon
+	
+	Same as rubble:incompatibleaddon except me should be an addon group.
+
+
+Variables:
+	rubble:version		The Rubble version
 	rubble:dfdir		The Dwarf Fortress directory
 	rubble:outputdir	The Rubble output directory
 	rubble:addonsdir	The directory where any addons may be found

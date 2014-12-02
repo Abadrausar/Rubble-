@@ -90,15 +90,31 @@
 	})
 })
 
-(rubble:template "IF" a b then "else=" {
-	(if (str:cmp [a] [b]){
+(rubble:template "@IF" a b then "else=" {
+	(if (str:cmp [a] [b]) {
 		(rubble:stageparse [then])
 	}{
 		(rubble:stageparse [else])
 	})
 })
 
-(rubble:template "SET" name value {
+(rubble:template "@IF_ACTIVE" addon then "else=" {
+	(if (rubble:addonactive [addon]){
+		(rubble:stageparse [then])
+	}{
+		(rubble:stageparse [else])
+	})
+})
+
+(rubble:template "@IF_CODE" code then "else=" {
+	(if (eval [code]) {
+		(rubble:stageparse [then])
+	}{
+		(rubble:stageparse [else])
+	})
+})
+
+(rubble:template "@SET" name value {
 	(rubble:setvar [name] [value])
 	(ret "")
 })
@@ -116,9 +132,9 @@
 	})
 	(ret "")
 })
-(rubble:template "!PRINT" {(rubble:print [params])})
-(rubble:template "PRINT" {(rubble:print [params])})
-(rubble:template "#PRINT" {(rubble:print [params])})
+(rubble:template "!PRINT" ... {(rubble:print [params])})
+(rubble:template "PRINT" ... {(rubble:print [params])})
+(rubble:template "#PRINT" ... {(rubble:print [params])})
 
 (rubble:template "SHARED_PLANT" id raws {
 	# Tree Tiles

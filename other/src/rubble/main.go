@@ -45,7 +45,7 @@ func main() {
 		}
 	}()
 
-	LogPrintln("Rubble v3.6")
+	LogPrintln("Rubble " + RubbleVersion)
 	LogPrintln("After Blast comes Rubble.")
 	LogPrintln("=============================================")
 

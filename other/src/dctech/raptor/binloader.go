@@ -166,7 +166,7 @@ func LoadBinaryV1(code []byte) (script *CompiledScript, oops error) {
 // Token count, 2 bytes
 // String count, 2 bytes
 // Code stream, 2 bytes per token, Token count * 2 bytes long
-// String table, variable entry size, 2 byte record length, record length bytes of data, repeates String count times
+// String table, variable entry size, 2 byte record length, record length bytes of data, repeats String count times
 // 
 // Notes:
 // Should work for all (normal) scripts.
@@ -321,7 +321,7 @@ func LoadBinaryV2(code []byte) (script *CompiledScript, oops error) {
 // Token count, 2 bytes
 // String count, 1 byte
 // Code stream, 1 byte per token, Token count bytes long
-// String table, variable entry size, 2 byte record length, record length bytes of data, repeates String count times
+// String table, variable entry size, 2 byte record length, record length bytes of data, repeats String count times
 // 
 // Notes:
 // This format produces smaller binaries at the cost of a smaller maximum string table.

@@ -53,7 +53,7 @@ Shell mode is great for learning Raptor, as you can play around with the various
 
 The one place the embedded version of the shell differs from the version that comes with Raptor, is that all the commands and variables in the "rubble" namespace are pre-defined, so it is technically possible to simulate a full run of Rubble from the shell. ("technically" because it would be a tremendous amount of typing, so I'm not going to test it)
 
-One thing to keep in mind: Rubble has a copy of the "Shell Predefs" loaded via a forced init script, so if you want to use the "-forcedinit" option you will want to use the "-nopredefs" option as well or Rubble will crash with a script error.
+One thing to keep in mind: Rubble has a copy of the "Shell Predefs" loaded via a init script, so if you want to use the "-init" option you will want to use the "-nopredefs" option as well or Rubble will crash with a script error.
 
 To exit the shell just enter CTRL-Z (on windows, I have no idea how to generate an EOF char on Mac or Linux)
 
@@ -67,7 +67,7 @@ To validate a script (syntax check only) run:
 'rubble -shell -validate -script="<script path>"'
 
 To validate a script (command and object lit check, may result in false positives) run:
-'rubble -shell -validate -all -forcedinit -nopredefs -script="<script path>"'
+'rubble -shell -validate -all -init -nopredefs -script="<script path>"'
 
 To run a script in batch mode run:
 'rubble -shell -script="<script path>"'

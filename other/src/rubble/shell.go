@@ -88,13 +88,13 @@ func ShellModeRun() {
 	// Load predefs if desired.
 	if !NoPredefs {
 		LogPrintln("Loading Predefined User Commands...")
-		script.Code.AddCodeSource(raptor.NewLexer(preDefs, 64, 1))
+		script.Code.AddCodeSource(raptor.NewLexer(preDefs, 275, 1))
 		rtn, err := GlobalRaptorState.RunShell(script)
 		if err != nil {
 			LogPrintln("Predefine Error:", err)
 			LogPrintln("Predefine Ret:", rtn)
 		}
-		script.RetVal = nil
+		script.RetVal = raptor.NewValue()
 	}
 
 	if Validate && ValidateAll {

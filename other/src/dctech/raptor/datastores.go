@@ -29,7 +29,7 @@ import "sync"
 // a nil or non-nil keys is expected but not found.
 type ObjectFactory func(script *Script, keys []string, values []*Value) *Value
 
-// An Enviroment is where all variables are stored.
+// An Environment is where all variables are stored.
 // Nesting is handled by State via EnvStore.
 // Touch only if you know what you are doing!
 type Environment struct {

@@ -1,0 +1,22 @@
+EBNF for Raptor
+(has errors (I think...))
+
+comment = "#" { /* an arbitrary character except new line */ | "\\'" } "\n" .
+whitespace = " " | "\t" | "\n" | "\r" | "," | comment { " " | "\t" | "\n" | "\r" | "," | comment } .
+letter = /* an arbitrary character except white space (as defined above), double quote, curly brackets, parentheses, and square brackets */ .
+
+sbracket = "[" | "]" .
+cbracket = "{" | "}" .
+paren = "(" | ")" .
+
+program = { value } .
+command = "(" value { value } ")" .
+dereference = "[" value { value } "]" .
+block = "{" { value } "}" .
+objlit = "<" value { value [ "=" value ] } ">" .
+
+value = command | dereference | string | block | objlit .
+
+string = rawstring | dqstring .
+rawstring = letter { letter } .
+dqstring = "\"" { letter | whitespace | "\\\"" | sbracket | paren | cbracket } "\"" .
