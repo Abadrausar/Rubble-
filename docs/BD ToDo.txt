@@ -5,6 +5,9 @@ The following is a unsorted list of things I (may) want to add to better dorfs a
 Flesh out orcs
 	As of now they are just up-sized goblins that can use bronze and steel.
 
+Write my own generic materials system
+	And the remove Acellerated DF support
+
 Dwarf castes
 	Add a few castes to the dwarves, not too many
 

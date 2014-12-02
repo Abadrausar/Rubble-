@@ -62,5 +62,6 @@ BD_WICKER = YES
 # Use the steam engine? Does not effect saurians. Requires DFHack.
 DFHACK_STEAM = YES
 
-# Use Better Dorfs with Accelerated DF V1.1? You MUST install Accelerated DF BEFORE you install/activate Better Dorfs.
-BD_COMPAT_ACCELERATED_DF = NO
+# Use Better Dorfs generic materials?
+# Currently only effects creatures
+BD_GENERIC_MATS = YES
