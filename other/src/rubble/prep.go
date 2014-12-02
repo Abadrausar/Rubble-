@@ -28,7 +28,7 @@ import "dctech/raptor"
 func PrepModeRun(region string) {
 	LogPrintln("=============================================")
 	LogPrintln("Entering Prep Mode for Region:", region)
-	
+
 	path := DFDir
 	if region == "raw" {
 		// Main raw folder
@@ -36,19 +36,19 @@ func PrepModeRun(region string) {
 	} else {
 		path += "/data/save/" + region + "/raw/prep"
 	}
-	
+
 	source, err := dcfs.NewDirReader(path)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	LogPrintln("Loading Prep Files...")
 	prep := loadPrep(source, region)
-	
+
 	// A hack, but a hack that keeps everything working correctly.
 	prep.Active = true
 	Files = NewFileList([]*Addon{prep})
-	
+
 	LogPrintln("Running Prep Scripts...")
 	for _, i := range Files.Order {
 		if Files.Files[i].Skip || !Files.Files[i].PrepScript {
@@ -74,9 +74,9 @@ func PrepModeRun(region string) {
 
 func loadPrep(source dcfs.DataSource, region string) *Addon {
 	addon := NewAddon(region + "/Prep")
-	
+
 	for _, filepath := range source.ListFiles("") {
-		
+
 		LogPrintln("  " + filepath)
 
 		file := new(AddonFile)

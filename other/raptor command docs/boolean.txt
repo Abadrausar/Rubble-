@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package boolean
     import "dctech/raptor/commands/boolean"
 
-    Raptor Boolean Commands.
+
 
 FUNCTIONS
 
@@ -27,12 +27,5 @@ func CommandBool_Or(script *raptor.Script, params []*raptor.Value)
 	bool:or a b
 
     Returns a || b
-
-func Setup(state *raptor.State)
-    Adds the boolean commands to the state. The boolean commands are:
-
-	bool:and
-	bool:or
-	bool:not
 
 

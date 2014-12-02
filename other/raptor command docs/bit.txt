@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package bit
     import "dctech/raptor/commands/bit"
 
-    Raptor Bitwise Commands.
+
 
 FUNCTIONS
 
@@ -48,15 +48,5 @@ func CommandBit_Xor(script *raptor.Script, params []*raptor.Value)
 	bit:xor a b
 
     Returns a ^ b
-
-func Setup(state *raptor.State)
-    Adds the bitwise commands to the state. The bitwise commands are:
-
-	bit:lshift
-	bit:rshift
-	bit:and
-	bit:or
-	bit:xor
-	bit:not
 
 

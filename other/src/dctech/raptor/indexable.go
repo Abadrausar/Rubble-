@@ -6,7 +6,7 @@ package raptor
 
 //import "fmt"
 
-// Indexable represents an object that may be used with the 
+// Indexable represents an object that may be used with the
 // dereference operator ([]) as well as some of the base commands.
 // Indexable is readonly.
 type Indexable interface {
@@ -19,14 +19,14 @@ type Indexable interface {
 	// The output should resemble Raptor code but it does not need to use things like proper types.
 	String() string
 
-	// Code should return the contents as valid Raptor code, if this is impossible return a 
+	// Code should return the contents as valid Raptor code, if this is impossible return a
 	// string that is descriptive of the type eg "<SomeUnconvertableType>".
 	// If the Indexable does not have a type name it is ok to use map or array if the data is written out in a form
 	// the map or array ObjectFactory can understand.
 	CodeString() string
 }
 
-// EditIndexable represents an object that may be used with the 
+// EditIndexable represents an object that may be used with the
 // dereference operator ([]) as well as some of the base commands.
 // EditIndexable is read/write.
 type EditIndexable interface {

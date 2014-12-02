@@ -13,21 +13,21 @@ import "strings"
 // Script stores all non-global data and provides an interface to the global data.
 // Script.Host is only valid if the script is being run by a State!
 type Script struct {
-	RetVal     *Value       // The return value of the last command
-	Exit       bool         // true when exiting
-	Return     bool         // true when a return is active
-	Break      bool         // true when a break is active
-	BreakLoop  bool         // true when a loop break is active
-	Error      bool         // set by some commands on error, this is NOT automatically reset!
-	This       *Value       // When the value retrieved by the indexing deref operator is a command this is set to the containing Indexable.
-	Envs       *EnvStore    // The script environments, you should not need to touch this.
-	Code       *BlockStore  // This is where script code is stored.
-	Output     io.Writer    // Normally set to nil (in which case the global value is used)
-	Host       *State       // Set to nil unless this Script is being run, then it is the host State.
-	
-	// Set to "" unless a _NATIVE_ command is running, then it is the string command name. 
-	// Note that if another native command is called by a native command (eg in loop commands) this value can 
-	// get trashed (for the first command). This could be a stack, but in practice it's not needed, 
+	RetVal    *Value      // The return value of the last command
+	Exit      bool        // true when exiting
+	Return    bool        // true when a return is active
+	Break     bool        // true when a break is active
+	BreakLoop bool        // true when a loop break is active
+	Error     bool        // set by some commands on error, this is NOT automatically reset!
+	This      *Value      // When the value retrieved by the indexing deref operator is a command this is set to the containing Indexable.
+	Envs      *EnvStore   // The script environments, you should not need to touch this.
+	Code      *BlockStore // This is where script code is stored.
+	Output    io.Writer   // Normally set to nil (in which case the global value is used)
+	Host      *State      // Set to nil unless this Script is being run, then it is the host State.
+
+	// Set to "" unless a _NATIVE_ command is running, then it is the string command name.
+	// Note that if another native command is called by a native command (eg in loop commands) this value can
+	// get trashed (for the first command). This could be a stack, but in practice it's not needed,
 	// just make sure you don't use it in a command after calling another command.
 	// (this means don't use the error generators after you start such a loop)
 	RunningCmd string
@@ -284,7 +284,7 @@ func (this *Script) Printf(format string, msg ...interface{}) {
 			fmt.Fprintf(os.Stdout, format, msg...)
 			return
 		}
-		
+
 		fmt.Fprintf(this.Host.Output, format, msg...)
 		return
 	}
@@ -298,7 +298,7 @@ func (this *Script) Println(msg ...interface{}) {
 			fmt.Fprintln(os.Stdout, msg...)
 			return
 		}
-		
+
 		fmt.Fprintln(this.Host.Output, msg...)
 		return
 	}
@@ -312,7 +312,7 @@ func (this *Script) Print(msg ...interface{}) {
 			fmt.Fprint(os.Stdout, msg...)
 			return
 		}
-		
+
 		fmt.Fprint(this.Host.Output, msg...)
 		return
 	}
@@ -380,7 +380,7 @@ func (this *Script) Exec() {
 }
 
 // SafeExec is exported for the use of commands ONLY!
-// SafeExec traps panics and turns them into errors, use when you want to emulate the behavior 
+// SafeExec traps panics and turns them into errors, use when you want to emulate the behavior
 // of State.Run without doing the other stuff Run does.
 // Respects this.Host.NoRecover.
 // Halts all exit states, but does none of the other cleanup (aside from what Exec already does).
@@ -392,7 +392,7 @@ func (this *Script) SafeExec() (err error) {
 		this.Return = false
 		this.Break = false
 		this.BreakLoop = false
-		
+
 		if this.Host.NoRecover {
 			return
 		}
@@ -587,7 +587,7 @@ func (this *Script) fetchValue() *Value {
 // Validate checks a script to make sure all braces are matched and things like derefs are correctly formed.
 // Validate CANNOT ensure a script is valid! Validate will only find obvious syntax errors.
 // The check is "destructive" eg the code is consumed.
-// If validate is called from the state is will run further checks for commands and object literals 
+// If validate is called from the state is will run further checks for commands and object literals
 // (Note that this may result in false missing command errors).
 func (this *Script) Validate() (err error) {
 	err = nil
@@ -603,10 +603,10 @@ func (this *Script) Validate() (err error) {
 				err = errors.New(fmt.Sprint(i))
 			}
 		}
-		
+
 		this.Code.Clear()
 	}()
-	
+
 	this.validate()
 	return
 }
@@ -621,7 +621,7 @@ func (this *Script) validate() {
 
 func (this *Script) validateCommand() {
 	GetToken(this.Code.Last(), TknCmdBegin)
-	
+
 	// Get the command's name
 	name := this.validateValue()
 	paramcount := -1
@@ -634,19 +634,19 @@ func (this *Script) validateCommand() {
 			paramcount = len(command.Params)
 		}
 	}
-	
+
 	// Read the commands parameters if any
 	for !CheckLookAhead(this.Code.Last(), TknCmdEnd) {
 		this.validateValue()
 		params++
 	}
-	
+
 	if paramcount != -1 {
 		if paramcount != params {
 			panic("Invalid param count to " + name.String() + ".")
 		}
 	}
-	
+
 	GetToken(this.Code.Last(), TknCmdEnd)
 }
 
@@ -667,7 +667,7 @@ func (this *Script) validateObjLit() {
 	GetToken(this.Code.Last(), TknObjLitBegin)
 
 	name := this.validateValue()
-	
+
 	if this.Host != nil {
 		this.GetType(name.String())
 	}
@@ -679,7 +679,7 @@ func (this *Script) validateObjLit() {
 			this.validateValue()
 		}
 	}
-	
+
 	GetToken(this.Code.Last(), TknObjLitEnd)
 }
 
@@ -717,7 +717,3 @@ func (this *Script) validateValue() *Value {
 	}
 	panic("UNREACHABLE")
 }
-
-
-
-

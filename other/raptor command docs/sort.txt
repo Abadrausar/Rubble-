@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package sort
     import "dctech/raptor/commands/sort"
 
-    Raptor Ordered Map Commands.
+
 
 FUNCTIONS
 
@@ -20,37 +20,5 @@ func CommandSort_New(script *raptor.Script, params []*raptor.Value)
 	sort:new
 
     Ordered maps are also thread safe. Returns a new (empty) ordered map.
-
-func NewOrderedMap() raptor.EditIndexable
-
-func NewOrderedMapFromIndexable(input raptor.Indexable) raptor.EditIndexable
-
-func Setup(state *raptor.State)
-    Adds the ordered map commands to the state. The ordered map commands
-    are:
-
-	sort:map
-	sort:new
-
-
-TYPES
-
-type OrderedMap struct {
-    // contains filtered or unexported fields
-}
-
-func (this *OrderedMap) CodeString() string
-
-func (this *OrderedMap) Exists(index string) bool
-
-func (this *OrderedMap) Get(index string) *raptor.Value
-
-func (this *OrderedMap) Keys() []string
-
-func (this *OrderedMap) Len() int64
-
-func (this *OrderedMap) Set(index string, value *raptor.Value) bool
-
-func (this *OrderedMap) String() string
 
 

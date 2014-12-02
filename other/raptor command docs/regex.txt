@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package regex
     import "dctech/raptor/commands/regex"
 
-    Raptor Regular Expression Commands.
+
 
 FUNCTIONS
 
@@ -13,10 +13,5 @@ func CommandRegEx_Replace(script *raptor.Script, params []*raptor.Value)
 	regex:replace regex input replace
 
     Returns input with all strings matching regex replaced with replace.
-
-func Setup(state *raptor.State)
-    Adds the regex commands to the state. The regex commands are:
-
-	regex:replace
 
 

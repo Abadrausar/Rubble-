@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package integer
     import "dctech/raptor/commands/integer"
 
-    Raptor Integer Commands.
+
 
 FUNCTIONS
 
@@ -62,17 +62,5 @@ func CommandInt_Sub(script *raptor.Script, params []*raptor.Value)
 	int:sub a b
 
     Returns a - b
-
-func Setup(state *raptor.State)
-    Adds the integer commands to the state. The integer commands are:
-
-	int:add
-	int:sub
-	int:div
-	int:mod
-	int:mul
-	int:gt
-	int:lt
-	int:eq
 
 

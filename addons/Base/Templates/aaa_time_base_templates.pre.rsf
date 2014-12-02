@@ -25,7 +25,7 @@
 		(rubble:abort (str:add "Error: Attempt to use invalid unit: " [unit] " In #ADV_TIME."))
 	})
 	
-	(var out (int:mul [rubble:timemap [unit]] [count]))
+	(var out (float:mul [rubble:timemap [unit]] [count]))
 	(if (int:lt [out] 1) {
 		(set out 1)
 	})
@@ -39,7 +39,7 @@
 	})
 	
 	# This should work...
-	(var out (int:mul [rubble:timemap [unit]] [count]))
+	(var out (float:mul [rubble:timemap [unit]] [count]))
 	(set out (convert:int (float:div [out] 72)))
 	(if (int:lt [out] 1) {
 		(set out 1)
@@ -54,7 +54,7 @@
 	})
 	
 	# This should work...
-	(var out (int:mul [rubble:timemap [unit]] [count]))
+	(var out (float:mul [rubble:timemap [unit]] [count]))
 	(set out (convert:int (float:div [out] 7200)))
 	(if (int:lt [out] 1) {
 		(set out 1)

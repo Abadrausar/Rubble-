@@ -211,7 +211,7 @@ Known Issues (non-bug):
 	You should not use the extension .txt for readme files, as this will cause Rubble to parse those files.
 		See "Rubble Addons.txt" for more details.
 	
-	It may be possible to see FBs made from "dfhack command" or "caste transformation", there is nothing I can do about this as autosyndrome requires the use of inorganic materials.
+	It may be possible to see FBs made from "dfhack command" or "caste transformation", there is nothing I can do about this as autoSyndrome requires the use of inorganic materials.
 
 When making an error report please post the FULL log file! Posting just a few lines tells me almost nothing about the problem, after all I made Rubble write all that stuff for a reason :)
 
@@ -222,6 +222,14 @@ I know everything there is to know about how Rubble works and so I tend to forge
 ==============================================
 Changelog:
 ==============================================
+v3.13
+	The resource file is no longer linked into the OSX and Linux binaries.
+		AFAIK it is useless with them anyway...
+	The Raptor command docs have less unrelated content.
+		Unfortunately there is still much room for improvement...
+	Fixed the time templates (@ADV_TIME. @FORT_TIME, and @GROWDUR) so that floating point amounts actually work.
+	Added a simple timing mode for benchmarking, activate via "-bench" (this prints the run time just before exit).
+
 v3.12
 	Revised/extended/bugfixed "Libs/DFHack/Fluids".
 		I added the ability to spawn fluids in an area and fixed a bug that got in by accident 
@@ -418,7 +426,7 @@ v3.1
 		base_templates -> Base/Templates
 		clear_raws -> Base/Clear
 		broken_arrow -> Nerf/Ranged
-		nerf_whips -> Nerf/whips
+		nerf_whips -> Nerf/Whips
 		fix_vermin_variations -> Fix/Vermin Variations
 		mlc_tileset -> Tileset/MLC
 	Updated the "Add CHILD Tags" addon to handle DOES_NOT_EXIST and EQUIPMENT_WAGON creatures

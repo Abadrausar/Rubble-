@@ -141,7 +141,7 @@ func LoadBinaryV1(code []byte) (script *Code, oops error) {
 }
 
 // WriteBinaryV1 writes version 1 Raptor binaries.
-// 
+//
 // Format:
 // Version 1, Big Endian encoding
 // Signature, 8 bytes, "Raptor 1"
@@ -149,7 +149,7 @@ func LoadBinaryV1(code []byte) (script *Code, oops error) {
 // String count, 2 bytes
 // Code stream, 2 bytes per token, Token count * 2 bytes long
 // String table, variable entry size, 2 byte record length, record length bytes of data, repeats String count times
-// 
+//
 // Notes:
 // Should work for all (normal) scripts.
 // Max string size is 65535 bytes.
@@ -296,7 +296,7 @@ func LoadBinaryV2(code []byte) (script *Code, oops error) {
 }
 
 // WriteBinaryV2 writes version 2 Raptor binaries.
-// 
+//
 // Format:
 // Version 2, Big Endian encoding
 // Signature, 8 bytes, "Raptor 2"
@@ -304,7 +304,7 @@ func LoadBinaryV2(code []byte) (script *Code, oops error) {
 // String count, 1 byte
 // Code stream, 1 byte per token, Token count bytes long
 // String table, variable entry size, 2 byte record length, record length bytes of data, repeats String count times
-// 
+//
 // Notes:
 // This format produces smaller binaries at the cost of a smaller maximum string table.
 // Max string size is 65535 bytes.
@@ -450,7 +450,7 @@ func LoadBinaryV3(code []byte) (script *Code, oops error) {
 }
 
 // WriteBinaryV3 writes version 3 Raptor binaries.
-// 
+//
 // Format:
 // Version 3, is just version 1 with a DEFLATE compressed string table.
 func WriteBinaryV3(script *Code) (code []byte, oops error) {
@@ -601,7 +601,7 @@ func LoadBinaryV4(code []byte) (script *Code, oops error) {
 }
 
 // WriteBinaryV4 writes version 4 Raptor binaries.
-// 
+//
 // Format:
 // Version 4, is just version 2 with a DEFLATE compressed string table.
 func WriteBinaryV4(script *Code) (code []byte, oops error) {

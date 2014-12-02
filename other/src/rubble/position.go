@@ -28,8 +28,8 @@ import "dctech/raptor"
 // Position stores line and file information.
 // Be careful about changing values after creation, these things get passed and stored all over the place.
 type Position struct {
-	Line   int
-	File   string
+	Line int
+	File string
 }
 
 // NewPosition creates and returns a new Position object.
@@ -61,17 +61,17 @@ func (this *Position) Raptor() *raptor.Position {
 	return raptor.NewPosition(this.Line, 1, this.File)
 }
 
-// String returns strings of one of the following forms: 
+// String returns strings of one of the following forms:
 //	"somefile|L:x"
 //	"L:x"
 func (this *Position) String() string {
 	out := ""
-	
+
 	if this.File != "" {
 		out += this.File + "|"
 	}
-	
+
 	out += fmt.Sprintf("L:%v", this.Line)
-	
+
 	return out
 }

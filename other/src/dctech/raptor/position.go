@@ -40,22 +40,22 @@ func (this *Position) Copy() *Position {
 	return newPosition(this.Line, this.Column, this.file)
 }
 
-// String returns strings of one of the following forms: 
+// String returns strings of one of the following forms:
 //	"somefile.rsf|L:x|C:y"
 //	"somefile.rbf|T:x"
 //	"L:x|C:y"
 //	"T:x"
 func (this *Position) String() string {
 	out := ""
-	
+
 	if *this.file != "" {
 		out += *this.file + "|"
 	}
-	
+
 	if this.Column == -1 {
 		out += fmt.Sprintf("T:%v", this.Line)
 	}
 	out += fmt.Sprintf("L:%v|C:%v", this.Line, this.Column)
-	
+
 	return out
 }

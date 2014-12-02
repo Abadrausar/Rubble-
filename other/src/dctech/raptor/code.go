@@ -62,7 +62,7 @@ func NewCode(input CodeSource) *Code {
 	return this
 }
 
-// NewCodeBlock will generate a new Code object from an existing CodeSource, 
+// NewCodeBlock will generate a new Code object from an existing CodeSource,
 // reading from the current token (which MUST be a TknCodeBegin) to the matching TknCodeEnd.
 // (Nested blocks are allowed)
 func NewCodeBlock(input CodeSource) *Code {
@@ -174,4 +174,3 @@ func (this *Code) String() string {
 	}
 	return out + "}"
 }
-

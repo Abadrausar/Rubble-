@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package thread
     import "dctech/raptor/commands/thread"
 
-    Raptor Threading Commands.
+
 
 FUNCTIONS
 
@@ -42,14 +42,5 @@ func CommandThread_Send(script *raptor.Script, params []*raptor.Value)
 	thread:send channel value
 
     Sending to a closed channel is a runtime error. Returns unchanged.
-
-func Setup(state *raptor.State)
-    Adds the threading commands to the state. The threading commands are:
-
-	thread:new
-	thread:channel
-	thread:send
-	thread:receive
-	thread:close
 
 

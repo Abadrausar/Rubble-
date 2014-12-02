@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package ini
     import "dctech/raptor/commands/ini"
 
-    Raptor INI Commands.
+
 
 FUNCTIONS
 
@@ -42,14 +42,5 @@ func CommandIni_SetValue(script *raptor.Script, params []*raptor.Value)
 	ini:setvalue file sectionname keyname value
 
     Returns unchanged or an error message. May set the Error flag.
-
-func Setup(state *raptor.State)
-    Adds the ini commands to the state. The ini commands are:
-
-	ini:create
-	ini:parse
-	ini:format
-	ini:getvalue
-	ini:setvalue
 
 

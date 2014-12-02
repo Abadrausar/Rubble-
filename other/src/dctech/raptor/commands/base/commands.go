@@ -84,7 +84,7 @@ func Setup(state *raptor.State) {
 	state.NewNativeCommand("if", CommandIf)
 	state.NewNativeCommand("loop", CommandLoop)
 	state.NewNativeCommand("foreach", CommandForEach)
-    
+
 	state.RegisterType("map", NewScriptMapFromLit)
 	state.RegisterType("array", NewScriptArrayFromLit)
 }
@@ -97,7 +97,7 @@ func CommandNop(script *raptor.Script, params []*raptor.Value) {
 
 // Return from current command.
 // 	ret [value]
-// Some commands will be bypassed like if and loop, for example calling ret from inside a 
+// Some commands will be bypassed like if and loop, for example calling ret from inside a
 // loop will not return from the loop, it will return from the command that called loop.
 // See break.
 // Returns value or unchanged.
@@ -216,7 +216,7 @@ func CommandGetCommand(script *raptor.Script, params []*raptor.Value) {
 }
 
 // Creates a new namespace.
-// 	namespace name 
+// 	namespace name
 // Returns unchanged.
 func CommandNamespace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
@@ -226,10 +226,10 @@ func CommandNamespace(script *raptor.Script, params []*raptor.Value) {
 	script.NewNameSpace(params[0].String())
 }
 
-// Deletes a namespace. 
+// Deletes a namespace.
 // Be careful with this one! Some actions are not reversable from a script.
 // For example it may be a very bad idea to delete debug or int.
-// 	delnamespace name 
+// 	delnamespace name
 // Returns unchanged.
 func CommandDelNamespace(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
@@ -274,11 +274,11 @@ func CommandCopy(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic(script.BadParamCount("1"))
 	}
-	
+
 	val := new(raptor.Value)
 	val.Type = params[0].Type
 	val.Pos = raptor.NewPosition(0, -1, "")
-	
+
 	switch val.Type {
 	case raptor.TypString:
 		val.Data = params[0].Data.(string) // Not sure if this is needed, but it should work at least.
@@ -300,11 +300,11 @@ func CommandCopy(script *raptor.Script, params []*raptor.Value) {
 
 	case raptor.TypObject:
 		val.Data = params[0].Data
-	
+
 	case raptor.TypNil:
 		val.Data = nil
 	}
-	
+
 	script.RetVal = val
 }
 
@@ -453,7 +453,7 @@ func CommandEvalInNew(script *raptor.Script, params []*raptor.Value) {
 // WARNING!! This command may result in a messed up state/script if you are not careful!
 // There is a reason "unrecoverable errors" are called that! In most cases you should be OK, but be careful.
 // 	trap code
-// Returns the return value of the last command in the code it runs or sets the error 
+// Returns the return value of the last command in the code it runs or sets the error
 // flag and returns a string describing the error..
 func CommandTrap(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {

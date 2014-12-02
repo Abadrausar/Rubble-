@@ -21,15 +21,15 @@ type Lexer struct {
 
 	source string
 
-	pos    *Position
+	pos *Position
 
 	index int
 	state int
 
 	lexeme []byte
 
-	token       int
-	tokenpos    *Position
+	token    int
+	tokenpos *Position
 
 	strdepth int
 	objdepth int

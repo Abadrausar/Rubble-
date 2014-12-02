@@ -129,7 +129,7 @@ Anyway enough talk, time for the template:
 	[SKILL:METALCRAFT]
 }
 [/code]
-The first thing to note is that the template body consists mostly of normal Rubble code with a few odd little bits prefixed with a '%' symbol. Each of these "Replacement Tokens" is defined just before the template body and just after the template name. For example the first of these tokens (also called "Template Parameters", or just "params") is named "id" and can be accessed via "%id" or "%{id}". The value of a template parameter is detremined when the template is called.
+The first thing to note is that the template body consists mostly of normal Rubble code with a few odd little bits prefixed with a '%' symbol. Each of these "Replacement Tokens" is defined just before the template body and just after the template name. For example the first of these tokens (also called "Template Parameters", or just "params") is named "id" and can be accessed via "%id" or "%{id}". The value of a template parameter is determined when the template is called.
 
 To really describe how a user defined template like this works we need values for the parameters, so here is an example call:
 [code]
@@ -180,7 +180,7 @@ set allows you to change the value of a variable, also very simple, at least unt
 set is used to add new keys to an indexable, for map all you need to do is set a non-existent key, for array the only key you can add is the one just passed the end, eg if len returns "10" for an array indexable that means that the existing keys are 0-9 and if you set key 10 you will be appending to the array.
 
 exists
-exists checks if a key exists in an indexable, invaluable when working with indexables
+exists checks if a key exists in an indexable, invaluable.
 
 foreach
 foreach is the first of the two native loop commands provided by Raptor (Rubble comes with some user command loops as well). foreach will iterate over all key/value pairs in an indexable until it gets to the end or you tell it to stop (by using breakloop or returning false)
@@ -273,7 +273,7 @@ To set things like track tiles you use OPEN_D_INIT, EDIT_D_INIT, CLOSE_D_INIT, a
 {CLOSE_D_INIT}
 [/code]
 Note that CLOSE_D_INIT will set ALL tileset related init settings to their defaults unless a call to EDIT_D_INIT has explicitly set that value! This is so that it is easy to reset values changed by other tilesets you may have installed before. 
-If you use all default init settings all you need to do is call D_INIT_TO_DEFAULTS to make sure an different tileset didn't clobber your settings.
+If you use all default init settings all you need to do is call D_INIT_TO_DEFAULTS to make sure a different tileset didn't clobber your settings.
 
 ========================================================
 
@@ -298,12 +298,12 @@ Here is the whole script that I will be dissecting:
 		(console:print "    " [params 0] "\n")
 		
 		(loop {
-			(raw:advance)
+			(raw:advance [file])
 			
-			(if (raw:valid){}{(breakloop false)})
+			(if (raw:valid [file]){}{(breakloop false)})
 			
 			(if (str:cmp [tag id] "AQUIFER") {
-				(raw:disable)
+				(raw:disable [file])
 				(++ aquifercount)
 			})
 			
@@ -313,7 +313,7 @@ Here is the whole script that I will be dissecting:
 		(set aquifercounttotal (int:add [aquifercounttotal] [aquifercount]))
 		(set aquifercount 0)
 		
-		(set [rubble:raws] [params 0] (raw:dump))
+		(set [rubble:raws] [params 0] (raw:dump [file]))
 	})
 	(break true)
 })
@@ -339,14 +339,14 @@ Now for the body of the foreach loop:
 (foreach [rubble:raws] {
 	(if (str:cmp "inorganic_" (str:left [params 0] 10)) {
 		(var file (raw:init [params 1]))
-		(var tag (raw:current))
+		(var tag (raw:current [file]))
 		
 		(console:print "    " [params 0] "\n")
 		
 		(loop {
-			(raw:advance)
+			(raw:advance [file])
 			
-			(if (raw:valid){}{(breakloop false)})
+			(if (raw:valid [file]){}{(breakloop false)})
 			
 			...
 			
@@ -356,7 +356,7 @@ Now for the body of the foreach loop:
 		(set aquifercounttotal (int:add [aquifercounttotal] [aquifercount]))
 		(set aquifercount 0)
 		
-		(set [rubble:raws] [params 0] (raw:dump))
+		(set [rubble:raws] [params 0] (raw:dump [file]))
 	})
 	(break true)
 })
@@ -411,7 +411,7 @@ Please activate that addon and try again.
 (There is also a command for specifying incompatible addons)
 Most of the time you would want your dependency checks to be in prescripts, so as to abort as soon as possible.
 
-"So how does Rubble know what is a postscript and what is a prescript" you ask? Simple, the file extension. Rubble "knows" a file ending in .pre.rsf i a prescript and a file ending in .post.rsf is a post script.
+"So how does Rubble know what is a postscript and what is a prescript?" you ask. Simple, the file extension. Rubble "knows" a file ending in .pre.rsf is a prescript and a file ending in .post.rsf is a post script.
 
 There are many, many things that you can do with tweak scripts, for more examples see the addons that come with Rubble.
 

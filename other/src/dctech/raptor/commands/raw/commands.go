@@ -54,7 +54,7 @@ func CommandRaw_Init(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic(script.BadParamCount("1"))
 	}
-	
+
 	script.RetVal = raptor.NewValueObject(newRawLexer(params[0].String()))
 }
 
@@ -69,7 +69,7 @@ func CommandRaw_Advance(script *raptor.Script, params []*raptor.Value) {
 		panic(script.GeneralCmdError("Parameter 0 is not a raw lexer."))
 	}
 	lex := params[0].Data.(*rawlexer)
-	
+
 	lex.advance()
 }
 
@@ -84,7 +84,7 @@ func CommandRaw_Valid(script *raptor.Script, params []*raptor.Value) {
 		panic(script.GeneralCmdError("Parameter 0 is not a raw lexer."))
 	}
 	lex := params[0].Data.(*rawlexer)
-	
+
 	script.RetVal = raptor.NewValueBool(lex.tagvalid)
 }
 
@@ -100,7 +100,7 @@ func CommandRaw_Current(script *raptor.Script, params []*raptor.Value) {
 		panic(script.GeneralCmdError("Parameter 0 is not a raw lexer."))
 	}
 	lex := params[0].Data.(*rawlexer)
-	
+
 	script.RetVal = raptor.NewValueObject(lex)
 }
 
@@ -115,7 +115,7 @@ func CommandRaw_Disable(script *raptor.Script, params []*raptor.Value) {
 		panic(script.GeneralCmdError("Parameter 0 is not a raw lexer."))
 	}
 	lex := params[0].Data.(*rawlexer)
-	
+
 	lex.source[lex.tagbegin] = '-'
 	lex.source[lex.tagend] = '-'
 }
@@ -131,7 +131,7 @@ func CommandRaw_Replace(script *raptor.Script, params []*raptor.Value) {
 		panic(script.GeneralCmdError("Parameter 0 is not a raw lexer."))
 	}
 	lex := params[0].Data.(*rawlexer)
-	
+
 	newstring := params[1].String()
 	beginstr := lex.source[:lex.tagbegin]
 	endstr := lex.source[lex.tagend+1:]
@@ -157,7 +157,7 @@ func CommandRaw_Append(script *raptor.Script, params []*raptor.Value) {
 		panic(script.GeneralCmdError("Parameter 0 is not a raw lexer."))
 	}
 	lex := params[0].Data.(*rawlexer)
-	
+
 	newstring := params[1].String()
 	beginstr := lex.source[:lex.tagend+1]
 	endstr := lex.source[lex.tagend+1:]
@@ -184,6 +184,6 @@ func CommandRaw_Dump(script *raptor.Script, params []*raptor.Value) {
 		panic(script.GeneralCmdError("Parameter 0 is not a raw lexer."))
 	}
 	lex := params[0].Data.(*rawlexer)
-	
+
 	script.RetVal = raptor.NewValueString(string(lex.source))
 }

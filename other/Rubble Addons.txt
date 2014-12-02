@@ -44,7 +44,7 @@ The above steps should create a file named "tileset.rbl", this file has all the 
 Shell Mode:
 ==============================================
 
-Due to me not wanting to have to distribute another group of 2MB+ binaries I went ahead and built a slightly customized version of the Raptor "shell" program into Rubble.
+Due to me not wanting to have to distribute another group of 8MB+ binaries I went ahead and built a slightly customized version of the Raptor "shell" program into Rubble.
 Although it is called the Raptor shell, the program in question is more of a general Raptor toolkit.
 
 Shell mode provides access to some debugging tools (most of which are for debugging the runtime not scripts, but some are useful) as well as the script compiler and syntax checker.
@@ -167,7 +167,7 @@ The following rules determine how addons are loaded:
 
 The following rules determine how addon files override each other (if there is a name collision):
 	Addons in zip files will always override addons in directories.
-	Addons are loaded in alphabetical order, addon "aaa/zzz" will override "aaa/hhh" but not "bbb/zzz"
+	Addons are loaded in alphabetical order, addon "aaa/zzz" will override "aaa/hhh" but not "bbb/aaa"
 
 If you have readmes or the like in an otherwise empty addon it is recommended that you do not give them a file extension, or better yet surround the file contents with <pre></pre> tags and change the extension to .htm, In any case you do not want such an addon appearing in addonlist.ini, so do not use any of the "parseable" extensions (.txt, .rbl, .rsf, .rbf).
 WTF was toady thinking when he used the .txt extension for raw files? Why not use .dfr or just .raw? (aside from the fact .raw is used by some audio files)

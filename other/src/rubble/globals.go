@@ -25,15 +25,16 @@ package main
 import "sort"
 
 // Update this!
-var RubbleVersion = "3.12"
+var RubbleVersion = "3.13"
 var RubbleCompat = map[string]bool{
 	// I don't know why I bothered, this is the next best thing to useless anyway.
-	// I really need to maintain this on a per-addon basis, as is it is just for the binary.
-	"3.8": true,
-	"3.9": true,
+	// I really need to maintain this on a per-addon basis, as is this is just for the binary.
+	"3.8":  true,
+	"3.9":  true,
 	"3.10": true,
 	"3.11": true,
 	"3.12": true,
+	"3.13": true,
 }
 
 // All the addons are loaded to here.

@@ -28,7 +28,7 @@ import "io/ioutil"
 
 func LoadAddons(path string) []*Addon {
 	addonlist := make([]*Addon, 0, 20)
-	
+
 	LogPrintln(path)
 	source, err := dcfs.NewDirReader(path)
 	if err != nil {
@@ -61,35 +61,35 @@ func loadDir(source dcfs.DataSource, addonname, path string, addons []*Addon) []
 	if path != "" {
 		path += "/"
 	}
-	
+
 	// Load a init script if any.
 	loadInit(source, dirpath)
-	
+
 	if containsParseable(source, dirpath) {
 		addons = append(addons, loadAddon(source, addonname, dirpath))
 	}
-	
+
 	dirs := source.ListDirs(dirpath)
 	if len(dirs) != 0 {
 		for _, dir := range dirs {
-			addons = loadDir(source, addonname + "/" + dir, path + dir, addons)
+			addons = loadDir(source, addonname+"/"+dir, path+dir, addons)
 		}
 	}
-	
+
 	return addons
 }
 
 func loadAddon(source dcfs.DataSource, addonname, path string) *Addon {
 	addon := NewAddon(addonname)
 	LogPrintln(addonname)
-	
+
 	dirpath := path
 	if path != "" {
 		path += "/"
 	}
-	
+
 	for _, filepath := range source.ListFiles(dirpath) {
-		
+
 		LogPrintln("  " + path + filepath)
 
 		file := new(AddonFile)
@@ -144,10 +144,10 @@ func loadInit(source dcfs.DataSource, path string) {
 	if path != "" {
 		path += "/"
 	}
-	
+
 	for _, filepath := range source.ListFiles(dirpath) {
 		if strings.HasSuffix(filepath, ".init.rsf") {
-			
+
 			content, err := source.OpenAndRead(path + filepath)
 			if err != nil {
 				panic(err)
@@ -157,7 +157,7 @@ func loadInit(source dcfs.DataSource, path string) {
 			continue
 		}
 		if strings.HasSuffix(filepath, ".init.rbf") {
-			
+
 			content, err := source.OpenAndRead(path + filepath)
 			if err != nil {
 				panic(err)
@@ -166,7 +166,7 @@ func loadInit(source dcfs.DataSource, path string) {
 			ForcedInitOrder = append(ForcedInitOrder, filepath)
 		}
 	}
-	
+
 	return
 }
 
@@ -197,7 +197,7 @@ func containsParseable(source dcfs.DataSource, path string) bool {
 
 func UpdateAddonList(dest string, addons []*Addon) {
 	out := make([]byte, 0, 2048)
-	out = append(out, "# Rubble Version: " + RubbleVersion + "\n[addons]\n"...)
+	out = append(out, "# Rubble Version: "+RubbleVersion+"\n[addons]\n"...)
 	for i := range addons {
 		out = append(out, addons[i].Name+"="...)
 		if addons[i].Active {

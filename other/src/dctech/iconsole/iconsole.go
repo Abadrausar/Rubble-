@@ -33,7 +33,7 @@ type Info struct {
 	In     io.Reader
 	Out    io.Writer
 	Escape byte
-	char []byte
+	char   []byte
 }
 
 // New creates a new interactive console information object.
@@ -52,16 +52,29 @@ func New() *Info {
 	return this
 }
 
+// Ways to exit with an io.EOF error:
+//	Ctrl+Z			Sends char 26... but later versions of go no longer treat this like EOF
+//	Ctrl+Break		Seems to work like a combo of Alt+26 followed by Enter
+//	Alt+26			Generates an EOF condition
+//	Alt+026			Same as Ctrl+Z
+//	Alt+27			Same as Alt+26?
+// I am not sure, but there may be more...
 func (this *Info) Run() ([]byte, error) {
 	escape := false
-	
+
 	out := make([]byte, 0, 100)
-	
+
 	fmt.Fprint(this.Out, this.Prompt)
 	for {
 		_, err := os.Stdin.Read(this.char)
 		if err != nil {
 			return out, err
+		}
+
+		// The DOS EOF char.
+		// This causes Ctrl+Z and Alt+026 to work for later go versions.
+		if this.char[0] == 26 {
+			return out, io.EOF
 		}
 		
 		if this.char[0] == byte('\r') {
@@ -88,6 +101,6 @@ func (this *Info) Run() ([]byte, error) {
 		escape = false
 		out = append(out, this.char...)
 	}
-	
+
 	panic("UNREACHABLE")
 }

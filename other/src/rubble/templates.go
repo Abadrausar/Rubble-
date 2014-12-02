@@ -100,7 +100,6 @@ func tempScript(params []*Value) *Value {
 	script := raptor.NewScript()
 	script.Code.AddString(params[0].Data, params[0].Pos.Raptor())
 
-	
 	if len(params) > 1 {
 		tmp := make([]*raptor.Value, 0, len(params)-1)
 		for i := range params[1:] {

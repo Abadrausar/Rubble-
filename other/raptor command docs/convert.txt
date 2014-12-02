@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package convert
     import "dctech/raptor/commands/convert"
 
-    Raptor Type Conversion Commands.
+
 
 FUNCTIONS
 
@@ -59,17 +59,5 @@ func CommandConvert_Type(script *raptor.Script, params []*raptor.Value)
 	convert:type value
 
     Returns the values type.
-
-func Setup(state *raptor.State)
-    Adds the type conversion commands to the state. The type conversion
-    commands are:
-
-	convert:type
-	convert:int
-	convert:float
-	convert:bool
-	convert:string
-	convert:command
-	convert:escape
 
 

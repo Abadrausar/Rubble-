@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package raw
     import "dctech/raptor/commands/raw"
 
-    Raptor DF Raw Commands
+
 
 FUNCTIONS
 
@@ -63,17 +63,5 @@ func CommandRaw_Valid(script *raptor.Script, params []*raptor.Value)
 	raw:valid file
 
     Returns true or false.
-
-func Setup(state *raptor.State)
-    Adds the raw commands to the state. The raw commands are:
-
-	raw:init
-	raw:advance
-	raw:valid
-	raw:current
-	raw:disable
-	raw:replace
-	raw:append
-	raw:dump
 
 

@@ -72,14 +72,14 @@ func InitScripting() {
 	sort.Setup(state)
 	str.Setup(state)
 	thread.Setup(state)
-	
+
 	state.NewNameSpace("rubble")
 	state.NewNamespacedVar("rubble:version", raptor.NewValueString(RubbleVersion))
 	state.NewNamespacedVar("rubble:dfdir", raptor.NewValueString(DFDir))
 	state.NewNamespacedVar("rubble:outputdir", raptor.NewValueString(OutputDir))
 	state.NewNamespacedVar("rubble:addonsdir", raptor.NewValueString(AddonsDir))
 	state.NewNamespacedVar("rubble:raws", raptor.NewValueObject(NewIndexableRaws()))
-	
+
 	versionKeys := make([]string, 0, 20)
 	versionVals := make([]*raptor.Value, 0, 20)
 	for i := range RubbleCompat {
@@ -87,7 +87,7 @@ func InitScripting() {
 		versionVals = append(versionVals, raptor.NewValueBool(RubbleCompat[i]))
 	}
 	state.NewNamespacedVar("rubble:compat", raptor.NewValueObject(NewReadOnlyMap(versionKeys, versionVals)))
-	
+
 	addons := make([]*raptor.Value, 0, 20)
 	for i := range Addons {
 		if Addons[i].Active == true {
@@ -95,24 +95,24 @@ func InitScripting() {
 		}
 	}
 	state.NewNamespacedVar("rubble:activeaddons", raptor.NewValueObject(raptor.NewParamsArray(addons)))
-	
+
 	state.NewNativeCommand("rubble:abort", CommandRubble_Abort)
-	
+
 	state.NewNativeCommand("rubble:skipfile", CommandRubble_SkipFile)
 	state.NewNativeCommand("rubble:nowritefile", CommandRubble_NoWriteFile)
 	state.NewNativeCommand("rubble:graphicsfile", CommandRubble_GraphicsFile)
 	state.NewNativeCommand("rubble:prepfile", CommandRubble_PrepFile)
 	state.NewNativeCommand("rubble:currentfile", CommandRubble_CurrentFile)
-	
+
 	state.NewNativeCommand("rubble:setvar", CommandRubble_SetVar)
 	state.NewNativeCommand("rubble:getvar", CommandRubble_GetVar)
-	
+
 	state.NewNativeCommand("rubble:stageparse", CommandRubble_Parse)
 	state.NewNativeCommand("rubble:calltemplate", CommandRubble_CallTemplate)
 	state.NewNativeCommand("rubble:expandvars", CommandRubble_ExpandVars)
-	
+
 	state.NewNativeCommand("rubble:template", CommandRubble_Template)
-	
+
 	state.NewNativeCommand("rubble:addonactive", CommandRubble_AddonActive)
 
 	// Redirect output to logger
@@ -128,7 +128,7 @@ func CommandRubble_Abort(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to rubble:abort (how ironic).")
 	}
-	
+
 	LogPrintln("Abort:", params[0].String())
 	os.Exit(1) // Evil, evil, evil, but it works
 }
@@ -269,10 +269,10 @@ func CommandRubble_CallTemplate(script *raptor.Script, params []*raptor.Value) {
 		panic("Wrong number of params to rubble:calltemplate.")
 	}
 	name := params[0].String()
-	
+
 	// Rubble Value! NOT Raptor Value
 	strParams := make([]*Value, 0, len(params)-1)
-	
+
 	for _, val := range params[1:] {
 		strParams = append(strParams, NewValueRaptor(val))
 	}
@@ -305,10 +305,10 @@ func CommandRubble_Template(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 2 {
 		panic("Wrong number of params to rubble:template.")
 	}
-	
+
 	name := params[0].String()
 	code := params[len(params)-1].Code()
-	paramNames := params[1:len(params)-1]
+	paramNames := params[1 : len(params)-1]
 
 	parsedParams := make([]*TemplateParam, 0, len(paramNames))
 
@@ -338,7 +338,7 @@ func CommandRubble_AddonActive(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic("Wrong number of params to rubble:addonactive.")
 	}
-	
+
 	name := params[0].String()
 	for _, val := range Addons {
 		if val.Name == name {
@@ -349,7 +349,7 @@ func CommandRubble_AddonActive(script *raptor.Script, params []*raptor.Value) {
 			script.RetVal = raptor.NewValueBool(false)
 			return
 		}
-		
+
 	}
 	script.RetVal = raptor.NewValueBool(false)
 }

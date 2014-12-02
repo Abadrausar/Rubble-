@@ -8,14 +8,14 @@ package raptor
 import "strconv"
 
 const (
-	TypNil  = iota // Nothing.
-	TypObject      // Generic data, possibly an Indexable.
-	TypString      // A string
-	TypInt         // An int64
-	TypFloat       // A float64
-	TypBool        // A boolean
-	TypCode        // A Code object
-	TypCommand     // A command reference, basically a string with a special type value.
+	TypNil     = iota // Nothing.
+	TypObject         // Generic data, possibly an Indexable.
+	TypString         // A string
+	TypInt            // An int64
+	TypFloat          // A float64
+	TypBool           // A boolean
+	TypCode           // A Code object
+	TypCommand        // A command reference, basically a string with a special type value.
 )
 
 // Why do I have this type? It makes refactoring easier.
@@ -174,7 +174,7 @@ func (this *Value) CodeString() string {
 		}
 
 		return index.CodeString()
-	
+
 	case TypNil:
 		return "nil"
 	}
@@ -213,7 +213,7 @@ func (this *Value) String() string {
 		}
 
 		return index.String()
-		
+
 	case TypNil:
 		return "nil"
 	}
@@ -251,7 +251,7 @@ func (this *Value) Int64() int64 {
 
 	case TypObject:
 		return 0
-		
+
 	case TypNil:
 		return 0
 	}
@@ -289,7 +289,7 @@ func (this *Value) Float64() float64 {
 
 	case TypObject:
 		return 0.0
-		
+
 	case TypNil:
 		return 0.0
 	}
@@ -325,7 +325,7 @@ func (this *Value) Bool() bool {
 
 	case TypObject:
 		return this.Data != nil
-		
+
 	case TypNil:
 		return false
 	}
@@ -397,13 +397,12 @@ func (this *Value) TypeString() string {
 
 	case TypObject:
 		return "object"
-		
+
 	case TypNil:
 		return "nil"
 	}
 	panic("Type: Script Value has invalid Type.")
 }
-
 
 // Formatting Functions
 

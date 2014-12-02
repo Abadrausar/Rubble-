@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package float
     import "dctech/raptor/commands/float"
 
-    Raptor Floating Point Commands.
+
 
 FUNCTIONS
 
@@ -55,17 +55,5 @@ func CommandFloat_Sub(script *raptor.Script, params []*raptor.Value)
 	float:sub a b
 
     Returns a - b
-
-func Setup(state *raptor.State)
-    Adds the floating point commands to the state. The floating point
-    commands are:
-
-	float:add
-	float:sub
-	float:div
-	float:mul
-	float:gt
-	float:lt
-	float:eq
 
 

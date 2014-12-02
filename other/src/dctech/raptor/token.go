@@ -84,7 +84,7 @@ func tokenTypeToString(tokenType int) string {
 	panic("Token type value out of range")
 }
 
-// Panics with a message formatted like the following: 
+// Panics with a message formatted like the following:
 //	Invalid Token: Found: thecurrenttoken. Expected: expected1, expected2, or expected3.
 //	Invalid Token: Found: thecurrenttoken. Expected: expected1 or expected2.
 //	Invalid Token: Found: thecurrenttoken. Expected: expected.

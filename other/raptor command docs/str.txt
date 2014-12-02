@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package str
     import "dctech/raptor/commands/str"
 
-    Raptor String Commands.
+
 
 FUNCTIONS
 
@@ -128,24 +128,5 @@ func CommandStr_TrimSpace(script *raptor.Script, params []*raptor.Value)
 	str:trimspace str
 
     Returns str with leading and trailing whitespace removed.
-
-func Setup(state *raptor.State)
-    Adds the string commands to the state. The string commands are:
-
-	str:add
-	str:trimspace
-	str:len
-	str:char
-	str:fmt
-	str:cmp
-	str:find
-	str:left
-	str:trimleft
-	str:right
-	str:trimright
-	str:mid
-	str:replace
-	str:tolower
-	str:toupper
 
 

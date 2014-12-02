@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package file
     import "dctech/raptor/commands/file"
 
-    Raptor File System Commands.
+
 
 FUNCTIONS
 
@@ -70,18 +70,5 @@ func CommandFile_WalkFiles(script *raptor.Script, params []*raptor.Value)
 	code path
 
     Returns nil or an error message. May set the Error flag.
-
-func Setup(state *raptor.State)
-    Adds the file system commands to the state. The file system commands
-    are:
-
-	file:deldir
-	file:deltree
-	file:newdir
-	file:del
-	file:exists
-	file:direxists
-	file:walkfiles
-	file:walkdirs
 
 

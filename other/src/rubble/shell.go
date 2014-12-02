@@ -51,7 +51,7 @@ func ShellModeRun() {
 			}
 		}
 	}
-	
+
 	script := raptor.NewScript()
 
 	if Validate && !ValidateAll {
@@ -60,19 +60,19 @@ func ShellModeRun() {
 			LogPrintln("Validate Error: No script set.")
 			return
 		}
-		
+
 		file, err := ioutil.ReadFile(ScriptPath)
 		if err != nil {
 			LogPrintln("Validate Error:", err)
 			return
 		}
-		
+
 		err = raptor.LoadFile(ScriptPath, file, script)
 		if err != nil {
 			LogPrintln("Validate Error:", err)
 			return
 		}
-		
+
 		err = script.Validate()
 		if err != nil {
 			LogPrintln("Validate Error:", err)
@@ -103,19 +103,19 @@ func ShellModeRun() {
 			LogPrintln("Validate Error: No script set.")
 			return
 		}
-		
+
 		file, err := ioutil.ReadFile(ScriptPath)
 		if err != nil {
 			LogPrintln("Validate Error:", err)
 			return
 		}
-		
+
 		err = raptor.LoadFile(ScriptPath, file, script)
 		if err != nil {
 			LogPrintln("Validate Error:", err)
 			return
 		}
-		
+
 		err = GlobalRaptorState.Validate(script)
 		if err != nil {
 			LogPrintln("Validate Error:", err)
@@ -233,7 +233,7 @@ func ShellModeRun() {
 			LogPrintln("Read Error:", err, "\nExiting...")
 			break
 		}
-		
+
 		script.Code.AddString(string(line), raptor.NewPosition(1, 1, ""))
 		rtn, err := GlobalRaptorState.RunShell(script)
 		if err != nil {

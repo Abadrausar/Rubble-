@@ -21,7 +21,7 @@ func Example() {
 	`, raptor.NewPosition(19, 28, "example_test.go"))
 
 	// Run!
-	// Note that Run removes the code it executes from the BlockStore 
+	// Note that Run removes the code it executes from the BlockStore
 	// so there is no need to clean up before using the script again.
 	rtn, err := state.Run(script)
 	if err != nil {

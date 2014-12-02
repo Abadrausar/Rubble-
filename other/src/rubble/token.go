@@ -38,6 +38,7 @@ type Token struct {
 	Type   int
 	Pos    *Position
 }
+
 func NewToken(lexeme string, typ int, pos *Position) *Token {
 	this := new(Token)
 	this.Lexeme = lexeme
@@ -71,7 +72,7 @@ func tokenTypeToString(tokenType int) string {
 	panic("Token type value out of range")
 }
 
-// Panics with the message: 
+// Panics with the message:
 //	Invalid Token: Found: thecurrenttoken. Expected: expected.
 func ExitOnTokenExpected(token *Token, expected ...int) {
 	expectedString := ""

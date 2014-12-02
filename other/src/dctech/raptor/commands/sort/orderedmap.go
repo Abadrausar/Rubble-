@@ -27,9 +27,9 @@ import "sort"
 import "sync"
 
 type OrderedMap struct {
-	data map[string]*raptor.Value
+	data  map[string]*raptor.Value
 	order []string
-	lock *sync.RWMutex
+	lock  *sync.RWMutex
 }
 
 func NewOrderedMap() raptor.EditIndexable {
@@ -46,7 +46,7 @@ func NewOrderedMapFromIndexable(input raptor.Indexable) raptor.EditIndexable {
 	this.order = make([]string, 0, len(keys))
 	this.order = append(this.order, keys...)
 	sort.Strings(this.order)
-	
+
 	this.data = make(map[string]*raptor.Value, len(keys))
 	for _, val := range keys {
 		this.data[val] = input.Get(val)

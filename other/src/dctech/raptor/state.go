@@ -17,8 +17,8 @@ type State struct {
 	Commands   *CommandStore
 	NameSpaces *NameSpaceStore
 	Types      *TypeStore
-	NoRecover  bool         // Do not recover errors, this makes it easier to debug the parser.
-	Output     io.Writer    // Normally set to os.Stdout, this can be changed to redirect to a log file or the like.
+	NoRecover  bool      // Do not recover errors, this makes it easier to debug the parser.
+	Output     io.Writer // Normally set to os.Stdout, this can be changed to redirect to a log file or the like.
 }
 
 // NewState creates (and initializes) a new state.
@@ -51,7 +51,7 @@ func (this *State) NewNamespacedVar(name string, value *Value) {
 // NewNameSpace creates a new namespace.
 func (this *State) NewNameSpace(name string) {
 	space, itemname := this.ParseName(name)
-	
+
 	if space != nil {
 		if space.NameSpaces.Exist(itemname) {
 			panic(fmt.Sprintf("Namespace: \"%v\" already declared", name))
@@ -59,7 +59,7 @@ func (this *State) NewNameSpace(name string) {
 		space.NameSpaces.Store(itemname, NewNameSpace())
 		return
 	}
-	
+
 	if this.NameSpaces.Exist(itemname) {
 		panic(fmt.Sprintf("Namespace: \"%v\" already declared", name))
 	}
@@ -82,10 +82,10 @@ func (this *State) DeleteNameSpace(name string) {
 // NewNativeCommand adds a new native command.
 func (this *State) NewNativeCommand(name string, handler NativeCommand) {
 	space, itemname := this.ParseName(name)
-	
+
 	rtn := new(Command)
 	rtn.Handler = handler
-	
+
 	if space != nil {
 		space.Commands.Store(itemname, rtn)
 		return
@@ -125,7 +125,7 @@ func (this *State) GetCommand(name string) *Command {
 		panic("Undeclared command: " + name)
 	}
 
-	if this.Commands.Exist(itemname)  {
+	if this.Commands.Exist(itemname) {
 		return this.Commands.Fetch(itemname)
 	}
 	panic("Undeclared command: " + name)
@@ -134,7 +134,7 @@ func (this *State) GetCommand(name string) *Command {
 // DeleteCommand removes a command.
 func (this *State) DeleteCommand(name string) {
 	space, itemname := this.ParseName(name)
-	
+
 	if space != nil {
 		space.Commands.Delete(itemname)
 		return
@@ -148,7 +148,7 @@ func (this *State) DeleteCommand(name string) {
 // Registering a type allows it to be created with an object literal.
 func (this *State) RegisterType(name string, handler ObjectFactory) {
 	space, itemname := this.ParseName(name)
-	
+
 	if space != nil {
 		space.Types.Store(itemname, handler)
 		return
@@ -166,7 +166,7 @@ func (this *State) GetType(name string) ObjectFactory {
 		panic("Undeclared type: " + name)
 	}
 
-	if this.Types.Exist(itemname)  {
+	if this.Types.Exist(itemname) {
 		return this.Types.Fetch(itemname)
 	}
 	panic("Undeclared type: " + name)
@@ -201,7 +201,7 @@ func (this *State) ParseNameSpaceName(name string) *NameSpace {
 	}
 
 	names := strings.Split(name, ":")
-	
+
 	if !this.NameSpaces.Exist(names[0]) {
 		panic("Undeclared Namespace: " + name)
 	}
@@ -239,14 +239,14 @@ func (this *State) Print(msg ...interface{}) {
 func (this *State) RunCommand(script *Script, command string, params ...*Value) (ret *Value, err error) {
 	// Most of this function is identical to Run
 	// It's just easier to copy than refactor
-	
+
 	script.Host = this
-	
+
 	err = nil
 
 	defer func() {
 		ret = script.RetVal
-		
+
 		if !this.NoRecover {
 			if x := recover(); x != nil {
 				switch i := x.(type) {
@@ -259,12 +259,11 @@ func (this *State) RunCommand(script *Script, command string, params ...*Value) 
 				}
 			}
 		}
-		
+
 		// Normal Cleanup
 		script.ClearMost()
 	}()
 
-	
 	this.GetCommand(command).Call(command, script, params)
 	return // Required :(
 }
@@ -274,14 +273,14 @@ func (this *State) RunCommand(script *Script, command string, params ...*Value) 
 func (this *State) Run(script *Script) (ret *Value, err error) {
 	// Most of this function is identical to RunCommand
 	// It's just easier to copy than refactor
-	
+
 	script.Host = this
-	
+
 	err = nil
 
 	defer func() {
 		ret = script.RetVal
-		
+
 		if !this.NoRecover {
 			if x := recover(); x != nil {
 				switch i := x.(type) {
@@ -294,7 +293,7 @@ func (this *State) Run(script *Script) (ret *Value, err error) {
 				}
 			}
 		}
-		
+
 		// Normal Cleanup
 		script.ClearMost()
 	}()
@@ -308,14 +307,14 @@ func (this *State) Run(script *Script) (ret *Value, err error) {
 func (this *State) RunShell(script *Script) (ret *Value, err error) {
 	// Most of this function is identical to RunCommand
 	// It's just easier to copy than refactor
-	
+
 	script.Host = this
-	
+
 	err = nil
 
 	defer func() {
 		ret = script.RetVal
-		
+
 		if !this.NoRecover {
 			if x := recover(); x != nil {
 				switch i := x.(type) {
@@ -328,7 +327,7 @@ func (this *State) RunShell(script *Script) (ret *Value, err error) {
 				}
 			}
 		}
-		
+
 		// Normal Cleanup
 		script.ClearSome()
 	}()
@@ -342,7 +341,7 @@ func (this *State) RunShell(script *Script) (ret *Value, err error) {
 // See the docs for the Script version for more details.
 func (this *State) Validate(script *Script) (err error) {
 	script.Host = this
-	
+
 	err = nil
 
 	defer func() {
@@ -356,12 +355,11 @@ func (this *State) Validate(script *Script) (err error) {
 				err = errors.New(fmt.Sprint(i))
 			}
 		}
-		
+
 		script.Host = nil
 		script.Code.Clear()
 	}()
-	
+
 	script.validate()
 	return
 }
-

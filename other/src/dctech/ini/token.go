@@ -57,7 +57,7 @@ func tokenTypeToString(tokenType int) string {
 	panic("Token type value out of range")
 }
 
-// Panics with the message: 
+// Panics with the message:
 //	Error: Invalid Token: Found: thecurrenttoken. Expected: expected.
 func exitOnTokenExpected(token Token, expected ...int) {
 	expectedString := ""

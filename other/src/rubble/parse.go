@@ -30,7 +30,7 @@ func Parse(input []byte, stage int, pos *Position) []byte {
 	if stage != stgPreParse && stage != stgParse && stage != stgPostParse {
 		panic("Parse called with invalid parse stage")
 	}
-	
+
 	// 100k sounds like a lot, but there are vanilla raw files that are almost 400k
 	// Most seem to be around 50k-70k so 100k is not too high
 	out := make([]byte, 0, 102400)
@@ -84,7 +84,7 @@ func stageTemplate(name string, stage int) bool {
 	if name[0] == '@' {
 		return true
 	}
-	
+
 	switch stage {
 	case stgPreParse:
 		return name[0] == '!'
@@ -94,7 +94,7 @@ func stageTemplate(name string, stage int) bool {
 
 	case stgPostParse:
 		return name[0] == '#'
-	
+
 	}
 	return false
 }

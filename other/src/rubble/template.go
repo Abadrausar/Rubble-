@@ -48,7 +48,7 @@ type Template struct {
 
 	// The script template code
 	Code *raptor.Code
-	
+
 	// The user template text
 	Text *Value
 
@@ -157,7 +157,7 @@ func (this *Template) Call(params []*Value) *Value {
 	})
 
 	return NewValuePos(string(Parse([]byte(out), stgUseCurrent, this.Text.Pos)), this.Text.Pos)
-	
+
 }
 
 func NewNativeTemplate(name string, handler NativeTemplate) {

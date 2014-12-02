@@ -25,11 +25,9 @@ Shell for the Raptor scripting language.
 
 Run "raptor -h" for usage information.
 
-The Raptor shell's default mode is interactive mode, in which you can type code and run it interactively, but there is also a batch mode where Raptor will run code from a file and then exit. 
+The Raptor shell's default mode is interactive mode, in which you can type code and run it interactively, but there is also a batch mode where Raptor will run code from a file and then exit.
 
 If using this shell to debug custom commands you may want to use "-norecover" to cause it to print a stack trace on error.
 Note that to load a custom command you will need to edit the shell as there is no way (AFAIK) to dynamically load Go code at this time.
 */
 package documentation
-
-

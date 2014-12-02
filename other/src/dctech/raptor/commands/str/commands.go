@@ -306,7 +306,7 @@ func CommandStr_TrimRight(script *raptor.Script, params []*raptor.Value) {
 
 // Returns count characters from a string.
 // 	str:mid str start count
-// Returns the new string or (if start or count is out of range) returns as close a 
+// Returns the new string or (if start or count is out of range) returns as close a
 // result as possible and sets the error flag.
 func CommandStr_Mid(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 3 {
@@ -331,7 +331,7 @@ func CommandStr_Mid(script *raptor.Script, params []*raptor.Value) {
 
 // Replaces search with replace in source.
 // 	str:replace source search replace occurrence
-// Occurrence gives a number of times to carry out the replacement, 
+// Occurrence gives a number of times to carry out the replacement,
 // use -1 to replace all.
 // Returns the new string.
 func CommandStr_Replace(script *raptor.Script, params []*raptor.Value) {

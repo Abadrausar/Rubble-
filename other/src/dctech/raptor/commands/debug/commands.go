@@ -29,7 +29,7 @@ import "os"
 import "io"
 import "text/tabwriter"
 
-// Adds the debug commands to the state. 
+// Adds the debug commands to the state.
 // The debug commands are:
 //	debug:shell
 //	debug:value
@@ -47,7 +47,7 @@ func Setup(state *raptor.State) {
 }
 
 // Break into the debugging shell.
-// This command will provide an interactive shell until eof is reached, 
+// This command will provide an interactive shell until eof is reached,
 // on windows this may be simulated by pressing CTRL+Z followed by <ENTER>.
 // 	debug:shell
 // Returns the return value of the last command to be run.
@@ -166,25 +166,25 @@ func CommandDebug_Value(script *raptor.Script, params []*raptor.Value) {
 func CommandDebug_List(script *raptor.Script, params []*raptor.Value) {
 	script.Println("+-------------------------------------------+")
 	script.Println("Raptor Global Data")
-	
+
 	script.Println("Namespaces:")
 	for i := range script.Host.NameSpaces.BeginLowLevel() {
 		script.Println("\t" + i)
 	}
 	script.Host.NameSpaces.EndLowLevel()
-	
+
 	script.Println("Commands:")
 	for i := range script.Host.Commands.BeginLowLevel() {
 		script.Println("\t" + i)
 	}
 	script.Host.Commands.EndLowLevel()
-	
+
 	script.Println("Variables:")
 	envs := []*raptor.Environment(*script.Envs)
 	for i := range envs[0].Vars {
 		script.Println("\t" + i)
 	}
-	
+
 	script.Println("Registers:")
 	script.Println("\tExit:", script.Exit)
 	script.Println("\tReturn:", script.Return)
@@ -209,25 +209,25 @@ func CommandDebug_NameSpace(script *raptor.Script, params []*raptor.Value) {
 
 	script.Println("+-------------------------------------------+")
 	script.Println("Raptor Namespace Inspector")
-	
+
 	script.Println("Namespaces:")
 	for i := range namespace.NameSpaces.BeginLowLevel() {
 		script.Println("\t" + i)
 	}
 	namespace.NameSpaces.EndLowLevel()
-	
+
 	script.Println("Commands:")
 	for i := range namespace.Commands.BeginLowLevel() {
 		script.Println("\t" + i)
 	}
 	namespace.Commands.EndLowLevel()
-	
+
 	script.Println("Variables:")
 	for i := range namespace.Vars.BeginLowLevel() {
 		script.Println("\t" + i)
 	}
 	namespace.Vars.EndLowLevel()
-	
+
 	script.Println("+-------------------------------------------+")
 }
 

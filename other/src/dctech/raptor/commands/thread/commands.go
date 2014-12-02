@@ -53,20 +53,20 @@ func CommandThread_New(script *raptor.Script, params []*raptor.Value) {
 	if len(params) < 1 {
 		panic(script.BadParamCount(">=1"))
 	}
-	
+
 	scr := raptor.NewScript()
 	scr.Envs.Add(raptor.NewEnvironment())
 
 	scr.AddParamsValue(params[1:]...)
 
 	scr.Code.Add(params[0].CodeSource())
-	go func(){
+	go func() {
 		_, err := script.Host.Run(scr)
 		if err != nil {
 			panic(err)
 		}
 	}()
-	
+
 	return
 }
 
@@ -77,12 +77,12 @@ func CommandThread_Channel(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 0 && len(params) != 1 {
 		panic(script.BadParamCount("0 or 1"))
 	}
-	
+
 	if len(params) == 0 {
 		script.RetVal = raptor.NewValueObject(make(chan *raptor.Value))
 		return
 	}
-	
+
 	script.RetVal = raptor.NewValueObject(make(chan *raptor.Value, params[0].Int64()))
 	return
 }
@@ -95,13 +95,13 @@ func CommandThread_Send(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 2 {
 		panic(script.BadParamCount("2"))
 	}
-	
+
 	if _, ok := params[0].Data.(chan *raptor.Value); !ok {
 		panic(script.GeneralCmdError("Parameter 0 is not a channel."))
 	}
 	channel := params[0].Data.(chan *raptor.Value)
 	channel <- params[1]
-	
+
 	return
 }
 
@@ -113,13 +113,13 @@ func CommandThread_Receive(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic(script.BadParamCount("1"))
 	}
-	
+
 	if _, ok := params[0].Data.(chan *raptor.Value); !ok {
 		panic(script.GeneralCmdError("Parameter 0 is not a channel."))
 	}
 	channel := params[0].Data.(chan *raptor.Value)
 	script.RetVal = <-channel
-	
+
 	return
 }
 
@@ -130,12 +130,12 @@ func CommandThread_Close(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic(script.BadParamCount("1"))
 	}
-	
+
 	if _, ok := params[0].Data.(chan *raptor.Value); !ok {
 		panic(script.GeneralCmdError("Parameter 0 is not a channel."))
 	}
 	channel := params[0].Data.(chan *raptor.Value)
 	close(channel)
-	
+
 	return
 }

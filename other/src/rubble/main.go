@@ -30,11 +30,14 @@ import "os"
 import "runtime/pprof"
 import "net/http"
 import _ "net/http/pprof"
+import "time"
 
 func main() {
+	timeStart := time.Now()
+	
 	// init logging
 	InitLogging()
-	
+
 	// Init crash handler
 	defer func() {
 		if NoRecover {
@@ -63,23 +66,23 @@ func main() {
 		}
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
-    }
-	
+	}
+
 	if NetProfile != "" {
 		LogPrintln("Started live profile on port:", NetProfile)
-		http.ListenAndServe("localhost:" + NetProfile, nil)
+		http.ListenAndServe("localhost:"+NetProfile, nil)
 	}
-	
+
 	// If we are in prep mode do not load any addon (or do any other addon type stuff)
 	if PrepRegion == "" {
 		LogPrintln("=============================================")
 		LogPrintln("Loading Addons...")
-	
+
 		Addons = LoadAddons(AddonsDir)
-	
+
 		LogPrintln("=============================================")
 		LogPrintln("Activating Addons...")
-	
+
 		addonNames := make([]string, 0, 10)
 		if AddonsList != "" {
 			LogPrintln("Addons Specified via Command Line.")
@@ -98,7 +101,7 @@ func main() {
 				LogPrintln("Read failed (this is bad if unexpected)\n  Error:", err)
 				LogPrintln("Rubble has no files to parse but shell mode is active, continuing.")
 			}
-	
+
 			lines := strings.Split(string(file), "\n")
 			for i := range lines {
 				if strings.HasPrefix(strings.TrimSpace(lines[i]), "#") {
@@ -110,12 +113,12 @@ func main() {
 				if strings.TrimSpace(lines[i]) == "" {
 					continue
 				}
-	
+
 				parts := strings.SplitN(lines[i], "=", 2)
 				if len(parts) != 2 {
 					panic("Malformed config line.")
 				}
-	
+
 				parts[0] = strings.TrimSpace(parts[0])
 				parts[1] = strings.ToLower(strings.TrimSpace(parts[1]))
 				if parts[1] == "true" {
@@ -123,13 +126,13 @@ func main() {
 				}
 			}
 		}
-	
+
 		if len(addonNames) == 0 && !ShellMode {
 			LogPrintln("No Addons Marked Active")
 			LogPrintln("Rubble has no files to parse, aborting.")
 			return
 		}
-	
+
 		addonNameLookupTbl := make(map[string]bool)
 		for _, name := range addonNames {
 			addonNameLookupTbl[name] = true
@@ -144,15 +147,18 @@ func main() {
 
 		LogPrintln("Updating the Addon List File...")
 		UpdateAddonList(AddonsDir, Addons)
-	
+
 		if ExitAfterUpdate {
 			LogPrintln("Done.")
+			if Bench {
+				LogPrintln("Run time: ", time.Since(timeStart))
+			}
 			return
 		}
 
 		// Convert Addons to File List
 		Files = NewFileList(Addons)
-	
+
 		if len(Files.Order) == 0 && !ShellMode {
 			LogPrintln("Files list is empty. (no active addons have parseable files)")
 			LogPrintln("Rubble has no files to parse, aborting.")
@@ -201,27 +207,27 @@ func main() {
 
 	LogPrintln("Initializing Scripting Subsystem.")
 	InitScripting()
-	
-	LogPrintln("Adding Builtins.")
-	SetupBuiltins()
-	
+
 	if PrepRegion != "" {
 		PrepModeRun(PrepRegion)
 		os.Exit(0)
 	}
-	
+
+	LogPrintln("Adding Builtins.")
+	SetupBuiltins()
+
 	if !ShellMode || RunForcedInit {
 		LogPrintln("Running Init Scripts.")
 		for _, i := range ForcedInitOrder {
 			CurrentFile = i
 			LogPrintln("  " + i)
-			
+
 			script := raptor.NewScript()
 			err := raptor.LoadFile(i, ForcedInit[i], script)
 			if err != nil {
 				panic("Script Error: " + err.Error())
 			}
-	
+
 			_, err = GlobalRaptorState.Run(script)
 			if err != nil {
 				panic("Script Error: " + err.Error())
@@ -230,13 +236,13 @@ func main() {
 	} else {
 		LogPrintln("Skipping Init Scripts.")
 	}
-	
+
 	// Embedded Raptor Shell
 	if ShellMode {
 		ShellModeRun()
 		os.Exit(0)
 	}
-	
+
 	LogPrintln("=============================================")
 	LogPrintln("Running Prescripts...")
 	ParseStage = stgPreScripts
@@ -328,7 +334,7 @@ func main() {
 		if err != nil {
 			panic("Script Error: " + err.Error())
 		}
-		
+
 		_, err = GlobalRaptorState.Run(script)
 		if err != nil {
 			panic("Script Error: " + err.Error())
@@ -344,7 +350,6 @@ func main() {
 
 		LogPrintln("  " + Files.Files[i].Path)
 
-		// HACK: Redo this
 		file := []byte(StripExt(i) + "\n\n" + string(Files.Files[i].Content))
 		err := ioutil.WriteFile(OutputDir+"/"+i, file, 0600)
 		if err != nil {
@@ -359,7 +364,6 @@ func main() {
 
 		LogPrintln("  " + Files.Files[i].Path)
 
-		// HACK: Redo this
 		file := []byte(StripExt(i) + "\n\n" + string(Files.Files[i].Content))
 		err := ioutil.WriteFile(OutputDir+"/../graphics/"+i, file, 0600)
 		if err != nil {
@@ -380,8 +384,11 @@ func main() {
 			panic("Write Error: " + err.Error())
 		}
 	}
-	LogPrintln("Writing addon list to output directory...")
+	LogPrintln("Writing addon list to raw directory...")
 	LogPrintln("  addonlist.ini")
-	UpdateAddonList(OutputDir, Addons)
+	UpdateAddonList(OutputDir+"/..", Addons)
+	if Bench {
+		LogPrintln("Run time: ", time.Since(timeStart))
+	}
 	LogPrintln("Done.")
 }

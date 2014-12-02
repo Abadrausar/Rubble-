@@ -39,6 +39,8 @@ var AddonsDir string
 var AddonsList string
 var ConfigList string
 
+var Bench bool
+
 var LexTest bool
 var NoRecover bool
 var ExitAfterUpdate bool
@@ -67,16 +69,16 @@ func ParseCommandLine() {
 	DFDir = ".."
 	OutputDir = "../raw/objects"
 	AddonsDir = "./addons"
-	
+
 	AddonsList = ""
 	ConfigList = ""
-	
+
 	LexTest = false
 	NoRecover = false
 	ExitAfterUpdate = false
-	
+
 	PrepRegion = ""
-	
+
 	ShellMode = false
 	ScriptPath = ""
 	Compile = ""
@@ -86,7 +88,7 @@ func ParseCommandLine() {
 	NoExit = false
 	NoPredefs = false
 	RunForcedInit = false
-	
+
 	Threaded = false
 
 	// Load defaults from config if present
@@ -125,6 +127,8 @@ func ParseCommandLine() {
 				AddonsList = parts[1]
 			case "config":
 				ConfigList = parts[1]
+			case "bench":
+				Bench = parts[1] == "true"
 			case "addonlist":
 				ExitAfterUpdate = parts[1] == "true"
 			case "lextest":
@@ -173,17 +177,19 @@ func ParseCommandLine() {
 	Flags.StringVar(&DFDir, "dfdir", DFDir, "The path to the DF directory. May be relative.")
 	Flags.StringVar(&OutputDir, "outputdir", OutputDir, "Where should Rubble write the generated raw files?")
 	Flags.StringVar(&AddonsDir, "addonsdir", AddonsDir, "Rubble addons directory.")
-	
+
 	Flags.StringVar(&AddonsList, "addons", AddonsList, "List of addons to load. This is optional.")
 	Flags.StringVar(&ConfigList, "config", ConfigList, "List of config overrides. This is optional.")
 
+	Flags.BoolVar(&Bench, "bench", Bench, "Display the elapsed time before exiting. Only works if no errors were encountered.")
+	
 	Flags.BoolVar(&ExitAfterUpdate, "addonlist", ExitAfterUpdate, "Update the addon list and exit.")
 
 	Flags.BoolVar(&LexTest, "lextest", LexTest, "Run a Rubble lexer test. No files will be written.")
 	Flags.BoolVar(&NoRecover, "norecover", NoRecover, "Should Rubble not recover errors? Useful for debugging.")
-	
+
 	Flags.StringVar(&PrepRegion, "prep", PrepRegion, "Name of a world to prepare DF for loading (or \"raw\" for the base raw folder). Use this to make sure tilesets, init changes, and DFHack scripts match the world's requirements.")
-	
+
 	Flags.BoolVar(&ShellMode, "shell", ShellMode, "Enter Shell Mode. Shell Mode is a full-up version of the Raptor Shell.")
 	Flags.StringVar(&ScriptPath, "script", ScriptPath, "Shell Mode: Path to the input script, if any. Changes to batch mode. Needed for -compile")
 	Flags.StringVar(&Compile, "compile", Compile, "Shell Mode: Path to the output file. Changes to compile mode. Needs -script to be set.")
@@ -193,14 +199,14 @@ func ParseCommandLine() {
 	Flags.BoolVar(&NoExit, "noexit", NoExit, "Shell Mode: If set changes from batch mode to interactive mode. Use with -script.")
 	Flags.BoolVar(&NoPredefs, "nopredefs", NoPredefs, "Shell Mode: If set disables the shell predefs.")
 	Flags.BoolVar(&RunForcedInit, "init", RunForcedInit, "Shell Mode: Run the Rubble init scripts before entering shell mode.")
-	
+
 	Flags.BoolVar(&Threaded, "threads", Threaded, "Allows Rubble to use more than one processor core, not useful except for running threaded tweak scripts.")
-	
+
 	Flags.StringVar(&Profile, "profile", "", "Output CPU profile information to specified file.")
 	Flags.StringVar(&NetProfile, "netprofile", "", "Use the http pprof interface on specified port")
-	
+
 	Flags.Parse(os.Args[1:])
-	
+
 	if Threaded {
 		runtime.GOMAXPROCS(runtime.NumCPU())
 	}

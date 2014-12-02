@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package csv
     import "dctech/raptor/commands/csv"
 
-    Raptor CSV Commands.
+
 
 FUNCTIONS
 
@@ -14,31 +14,5 @@ func CommandCsv_Parse(script *raptor.Script, params []*raptor.Value)
 	csv:parse filecontents
 
     Returns the csv file or an error message. May set the Error flag.
-
-func NewCSVFile() raptor.Indexable
-
-func Setup(state *raptor.State)
-    Adds the csv commands to the state. The csv commands are:
-
-	csv:parse
-
-    Note that there is no support for writing csv files
-
-
-TYPES
-
-type CSVFile []*raptor.Value
-
-func (this *CSVFile) CodeString() string
-
-func (this *CSVFile) Exists(index string) bool
-
-func (this *CSVFile) Get(index string) *raptor.Value
-
-func (this *CSVFile) Keys() []string
-
-func (this *CSVFile) Len() int64
-
-func (this *CSVFile) String() string
 
 

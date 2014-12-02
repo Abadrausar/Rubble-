@@ -34,7 +34,7 @@ import "runtime/pprof"
 import "net/http"
 import _ "net/http/pprof"
 
-// The bit about "Enter Ctrl+Z to exit." is true in windows when using the default command prompt, 
+// The bit about "Enter Ctrl+Z to exit." is true in windows when using the default command prompt,
 // I have no idea how to generate an EOF in linux/mac.
 var header = ` +----------------------------------------------------------------------------+
  |                                Raptor Shell                                |
@@ -114,7 +114,7 @@ func main() {
 	if Threaded {
 		runtime.GOMAXPROCS(runtime.NumCPU())
 	}
-	
+
 	if Profile != "" {
 		f, err := os.Create(Profile)
 		if err != nil {
@@ -123,12 +123,12 @@ func main() {
 		}
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
-    }
-	
-	if NetProfile != "" {
-		http.ListenAndServe("localhost:" + NetProfile, nil)
 	}
-	
+
+	if NetProfile != "" {
+		http.ListenAndServe("localhost:"+NetProfile, nil)
+	}
+
 	fmt.Print(header)
 
 	// Lexer test
@@ -162,19 +162,19 @@ func main() {
 			fmt.Println("Validate Error: No script set.")
 			return
 		}
-		
+
 		file, err := ioutil.ReadFile(ScriptPath)
 		if err != nil {
 			fmt.Println("Validate Error:", err)
 			return
 		}
-		
+
 		err = raptor.LoadFile(ScriptPath, file, script)
 		if err != nil {
 			fmt.Println("Validate Error:", err)
 			return
 		}
-		
+
 		err = script.Validate()
 		if err != nil {
 			fmt.Println("Validate Error:", err)
@@ -225,19 +225,19 @@ func main() {
 			fmt.Println("Validate Error: No script set.")
 			return
 		}
-		
+
 		file, err := ioutil.ReadFile(ScriptPath)
 		if err != nil {
 			fmt.Println("Validate Error:", err)
 			return
 		}
-		
+
 		err = raptor.LoadFile(ScriptPath, file, script)
 		if err != nil {
 			fmt.Println("Validate Error:", err)
 			return
 		}
-		
+
 		err = state.Validate(script)
 		if err != nil {
 			fmt.Println("Validate Error:", err)
@@ -354,7 +354,7 @@ func main() {
 			fmt.Println("Read Error:", err, "\nExiting...")
 			break
 		}
-		
+
 		script.Code.AddString(string(line), raptor.NewPosition(1, 1, ""))
 		rtn, err := state.RunShell(script)
 		if err != nil {

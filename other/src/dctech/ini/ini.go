@@ -33,7 +33,7 @@ type Key struct {
 }
 
 // An ini section.
-// All keys are listed, in first added first order, in KeyOrder. 
+// All keys are listed, in first added first order, in KeyOrder.
 // No key is ever removed from KeyOrder so you can not assume that a key listed there in in Content.
 // Keys are written out in the order they are listed in KeyOrder.
 type Section struct {
@@ -51,7 +51,7 @@ func NewSection() *Section {
 }
 
 // An ini File.
-// All sections are listed, in first added first order, in SectionOrder. 
+// All sections are listed, in first added first order, in SectionOrder.
 // No section is ever removed from SectionOrder so you can not assume that a section listed there in in Content.
 // Sections are written out in the order they are listed in SectionOrder.
 type File struct {

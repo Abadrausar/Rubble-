@@ -77,7 +77,7 @@ func (this *ZipReader) ListDirs(dir string) []string {
 	if dir == "" {
 		dir = "."
 	}
-	
+
 	for _, f := range this.zip.File {
 		if f.FileInfo().IsDir() {
 			name := strings.TrimRight(f.Name, "/")
@@ -95,7 +95,7 @@ func (this *ZipReader) ListFiles(dir string) []string {
 		dir = "."
 	}
 	rtn := make([]string, 0, 20)
-	
+
 	for _, f := range this.zip.File {
 		if !f.FileInfo().IsDir() {
 			if path.Dir(f.Name) == dir {

@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package debug
     import "dctech/raptor/commands/debug"
 
-    Raptor Debug Command.
+
 
 FUNCTIONS
 
@@ -43,15 +43,5 @@ func CommandDebug_Value(script *raptor.Script, params []*raptor.Value)
 	debug:value value
 
     Returns unchanged.
-
-func Setup(state *raptor.State)
-    Adds the debug commands to the state. The debug commands are:
-
-	debug:shell
-	debug:value
-	debug:list
-	debug:namespace
-	debug:env
-	debug:clrret
 
 

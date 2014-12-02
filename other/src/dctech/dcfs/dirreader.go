@@ -93,7 +93,7 @@ func (this *DirReader) ListFiles(dir string) []string {
 		dir = "."
 	}
 	rtn := make([]string, 0, 20)
-	
+
 	files, err := ioutil.ReadDir(this.path + "/" + dir)
 	if err != nil {
 		return rtn

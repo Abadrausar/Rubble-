@@ -1,9 +1,9 @@
-PACKAGE
+PACKAGE DOCUMENTATION
 
 package console
     import "dctech/raptor/commands/console"
 
-    Raptor Console IO Commands.
+
 
 FUNCTIONS
 
@@ -13,10 +13,5 @@ func CommandConsole_Print(script *raptor.Script, params []*raptor.Value)
 	print [value...]
 
     Returns unchanged.
-
-func Setup(state *raptor.State)
-    Adds the console IO commands to the state. The console IO commands are:
-
-	console:print
 
 

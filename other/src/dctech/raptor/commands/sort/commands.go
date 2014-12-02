@@ -42,7 +42,7 @@ func CommandSort_Map(script *raptor.Script, params []*raptor.Value) {
 	if len(params) != 1 {
 		panic(script.BadParamCount("1"))
 	}
-	
+
 	value := params[0].Indexable()
 	if value == nil {
 		panic(script.GeneralCmdError("Parameter 0 is not Indexable."))
