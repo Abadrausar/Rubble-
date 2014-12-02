@@ -29,6 +29,8 @@ import "dctech/rex"
 // The boolean commands are:
 //	bool:and
 //	bool:or
+//	bool:sand
+//	bool:sor
 //	bool:not
 func Setup(state *rex.State) (err error) {
 	defer func() {

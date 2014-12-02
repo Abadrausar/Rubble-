@@ -43,14 +43,14 @@ Libs/Castes/DFHack/Transform
 	<DELAY> is a time in ticks to wait before transforming, this allows you to sequence several transformations.
 
 ==============================================
-{DFHACK_CASTE_TRANSFORM;<CREATURE>;<CASTE>;[<DELAY>=0;[<ID>=""]]}
+{DFHACK_CASTE_TRANSFORM;<CREATURE>;<CASTE>;[<DELAY>=0;[<ID>=nil]]}
 	Transforms a creature to the specified type when the reaction is run.
 	
 	<CASTE> should be the ID passed to the CASTE or !DEFAULT_CASTE template used to create the caste you want to transform into. DO NOT use a gender prefix! The transformation script adds this automatically as needed.
 	
 	<DELAY> is a time in ticks to wait before transforming, this allows you to sequence several transformations.
 	
-	If <ID> is "" then the ID of the last reaction defined by a REACTION template is used.
+	If <ID> is nil then the ID of the last reaction defined by a REACTION template is used.
 	(Specialized variants of REACTION, such as DFHACK_REACTION, work as well)
 
 **********************************************
@@ -158,9 +158,9 @@ Libs\DFHack\Announcement
 	If the addon is not active then this template acts exactly like REACTION.
 
 ==============================================
-{DFHACK_ANNOUNCE;<TEXT>;[<COLOR>=COLOR_WHITE];[<ID>=""]}
+{DFHACK_ANNOUNCE;<TEXT>;[<COLOR>=COLOR_WHITE];[<ID>=nil]}
 	Write an announcement to the screen and gamelog when the reaction <ID> completes, works exactly like the DFHACK_REACTION_BIND base template.
-	If <ID> is "" then the ID of the last reaction defined by a REACTION template is used.
+	If <ID> is nil then the ID of the last reaction defined by a REACTION template is used.
 	(Specialized variants of REACTION, such as DFHACK_REACTION, work as well)
 	
 	This template is always active even when it's addon is not enabled.

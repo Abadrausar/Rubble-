@@ -1,6 +1,6 @@
 
 local event = require "plugins.eventful"
-local fluids = rubble.fluids
+local fluids = rubble.require "fluids"
 
 function makeBar(mat)
 	local item = df['item_barst']:new()

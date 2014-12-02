@@ -29,6 +29,9 @@ import "dctech/rex"
 // The ordered map commands are:
 //	sort:map
 //	sort:new
+// In addition adds the following indexable type:
+//	sort:map
+// (command and type names do not conflict)
 func Setup(state *rex.State) (err error) {
 	defer func() {
 		if !state.NoRecover {
@@ -45,6 +48,8 @@ func Setup(state *rex.State) (err error) {
 	mod := state.RegisterModule("sort")
 	mod.RegisterCommand("map", Command_Map)
 	mod.RegisterCommand("new", Command_New)
+	
+	mod.RegisterType("map", NewOrderedMapFromLit)
 	
 	return nil
 }

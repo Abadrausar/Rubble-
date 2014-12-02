@@ -11,415 +11,333 @@ All addons will automatically activate any dependencies, so don't worry if the a
 
 A few of the addons allow you to make gloves via reactions, unfortunately these gloves will be unusable (it's a vanilla bug). If you have DFHack this will be fixed automatically.
 
-This list is not in any way complete, for a full list see the addon list page in the web UI.
-Some of the addon description are shortened and/or out of date, the full up-to-date versions are always available through the web UI.
+This list is automatically generated, for the full description of an addon see it's web UI addon description page.
 
-Base:
-	The standard base addon. Contains Rubblized versions of the vanilla raw files. 
-	Do not disable unless you have a replacement.
-	The following changes have been made from vanilla:
-		Some of the files have been re-indented (tag order is not effected).
-		The dwarf creature has templates from the "Libs/Castes" addon installed.
-		Specialized SHARED_OBJECT templates have been inserted where appropriate.
-		REACTION and BUILDING_WORKSHOP templates have been inserted where appropriate.
-		@BUILD_KEY templates have been inserted where appropriate.
-		ADDON_HOOKS have been added to all entities.
-		!ENTITY_PLAYABLE templates have been added to all entities.
-		The dwarven outpost liaison has been modded to work as a trade rep if the dwarves are unplayable.
-		Dwarves have the alchemist labor permitted in their entity.
-		Vermin creatures have #TILE and #COLOR templates inserted.
-		All file IDs have been stripped.
-
-User:
 [spoiler]
-	User/Adv Reactions:
-		Adds some basic adventure mode crafting reactions, mostly useful to help jump-start use of advfort.
-		Allows you to make crude picks and axes from knapped stone, anvils from boulders, backpacks from bags (that you can find in any human hamlet), and "emergency" crutches from bone.
-		All adventure mode reactions use the knapping skill.
-	
-	User/Archery:
-		Adds the archers workshop, a building where you can make all types of ranged weapons and their ammo.
-		The only thing you cannot do (yet) is make ranged weapons from metal, you will have to use bone or wood for now.
-		To keep the ammo reaction count under control ammo creation is done in two steps, first you make "shafts" out of the desired material, then you turn the shafts into ammo of the desired type.
+Base
+	The standard base addon. Contains Rubblized versions of the vanilla raw files.
 
-	User/Block/Boulder:
-		For the OCD among us, I present the boulder press. The boulder press allows you to recolor boulders via the wonders of dwarven masonry. 
-		How does it work? I have no idea, but dwarven masons are renowned for their ability to do strange things with stone :)
-		Like the other shops of it's kind the boulder press allows you to spend twice as much to get a better quality product.
-		Fine boulders are not only worth more, but magma safe as well.
-	
-	User/Block/Cutter:
-		The block cutter allows you to harness the wonderful power of dwarven masonry to cut 4 blocks of any color from 1 hard non-economic boulder of any kind. If you want to make higher value constructions you can also cut a boulder into 2 better quality blocks instead.
-		Fine blocks are not only worth more, but magma safe as well.
-	
-	User/Block/Kiln:
-		The Block Kiln works exactly like the block cutter except that you fire blocks from clay instead of cutting them from boulders. 5 clay gets you 10 normal blocks or 5 fine blocks.
-		Fine blocks are not only worth more, but magma safe as well.
-	
-	User/Bone Flux:
-		Bake bones at the kiln to make calcite, a flux stone.
-		Very useful for steel making in flux-poor locations.
-	
-	User/Bonecarver:
-		Adds a workshop for advanced shaping of bone, allows you to make basic furniture and some items from your choice of bone or a fake "bone" stone (to allow better stockpiling).
-		Blocks may also be made from a fire safe "treated bone" material, this makes item-less embarks a little less dependent upon caravans.
-	
-	User/Bonfire:
-		Start a fire and burn them goblins! Either start a short wood fueled fire or start a longer coke fueled one.
-		Good for starting brush fires or burning trash.
-	
-	User/Building Dimensions:
-		Append all building names with their dimensions, really simple.
-	
-	User/Cast Anvil:
-		Gives playable races a reaction to cast an iron anvil from 5 iron bars.
-	
-	User/Cat Damper:
-		Removes ADOPTS_OWNER and RETURNS_VERMIN_KILLS_TO_OWNER from the cat, preventing catsplosion and widespread miasma.
-	
-	User/Cave Color:
-		Changes color and availability of cave "grasses". Level 1 is green, yellow and brown, level 2 is mostly blue and cyan, and level 3 is red and gray. 
-		Changes are cosmetic only. Does not change non-grass plants or trees.
-		Makes it easy to tell which cavern level you are looking at.
-	
-	User/Decorations/Display Case:
-		Adds a useless workshop that can be built with 1 block and any 1 other item, build with an artifact to make room value skyrocket or just use to keep things out of reach of those pesky thieves.
-	
-	User/Decorations/Display Case/DFHack:
-		Gives the display case a pretty custom sidebar menu that displays the contained item.
-		The script used is a direct, unchanged, copy of the one from the DFHack r5 mini-mod pack.
-	
-	User/DFHack/Cart Filler:
-		Fill minecarts with water or magma (without big fancy mechanical contraptions).
-		To access fluids the filler needs to be adjacent to a downward passable tile leading to a cistern!
-		To fill a minecart it needs to be adjacent to or on top of the filler, the minecart is NOT used as a reagent in the reaction. The best way to use the filler is to place it next to a minecart stop (or stops) and a cistern, this allows you to fill minecarts and send them on their way with a minimum of fuss.
-		The amount of liquid used is determined by the minecart capacity, but at least 4/7 fluid is needed for the filler to function at all.
-		Uses the pump operator skill (to fill carts) and mechanics (to build the filler).
-	
-	User/DFHack/Cart Filler/Powered:
-		An automatic mechanically powered version of the "DFHack/Cart Filler" addon.
-		This addon works exactly the same with these additional rules (which are evaluated in order):
-			If both magma and a magma safe minecart are present magma is loaded
-			If any minecart and water is present water is loaded
-			If magma is present and the only minecart(s) are not magma safe an announcement is printed
-			If no minecarts are present nothing happens
-			If no fluids are present an announcement is printed
-		(If these rules cause announcement spam they may need to be changed)
-	
-	User/DFHack/Dragon Engine:
-		A direct port of the dragon engines from the DFHack r5 mini-mod pack.
-		Dragon engines are basically machines that take magma and spit it out as dragon fire, very deadly short range siege engines.
-	
-	User/DFHack/Fill Barrel:
-		Fill barrels from nearby water at the still, works like the cart filler as far as finding the water goes.
-		Also allows you to fill water buckets for use in the hospital.
-		This addon is most for use in biomes where water freezes in the winter (so you can have water reserves).
-		Please note that AFAIK water barrels are not stockpilable.
-		Note that unlike most DFHack addons this one will still work without DFHack, it just won't require/use water.
-		Why the still? Well the water needs to be purified somewhere right?
-	
-	User/DFHack/Magma/Extractor:
-		Extract minerals from magma, get all kinds of rare and valuable metals! (but only rarely)
-		A magma extractor can be very profitable, provided you can feed it enough magma.
-		Each cycle uses 2/7 magma and at least 4/7 magma needs to be available.
-		Uses the furnace operator skill.
-	
-	User/DFHack/Magma/Extractor/Powered:
-		An automatic powered version of the "DFHack/Magma/Extractor" addon.
-		This addon works exactly the same as "DFHack/Magma/Extractor", just without dwarf labor.
-	
-	User/DFHack/Magma/Melter:
-		Melt rocks into magma! 
-		The magma is put into an adjacent magma-safe minecart or an adjacent cistern.
-		When using minecarts this works exactly like the magma cart filler, when using a cistern it will attempt to spawn magma into any open space below an adjacent downward passable tile.
-		DO NOT BUILD THIS BUILDING NEXT TO YOUR MAIN STAIRWELL!
-		It is possible to enable magma workshops/furnaces here as well, so if you don't have a volcano there is no need to dig to the magma sea if you don't wish to.
-		Uses the furnace operator skill.
-	
-	User/DFHack/Obsidian Caster:
-		The obsidian caster makes obsidian boulders directly from adjacent water and magma, which needs to be on the level below and accessible via downward passable tiles.
-		4/7 water and magma are used for every boulder (so clever engineers can still be more efficient).
-		Uses the pump operator skill (to operate) and mechanics (to build the caster).
-	
-	User/DFHack/Obsidian Caster/Powered:
-		An automatic powered version of the "DFHack/Obsidian Caster" addon.
-		This addon works exactly the same as "DFHack/Obsidian Caster", just without dwarf labor.
-	
-	User/DFHack/Spatter:
-		A streamlined version of the DFHack spatter example mod. Allows you to coat weapons and ammo with extracts.
-		(Note that some extracts have no military value.)
-		Uses the wax worker skill.
-	
-	User/DFHack/Steam:
-		The DFHack steam engine example mod neatly packed as a Rubble addon. See the DFHack readme for details.
-		
-	User/Diggable Slade:
-		Allows you to dig slade, once you get past it's guardians that is...
-		Digging slade may lead to bugs, so be careful.
-	
-	User/Dwarf/Castes:
-		Adds more dwarf castes.
-		See the addon description in the web UI for more details, including descriptions and detailed population ratios.
-	
-	User/Dwarf/Castes/DFHack/Transform:
-		Allows you to change the caste of your dwarves at the guild hall for a nominal fee.
-		Most caste changes cost 500 gold, but warriors and priests cost more.
-		Requires the "User/Dwarf/Castes" addon.
-	
-	User/Edible Vermin:
-		Allows you to cook vermin at the kitchen to get cheap meat, a good emergency food source.
-		(urist likes vermin for their great taste.)
-	
-	User/Factory:
-		Adds a large factory building for making batches of cheap items (mostly from wood and stone).
-		Allows you to make all kinds of furniture as well as sets of clothing, batches of weapons, and sets of armor.
-		All factory reactions are just a little bit cheaper than the vanilla version.
-		All factory items that can be made from stone and wood also have a version that can be made from blocks or planks, save even more resources!
-		Uses various skills.
-	
-	User/Fix/Butcher Inorganic:
-		Allows you to butcher creatures made from (some) inorganics, FB stone walls anyone?
-		(Not 100% sure this works, copied from Modest Mod)
-	
-	User/Fix/Fish Pops:
-		Raises fish vermin populations to the max.
-		This should stop you from fishing out a lake or ocean ever again! (unless you catch ~30,000 fish...)
-	
-	User/Fix/Gays:
-		Makes humans and dwarves have a strictly straight orientation.
-		The list of creatures can be modified via config variable, but this should only be done with care, as indiscriminate modification of the variable in question may clobber changes made by other addons (this is not an issue with the default addons).
-		For details on how to modify the creature list see the comments in this addon's script.
-	
-	User/Fix/Human Diplomats:
-		Adds trade representatives and diplomats to the humans.
-	
-	User/Fix/Undead Melt:
-		Fixes bad temperature values in material_template_default.
-		I think all bad values are fixed, but this addon has not received extensive testing!.
-		In any case this should make it possible to melt undead with magma.
-	
-	User/Fix/Usable Chitin:
-		Allows you to use chitin as shell.
-	
-	User/Fix/Usable Feathers:
-		Allows you to use feathers as "soft" pearls (you can use them to make crafts).
-	
-	User/Fix/Usable Scale:
-		Allows you to use scale like leather.
-	
-	User/Fix/Vermin Variations:
-		This adds two fixes:
-			Forces all giant animals to have a life span of at least 10 years and
-			Replaces all pool biome tags in giant and animal-man creatures with the correct lake biome.
-		This is useful to make variations on vermin appear in game and to help them live long enough to be interesting.
-	
-	User/Fix/Whips:
-		Nerfs whips and scourges so they are not deadly anti-armor weapons.
-		
-	User/Generic Animal Mats:
-		The addons in this group all make some animal materials generic.
-		Each addon handles a different group of materials, who handles what is easy to tell from the addon names (I won't make a full list here).
-		Not all animal materials are handled, for example silk is not touched in any way, but most common materials are handled.
-	
-	User/Glass Forge:
-		The glass forge allows you to make armor and weapons from all three kinds of glass.
-		Green glass is a little under iron grade, clear glass is equivalent to iron, and crystal glass is a little under steel.
-		If you melt down glass items you will get "bars" of glass, you can melt these bars back to raw glass if you wish, or you can use them at the forge to make other glass items. If you wish you can also make bars directly from raw glass.
-	
-	User/Lamination:
-		Glue wooden planks together to make laminated logs, which are more valuable than most generic woods.
-		Uses the alchemy skill.
-	
-	User/Metallurgy:
-		Adds an "Alloy Furnace" that can be used to make alloys.
-		All alloys are made from bars using the smelting skill. Does not effect the smelter in any way.
-	
-	User/Metallurgy/Aluminum Bronze:
-		Make a bronze from aluminum and copper, makes a good decorative metal and can be made into armor and weapons as well.
-		Finally, an armor material worthy of your nobles :p
-	
-	User/Metallurgy/Bloomery:
-		Adds a "Bloomery" that can be used to make iron and steel in a more realistic manner.
-		This completely replaces vanilla iron and steel production.
-		Sadly this required removing the metal ore tags from iron ores (which breaks the metal ore embark indicator and ore stockpiles).
-		This addon is loosely based on parts of the Realistic 14th Century Metallurgy Mod.
-		To refine iron or make steel you need to make a bloom and hammer impurities out of it multiple times, if you have flux you can cut the time required in half and save some fuel (by skipping the first two hammer steps).
-		Blooms will self destruct in a few weeks, so you need to keep on top of the process.
-		Cost Table:
-			Iron ore -> 4 bars (no flux): 4.25 fuel per bar, 0 with magma, 4.25 steps per bar
-			Iron ore -> 4 bars (with flux): 2.25 fuel per bar, 0 with magma, 2.25 steps per bar
-			Iron bar -> steel bar (no flux): 6 fuel per bar, 1 with magma, 5 steps per bar
-			Iron bar -> steel bar (with flux): 4 fuel per bar, 1 with magma, 3 steps per bar
-		For consistency I suggest using this addon together with "User/Metallurgy/Smelter".
-	
-	User/Metallurgy/DFHack/Volcanic:
-		Made from a mix of metals carefully steeped in specially prepared magma, volcanic metal has some very odd properties. Volcanic metal is always slightly warm to the touch and is very heavy, it is also far stronger than its components. 
-		Volcanic metal is made from platinum and iron in roughly equal parts (plus lots of magma).
-		Note that this reaction is only possible at the magma version of the alloy furnace and that it USES UP 4/7 magma!
-		Requires the "User/Metallurgy" Addon.
-	
-	User/Metallurgy/Mithril:
-		Stretch your precious Adamantine supply, make mithril.
-		Mithril is a very light and sharp alloy that is made from steel and aluminum with a small admixture of adamantine, thereby greatly extending your adamantine supply (at the cost of slightly worse performance). 
-		Mithril is a little better than steel grade plus it is lighter and sharper.
-		Requires the "User/Metallurgy" Addon.
-	
-	User/Metallurgy/Smelter:
-		Replaces the default ore smelting reactions with a better set.
-		Unfortunately this addon completely breaks the metal ore embark indicator and stockpiles (use economic stone stockpiles instead)
-		Galena and tetrahedrite may only be smelted to one metal at a time, so you need to decide which metal is more important to your needs.
-	
-	User/Metallurgy/Smelter/Remove Alloys:
-		Removes all the vanilla alloy reactions, it is not a good idea to use this without "User/Metallurgy"!
-	
-	User/Pottery:
-		Replace the vanilla pottery system with a much expanded version. 
-		Glazing is still done the same basic way as vanilla (unless "User/Pottery/Glaze" is installed, then it is MUCH better). Unlike vanilla there is not a glazing reaction for each item type, use stockpiles to restrict item usage.
-	
-	User/Pottery/Batch:
-		Adds a batch kiln that can make 5x the stuff with 4x the material and 1x the fuel.
-		Like the normal kiln addon you can make many, many, more things from clay than you can make in vanilla.
-		Glazing and collecting clay can only be done at the normal kiln.
-	
-	User/Pottery/Glaze:
-		Allows you to grind minerals and ores into glaze powders of various colors and then use these powders to glaze various items. Unlike vanilla there is not a glazing reaction for each item type, use stockpiles to restrict item usage.
-		Each mineral or ore boulder is ground into 10 units of glaze powder, ash bars only produce 3 units.
-		There are four different kinds of glazing you may do:
-			Ash glazing uses one unit of ash to glaze an item, simple and cheap.
-			Monochrome glazing uses two units of any color glaze to glaze an item.
-			Dichrome glazing uses one unit of white glaze and one unit of any other color to glaze an item, this is more valuable than monochrome and has an additional chance of having bands on the item for even more value.
-			Polychrome glazing uses one unit of white and one unit each of blue, red, and yellow glaze to glaze an item, like dichrome this adds lots of value and each non-white color has a chance of adding bands. If you get lucky your simple pot could become very valuable!
-		Glaze List:
-			Name									Color Class		Value
-			olive ash glaze							ash				3
-			cream white tin glaze					white			10
-			pearl white zinc glaze					white			10
-			silver glaze							white			15
-			gold glaze								yellow			20
-			turquoise green copper glaze			blue			10
-			rust red iron glaze						red				15
-			chartreuse green nickel glaze			blue			10
-			scarlet red lead glaze					red				10
-			vermilion cinnabar glaze				red				6
-			cobalt blue glaze						blue			6
-			saffron yellow orpiment glaze			yellow			6
-			lemon yellow antimony glaze				yellow			6
-			dark indigo manganese glaze				blue			6
-			orange radiant pitchblende glaze		red				6
-		This addon is a polished and Rubblized port of the old "Expanded Glazes" mod by "NW_Kohaku". This version has had the reactions completely reworked as well as a few other balancing changes.
-	
-	User/Pottery/Porcelain:
-		Allows you to use orthoclase and microcline to make porcelain (in addition to kaolinite).
-		I am not sure how realistic this is, orthoclase and microcline are used to make porcelain, but it may only be as an additive, not the main ingredient.
-	
-	User/Quarry:
-		Dig for some basic raw materials without needing to actually dig.
-		There are two types of quarry:
-			Quarry: 8 blocks, 4 mechanisms, 2 giant corkscrews, 10x10
-				Dig for clay; 100% chance of a clay boulder, 10% chance of additional fire clay boulder
-				Dig for sand; 100% chance for a bag of sand
-				Dig for stone; 2% chance for 12 different layer stones
-			Makeshift Quarry, free, 5x5
-				Dig for clay; 20% chance of a clay boulder
-				Dig for sand; 20% chance for a bag of sand
-		You can use a quarry to dig for resources that do not exist in your current fort, so if you use quarries you never need to worry if you proposed embark has sand or clay.
-		Uses the pump operator skill.
-	
-	User/Research:
-		Build a laboratory and research advanced workshops.
-		Handles the research class "RESEARCH_GENERIC", which is used by many of the default addons.
-		You may also copy any research discovery here (for free). Uses the alchemy skill.
-	
-	User/Saurian:
-		A new race to play as, see the addon description in the web UI for more details.
-		This addon only includes the saurian creature and entity as well as saurian sized weapons and some basic reactions. Nothing else is included.
-		It is HIGHLY recommended to activate at least the "User/Quarry", "User/Glass Forge", "User/Sawmill", "User/Warcrafter" and "User/Pottery" addons.
-		To dig as saurians you need to buy a pick and resize it at the craftsaurian.
-		If this addon is activated dwarves are unplayable and the dwarven outpost liaison becomes a trade rep (unless you activate "Saurian/Unplayable").
-		Requires the "Glass Forge" addon.
-	
-	User/Saurian/Castes:
-		Adds some basic castes to the saurians.
-		See the addon description in the web UI for details.
-		Requires the "User/Saurian" addon.
-	
-	User/Saurian/Castes/DFHack/Transform:
-		Allows you to change the caste of your saurians at the new meditation circle workshop.
-		Meditating takes from 1/2 to 3 seasons (depending on what the result caste is).
-		Requires the "User/Saurian" and "User/Saurian/Basic Castes" addons.
-	
-	User/Saurian/Unplayable:
-		If you just want saurians as an extra race to trade with the dwarves, activate this addon.
-		Requires the "User/Saurian" addon.
-	
-	User/Sawmill:
-		Farmable wood plants and advanced wood processing, makes aboveground and/or treeless forts a lot easier.
-		If you wish you can scrap most wooden items (at a small loss), good for getting rid of all that elf crap you took from the last caravan :)
-		The sawmill uses the carpentry and wood burning skills for its reactions.
-		Don't forget a serrated disk!
-		There are two kinds of farmable wood plants:
-			Name			Biome			Growth Time		Log Color	Notes
-			lumber bamboo	non freezing	1/2 year		Brown		Edible seeds
-			stalkshroom		caves lvl 1-2	1 year			Dark Gray	Heavy and slightly more valuable
-	
-	User/Smoked Meat:
-		Allows you to smoke meat at the kitchen to preserve it (inedible to vermin and will not rot).
-		Does not improve value.
-	
-	User/Tanning:
-		Makes creatures give skin "globs" instead of "skins" when butchered, this allows large animals to produce more than one piece of leather once tanned. 
-		If "User/Fix/Usable Scale" is activated then scale is changed as well.
-		Based on a mod/modders resource by sackhead.
-	
-	User/Tileset/MLC/DFHack/TWBT:
-		A simple addon that installs my custom ASCII-like tileset.
-		This version uses the "Text Will Be Text" DFHack plugin (you will need to install that plugin separately).
-		Unlike most ASCII tilesets this one has special tiles for most buildings and items, making it (almost) fully graphical.
-		Comes only in the 16x16 size.
-		This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
-	
-	User/Tileset/MLC/Normal:
-		A simple addon that installs my custom ASCII-like tileset.
-		This version is very close to default ASCII (a few tiles are graphical).
-		Comes in two sizes, a 16x16 for fullscreen mode and a 10x10 for windowed mode.
-		This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
-	
-	User/Tileset/MLC/Pure ASCII:
-		A simple addon that installs my custom ASCII-like tileset.
-		This version has absolutely no graphical tiles.
-		Comes in two sizes, a 16x16 for fullscreen mode and a 10x10 for windowed mode.
-		This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
-	
-	User/Tileset/Vanilla:
-		Restores the vanilla tileset related init options.
-		It is a very good idea to use this addon whenever you are using the vanilla tileset, as otherwise prepping worlds generated from those raws may not work quite right.
-		This addon makes no raw changes, so it should be usable with all ASCII compatible mods.
-	
-	User/Tileset/Vanilla/Graphics:
-		The vanilla creature graphics, mostly just a demo.
-	
-	User/Training:
-		Make ink from ash, and paper from wood, then make a book from paper and ink and read it for exp in your chosen skill.
-		Note that EVERY skill in the game can be trained this way, even the useless ones ;). Making books uses the Alchemy skill.
-		Note that skills that do not have a labor appear to allow ANYONE to do the reaction, use workshop profiles.
-	
-	User/Warcrafter:
-		A special workshop for all your early game armor and ammo needs, the warcrafter allows you to make:
-			Scalemail armor from leather, bone, and shell
-			Bolts and arrows from bone and shell
-			Heavy cloaks from leather
-			Green glass weapons and armor (if the "User/Glass Forge" addon is active)
-		Making bone and shell items requires you to cut them into "scales" first.
-	
-	User/Warcrafter/Adventure:
-		Adds a bunch of adventure mode reactions, mostly for making use of bones and skin (via bone and leather items, mostly armor but also a few other useful things including a few bone weapons)
-		This addon is mostly for those who do not wish to use the advfort DFHack script, but still want to do some basic crafting.
-		Supports "User/Tanning" and "User/Fix/Usable Scale", but a DF bug keeps the support for "User/Tanning" from working correctly, it works but it requires lots of hunting to get much leather (the tanning reaction always takes two stacks of skin, and produces one tanned hide no matter how large the stacks are, so "User/Tanning" actually REDUCES the hide output in adventure mode).
-		Requires "User/Warcrafter" (for the armor items and materials).
-	
-	User/Wicker:
-		Make all sorts of stuff from woven plants. Uses the process plants skill (for bundling) and weaving (for making stuff).
-	
-	User/Zap Aquifers:
-		Disables all AQUIFER tags, very simple.
+Dev/Cheat
+	A bunch of cheat reactions to allow for fast setup of testing forts.
+
+Dev/Dummy Reactions
+	This addon adds "dummy reactions" eg. empty reactions registered to "ADDON_HOOK_PLAYABLE".
+
+Dev/Tileset/Export
+	This addon is a helper for extracting tileset information from raws that have the Rubble tileset templates added.
+
+Dev/Tileset/Insert
+	This addon adds the SHARED_OBJECT templates to all the tileset sensitive objects.
+
+Libs/Base
+	All the base templates and other such stuff, critical to normal operation.
+
+Libs/Castes
+	Adds support for dynamically adding castes to a creature.
+
+Libs/Castes/DFHack/Transform
+	Adds support for transforming castes.
+
+Libs/Crates
+	Adds infrastructure for "crates", eg bars that can be bought from caravans and then "unpacked" into items.
+
+Libs/DFHack/Add Reaction
+	Modify the reaction list of hard coded buildings.
+
+Libs/DFHack/Announcement
+	This addon provides templates for displaying announcements to the player.
+
+Libs/DFHack/Fix Handedness
+	Automatically installs and activates a fix for making gloves in reactions.
+
+Libs/DFHack/Fluids
+	Installs the extremely useful rubble.fluids Lua pseudo module and it's companion command rubble_fluids.
+
+Libs/DFHack/Timeout
+	Adds DFHack Lua support for persistent time delays (eg they survive a save/load).
+
+Libs/Macro
+	A modders resource for generating macros from scripts.
+
+Libs/Macro/Example
+	A simple addon that generates a large complicated macro from images, makes a good demo/test of "Libs/Macro".
+
+Libs/Research
+	This is the old research addon from Better Dorfs, reworked as a library.
+
+Libs/Wood Additions
+	Adds several small tweaks to wood materials.
+
+User/Adv Reactions
+	Adds some basic adventure mode crafting reactions, mostly useful to help jump-start use of advfort.
+
+User/Archery
+	Adds the archers workshop, a building where you can make all types of ranged weapons and their ammo.
+
+User/Block
+	Support for the addons in the "Block" group.
+
+User/Block/Boulder
+	Adds the boulder press, which allows you to recolor boulders via the wonders of dwarven masonry.
+
+User/Block/Cutter
+	The block cutter allows you to harness the wonderful power of dwarven masonry to cut blocks of any color.
+
+User/Block/Kiln
+	Fire blocks of any color from clay.
+
+User/Bone Flux
+	Bake bones at the kiln to make calcite, a flux stone.
+
+User/Bonecarver
+	Adds a workshop for advanced shaping of bone.
+
+User/Bonfire
+	Allows you to start fires.
+
+User/Building Dimensions
+	Append all building names with their dimensions, really simple.
+
+User/Cast Anvil
+	Gives playable races a reaction to cast an iron anvil from 5 iron bars.
+
+User/Cat Damper
+	Removes ADOPTS_OWNER and RETURNS_VERMIN_KILLS_TO_OWNER from the cat, preventing catsplosion and widespread miasma.
+
+User/Cave Color
+	Changes color and availability of cave "grasses" to enhance the visual difference between caverns.
+
+User/DFHack/Bulletin Board
+	A bulletin board, where your idle dwarves will post thoughts, preferences, etc...
+
+User/DFHack/Cart Filler
+	Fill minecarts with water or magma (without big fancy mechanical contraptions).
+
+User/DFHack/Cart Filler/Powered
+	An automatic mechanically powered version of the "User/DFHack/Cart Filler" addon.
+
+User/DFHack/Cart Launcher
+	Launch full minecarts automatically.
+
+User/DFHack/Cart Loader
+	Fill minecarts with items automatically.
+
+User/DFHack/Dragon Engine
+	A direct port of the dragon engines from the DFHack r5 mini-mod pack.
+
+User/DFHack/Fill Barrel
+	Fill barrels from nearby water at the still.
+
+User/DFHack/Magma/Extractor
+	Extract minerals from magma, get all kinds of rare and valuable metals! (but only rarely)
+
+User/DFHack/Magma/Extractor/Powered
+	An automatic powered version of the "User/DFHack/Magma/Extractor" addon.
+
+User/DFHack/Magma/Melter
+	Melt rocks into magma!
+
+User/DFHack/Obsidian Caster
+	The obsidian caster makes obsidian boulders directly from adjacent water and magma.
+
+User/DFHack/Obsidian Caster/Powered
+	An automatic powered version of the "User/DFHack/Obsidian Caster" addon.
+
+User/DFHack/Pop Cap
+	Allows you to set a population cap that will override the default for this world.
+
+User/DFHack/Spatter
+	A streamlined version of the DFHack spatter example mod.
+
+User/DFHack/Steam
+	The DFHack steam engine example mod.
+
+User/DFHack/Stirling Engine
+	Produces a (very) small amount of power for free.
+
+User/Deadly Bones
+	Makes creatures take 10x damage from weapons made from their bones.
+
+User/Decorations/Display Case
+	Adds a workshop for displaying items.
+
+User/Decorations/Display Case/DFHack
+	Gives the display case a pretty custom sidebar menu that displays the contained item.
+
+User/Diggable Slade
+	Allows you to dig slade, once you get past it's guardians that is...
+
+User/Dwarf/Castes
+	Adds more dwarf castes.
+
+User/Dwarf/Castes/DFHack/Transform
+	Allows you to change the caste of your dwarves at the guild hall for a nominal fee.
+
+User/Edible Vermin
+	Allows you to cook vermin at the kitchen to get cheap meat, a good emergency food source.
+
+User/Factory
+	Adds a large factory building for making batches of cheap items (mostly from wood and stone).
+
+User/Fix/Butcher Inorganic
+	Allows you to butcher creatures made from (some) inorganics, FB stone walls anyone?
+
+User/Fix/Fish Pops
+	Raises fish vermin populations to the max.
+
+User/Fix/Gays
+	Makes humans and dwarves have a strictly straight orientation.
+
+User/Fix/Human Diplomats
+	Adds trade representatives and diplomats to the humans.
+
+User/Fix/Undead Melt
+	Fixes bad temperature values in material_template_default.
+
+User/Fix/Usable Chitin
+	Allows you to use chitin as shell.
+
+User/Fix/Usable Feathers
+	Allows you to use feathers as "soft" pearls (you can use them to make crafts).
+
+User/Fix/Usable Scale
+	Allows you to use scale like leather.
+
+User/Fix/Vermin Variations
+	Makes giant and animal man vermin show up properly.
+
+User/Fix/Whips
+	Nerfs whips and scourges so they are not deadly anti-armor weapons.
+
+User/Generic Animal Mats
+	Support for the the addons in the "Generic Animal Mats" group.
+
+User/Generic Animal Mats/Blood and Pus
+	Generic animal blood and pus.
+
+User/Generic Animal Mats/Bone
+	Generic animal bones.
+
+User/Generic Animal Mats/Fat, Tallow, and Soap
+	Generic animal fat, tallow, and soap.
+
+User/Generic Animal Mats/Hair and Feathers
+	Generic animal hair and feathers.
+
+User/Generic Animal Mats/Horn and Hoof
+	Generic animal horn and hooves.
+
+User/Generic Animal Mats/Meat
+	Generic animal meat (including organs).
+
+User/Generic Animal Mats/Milk
+	Generic animal milk and cheese.
+
+User/Generic Animal Mats/Shell
+	Generic animal shell.
+
+User/Generic Animal Mats/Sinew
+	Generic animal sinew.
+
+User/Generic Animal Mats/Skin, Scale and Chitin
+	Generic animal hide materials.
+
+User/Generic Animal Mats/Tooth and Claw
+	Generic animal teeth and claws.
+
+User/Glass Forge
+	The glass forge allows you to make armor and weapons from all three kinds of glass.
+
+User/Lamination
+	Glue wooden planks together to make laminated logs, which are more valuable than most wood.
+
+User/Metallurgy
+	Adds an "Alloy Furnace" that can be used to make alloys.
+
+User/Metallurgy/Aluminum Bronze
+	Adds a new alloy to the alloy furnace, aluminum bronze.
+
+User/Metallurgy/Bloomery
+	Adds a "Bloomery" that can be used to make iron and steel in a more realistic manner.
+
+User/Metallurgy/DFHack/Volcanic
+	Adds a new alloy to the alloy furnace, volcanic.
+
+User/Metallurgy/Mithril
+	Adds a new alloy to the alloy furnace, mithril.
+
+User/Metallurgy/Smelter
+	Replaces the default ore smelting reactions with a better set.
+
+User/Metallurgy/Smelter/Remove Alloys
+	Removes all the vanilla alloy reactions, it is not a good idea to use this without "User/Metallurgy"!
+
+User/Pottery
+	Replace the vanilla pottery system with a much expanded version.
+
+User/Pottery/Batch
+	Adds a batch kiln that can make 5x the stuff with 4x the material and 1x the fuel.
+
+User/Pottery/Glaze
+	Greatly expands the glazing system.
+
+User/Pottery/Porcelain
+	Allows you to use orthoclase and microcline to make porcelain (in addition to kaolinite).
+
+User/Quarry
+	Dig for some basic raw materials without needing to actually dig.
+
+User/Research
+	Build a laboratory and research advanced workshops.
+
+User/Saurian
+	Adds a new playable race, the saurians.
+
+User/Saurian/Castes
+	Adds some basic castes to the saurians.
+
+User/Saurian/Castes/DFHack/Transform
+	Allows you to change the caste of your saurians at the meditation circle.
+
+User/Saurian/Unplayable
+	If you just want saurians as an extra race to trade with the dwarves, activate this addon.
+
+User/Sawmill
+	Farmable wood plants and advanced wood processing, makes aboveground and/or treeless forts a lot easier.
+
+User/Smoked Meat
+	Allows you to smoke meat at the kitchen to preserve it (inedible to vermin and will not rot).
+
+User/Tanning
+	Allows creatures to give more than one skin based on size.
+
+User/Tilesets/MLC/DFHack/TWBT
+	A simple addon that installs my custom ASCII-like tileset (Text Will Be Text version).
+
+User/Tilesets/MLC/Normal
+	A simple addon that installs my custom ASCII-like tileset (normal version).
+
+User/Tilesets/MLC/Pure ASCII
+	A simple addon that installs my custom ASCII-like tileset (pure ASCII version).
+
+User/Tilesets/Vanilla
+	Restores the vanilla tileset related init options.
+
+User/Tilesets/Vanilla/Graphics
+	The vanilla creature graphics, mostly just a demo.
+
+User/Training
+	Train your dwarves by reading books.
+
+User/Warcrafter
+	A special workshop for all your early game armor and ammo needs.
+
+User/Warcrafter/Adventure
+	Adventure mode reactions for armor, weapons, and other useful items.
+
+User/Wicker
+	Make all sorts of stuff from woven plants.
+
+User/Zap Aquifers
+	Removes all aquifers, simple.
 [/spoiler]

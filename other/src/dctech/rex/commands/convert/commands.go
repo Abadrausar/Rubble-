@@ -27,7 +27,6 @@ import "dctech/rex"
 
 // Adds the type conversion commands to the state.
 // The type conversion commands are:
-//	convert:type
 //	convert:int
 //	convert:float
 //	convert:bool

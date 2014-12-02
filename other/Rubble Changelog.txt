@@ -2,6 +2,41 @@
 ==============================================
 Changelog:
 ==============================================
+v5.3 (for DF 40.13)
+	Updated Rex (v1.6).
+		array indexables should be a little faster in most cases.
+		Some errors (specifically those dealing with indexables) should now be properly handled.
+		A pseudo-random number generator is now included (the "rand" module).
+		debug:value now prints the raw value data with a much nicer (clearer) format.
+		New (sorta, Raptor had breakif) commands breakif and breakloopif (short versions of if + break or breakloop).
+		New command modval, enables some interesting pointer-like behavior (for advanced users only!).
+	Script command documentation is now generated for ALL included Rex command packages (I had forgotten a few...).
+	Added "User/Deadly Bones", makes creatures extra vulnerable vs. their own bone material (10x damage bonus!).
+		Not 100% sure this works, if you want to test effectiveness some ideas are listed in the addon description.
+	The "shell" and "bone" materials in "User/Warcrafter" now have the same colors as vanilla bone and shell.
+	Saurians may now make socks (because it's just not DF without piles of XX(rope reed fiber sock)XX).
+	Added "User/DFHack/Pop Cap", set the population cap(s) on a per-world basis (overriding the init settings).
+	Added "User/DFHack/Cart Loader", load items into minecarts without dwarf power.
+	Added "User/DFHack/Cart Launcher", launch carts that are more than 75% full (automatically!).
+	Added "User/DFHack/Stirling Engine", generate a (very) small amount of power for free.
+	Added "User/DFHack/Bulletin Board", a bulletin board, where your idle dwarves will post thoughts, preferences, etc...
+	The web UI now passes the full URL of the menu page (including the "http://" part) to the browser start script.
+	Fixed some file permission bugs (writing files with the wrong mode), this should only effect Linux users.
+	Added default browser startup scripts for the web UI (for Windows and Linux).
+	Added a check to the Web UI server to make sure startup errors for the HTTP server are reported (yes, I am an idiot).
+	Changed the web UI default port to 2120 (from 1010, which Linux doesn't like).
+		The port was picked arbitrarily, if it collides with something common let me know and I'll change it again.
+	Added missing dependency in the "Dwarf/Castes/DFHack/Transform" addon.meta file (so it should work now).
+	Replaced the old (way out of date) "Rubble Addon List" file with a new automatically generated one.
+	Changed the DFHack Lua pseudo module syntax so it matches the syntax for regular modules.
+		(just use rubble.require and rubble.mkmodule)
+	Fixed an AXIS bug that made the web UI crash if the "Go Directly To Regeneration" button was clicked.
+		This bug effected other things as well, but with a default setup this was the only thing that triggered it.
+	Revised some of the templates in "Libs/Base" (mostly removing unneeded block declarations).
+	All templates that had a command version for use in prep mode now have a command version for normal use as well.
+	Changed the default tileset addons to use a different system for prep support.
+		They generate their own prep scripts now, so the whole process is less prone to error.
+
 v5.2 (for DF 40.13)
 	Changed "User/Saurian" entity values a little, they should now dream about things other than becoming a legendary warrior.
 		Saurians are still properly warlike, they just have more other interests now.

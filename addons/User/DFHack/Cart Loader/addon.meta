@@ -1,0 +1,19 @@
+<rubble:addonmeta
+	header=`Fill minecarts with items automatically.`
+	
+	description=`
+When powered this machine loads any items that are on it's input side into nearby minecarts.
+If you want to load liquids see "User/DFHack/Cart Filler/Powered".
+
+The direction given in the building name is the direction that items are loaded from,
+the minecart may be in any of the 9 tiles around the loader.
+
+Items are loaded one stack at a time once every 10 ticks.
+
+Connecting machines must be built AFTER any mechanical workshop!
+
+Based on the Masterwork Gnome mode machina scripts.
+`
+	
+	activates="Libs/Base"
+>

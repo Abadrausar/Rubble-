@@ -55,12 +55,37 @@ func (ii *Array) Get(index string) *rex.Value {
 	return RValueToSValue(rval)
 }
 
+func (ii *Array) GetI(index int64) *rex.Value {
+	i := int(index)
+	
+	length := reflect.Value(*ii).Len()
+	if i < 0 || i >= length {
+		rex.RaiseError("GenII: Index out of range.")
+	}
+	
+	rval := reflect.Value(*ii).Index(i)
+	return RValueToSValue(rval)
+}
+
 func (ii *Array) Set(index string, sval *rex.Value) bool {
 	val, err := strconv.ParseInt(index, 0, 32)
 	if err != nil {
 		rex.RaiseError("GenII: Index not a valid number.")
 	}
 	i := int(val)
+	
+	length := reflect.Value(*ii).Len()
+	if i < 0 || i >= length {
+		rex.RaiseError("GenII: Index out of range.")
+	}
+	
+	rval := reflect.Value(*ii).Index(i)
+	SValueToRValue(sval, rval)
+	return true
+}
+
+func (ii *Array) SetI(index int64, sval *rex.Value) bool {
+	i := int(index)
 	
 	length := reflect.Value(*ii).Len()
 	if i < 0 || i >= length {

@@ -1,12 +1,12 @@
 [OBJECT:INORGANIC]
 
-# Same as war-grade green glass.
+# Same as war-grade green glass (with the same color as vanilla shell).
 {SHARED_INORGANIC;WARCRAFTER_SHELL;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
 	[STATE_NAME_ADJ:ALL_SOLID:shell]
 	[STATE_NAME_ADJ:LIQUID:shell]
 	[STATE_NAME_ADJ:GAS:shell]
-	[DISPLAY_COLOR:2:10:0]
+	[DISPLAY_COLOR:2:0:0]
 	[MATERIAL_VALUE:2]
 	[SPEC_HEAT:450]
 	[MELTING_POINT:12768]
@@ -35,13 +35,13 @@
 	[MAX_EDGE:10000]
 }
 
-# Same as war-grade green glass.
+# Same as war-grade green glass (with the same color as vanilla bone).
 {SHARED_INORGANIC;WARCRAFTER_BONE;
 	[USE_MATERIAL_TEMPLATE:METAL_TEMPLATE]
 	[STATE_NAME_ADJ:ALL_SOLID:bone]
 	[STATE_NAME_ADJ:LIQUID:bone]
 	[STATE_NAME_ADJ:GAS:bone]
-	[DISPLAY_COLOR:2:10:0]
+	[DISPLAY_COLOR:7:0:1]
 	[MATERIAL_VALUE:2]
 	[SPEC_HEAT:450]
 	[MELTING_POINT:12768]

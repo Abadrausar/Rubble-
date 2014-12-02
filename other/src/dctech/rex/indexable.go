@@ -26,6 +26,7 @@ package rex
 // variable operator ([]) as well as some of the base commands.
 // Indexable is readonly.
 type Indexable interface {
+	// Get should return a type nil value for non-existent keys.
 	Get(index string) *Value
 	Exists(index string) bool
 	Len() int64
@@ -46,6 +47,26 @@ type EditIndexable interface {
 	// Set returns false if the key could not be created.
 	// This may be caused by the indexable being semi-readonly.
 	Set(index string, value *Value) bool
+}
+
+// IntIndexable is an indexable that may be indexed by integer.
+// Indexes MUST range from 0 to Len() - 1, otherwise all sorts of things will break!
+type IntIndexable interface {
+	Indexable
+
+	// GetI should return a type nil value for non-existent keys.
+	GetI(index int64) *Value
+}
+
+// IntEditIndexable is an edit indexable that may be indexed by integer.
+// Indexes MUST range from 0 to Len() - 1, otherwise all sorts of things will break!
+type IntEditIndexable interface {
+	EditIndexable
+
+	// SetI returns false if the key could not be created.
+	// This may be caused by the indexable being semi-readonly.
+	// Conventionally -1 is used as a shorthand for append (but this is not required).
+	SetI(index int64, value *Value) bool
 }
 
 // IndexableToString is a helper function for implementing an Indexable's String method.

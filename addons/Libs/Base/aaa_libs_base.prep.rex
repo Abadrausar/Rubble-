@@ -1,7 +1,7 @@
 
-# this is the prep file version of the base templates
-# only a small subset are included
-# these are all copies of other templates/commands
+# This is the prep file version of the base templates
+
+# This is just a copy of "aaa_tilesets_libs_base.pre.rex" with all the templates stripped.
 
 command rubble:install_tilesheet tilesheet {
 	(axis:write [rubble:fs] (str:add "df:data/art/" [tilesheet]) [rubble:raws [tilesheet]])
@@ -344,7 +344,7 @@ command rubble:edit_d_init setting value {
 	(if (exists [rubble:init_defaults] [setting]) {
 		[rubble:init_settings [setting] = [value]]
 	}{
-		(rubble:abort "Error: Attempt to use invalid init setting, only tileset related settings allowed.")
+		(rubble:abort "Attempt to use invalid init setting, only tileset related settings allowed.")
 	})
 }
 command rubble:close_d_init {
@@ -377,4 +377,8 @@ command rubble:d_init_to_defaults {
 		(break true)
 	})
 	(axis:write [rubble:fs] "df:data/init/d_init.txt" [rubble:d_init])
+}
+
+command rubble:install_graphics_file tilesheet {
+	(axis:write [rubble:fs] (str:add "out:graphics/" [tilesheet]) [rubble:raws [tilesheet]])
 }

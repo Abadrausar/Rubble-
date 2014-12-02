@@ -448,10 +448,17 @@ func (script *Script) execVar() {
 		if val.Type != TypIndex {
 			RaiseError(fmt.Sprint("Non-Indexable object passed to an indexing variable operator. Indexing level:", i))
 		}
-
-		val = val.Data.(Indexable).Get(params[i].String())
+		if v, ok := val.Data.(IntIndexable); ok && params[i].Type == TypInt {
+			val = v.GetI(params[i].Int64())
+		} else {
+			val = val.Data.(Indexable).Get(params[i].String())
+		}
 	}
 
+	if val.Type != TypIndex {
+		RaiseError("Non-Indexable object passed to an indexing variable operator (last element).")
+	}
+	
 	if script.code.last().checkLookAhead(opAssignment) {
 		script.code.last().getOpCode(opAssignment)
 		script.RetVal = script.execValue()
@@ -459,14 +466,31 @@ func (script *Script) execVar() {
 			return
 		}
 
-		index, ok := val.Data.(EditIndexable)
-		if !ok {
-			RaiseError("Attempt to use read only value with indexing form variable set operator.")
+		i := params[len(params)-1]
+		if v, ok := val.Data.(IntEditIndexable); ok && i.Type == TypInt {
+			r := v.SetI(i.Int64(), script.RetVal)
+			if !r {
+				RaiseError("Indexing variable set failed (Set returned false).")
+			}
+			script.RetVal = val
+		} else {
+			index, ok := val.Data.(EditIndexable)
+			if !ok {
+				RaiseError("Attempt to use read only value with indexing form variable set operator.")
+			}
+			r := index.Set(i.String(), script.RetVal)
+			if !r {
+				RaiseError("Indexing variable set failed (Set returned false).")
+			}
+			script.RetVal = val
 		}
-		index.Set(params[len(params)-1].String(), script.RetVal)
-		script.RetVal = val
 	} else {
-		script.RetVal = val.Data.(Indexable).Get(params[len(params)-1].String())
+		i := params[len(params)-1]
+		if v, ok := val.Data.(IntIndexable); ok && i.Type == TypInt {
+			script.RetVal = v.GetI(i.Int64())
+		} else {
+			script.RetVal = val.Data.(Indexable).Get(i.String())
+		}
 	}
 
 	script.code.last().getOpCode(opVarEnd)

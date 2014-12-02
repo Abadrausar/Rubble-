@@ -69,11 +69,8 @@ package rex
 
 	The debug commands need expanding.
 	
-	Rewrite variable lookup.
-		All modules should be stored in the global module
-		failed external variable lookups should fail over to looking in the global module
-		Can modules contain references to themselves? If so it will be easy to allow either:
-			[ret] or [global:ret]
+	The ScriptError type should have some type flags that can be used to classify errors into categories.
+	Some predefined ScriptError values may be useful.
 	
 	Look for cases where the error flag should be used but is not.
 	

@@ -35,12 +35,17 @@ type Logger struct {
 
 // NewLogger creates a new logger.
 func NewLogger(other ...io.Writer) (error, *Logger) {
+	// We never close this file (probably not a good idea, but where would we close it?)
 	file, err := os.Create("./rubble.log")
 	if err != nil {
 		return err, nil
 	}
-	// Ouch. That is quite the hack...
-	return nil, &Logger{io.MultiWriter(append([]io.Writer{file, os.Stdout}, other...)...)}
+	
+	writers := make([]io.Writer, 2, len(other) + 2)
+	writers[0] = os.Stdout
+	writers[1] = file
+	writers = append(writers, other...)
+	return nil, &Logger{io.MultiWriter(writers...)}
 }
 
 func (log *Logger) Printf(format string, msg ...interface{}) {
@@ -70,7 +75,7 @@ func (log *Logger) Header(version string) {
 	log.Separator()
 }
 
-var startupLines = []string{
+var startupLines = [...]string{
 	"After Blast comes Rubble.",
 	"Modding made easy!",
 	"Scriptable!",
@@ -104,4 +109,6 @@ var startupLines = []string{
 	"Done in less than 4 seconds or your money back!\n(disclaimer: Rubble is free.)",
 	"Open source!",
 	"Supports DFHack!",
+	"50 KB log files!",
+	"Include the ENTIRE log in any bug reports!",
 }

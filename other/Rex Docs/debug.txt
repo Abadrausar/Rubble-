@@ -16,8 +16,8 @@ func Command_Registers(script *rex.Script, params []*rex.Value)
 
 func Command_Shell(script *rex.Script, params []*rex.Value)
     Break into the debugging shell. This command will provide an interactive
-    shell until eof is reached, on windows this may be simulated by pressing
-    CTRL+Z followed by <ENTER>.
+    shell until a DOS EOF char is found, on windows this may be simulated by
+    pressing CTRL+Z followed by <ENTER>.
 
 	debug:shell
 

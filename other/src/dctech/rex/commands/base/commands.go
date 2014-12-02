@@ -28,10 +28,13 @@ import "dctech/rex"
 // Setup adds the base commands to the script.
 // The base commands are:
 //	nop
+//	modval
 //	ret
 //	exit
 //	break
+//	breakif
 //	breakloop
+//	breakloopif
 //	eval
 //	error
 //	onerror
@@ -59,10 +62,13 @@ func Setup(state *rex.State) (err error) {
 	}()
 	
 	state.RegisterCommand("nop", Command_Nop)
+	state.RegisterCommand("modval", Command_ModVal)
 	state.RegisterCommand("ret", Command_Ret)
 	state.RegisterCommand("exit", Command_Exit)
 	state.RegisterCommand("break", Command_Break)
+	state.RegisterCommand("breakif", Command_BreakIf)
 	state.RegisterCommand("breakloop", Command_BreakLoop)
+	state.RegisterCommand("breakloopif", Command_BreakLoopIf)
 	state.RegisterCommand("eval", Command_Eval)
 	state.RegisterCommand("error", Command_Error)
 	state.RegisterCommand("onerror", Command_OnError)
@@ -83,6 +89,20 @@ func Setup(state *rex.State) (err error) {
 // 	nop
 // Returns unchanged.
 func Command_Nop(script *rex.Script, params []*rex.Value) {
+}
+
+// Copies the second value over the first, allows you to do some weird pointer-like things.
+// In general do not use unless you know what you are doing.
+// 	modval a b
+// Returns unchanged.
+func Command_ModVal(script *rex.Script, params []*rex.Value) {
+	if len(params) != 2 {
+		rex.ErrorParamCount("modval", "2")
+	}
+	
+	params[0].Type = params[1].Type
+	params[0].Data = params[1].Data
+	params[0].Pos = params[1].Pos
 }
 
 // Return from current command.
@@ -132,6 +152,20 @@ func Command_Break(script *rex.Script, params []*rex.Value) {
 	}
 }
 
+// A conditional version of break.
+// 	breakif condition [value]
+// Returns value or unchanged.
+func Command_BreakIf(script *rex.Script, params []*rex.Value) {
+	if len(params) != 1 && len(params) != 2 {
+		rex.ErrorParamCount("breakif", "1 or 2")
+	}
+
+	script.Break = params[0].Bool()
+	if len(params) > 1 {
+		script.RetVal = params[1]
+	}
+}
+
 // Forces a return until it hits a loop or foreach command or the script exits.
 // 	breakloop [value]
 // Returns value or unchanged.
@@ -143,6 +177,20 @@ func Command_BreakLoop(script *rex.Script, params []*rex.Value) {
 	script.BreakLoop = true
 	if len(params) > 0 {
 		script.RetVal = params[0]
+	}
+}
+
+// A conditional version of breakloop.
+// 	breakloopif condition [value]
+// Returns value or unchanged.
+func Command_BreakLoopIf(script *rex.Script, params []*rex.Value) {
+	if len(params) != 1 && len(params) != 2 {
+		rex.ErrorParamCount("breakloopif", "1 or 2")
+	}
+
+	script.BreakLoop = params[0].Bool()
+	if len(params) > 1 {
+		script.RetVal = params[1]
 	}
 }
 
@@ -440,9 +488,27 @@ func Command_ForEach(script *rex.Script, params []*rex.Value) {
 	block := params[1].Data.(*rex.Code)
 	script.Locals.Add(script.Host, block)
 	
+	// If the value is an IntIndexable we can use this faster version
+	// (hopefully requires less string conversions)
+	if v, ok := params[0].Data.(rex.IntIndexable); ok {
+		for i := int64(0); i < v.Len(); i++ {
+			script.Locals.Set(0, rex.NewValueInt64(i))
+			script.Locals.Set(1, v.GetI(i))
+			script.Exec(block)
+			script.BreakLoop = false
+			if !script.RetVal.Bool() || script.ExitFlags() {
+				break
+			}
+		}
+		
+		script.Locals.Remove()
+		return
+	}
+	
+	v := params[0].Data.(rex.Indexable)
 	for _, i := range params[0].Data.(rex.Indexable).Keys() {
 		script.Locals.Set(0, rex.NewValueString(i))
-		script.Locals.Set(1, params[0].Data.(rex.Indexable).Get(i))
+		script.Locals.Set(1, v.Get(i))
 		script.Exec(block)
 		script.BreakLoop = false
 		if !script.RetVal.Bool() || script.ExitFlags() {

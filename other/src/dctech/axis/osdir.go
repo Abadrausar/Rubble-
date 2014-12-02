@@ -61,7 +61,7 @@ func (dir *OSDir) Delete(path *Path) error {
 }
 
 func (dir *OSDir) Create(path *Path) error {
-	err := os.MkdirAll(gopath.Dir(dir.path + "/" + path.Remainder()), 0666)
+	err := os.MkdirAll(gopath.Dir(dir.path + "/" + path.Remainder()), 04755)
 	if err != nil {
 		return err
 	}

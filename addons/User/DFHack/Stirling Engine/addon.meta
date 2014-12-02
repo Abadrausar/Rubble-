@@ -1,0 +1,20 @@
+<rubble:addonmeta
+	header=`Produces a (very) small amount of power for free.`
+	
+	description=`
+This machine provides 5 power all the time, use to power small
+machines that would be hard to connect to a conventional power source.
+
+As each engine produces so little power (and costs so much to build) producing
+enough power to run larger machines is not really worth the effort.
+
+Use steam engines from "User/DFHack/Steam" or vanilla water wheels and windmills
+for larger machines (or groups of machines).
+
+Most if not all machines will require two or more engines to run.
+
+Connecting machines must be built AFTER any mechanical workshop!
+`
+	
+	activates="Libs/Base"
+>

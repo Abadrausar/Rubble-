@@ -1,5 +1,9 @@
 <rubble:addonmeta
 	header=`The vanilla creature graphics, mostly just a demo.`
 	
+	description=`
+This addon lacks prep support (and it really should have it)!
+`
+	
 	activates="Libs/Base"
 >

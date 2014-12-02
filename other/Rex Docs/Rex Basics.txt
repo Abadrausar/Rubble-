@@ -256,7 +256,7 @@ Map object literals need to have keys specified:
 	<map "a"=1 "b"=2 "c"=3>
 
 Array indexables are a little more complicated, only integer numbers can be used as keys, and the keys are always consecutive starting from 0.
-To add a new key you use the special key "append", reading nonexistent keys is an error.
+To add a new key you use the special keys "append" or -1, reading nonexistent keys is an error.
 Array object literals must NOT have keys specified:
 	<array "a" "b" "c">
 
@@ -271,6 +271,7 @@ To check for key existence in any indexable use the base command exists:
 Add key examples:
 	[<map "a"=1 "b"=2 "c"=3> "d" = 4]
 	[<array "a" "b" "c"> append = "d"]
+	[<array "a" "b" "c"> -1 = "d"]
 
 Read key examples:
 	[<map "a"=1 "b"=2 "c"=3> "b"] # returns 2
@@ -347,42 +348,18 @@ You get the error message "No Value slot named: <varname> exists." and the posit
 	Unfortunately it is impossible to point the error directly at the variable in question without a complete re-write of all error handling code, which is far too much work to make this one error more clear.
 
 ==============================================
-Weird Stuff (that actually works!) and Other Code Examples
+Semi-Random Code Examples
 ==============================================
 
-What follows is some random code snippets demonstrating weird things you can do with Rex.
-
-Most of these are not generally a good idea (or even very useful) but are included here for interests sake.
-
--------------------
-
-(block a b {<array [a] [b]>} 5 10)
+Here I have several random code samples, each one does some small, but interesting task.
+Should be useful for you "learn by example" types...
 
 -------------------
 
-command test {[a = 10]}
-
-var a = 5
-
-(test)
-
-# a == 10
-
--------------------
-
-var test = [<array> append = 1]
-
-# test == <array 1>
-
--------------------
-
-var global:print = [console:print]
-(print 'Are you tired of typing "console:" over and over?')
-
--------------------
-
-# Make your own control structures! Not really weird, but still not common.
+# Make your own control structures!
 # This is actually really useful, but it may have slightly worse performance compared to nested ifs.
+
+# A faster switch can be implemented based on a map object literal, we'll do that next.
 
 var global:switch = block action condition other=... {
 	(if (int:eq (int:mod (len [other]) 2) 0) {}{
@@ -394,23 +371,21 @@ var global:switch = block action condition other=... {
 	var count = (int:sub (len [other]) 1)
 	var i = 0
 	(loop {
-		(if (int:lt [i] [count]) {
-			(if (str:cmp [other [i]] "default") {
-				[default = [other (int:add [i] 1)]]
-				[i = (int:add [i] 2)]
-				(breakloop true)
-			})
-			
-			(if ([action] [condition] [other [i]]) {
-				([other (int:add [i] 1)])
-				(ret)
-			})
-			
+		(breakif (bool:not (int:lt [i] [count])) false)
+		
+		(if (str:cmp [other [i]] "default") {
+			[default = [other (int:add [i] 1)]]
 			[i = (int:add [i] 2)]
-			(break true)
-		}{
-			(break false)
+			(breakloop true)
 		})
+		
+		(if ([action] [condition] [other [i]]) {
+			([other (int:add [i] 1)])
+			(ret)
+		})
+		
+		[i = (int:add [i] 2)]
+		(break true)
 	})
 	
 	([default])
@@ -428,9 +403,77 @@ var x = 20
 
 -------------------
 
+# Fast(er) switch statement.
+# Much less interesting, but it should be faster in most cases.
+
+var global:switch = block condition data {
+	(if (type [data] index) {}{
+		(console:print "switch: Bad data.")
+		(exit)
+	})
+	
+	(if (exists [data] [condition]) {
+		# The command type name has to be quoted to keep it from conflicting with the command keyword.
+		(if (bool:or (type [data [condition]] code) (type [data [condition]] "command")) {}{
+			(console:print "switch: condition action is not runnable.")
+			(exit)
+		})
+		
+		([data [condition]])
+		(ret)
+	})
+	
+	(if (exists [data] default) {
+		(if (bool:or (type [data default] code) (type [data default] "command")) {}{
+			(console:print "switch: default action is not runnable.")
+			(exit)
+		})
+		
+		([data default])
+	})
+}
+
+var x = 3
+(switch [x] <map
+	1={(console:print "x == 1\n")}
+	2={(console:print "x == 2\n")}
+	3={(console:print "x == 3\n")}
+	4={(console:print "x == 4\n")}
+	5={(console:print "x == 5\n")}
+	default={(console:print "x < 1 || x > 5\n")}
+>)
+
+-------------------
+
+# "while" we are creating control structures...
+# Most of the time it is better to use loop and breakif.
+
+# Checking to make sure condition and code are actually runnable types is left as an exercise for the reader.
+
+var global:while = block condition code {
+	(loop {
+		(if ([condition]) {
+			([code])
+			(break true)
+		}{
+			(break false)
+		})
+	})
+}
+
+var i = 0
+(while {(int:lt [i] 5)} {
+	(console:print [i] "\n")
+	[i = (int:add [i] 1)]
+})
+
+-------------------
+
 # This isn't really useful, for one thing it is slower than using the proper commands
 # plus it doesn't handle cases like `(int:eq 1 "1")`.
 # Anyway this makes a good demo of the type command.
+
+# Uses the switch command from one of the earlier examples.
 
 var global:eq = block a b {
 	(if (type [a] (type [b])) {}{
@@ -462,3 +505,71 @@ var global:eq = block a b {
 
 # error: invalid type
 (eq <array> <array>)
+
+==============================================
+Weird Stuff (that actually works!)
+==============================================
+
+What follows are a few small code snippets demonstrating weird things you can do with Rex.
+
+Most of these are not generally a good idea (or even very useful) but are included here for interests sake.
+
+-------------------
+
+(block a b {<array [a] [b]>} 5 10)
+
+-------------------
+
+# Evil, don't do this.
+command test {[a = 10]}
+
+var a = 5
+
+(test)
+
+# a == 10
+
+-------------------
+
+var test = [<array> append = 1]
+
+# test == <array 1>
+
+-------------------
+
+var test = <array>
+
+[[[test append = 1] append = 2] append = 3]
+[(nop) append = 4]
+
+# test == <array 1 2 3 4>
+
+-------------------
+
+var test1 = <array>
+var test2 = [test1]
+
+[test2 append = a]
+[test2 append = b]
+[test2 append = c]
+
+# test1 == <array a b c>
+
+-------------------
+
+var a = 5
+var b = [a]
+
+[b = 10]
+
+# a == 5
+
+[b = [a]]
+(modval [b] 15)
+
+# a == 15
+
+-------------------
+
+# if a is a code block run it.
+(if (type [a] code) [a])

@@ -1,9 +1,0 @@
-
-{D_INIT_TO_DEFAULTS}
-
-{SET_FULLSCREEN_FONT_GRAPHICS;curses_square_16x16.png}
-{SET_WINDOWED_FONT_GRAPHICS;curses_square_16x16.png}
-{SET_FULLSCREEN_FONT;curses_800x600.png}
-{SET_WINDOWED_FONT;curses_640x300.png}
-
-# In a non-ASCII tileset there would be a long list of calls to SET_TILE and SET_COLOR here.

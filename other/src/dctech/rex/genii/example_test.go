@@ -33,7 +33,6 @@ type T struct {
 
 func Example() {
 	state := rex.NewState()
-	script := rex.NewScript()
 	
 	// Create our test data
 	testStruct := &T{a: 100, B: "Test Data"}
@@ -42,9 +41,6 @@ func Example() {
 	// and add it to the state as "test:T"
 	mod := state.RegisterModule("test")
 	mod.RegisterVar("T", testII)
-	
-	// The above two functions can panic with an error, but the only way for this to happen is if
-	// "test" or "test:T" are already defined (which is not possible with a fresh state like we have here)
 	
 	// The script code.
 	source := `
@@ -67,14 +63,10 @@ func Example() {
 	`
 	
 	// Just the normal compile-and-run song and dance...
-	val, err := state.CompileToValue(source, rex.NewPosition(35, 1, ""))
+	ret, err := state.CompileAndRun(source, "")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
-	}
-	ret, err := state.Run(script, val)
-	if err != nil {
-		fmt.Println("Error:", err)
 	}
 	fmt.Println("Ret:", ret)
 	

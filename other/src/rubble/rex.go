@@ -296,12 +296,7 @@ func Command_Decompress(script *rex.Script, params []*rex.Value) {
 
 	defer func() {
 		if x := recover(); x != nil {
-			if a, ok := x.(error); ok {
-				rex.ErrorGeneralCmd("rubble:decompress", a.Error())
-			}
-			if a, ok := x.(string); ok {
-				rex.ErrorGeneralCmd("rubble:decompress", a)
-			}
+			rex.ErrorGeneralCmd("rubble:decompress", fmt.Sprint(x))
 		}
 	}()
 
@@ -319,12 +314,7 @@ func Command_Compress(script *rex.Script, params []*rex.Value) {
 
 	defer func() {
 		if x := recover(); x != nil {
-			if a, ok := x.(error); ok {
-				rex.ErrorGeneralCmd("rubble:compress", a.Error())
-			}
-			if a, ok := x.(string); ok {
-				rex.ErrorGeneralCmd("rubble:compress", a)
-			}
+			rex.ErrorGeneralCmd("rubble:compress", fmt.Sprint(x))
 		}
 	}()
 

@@ -2,7 +2,7 @@
 # Announcement Template and Script Install
 
 # Example:
-# In a reaction:
+# Right after a reaction:
 # {DFHACK_ANNOUNCE;You have unleashed a dragon!;COLOR_LIGHTRED}
 # (the color defaults to white)
 #
@@ -13,8 +13,8 @@
 	(rubble:reaction [id] [class])
 })
 
-(rubble:template "DFHACK_ANNOUNCE" block text color="COLOR_WHITE" id="" {
-	(if (str:cmp [id] "") {
+(rubble:template "DFHACK_ANNOUNCE" block text color="COLOR_WHITE" id=nil {
+	(if (isnil [id]) {
 		(if (str:cmp [rubble:reaction_last] "") {
 			(rubble:abort "Error: rubble:reaction_last is invalid in call to DFHACK_ANNOUNCE.")
 		})

@@ -85,7 +85,7 @@ func main() {
 		}
 	}()
 
-	Addr = "127.0.0.1:1010"
+	Addr = "127.0.0.1:2120"
 
 	DFDir = ".."
 	OutputDir = "df:raw"
@@ -625,26 +625,31 @@ func main() {
 
 	log.Separator()
 	log.Println("Attempting to Start Your Web Browser (wish me luck)...")
-	log.Println("  Attempting to Start: \"./other/webUI/browser\" \"" + Addr + "\"/menu")
+	log.Println("  Attempting to Start: \"./other/webUI/browser\" \"http://" + Addr + "/menu\"")
 	path, err := exec.LookPath("./other/webUI/browser")
 	if err != nil {
-		log.Println("    Startup Failed: Error:", err)
+		log.Println("    Browser Startup Failed:\n      Error:", err)
 	} else {
 		path, err := filepath.Abs(path)
 		if err != nil {
-			log.Println("    Startup Failed: Error:", err)
+			log.Println("    Browser Startup Failed:\n      Error:", err)
 		} else {
-			cmd := exec.Command(path, Addr+"/menu")
+			cmd := exec.Command(path, "http://" + Addr + "/menu")
 			err = cmd.Start()
 			if err != nil {
-				log.Println("    Startup Failed: Error:", err)
+				log.Println("    Browser Startup Failed:\n      Error:", err)
 			} else {
 				log.Println("  As far as I can tell everything went fine.")
 			}
 		}
 	}
 
-	http.ListenAndServe(Addr, nil)
+	log.Println("Starting Server...")
+	err = http.ListenAndServe(Addr, nil)
+	if err != nil {
+		log.Println("  Server Startup Failed:\n    Error:", err)
+		os.Exit(1)
+	}
 }
 
 // isAbs returns true if the path is not a relative path (includes no "." or ".." parts).

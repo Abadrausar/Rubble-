@@ -25,7 +25,7 @@ package rubble
 import "dctech/axis"
 
 // PrepModeRun runs prep mode for the specified region.
-// state.Load does NOT need to be run!
+// state.Load or state.Activate does NOT need to be (and should not be) run!
 func (state *State) PrepModeRun(region string) (err error) {
 	defer state.trapError(&err)
 

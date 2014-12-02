@@ -1,0 +1,9 @@
+<rubble:addonmeta
+	header=`A bulletin board, where your idle dwarves will post thoughts, preferences, etc...`
+	
+	description=`
+A direct port of the mod from the DFHack r5 mini-mod pack.
+`
+	
+	activates="Libs/Base;Libs/DFHack/Fluids"
+>

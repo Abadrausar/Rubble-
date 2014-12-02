@@ -28,6 +28,7 @@ import "reflect"
 // Adds the GenII helper commands to the state.
 // The GenII helper commands are:
 //	genii:bytes_string
+//	genii:string_bytes
 func Setup(state *rex.State) (err error) {
 	defer func() {
 		if !state.NoRecover {

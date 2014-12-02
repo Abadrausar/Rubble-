@@ -31,7 +31,7 @@ type rwArray struct {
 }
 
 // NewArray creates a new script array.
-func NewArray(data []*Value) EditIndexable {
+func NewArray(data []*Value) IntEditIndexable {
 	return &rwArray{
 		data: data,
 		lock: new(sync.RWMutex),
@@ -41,7 +41,7 @@ func NewArray(data []*Value) EditIndexable {
 // NewArrayFromLit is an ObjectFactory for script arrays.
 func NewArrayFromLit(script *Script, keys []string, values []*Value) *Value {
 	if keys != nil {
-		RaiseError("Array may not be initialized with keys.")
+		RaiseError("array may not be initialized with keys.")
 	}
 
 	return NewValueIndex(&rwArray{
@@ -65,15 +65,26 @@ func (array *rwArray) Get(index string) *Value {
 	return array.data[val]
 }
 
+func (array *rwArray) GetI(index int64) *Value {
+	if index < 0 {
+		RaiseError("Index out of range: Too small.")
+	}
+	if index >= int64(len(array.data)) {
+		RaiseError("Index out of range: Too large.")
+	}
+	return array.data[index]
+}
+
 func (array *rwArray) Set(index string, value *Value) bool {
+	if index == "append" {
+		array.lock.Lock()
+		array.data = append(array.data, value)
+		array.lock.Unlock()
+		return true
+	}
+	
 	val, err := strconv.ParseInt(index, 0, 64)
 	if err != nil {
-		if index == "append" {
-			array.lock.Lock()
-			array.data = append(array.data, value)
-			array.lock.Unlock()
-			return true
-		}
 		RaiseError("Index not a valid number.")
 	}
 	if val < 0 {
@@ -85,6 +96,28 @@ func (array *rwArray) Set(index string, value *Value) bool {
 	
 	if val < int64(len(array.data)) {
 		array.data[val] = value
+		return true
+	}
+	RaiseError("Index out of bounds: Too large.")
+	panic("UNREACHABLE")
+}
+
+func (array *rwArray) SetI(index int64, value *Value) bool {
+	if index == -1 {
+		array.lock.Lock()
+		array.data = append(array.data, value)
+		array.lock.Unlock()
+		return true
+	}
+	if index < 0 {
+		RaiseError("Index out of bounds: Too small.")
+	}
+	
+	array.lock.Lock()
+	defer array.lock.Unlock()
+	
+	if index < int64(len(array.data)) {
+		array.data[index] = value
 		return true
 	}
 	RaiseError("Index out of bounds: Too large.")

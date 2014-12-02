@@ -139,7 +139,7 @@ func Command_Lt(script *rex.Script, params []*rex.Value) {
 	script.RetVal = rex.NewValueBool(false)
 }
 
-// Floating point equal.
+// Floating point equal (basically useless, but included anyway).
 // 	float:eq a b
 // Returns true or false.
 func Command_Eq(script *rex.Script, params []*rex.Value) {

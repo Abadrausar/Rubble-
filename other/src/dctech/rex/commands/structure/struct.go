@@ -25,11 +25,13 @@ package structure
 import "dctech/rex"
 import "sync"
 
+// Structure is a thread-safe map-like indexable with a limited set of keys.
 type Structure struct {
 	data  map[string]*rex.Value
 	lock  *sync.RWMutex
 }
 
+// NewStructureFromLit is a rex.ObjectFactory for Structures.
 func NewStructureFromLit(script *rex.Script, keys []string, values []*rex.Value) *rex.Value {
 	if keys == nil {
 		rex.RaiseError("struct: May not initialize without keys.")
@@ -106,5 +108,5 @@ func (str *Structure) Keys() []string {
 }
 
 func (str *Structure) String() string {
-	return rex.IndexableToString("map", str)
+	return rex.IndexableToString("struct", str)
 }

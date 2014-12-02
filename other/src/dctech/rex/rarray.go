@@ -27,25 +27,25 @@ import "strconv"
 type rArray []*Value
 
 // NewStaticArray creates a new read only script array.
-func NewStaticArray(data []*Value) Indexable {
-	tmp := rArray(data)
-	return &tmp
+func NewStaticArray(data []*Value) IntIndexable {
+	array := rArray(data)
+	return &array
 }
 
 // NewStaticArray is an ObjectFactory for read only script arrays.
 func NewStaticArrayFromLit(script *Script, keys []string, values []*Value) *Value {
 	if keys != nil {
-		RaiseError("Sarray may not be initialized with keys.")
+		RaiseError("sarray may not be initialized with keys.")
 	}
 
-	tmp := make(rArray, len(values))
+	array := make(rArray, len(values))
 	for i := range values {
-		tmp[i] = values[i]
+		array[i] = values[i]
 	}
-	return NewValueIndex(&tmp)
+	return NewValueIndex(&array)
 }
 
-func (this *rArray) Get(index string) *Value {
+func (array *rArray) Get(index string) *Value {
 	val, err := strconv.ParseInt(index, 0, 64)
 	if err != nil {
 		RaiseError("Index not a valid number.")
@@ -53,35 +53,45 @@ func (this *rArray) Get(index string) *Value {
 	if val < 0 {
 		RaiseError("Index out of range: Too small.")
 	}
-	if val >= int64(len(*this)) {
+	if val >= int64(len(*array)) {
 		RaiseError("Index out of range: Too large.")
 	}
-	return (*this)[val]
+	return (*array)[val]
 }
 
-func (this *rArray) Exists(index string) bool {
+func (array *rArray) GetI(index int64) *Value {
+	if index < 0 {
+		RaiseError("Index out of range: Too small.")
+	}
+	if index >= int64(len(*array)) {
+		RaiseError("Index out of range: Too large.")
+	}
+	return (*array)[index]
+}
+
+func (array *rArray) Exists(index string) bool {
 	val, err := strconv.ParseInt(index, 0, 64)
 	if err != nil {
 		return false
 	}
-	if val < 0 || val >= int64(len(*this)) {
+	if val < 0 || val >= int64(len(*array)) {
 		return false
 	}
 	return true
 }
 
-func (this *rArray) Len() int64 {
-	return int64(len(*this))
+func (array *rArray) Len() int64 {
+	return int64(len(*array))
 }
 
-func (this *rArray) Keys() []string {
-	rtn := make([]string, 0, len(*this))
-	for key := range *this {
+func (array *rArray) Keys() []string {
+	rtn := make([]string, 0, len(*array))
+	for key := range *array {
 		rtn = append(rtn, strconv.FormatInt(int64(key), 10))
 	}
 	return rtn
 }
 
-func (this *rArray) String() string {
-	return IndexableToString("sarray", this)
+func (array *rArray) String() string {
+	return IndexableToString("sarray", array)
 }

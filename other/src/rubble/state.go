@@ -47,6 +47,7 @@ import "dctech/rex/commands/expr"
 import "dctech/rex/commands/float"
 import "dctech/rex/commands/integer"
 import "dctech/rex/commands/png"
+import "dctech/rex/commands/random"
 import "dctech/rex/commands/regex"
 import "dctech/rex/commands/sort"
 import "dctech/rex/commands/str"
@@ -65,6 +66,7 @@ import "rubble/rblutil"
 // (all the listed versions are assumed to be backwards compatible)
 // Index 0 MUST be the current version!
 var Versions = []string{
+	"5.3",
 	"5.2",
 	"5.1",
 	"5.0",
@@ -219,6 +221,7 @@ func NewState(dfdir, output string, addonsdir []string, log *rblutil.Logger) (er
 	float.Setup(state.ScriptState)
 	integer.Setup(state.ScriptState)
 	png.Setup(state.ScriptState)
+	random.Setup(state.ScriptState)
 	regex.Setup(state.ScriptState)
 	sort.Setup(state.ScriptState)
 	str.Setup(state.ScriptState)
@@ -287,6 +290,8 @@ func (state *State) trapError(err *error) {
 			switch y := x.(type) {
 			case RblError:
 				y.Pos = state.ErrPos.Copy()
+				*err = y
+			case Abort:
 				*err = y
 			case error:
 				*err = InternalError{Err: y, Pos: state.ErrPos.Copy()}

@@ -21,6 +21,16 @@ misrepresented as being the original software.
 */
 
 // Rex "struct" Type.
+// 
+// The struct type is basically a map indexable that has a fixed set of keys.
+// The keys are determined based on the value passed to the "proto" key (which
+// MUST be first, and MUST be an indexable), any keys which are not given a value
+// take their value from the prototype indexable.
+// 
+// To put it simply a struct is a copy of a map that cannot have new keys added.
+// 
+// At some point I may allow more advanced behavior via special indexables for
+// use in the prototype, but for now things are really simple.
 package structure
 
 import "dctech/rex"

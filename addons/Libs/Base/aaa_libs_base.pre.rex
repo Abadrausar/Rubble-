@@ -5,53 +5,37 @@
 (rubble:template "COMMENT" block a=... {(ret "")})
 (rubble:template "C" block a=... {(ret "")})
 
-command rubble:void params {
+command rubble:void params=... {
 	(foreach [params] block _ raws {
 		(rubble:stageparse [raws])
 		(break true)
 	})
 	(ret "")
 }
-(rubble:template "!VOID" block params=... {
-	(rubble:void [params])
-})
-(rubble:template "VOID" block params=... {
-	(rubble:void [params])
-})
-(rubble:template "#VOID" block params=... {
-	(rubble:void [params])
-})
-(rubble:template "V" block params=... {
-	(rubble:void [params])
-})
+(rubble:template "!VOID" [rubble:void])
+(rubble:template "VOID" [rubble:void])
+(rubble:template "#VOID" [rubble:void])
+(rubble:template "V" [rubble:void])
 
 # ABORT, cause Rubble to exit with an error, not used in the base.
-(rubble:template "!ABORT" block msg {(rubble:abort [msg])})
-(rubble:template "ABORT" block msg {(rubble:abort [msg])})
-(rubble:template "#ABORT" block msg {(rubble:abort [msg])})
+(rubble:template "!ABORT" [rubble:abort])
+(rubble:template "ABORT" [rubble:abort])
+(rubble:template "#ABORT" [rubble:abort])
 
 # The next templates are for stripping leading/trailing whitespace from a string.
 # A formatting tool mostly, helps keep whitespace under control in generated files.
 # May also be used to help control variable expansion.
-command rubble:echo params {
+command rubble:echo params=... {
 	var out = ""
-	(foreach [params] block key msg {
+	(foreach [params] block _ msg {
 		[out = (str:add [out] [msg])]
 	})
 	(rubble:stageparse [out])
 }
-(rubble:template "!ECHO" block params=... {
-	(rubble:echo [params])
-})
-(rubble:template "ECHO" block params=... {
-	(rubble:echo [params])
-})
-(rubble:template "#ECHO" block params=... {
-	(rubble:echo [params])
-})
-(rubble:template "E" block params=... {
-	(rubble:echo [params])
-})
+(rubble:template "!ECHO" [rubble:echo])
+(rubble:template "ECHO" [rubble:echo])
+(rubble:template "#ECHO" [rubble:echo])
+(rubble:template "E" [rubble:echo])
 
 (rubble:template "@IF" block a b then else="" {
 	(if (str:cmp [a] [b]) {
@@ -91,13 +75,13 @@ command rubble:echo params {
 	(ret "")
 })
 
-command rubble:print params {
-	(foreach [params] block key msg {
+command rubble:print params=... {
+	(foreach [params] block _ msg {
 		(console:print "    " (rubble:expandvars [msg]) "\n")
 		(break true)
 	})
 	(ret "")
 }
-(rubble:template "!PRINT" block params=... {(rubble:print [params])})
-(rubble:template "PRINT" block params=... {(rubble:print [params])})
-(rubble:template "#PRINT" block params=... {(rubble:print [params])})
+(rubble:template "!PRINT" [rubble:print])
+(rubble:template "PRINT" [rubble:print])
+(rubble:template "#PRINT" [rubble:print])

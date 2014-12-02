@@ -46,6 +46,7 @@ import "dctech/rex/commands/fileio"
 import "dctech/rex/commands/float"
 import "dctech/rex/commands/integer"
 import "dctech/rex/commands/png"
+import "dctech/rex/commands/random"
 import "dctech/rex/commands/regex"
 import "dctech/rex/commands/sort"
 import "dctech/rex/commands/str"
@@ -128,6 +129,7 @@ func main() {
 	float.Setup(state)
 	integer.Setup(state)
 	png.Setup(state)
+	random.Setup(state)
 	regex.Setup(state)
 	sort.Setup(state)
 	str.Setup(state)

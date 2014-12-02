@@ -17,11 +17,25 @@ func Command_Break(script *rex.Script, params []*rex.Value)
     returns a specific value and/or "returning" a value to loop. Returns
     value or unchanged.
 
+func Command_BreakIf(script *rex.Script, params []*rex.Value)
+    A conditional version of break.
+
+	breakif condition [value]
+
+    Returns value or unchanged.
+
 func Command_BreakLoop(script *rex.Script, params []*rex.Value)
     Forces a return until it hits a loop or foreach command or the script
     exits.
 
 	breakloop [value]
+
+    Returns value or unchanged.
+
+func Command_BreakLoopIf(script *rex.Script, params []*rex.Value)
+    A conditional version of breakloop.
+
+	breakloopif condition [value]
 
     Returns value or unchanged.
 
@@ -124,6 +138,15 @@ func Command_Loop(script *rex.Script, params []*rex.Value)
     Returns the return value of the last command in the code it runs, always
     false unless loop exited with ret (In which case the return value is
     unusable by the command calling loop anyway).
+
+func Command_ModVal(script *rex.Script, params []*rex.Value)
+    Copies the second value over the first, allows you to do some weird
+    pointer-like things. In general do not use unless you know what you are
+    doing.
+
+	modval a b
+
+    Returns unchanged.
 
 func Command_Nop(script *rex.Script, params []*rex.Value)
     Does nothing.

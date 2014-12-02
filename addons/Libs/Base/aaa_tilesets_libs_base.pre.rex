@@ -36,58 +36,79 @@ var rubble:tileset = <array>
 	})
 })
 
-(rubble:template "INSTALL_TILESHEET" block tilesheet {
+command rubble:install_tilesheet tilesheet {
 	(axis:write [rubble:fs] (str:add "df:data/art/" [tilesheet]) [rubble:raws [tilesheet]])
+}
+(rubble:template "INSTALL_TILESHEET" block tilesheet {
+	(rubble:install_tilesheet [tilesheet])
 	(ret "")
 })
+command rubble:set_fullscreen_tilesheet tilesheet {
+	var init = (axis:read [rubble:fs] "df:data/init/init.txt")
+	
+	[init = (regex:replace "\\[FULLFONT:[^]]+\\]" [init] (str:add "[FULLFONT:" [tilesheet] "]"))]
+	[init = (regex:replace "\\[GRAPHICS_FULLFONT:[^]]+\\]" [init] (str:add "[GRAPHICS_FULLFONT:" [tilesheet] "]"))]
+
+	(axis:write [rubble:fs] "df:data/init/init.txt" [init])
+}
 (rubble:template "SET_FULLSCREEN_TILESHEET" block tilesheet {
-	var init = (axis:read [rubble:fs] "df:data/init/init.txt")
-	
-	[init = (regex:replace "\\[FULLFONT:[^]]+\\]" [init] (str:add "[FULLFONT:" [tilesheet] "]"))]
-	[init = (regex:replace "\\[GRAPHICS_FULLFONT:[^]]+\\]" [init] (str:add "[GRAPHICS_FULLFONT:" [tilesheet] "]"))]
-
-	(axis:write [rubble:fs] "df:data/init/init.txt" [init])
+	(rubble:set_fullscreen_tilesheet [tilesheet])
 	(ret "")
 })
+command rubble:set_windowed_tilesheet tilesheet {
+	var init = (axis:read [rubble:fs] "df:data/init/init.txt")
+	
+	[init = (regex:replace "\\[FONT:[^]]+\\]" [init] (str:add "[FONT:" [tilesheet] "]"))]
+	[init = (regex:replace "\\[GRAPHICS_FONT:[^]]+\\]" [init] (str:add "[GRAPHICS_FONT:" [tilesheet] "]"))]
+
+	(axis:write [rubble:fs] "df:data/init/init.txt" [init])
+}
 (rubble:template "SET_WINDOWED_TILESHEET" block tilesheet {
-	var init = (axis:read [rubble:fs] "df:data/init/init.txt")
-	
-	[init = (regex:replace "\\[FONT:[^]]+\\]" [init] (str:add "[FONT:" [tilesheet] "]"))]
-	[init = (regex:replace "\\[GRAPHICS_FONT:[^]]+\\]" [init] (str:add "[GRAPHICS_FONT:" [tilesheet] "]"))]
-
-	(axis:write [rubble:fs] "df:data/init/init.txt" [init])
+	(rubble:set_windowed_tilesheet [tilesheet])
 	(ret "")
 })
-(rubble:template "SET_FULLSCREEN_FONT_GRAPHICS" block tilesheet {
+command rubble:set_fullscreen_font_graphics tilesheet {
 	var init = (axis:read [rubble:fs] "df:data/init/init.txt")
 	
 	[init = (regex:replace "\\[GRAPHICS_FULLFONT:[^]]+\\]" [init] (str:add "[GRAPHICS_FULLFONT:" [tilesheet] "]"))]
 
 	(axis:write [rubble:fs] "df:data/init/init.txt" [init])
+}
+(rubble:template "SET_FULLSCREEN_FONT_GRAPHICS" block tilesheet {
+	(rubble:set_fullscreen_font_graphics [tilesheet])
 	(ret "")
 })
-(rubble:template "SET_WINDOWED_FONT_GRAPHICS" block tilesheet {
+command rubble:set_windowed_font_graphics tilesheet {
 	var init = (axis:read [rubble:fs] "df:data/init/init.txt")
 	
 	[init = (regex:replace "\\[GRAPHICS_FONT:[^]]+\\]" [init] (str:add "[GRAPHICS_FONT:" [tilesheet] "]"))]
 
 	(axis:write [rubble:fs] "df:data/init/init.txt" [init])
+}
+(rubble:template "SET_WINDOWED_FONT_GRAPHICS" block tilesheet {
+	(rubble:set_windowed_font_graphics [tilesheet])
 	(ret "")
 })
-(rubble:template "SET_FULLSCREEN_FONT" block tilesheet {
+command rubble:set_fullscreen_font tilesheet {
 	var init = (axis:read [rubble:fs] "df:data/init/init.txt")
 	
 	[init = (regex:replace "\\[FULLFONT:[^]]+\\]" [init] (str:add "[FULLFONT:" [tilesheet] "]"))]
 
 	(axis:write [rubble:fs] "df:data/init/init.txt" [init])
+}
+(rubble:template "SET_FULLSCREEN_FONT" block tilesheet {
+	(rubble:set_fullscreen_font [tilesheet])
 	(ret "")
 })
-(rubble:template "SET_WINDOWED_FONT" block tilesheet {
+command rubble:set_windowed_font tilesheet {
 	var init = (axis:read [rubble:fs] "df:data/init/init.txt")
 	
 	[init = (regex:replace "\\[FONT:[^]]+\\]" [init] (str:add "[FONT:" [tilesheet] "]"))]
 
 	(axis:write [rubble:fs] "df:data/init/init.txt" [init])
+}
+(rubble:template "SET_WINDOWED_FONT" block tilesheet {
+	(rubble:set_windowed_font [tilesheet])
 	(ret "")
 })
 
@@ -377,20 +398,25 @@ var rubble:init_regexes = <map
 	"TREE_TRUNK_INTERIOR_DEAD"="\\[TREE_TRUNK_INTERIOR_DEAD:(?:[0-9]+|'.')\\]"
 >
 
-(rubble:template "OPEN_D_INIT" {
+command rubble:open_d_init {
 	[rubble:d_init = (axis:read [rubble:fs] "df:data/init/d_init.txt")]
+}
+(rubble:template "OPEN_D_INIT" {
+	(rubble:open_d_init)
 	(ret "")
 })
-(rubble:template "EDIT_D_INIT" block setting value {
+command rubble:edit_d_init setting value {
 	(if (exists [rubble:init_defaults] [setting]) {
 		[rubble:init_settings [setting] = [value]]
 	}{
-		(rubble:abort "Error: Attempt to use invalid init setting, only tileset related settings allowed.")
+		(rubble:abort "Attempt to use invalid init setting, only tileset related settings allowed.")
 	})
-	
+}
+(rubble:template "EDIT_D_INIT" block setting value {
+	(rubble:edit_d_init [setting] [value])
 	(ret "")
 })
-(rubble:template "CLOSE_D_INIT" {
+command rubble:close_d_init {
 	(foreach [rubble:init_defaults] block key value {
 		(if (exists [rubble:init_settings] [key]) {
 			[rubble:d_init =
@@ -407,10 +433,13 @@ var rubble:init_regexes = <map
 		(break true)
 	})
 	(axis:write [rubble:fs] "df:data/init/d_init.txt" [rubble:d_init])
+}
+(rubble:template "CLOSE_D_INIT" {
+	(rubble:close_d_init)
 	(ret "")
 })
-(rubble:template "D_INIT_TO_DEFAULTS" {
-	[rubble:d_init = (axis:read [rubble:fs] "df:/data/init/d_init.txt")]
+command rubble:d_init_to_defaults {
+	[rubble:d_init = (axis:read [rubble:fs] "df:data/init/d_init.txt")]
 	
 	(foreach [rubble:init_defaults] block key value {
 		[rubble:d_init =
@@ -421,11 +450,17 @@ var rubble:init_regexes = <map
 		(break true)
 	})
 	(axis:write [rubble:fs] "df:data/init/d_init.txt" [rubble:d_init])
+}
+(rubble:template "D_INIT_TO_DEFAULTS" {
+	(rubble:d_init_to_defaults)
 	(ret "")
 })
 
-(rubble:template "#INSTALL_GRAPHICS_FILE" block tilesheet {
+command rubble:install_graphics_file tilesheet {
 	(axis:write [rubble:fs] (str:add "out:graphics/" [tilesheet]) [rubble:raws [tilesheet]])
+}
+(rubble:template "#INSTALL_GRAPHICS_FILE" block tilesheet {
+	(rubble:install_graphics_file [tilesheet])
 	(ret "")
 })
 

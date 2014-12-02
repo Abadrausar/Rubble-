@@ -1,4 +1,19 @@
 
+v1.6
+	Fixed some incorrect error messages and incorrectly checked error conditions in indexing variable operator execution.
+		There were no false positives, but some errors were not caught at the right spot (or at all) so error messages could make little to no sense.
+	Added an extension to Indexable to allow faster value lookup in integer indexed Indexables.
+		If you have array-like Indexables change them to implement IntIndexable or IntEditIndexable for improved performance.
+	array and sarray now implement IntEditIndexable and IntIndexable.
+	GenII array types now implement IntEditIndexable and IntIndexable.
+	foreach now uses IntIndexable if the indexable implements it.
+	The indexing variable operator uses IntIndexable or IntEditIndexable as appropriate.
+		For the variable operator to use these the indexable must implement them AND the key must be type int.
+	The debug:value command now prints the value's raw data with the go syntax format specifier.
+	Added base commands modval, breakif and breakloopif.
+	Added basic support for error type meta-data.
+	Value types are now stored in a custom type (to encourage use of the type constants).
+
 v1.5
 	New command parameter handling, including two new bits of syntax!
 		Variadic parameters are MUCH improved, it is now possible to specify a variadic param at the end of a list of normal params.

@@ -22,10 +22,24 @@ misrepresented as being the original software.
 
 package rex
 
+type ErrType int
+
+// Error types, most errors use type ErrTypUndefined so far.
+const (
+	ErrTypUndefined ErrType = iota // Most errors use this type for now.
+	ErrTypGenCommand               // Used for any error created by ErrorGeneralCmd.
+	ErrTypParamCount               // Used for any error created by ErrorParamCount.
+	ErrTypGenCompile               // Unused (for now...)
+	ErrTypGenRuntime               // Unused (for now...)
+)
+
 // ScriptError is used for any and every error that is caused by Rex.
 type ScriptError struct {
 	Msg string
 	Pos *Position
+	
+	// Error type, eventually this will be usable for advanced error checking.
+	Type ErrType
 }
 
 func (err ScriptError) Error() string {
@@ -41,11 +55,17 @@ func RaiseError(msg string) {
 	panic(ScriptError{Msg: msg})
 }
 
+// RaiseError converts a string to a ScriptError and then panics with it.
+// The error's position is filled out when it is caught by the state.
+func RaiseErrorType(msg string, typ ErrType) {
+	panic(ScriptError{Msg: msg, Type: typ})
+}
+
 // ErrorGeneralCmd generates an error message for general command errors.
 //	"test:cmd": some error message
-// The generated message is passed directly to RaiseError.
+// The generated message is passed directly to RaiseErrorType.
 func ErrorGeneralCmd(name, msg string) {
-	RaiseError("\"" + name + "\": " + msg)
+	RaiseErrorType("\"" + name + "\": " + msg, ErrTypGenCommand)
 }
 
 // ErrorParamCount generates an error message for incorrect parameter count errors.
@@ -53,12 +73,12 @@ func ErrorGeneralCmd(name, msg string) {
 // If hint is set to "" it leaves that part off.
 //	"test:cmd": Incorrect parameter count.
 // Hint should be something like "5" or ">2".
-// The generated message is passed directly to RaiseError.
+// The generated message is passed directly to RaiseErrorType.
 func ErrorParamCount(name, hint string) {
 	if hint != "" {
-		ErrorGeneralCmd(name, "Incorrect parameter count: " + hint + " parameter(s) required.")
+		RaiseErrorType("\"" + name + "\": " + "Incorrect parameter count: " + hint + " parameter(s) required.", ErrTypParamCount)
 	}
-	ErrorGeneralCmd(name, "Incorrect parameter count.")
+	RaiseErrorType("\"" + name + "\": " + "Incorrect parameter count.", ErrTypParamCount)
 }
 
 
@@ -76,7 +96,7 @@ func (err InternalError) Error() string {
 	return err.Err.Error()
 }
 
-// RaiseInternalError converts a string to a ScriptError and then panics with it.
+// RaiseInternalError converts an error to a InternalError and then panics with it.
 // The error's position is filled out when it is caught by the state.
 func RaiseInternalError(err error) {
 	panic(InternalError{Err: err})

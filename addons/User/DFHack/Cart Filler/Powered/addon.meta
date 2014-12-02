@@ -8,6 +8,8 @@ This addon works exactly the same with these additional rules (which are evaluat
 	If magma is present and the only minecart(s) are not magma safe nothing happens
 	If no minecarts are present nothing happens
 	If no fluids are present nothing happens
+
+Connecting machines must be built AFTER any mechanical workshop!
 `
 	
 	activates="Libs/Base;Libs/DFHack/Fluids"

@@ -51,7 +51,9 @@ See the appropriate "Running Rubble" section below.
 
 Now you are good to go!
 
-If you use OSX or Linux, 32 bit binaries for these OSes can be found in the "rubble/other" directory. If you want 64 bit binaries you can compile them yourself, source code is in "rubble/other/src" (along with basic build instructions).
+If you use OSX or Linux, 32 bit binaries for these OSes are included. If you want 64 bit binaries you can compile them yourself, source code is in "./other/src" (along with basic build instructions).
+To use non-Windows binaries they must be placed in the same directory as the windows ones (you can delete the windows binaries if you don't need them). OSX binaries are in "./other/darwin_386", Linux binaries may be found in "./other/linux_386".
+For more help see the "Rubble OS Specific Information" section in "Rubble Basics".
 
 ==============================================
 Running Rubble (Web UI, all OSes):
@@ -61,12 +63,11 @@ The web UI is kinda ugly, but simple, functional, and easy to use.
 
 This interface is the new recommended way of running Rubble, as it always has full support for the latest ways of doing things.
 
-To use the web UI all you need to do is start the server (rubble_web) and then point your browser to "127.0.0.1:1010" (by default), from there just follow the menus.
+To use the web UI all you need to do is start the server (rubble_web) and then point your browser to "http://127.0.0.1:2120" (by default), from there just follow the menus.
 
-To make things easy you can create a batch file or shell script named "./other/webUI/browser" that starts your web browser, the server will try to run this file when it starts.
-For example my browser file is named "browser.bat" and contains:
-	@"C:\Program Files (x86)\SRWare Iron\iron.exe" "%1"
-You will obviously need to use something different if you are not using a default SRWare Iron install on Windows x64 :)
+To make things easy you can create a batch file or shell script named "./other/webUI/browser" that starts your web browser, the server will try to run this file when it starts. This file will be passed the URL for the main menu as an argument, the script should pass this argument through to the browser (so the page opens automatically).
+Rubble comes with default scripts for Windows and Linux that should "just work" on most systems.
+For more help with the browser startup script see the "Rubble Web UI Customization" section in "Rubble Basics".
 
 The web UI is the most advanced (functionality-wise) UI available. The command line UI can do most of the things the web UI can do, but it is limited by being non-interactive.
 
@@ -117,17 +118,15 @@ Known Issues (non-bug):
 
 Bugs:
 	
-	Web UI server does not always shutdown immediately when told to.
+	The Web UI server does not always shutdown immediately when told to.
 		Sometimes when you click "Quit" the server does not shut down, but as soon as you close the exit page/tab/whatever the server closes. It acts almost like it was waiting for browser (which should not be the case). I have no idea what causes this, but it is intermittent and doesn't really cause any problems, so I am unlikely to dig too much either.
 	
-	Several vanilla bugs make themselves known:
+	Several vanilla DF bugs make themselves known:
 		Adventure mode reactions do not always work the same as fortress mode reactions:
 			"User/Warcrafter/Adventure" does not work quite right with "User/Tanning" because the adventure mode tanning reaction uses too much skin. This cannot be fixed by me.
 		
 		Reactions produce unusable gloves:
 			The glove reactions are left in only because DFHack can be used to fix this bug, if DFHack is available then Rubble will automatically load a fix.
-
-	There are no known (non-vanilla) bugs.
 
 When making an error report please post the FULL log file! Posting just a few lines tells me almost nothing about the problem, after all I made Rubble write all that stuff for a reason :)
 I cannot stress this enough! With Rubble the actual error message is only a small part of the information I need for tracking an error down! In particular the list of active addons is VERY important (and it tends to get cut from most reports because it is near the start of the log).

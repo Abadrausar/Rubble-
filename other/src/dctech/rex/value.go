@@ -24,23 +24,25 @@ package rex
 
 import "strconv"
 
+type ValueTyp int
 // Script value internal type codes.
+// The comment for each value lists the type that Value.Data will (must) store.
 const (
-	TypNil     = iota // Nothing (nil)
-	TypString         // string
-	TypInt            // int64
-	TypFloat          // float64
-	TypBool           // bool
-	TypCode           // *Code
-	TypCommand        // NativeCommand
-	TypVariadic       // "...", used only as a marker in block/command declarations.
-	TypIndex          // Indexable or EditIndexable
-	TypUser           // User data, could be anything
+	TypNil ValueTyp = iota // nil
+	TypString              // string
+	TypInt                 // int64
+	TypFloat               // float64
+	TypBool                // bool
+	TypCode                // *Code
+	TypCommand             // NativeCommand
+	TypVariadic            // nil, used only as a marker in block/command declarations.
+	TypIndex               // Indexable or one of it's specialized supersets.
+	TypUser                // User data, could be anything.
 )
 
 // Value is a simple script value.
 type Value struct {
-	Type int
+	Type ValueTyp
 	Data interface{} // Data type stored here depends on value of Type field, see the TypXxx constants.
 	Pos  *Position
 }

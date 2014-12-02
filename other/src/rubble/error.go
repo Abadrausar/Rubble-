@@ -25,12 +25,14 @@ package rubble
 import "dctech/rex"
 
 // Abort is used for errors that should not have attached error position information.
+// Aborts are generally logged with the prefix "Abort:" rather than "Error:".
 type Abort string
 
 func (err Abort) Error() string {
 	return string(err)
 }
 
+// RaiseAbort converts a string to an Abort and then panics with it.
 func RaiseAbort(msg string) {
 	panic(Abort(msg))
 }
@@ -57,6 +59,7 @@ func RaiseError(msg string) {
 
 // InternalError is used for any and every error that is caused by something other than Rubble.
 // Examine the Err field to get the original error.
+// This type is just a way to attach a position to a generic error.
 type InternalError struct {
 	Err error
 	Pos *rex.Position
@@ -69,7 +72,7 @@ func (err InternalError) Error() string {
 	return err.Err.Error()
 }
 
-// RaiseInternalError converts a string to an InternalError and then panics with it.
+// RaiseInternalError converts an error to an InternalError and then panics with it.
 // The error's position is filled out when it is caught.
 func RaiseInternalError(err error) {
 	panic(InternalError{Err: err})

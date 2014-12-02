@@ -77,4 +77,4 @@ function tick()
 end
 tick()
 
-rubble.timeout = _ENV
+return _ENV

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# This should work in most cases...
+/etc/alternatives/x-www-browser "$1"
+
+# If the above doesn't work try one of the following...
+#/etc/alternatives/gnome-www-browser "$1"
+#google-chrome "$1"
+#firefox "$1"
+
+# If none of those work you are out of luck as far as help from me goes...

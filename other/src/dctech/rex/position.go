@@ -47,7 +47,7 @@ func (pos *Position) File() string {
 }
 
 // Copy copies a Position object.
-// More useful than it sounds.
+// When you are going to store a position (for ANY reason) ALWAYS take a copy!
 func (pos *Position) Copy() *Position {
 	return &Position{
 		Line: pos.Line,

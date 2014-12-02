@@ -1,6 +1,6 @@
 
 local event = require "plugins.eventful"
-local fluids = rubble.fluids
+local fluids = rubble.require "fluids"
 
 function fillBarrel(reaction, unit, in_items, in_reag, out_items, call_native)
 	call_native.value=false

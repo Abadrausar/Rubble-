@@ -37,7 +37,7 @@ import "text/tabwriter"
 // The debug commands are:
 //	debug:shell
 //	debug:value
-//	debug:list
+//	debug:registers
 func Setup(state *rex.State) (err error) {
 	defer func() {
 		if !state.NoRecover {
@@ -60,7 +60,7 @@ func Setup(state *rex.State) (err error) {
 }
 
 // Break into the debugging shell.
-// This command will provide an interactive shell until eof is reached,
+// This command will provide an interactive shell until a DOS EOF char is found,
 // on windows this may be simulated by pressing CTRL+Z followed by <ENTER>.
 // 	debug:shell
 // Returns the return value of the last command to be run.
@@ -120,7 +120,7 @@ func Command_Value(script *rex.Script, params []*rex.Value) {
 		script.Println("+-------------------------------------------+")
 		return
 	}
-	script.Println("| Data:", params[0].Data)
+	script.Printf("| Data: %#v\n", params[0].Data)
 	script.Println("| Type:", params[0].TypeString())
 	script.Println("|")
 	script.Println("| Position: ", params[0].Pos)
@@ -167,7 +167,9 @@ func Command_Registers(script *rex.Script, params []*rex.Value) {
 	script.Println("+-------------------------------------------+")
 }
 
-// TODO: Make command to list all modules
-// TODO: Make command to list all commands
-// TODO: Make command to print modules by name
-// TODO: Make command to print local variables
+// TODO: The debug commands may have to be move to the main Rex package, as
+// the following are currently impossible from here.
+
+// TODO: Make a command to list all modules
+// TODO: Make a command to print a module by name
+// TODO: Make a command to list all local variables by block

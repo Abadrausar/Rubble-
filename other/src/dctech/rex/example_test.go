@@ -41,6 +41,11 @@ func Example() {
 	// Load the base commands (for the ret command)
 	base.Setup(state)
 
+	// If you want the standard indexables you would register them here
+	
+	// Most of the following could be replaced with a single call to state.CompileAndRun
+	// (in which case the script above would not be needed)
+	
 	// Compile the code, this function returns a script value.
 	// It should be possible to inject code into a running script with this function,
 	// so long as the running script knows where to find the injected code :)

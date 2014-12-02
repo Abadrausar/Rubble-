@@ -31,6 +31,7 @@ type Code struct {
 	params   *blockParams   // Block parameter information (may be nil)
 }
 
+// NewCode creates a new empty Code block, ready to use as a compiler target.
 func NewCode() *Code {
 	block := new(Code)
 	block.data = make([]*opCode, 0, 100)
@@ -38,6 +39,7 @@ func NewCode() *Code {
 	return block
 }
 
+// NewCodeShell creates a new empty Code block with the same initial meta-data as the source.
 func NewCodeShell(source *Code) *Code {
 	if source == nil {
 		return NewCode()

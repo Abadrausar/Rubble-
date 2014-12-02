@@ -26,12 +26,14 @@ import "dctech/rex"
 import "sort"
 import "sync"
 
+// OrderedMap is a thread-safe map indexable with a fixed key order (alphabetical).
 type OrderedMap struct {
 	data  map[string]*rex.Value
 	order []string
 	lock  *sync.RWMutex
 }
 
+// NewOrderedMap creates a new empty OrderedMap.
 func NewOrderedMap() rex.EditIndexable {
 	this := new(OrderedMap)
 	this.data = make(map[string]*rex.Value, 20)
@@ -40,6 +42,7 @@ func NewOrderedMap() rex.EditIndexable {
 	return this
 }
 
+// NewOrderedMapFromIndexable creates a new OrderedMap from the contents of an existing rex.Indexable.
 func NewOrderedMapFromIndexable(input rex.Indexable) rex.EditIndexable {
 	this := new(OrderedMap)
 	keys := input.Keys()
@@ -54,6 +57,7 @@ func NewOrderedMapFromIndexable(input rex.Indexable) rex.EditIndexable {
 	return this
 }
 
+// NewOrderedMapFromLit is a rex.ObjectFactory for OrderedMaps.
 func NewOrderedMapFromLit(script *rex.Script, keys []string, values []*rex.Value) *rex.Value {
 	if len(values) != 0 {
 		if keys == nil {

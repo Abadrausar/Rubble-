@@ -33,7 +33,7 @@ func main() {
 }
 
 func WriteFile(name string, file []byte) {
-	ioutil.WriteFile(name, file, 0666)
+	ioutil.WriteFile(name, file, 04755)
 }
 
 func ReadFile(name string) []byte {

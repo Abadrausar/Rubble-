@@ -10,7 +10,7 @@ var rubble:dfhack_extras_init = <array>
 
 command rubble:dfhack_loadscript scr {
 	(if (isnil [rubble:raws [scr]]) {
-		(rubble:abort (str:add "    Error: Attempt to install missing DFHack script: " [scr]))
+		(rubble:abort (str:add "Attempt to install missing DFHack script: " [scr]))
 	}{
 		(axis:write [rubble:fs] (str:add "out:dfhack/" [scr]) [rubble:raws [scr]])
 	})
@@ -24,45 +24,74 @@ command rubble:dfhack_write {
 	var base = "\n-- DFHack init.lua script file\n-- Automatically generated, DO NOT EDIT!\n"
 	[base = (str:add [base] "print(\"Loading DFHack scripts from Rubble addons:\")\n")]
 	
-	[base = (str:add [base] 
-		`\n-- Important Globals\n`
-		`dfhack.BASE_G.rubble = dfhack.BASE_G.rubble or {}\n`
-		`rubble.savedir = SAVE_PATH\n`
-		`function rubble.load_script(name)\n`
-		`	env = {}\n`
-		`	setmetatable(env, { __index = dfhack.BASE_G })\n`
-		`	\n`
-		`	local f, perr = loadfile(name, 't', env)\n`
-		`	if f then\n`
-		`		return safecall(f)\n`
-		`	end\n`
-		`	dfhack.printerr("    Error: "..perr)\n`
-		`end\n`
-		`function rubble.mkmodule(name)\n`
-		`	rubble[name] = rubble[name] or {}\n`
-		`	setmetatable(rubble[name], { __index = dfhack.BASE_G })\n`
-		`	return rubble[name]\n`
-		`end\n`
+	[base = (str:add [base]
+`
+-- Important Globals and Loader Functions
+dfhack.BASE_G.rubble = dfhack.BASE_G.rubble or {}
+rubble.savedir = SAVE_PATH
+function rubble.load_script(name)
+	env = {}
+	setmetatable(env, { __index = dfhack.BASE_G })
+	
+	local f, perr = loadfile(name, 't', env)
+	if f then
+		return safecall(f)
+	end
+	dfhack.printerr("    Error: "..perr)
+end
+function rubble.load_module(name)
+	env = {}
+	setmetatable(env, { __index = dfhack.BASE_G })
+	
+	local f, perr = loadfile(name, 't', env)
+	if f then
+		local a, module = safecall(f)
+		if not module then
+			dfhack.printerr("    Error: Nil module returned.")
+			return nil
+		end
+		rubble[module.module] = module
+		return module
+	end
+	dfhack.printerr("    Error: "..perr)
+end
+function rubble.mkmodule(name)
+	rubble[name] = rubble[name] or {}
+	setmetatable(rubble[name], { __index = dfhack.BASE_G })
+	rubble[name].module = name
+	return rubble[name]
+end
+function rubble.require(name)
+	return rubble[name]
+end
+`
 	)]
 	
 	[base = (str:add [base] 
-		`\n-- Pseudo Modules and Scripts\n`
-		`local scrlist = dfhack.internal.getDir(SAVE_PATH.."/raw/dfhack/")\n`
-		`if scrlist then\n`
-		`	table.sort(scrlist)\n`
-		`	for i,name in ipairs(scrlist) do\n`
-		`		if string.match(name,'%.mod.lua$') then\n`
-		`			print("  Module: "..name)\n`
-		`			rubble.load_script(SAVE_PATH.."/raw/dfhack/"..name)\n`
-		`		end\n`
-		`	end\n`
-		`	for i,name in ipairs(scrlist) do\n`
-		`		if string.match(name,'%.lua$') and not string.match(name,'%.mod.lua$') then\n`
-		`			print("  Script: "..name)\n`
-		`			rubble.load_script(SAVE_PATH.."/raw/dfhack/"..name)\n`
-		`		end\n`
-		`	end\n`
-		`end\n`
+`
+-- The Pseudo Module and Script Loader
+function rubble.reload_scripts()
+	local scrlist = dfhack.internal.getDir(rubble.savedir.."/raw/dfhack/")
+	if scrlist then
+		table.sort(scrlist)
+		for i,name in ipairs(scrlist) do
+			if string.match(name,'%.mod.lua$') then
+				print("  Module: "..name)
+				rubble.load_module(rubble.savedir.."/raw/dfhack/"..name)
+			end
+		end
+		for i,name in ipairs(scrlist) do
+			if string.match(name,'%.lua$') and not string.match(name,'%.mod.lua$') then
+				print("  Script: "..name)
+				rubble.load_script(rubble.savedir.."/raw/dfhack/"..name)
+			end
+		end
+	else
+		print("  No scripts installed.")
+	end
+end
+rubble.reload_scripts()
+`
 	)]
 	
 	[base = (str:add [base] "\n-- Extras:\n")]
@@ -92,14 +121,14 @@ command rubble:dfhack_write {
 	
 	[base = (str:add [base] "\n# Extras:\n")]
 	(foreach [rubble:dfhack_extras_init] block _ txt {
-		[base = (str:add [base] [txt])]
+		[base = (str:add [base] [txt] "\n")]
 		(break true)
 	})
 	
 	(axis:write [rubble:fs] "out:onLoad.init" [base])
 }
 
-# Load a script when the world is loaded, the script must be in the raw/dfhack folder
+# Install a startup script or pseudo module by name.
 (rubble:template "DFHACK_LOADSCRIPT" block scr {
 	(rubble:dfhack_loadscript [scr])
 })
@@ -109,4 +138,4 @@ command rubble:dfhack_write {
 	(rubble:dfhack_runcommand [com])
 })
 
-# The Reaction template is with the tech templates.
+# The DFHACK_REACTION template is with the tech templates.

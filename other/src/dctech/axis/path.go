@@ -58,9 +58,13 @@ func NewPath(source string) *Path {
 	}
 	
 	path := new(Path)
-	if len(source) > 0 && source[len(source) - 1:] == ":" {
+	if len(source) == 0 {
+		path.locations = make([]string, 0)
+		path.dirs = make([]string, 0)
+	} else if source[len(source) - 1:] == ":" {
 		path.locations = strings.Split(source, ":")
 		path.locations = path.locations[:len(path.locations) - 1]
+		path.dirs = make([]string, 0)
 	} else {
 		locs := strings.Split(source, ":")
 		source = locs[len(locs) - 1]
@@ -81,7 +85,13 @@ func (path *Path) String() string {
 	for i := range path.dirs {
 		out += path.dirs[i] + "/"
 	}
-	return out[:len(out) - 1]
+	
+	if len(out) != 0 {
+		if out[len(out) - 1] == '/' {
+			return out[:len(out) - 1]
+		}
+	}
+	return out
 }
 
 // Done returns true once all path elements are marked used.
@@ -104,7 +114,12 @@ func (path *Path) Remainder() string {
 		for _, v := range path.dirs[path.useddirs:] {
 			out += v + "/"
 		}
-		return out[:len(out) - 1]
+		if len(out) != 0 {
+			if out[len(out) - 1] == '/' {
+				return out[:len(out) - 1]
+			}
+		}
+		return out
 	}
 	return "."
 }

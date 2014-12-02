@@ -22,7 +22,7 @@ func Command_Div(script *rex.Script, params []*rex.Value)
     Returns a / b
 
 func Command_Eq(script *rex.Script, params []*rex.Value)
-    Floating point equal.
+    Floating point equal (basically useless, but included anyway).
 
 	float:eq a b
 

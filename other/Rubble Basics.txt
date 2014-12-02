@@ -8,6 +8,41 @@ That said you should at least skim over everything so you have some idea what is
 Note that some of the things described here are added by the "Libs/Base" addon and are not hard-coded parts of Rubble. "Libs/Base" is commonly assumed to be an integral part of Rubble, it is safe to assume that it's features are always available.
 
 ==============================================
+Rubble OS Specific Information:
+==============================================
+
+On Windows:
+
+On windows Rubble should "just work", everything was originally written and tested on a 64 bit Windows 7 system, so if Rubble works anywhere it should work there :)
+
+No specific issues are known.
+
+The default browser startup script should start IE, if you don't like IE (like 90% of the right-thinking world) you will have to modify the script.
+
+----------------------------------------------
+On Linux:
+
+I recently setup a a Linux VM, did some Rubble testing, and found the following issues *sigh*.
+
+To get anything working at all you need to:
+	All the binaries needed to be marked "executable" (chmod +x) and moved to the same directory as the Windows binaries.
+	The browser startup script needed to be marked "executable" (chmod +x)
+
+After that was done things worked fine.
+
+If the web UI does not automatically start your browser you will have to modify the browser startup script (comments in the default script list some options).
+
+----------------------------------------------
+On OSX:
+
+It is impossible for me to do any OSX testing (and I have never used OSX for anything but the most trivial tasks on a borrowed computer).
+If you want to know how Rubble works on this platform either try it yourself or donate some hardware :)
+
+At a minimum you will have to move the binaries to the same directory as the Windows binaries (do you have to mark them executable like on Linux? OSX and Linux are both UNIX clones).
+
+There is no default browser startup script for the web UI on OSX. It will try to use the Linux script, but this is unlikely to work.
+
+==============================================
 Template Prefixes Explained:
 ==============================================
 
@@ -58,6 +93,23 @@ Most users will never need the configuration file.
 ==============================================
 Rubble Web UI Customization:
 ==============================================
+
+The Browser Startup Script:
+
+To make things easy you can create a batch file or shell script named "./other/webUI/browser" that starts your web browser, the server will try to run this file when it starts. This file will be passed the URL for the main menu as an argument, the script should pass this argument through to the browser (so the page opens automatically).
+
+The browser start script file extension MUST be listed in your PATHEXT environment variable (on windows) or have no extension (Linux, OSX). Windows users who do not know what "PATHEXT" is can assume ".com", ".exe", ".bat", or ".cmd" are usable.
+
+My browser file is named "browser.bat" and contains:
+	@"C:\Program Files (x86)\SRWare Iron\iron.exe" "%1"
+You will obviously need to use something different if you are not using a default SRWare Iron install on Windows x64 :)
+
+Rubble comes with some default browser files, so things *may* work just fine right out of the box. The included files should work on most Linux or Windows systems (Linux users will have to mark the script executable).
+OSX users are more or less on their own, but under the hood OSX is a lot like Linux (they are both UNIX clones), so if you provide the proper browser path the Linux script should work with minimal modification.
+
+Linux users will have to do a bunch of extra stuff to get Rubble working, see the "Rubble OS Specific Information" section of this document.
+
+HTML Template Customization:
 
 When the web UI server is run it tries to load HTML templates and CSS files from "./other/webUI/", if it does not find the file it is looking for it tries to write the default version of the file out to that directory.
 
@@ -167,6 +219,10 @@ Rubble's solution to the startup script problem is simple: it loads and evaluate
 
 To load a script with this system simple put any .lua file into out:dfhack, it's that simple. To make it even easier you can just use the rubble:dfhack_loadscript script command, it installs a script by name automatically.
 
+For convenience the loader provides a special value (rubble.savedir) that contains the path to the current region.
+
+When working on an addon you may wish to reload the scripts and modules, to do this simply run `:lua rubble.reload_scripts()`.
+
 ==============================================
 The Rubble DFHack Lua Pseudo Module System:
 ==============================================
@@ -178,25 +234,40 @@ Pseudo modules consist of three parts:
 	The loader
 	Client scripts
 
-The module file is almost exactly like a standard Lua module, the only difference is the prefix and suffix
-At the top of the script where you would have something like this:
+The module mostly the same as with normal modules, the only difference is instead of:
 	local _ENV = mkmodule("example")
 You have this instead:
 	local _ENV = rubble.mkmodule("example")
-And at the end where you would have:
-	return _ENV
-Use:
-	rubble.example = _ENV
+Simple.
+(remember to `return _ENV` at the end of the module!)
 
 The loader is simple and automatic, just put any .mod.lua file into out:dfhack. This works exactly like startup scripts (just with a different file extension) so you can even use rubble:dfhack_loadscript if you are feeling lazy.
 
 Clients are mostly the same as with normal modules, the only difference is instead of:
 	local example = require "example"
 You use:
+	local example = rubble.require "example"
+Or you can use:
 	local example = rubble.example
 Or, of course, you could just use the full name everywhere :)
+	rubble.example.someFunc()
 
 Obviously, due to the way they are loaded pseudo modules will only work when a save is loaded, but since they are only for use with region-local scripts this is not an issue.
+
+Pseudo modules have a special value normal modules lack:
+	"module" contains the module name as passed to rubble.mkmodule, this is mostly for internal use.
+
+When working on a module you may wish to reload the scripts and modules, to do this simply run `:lua rubble.reload_scripts()`.
+
+For convenience the loader provides a special value (rubble.savedir) that contains the path to the current region.
+
+The following names are reserved and should not be used as a module name:
+	savedir
+	load_script
+	load_module
+	mkmodule
+	require
+	reload_scripts
 
 ==============================================
 Patches:
@@ -248,7 +319,7 @@ Loader Scripts:
 
 Loader scripts are a lot like initialization scripts, just that they run earlier.
 
-Loader scripts only do one thing that init scripts can't do better: they can modify the activation state of addons. Since loader scripts run just after addons have been activated but before the active file list has been generated you can examine what addons are active and change this list if need be. This is particularly useful for automatically activating addon dependencies.
+Loader scripts only do two things that init scripts can't do better: they can modify the activation state of addons and they can modify the files of a specific addon without effecting other addons. Since loader scripts run just after addons have been activated but before the active file list has been generated you can examine what addons are active and change this list if need be. This is particularly useful for automatically activating addon dependencies.
 
 Like init scripts, loader scripts are global and pay no attention to their containing addon.
 Loader scripts are only run during normal generation cycles.
@@ -425,6 +496,30 @@ So why do you (the modder) need to know all this? To put it simply you need to k
 Do you want to use multiple small addons or just one large one? Do you want all of your mod's addons in one large directory, or do you want to group related things together? These decisions are important part of deciding how you want to package your mod and how you want the addon list presented to users.
 
 ==============================================
+Multi-Threaded Scripts:
+==============================================
+
+It is possible to write multi-threaded Rex scripts, but this capability is not generally useful, as the vast majority of scripts do not run long enough to make it worth while.
+
+That said if you do have a task that would benefit from being run in parallel the ability to do so is there.
+
+I will not try to tell you how to write concurrent code, I will just point out pitfalls and problems.
+
+Unless you included the -threads command line parameter or put "threads=true" in "rubble.ini" Rubble will (most likely) only have a single OS thread to work with, so using the script threading commands will actually slow things down!
+
+Some data exported to scripts in not thread safe! Standard indexables (map, smap, array, sarray) should work fine, as will normal global values, but GenII values and most custom indexables will not. Beware race conditions!
+
+If a script command requires some kind of custom value as a parameter (for example the rand commands or the axis commands) then the value in question is probably not thread safe.
+
+Many of the commands in the "rubble" module use the "rubble:state" variable internally, this value is not thread safe!
+
+Basically you should only do calculations on static data, any IO or interaction with Rubble should be done from a single thread.
+
+I have only ever used the Rex thread API once. The case I used it for was processing the DF language files (specifically I was expanding them so there was a different word for each form (verb, noun, etc)). Building the symbol file was taking far too long, so I made a new thread to generate each symbol. This worked fine and was just under 4x as fast (on a quad core processor).
+
+If you have a data processing task that is far too slow and could be done in parallel, take a look at the commands in the "thread" module, they may be just what you need.
+
+==============================================
 Other Random Information:
 ==============================================
 
@@ -439,9 +534,6 @@ Example:
 	}
 If Rubble finds a template call where the last param is ... it appends the params from the previous template call to the current template's params. This trick is good for aliases and the like.
 
-There is no check for infinite recursion, so make sure you never recurse without breaking out at some point (unless you want to cause an infinite loop and eat all your memory until Rubble crashes). 
-The reason there is no recursion check is that there are valid reasons to have deep recursion, and any infinite loops created by recursion like this are errors that should be caught in testing. If you are too lazy to do proper testing it is not my job to hold your hand, plus just how many programming languages have you used that had such a check? 
-
-The Rex command documentation is automatically generated every time I build Rubble, this make it easy for me to keep everything up to date, but the formatting leaves much to be desired.
+The Rex script command documentation is automatically generated every time I build Rubble, this make it easy for me to keep everything up to date, but the formatting leaves much to be desired.
 The problem is that the app that generates the docs is made for go programmers, not Rex programmers, so a lot of information that has nothing to do with the commands makes it's way to these docs.
 Sometime when I'm really bored I need to write a program to automatically reformat these files ;)

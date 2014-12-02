@@ -1,0 +1,17 @@
+<rubble:addonmeta
+	header=`Makes creatures take 10x damage from weapons made from their bones.`
+	
+	description=`
+Basically all it does is add a weakness to LOCAL_CREATURE_MAT:BONE to any creatures
+that have the STANDARD_MATERIALS body detail plan.
+
+I am not 100% sure this works properly, must test.
+Sadly arena testing will not work (can't make bone items).
+
+The fastest way to test this in a controlled manner would be to make some goblin bone
+blocks and do drop testing onto a floor of these blocks with other goblins.
+Of course captured goblins and some goblin bone would be required...
+`
+	
+	activates="Libs/Base"
+>
