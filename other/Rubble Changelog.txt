@@ -1,0 +1,138 @@
+
+==============================================
+Changelog:
+==============================================
+v4.3 (for DF 40.5)
+	Fixed "User/Fix/Human Diplomats", two small bugs bugs in it's script kept it from working.
+	Fixed "User/Cat Damper", I really should test these things better.
+	Split the readme into several parts.
+	Split "User/Generic Animal Mats" into many little addons, change only the stuff you want to!
+	Made the "User/Block" addons have less redundant content, this change should not affect users.
+	Fixed an error that kept rubble:groupactive from working.
+
+v4.2 (for DF 40.5)
+	Updated the "Base" addon to 40.5.
+	Removed "User/Nerf/Ranged" (it's changes are now part of vanilla!).
+	Moved "User/Nerf/Whips" to "User/Fix/Whips".
+	Added "User/Generic Animal Mats", generic animal materials for all!
+	Tweaked the DFHack support a little.
+	Removed "Libs/DFHack/Spawn", as 40.x DFHack will come with a unit spawn script there is no need for it.
+	Added "User/Cat Damper", slightly less annoying cats.
+	Added "User/Fix/Human Diplomats", adds trade reps and diplomats to the humans.
+
+v4.1 (for DF 40.3)
+	Added "Libs/Research", library support for a research reaction system.
+	Moved all "user" addons to the "User" group.
+	Added a bunch of addons from Better Dorfs (all were put into the "User" group).
+	Added "User/Warcrafter/Adventure", non-DFHack adventure mode crafting.
+	Reworked the DFHack support templates in "Libs/Base", they should be all ready to go now.
+	Removed "Libs/DFHack/Command".
+		Use DFHACK_REACTION or DFHACK_REACTION_BIND (from "Libs/Base") instead, they have radically
+		different syntax and usage, but they use the new reaction binding script (which is much
+		better than the old autoSyndrome method).
+	The REACTION template did not work exactly as documented, now it does.
+		This caused a minor loss of functionality (which wasn't used anywhere anyway) for a great
+		gain in simplicity.
+	Updated the tileset templates to handle the new tree related init settings.
+	Removed support for "Libs/DFHack/Command" from "Libs/DFHack/Fluids".
+	In the "Base" addon the dwarf creature now has the caste templates for "Libs/Castes" support.
+	"Libs/Castes" is now forced active during normal generation cycles.
+	Updated "Libs/DFHack/Announcement" to use the new DFHack system.
+	Updated "Libs/DFHack/Spawn" to use the new DFHack system.
+	Added "User/Tilesets/MLC/Pure ASCII", a version of my tileset that has no graphical tiles.
+	Removed the rubble:activeaddons script variable, it was only used once, and that was easy to replace.
+	Added script command rubble:add_file, add a file after generation starts (experts only!).
+		This is mostly to make patches possible, most users will have no use for this command.
+
+v4.0 (for DF 40.3)
+	First public release for the 4.x series.
+	Replaced "Base" with a base made from the raws for DF 40.3.
+	While the DFHack library addons were not removed do not assume that they will work with DFHack for DF2014.
+		In particular anything that needs "Libs/DFHack/Command" probably won't work.
+		"Libs/Caste/DFHack/Transform" will probably work just fine as will "Libs/DFHack/Add Reaction".
+
+v4pre (for DF 34.11, changes from Rubble 3.13)
+	Changed scripting subsystems from Raptor to Rex.
+		Rex is a little less flexible but ultimately faster and more powerful scripting language loosely based on Raptor.
+		Many, many things have changed, but only a few of them really make a big difference:
+			Some commands like set, var, command, and namespace are replaced by new syntax constructs.
+			Code is "compiled" to a much lower form, allowing for faster execution.
+			A lot of the more "dynamic" stuff from Raptor is gone:
+				It is not possible to use a string as code (directly, eval still works).
+				Some commands require code blocks to have variables "predeclared" via a special block declaration syntax.
+					This replaces many uses of the old params array with a much clearer, less error-prone syntax.
+				The various advanced eval commands are gone.
+			You may now use single quotes (') and back quotes (`) as string delimiters.
+		See the files in the "Rex Docs" folder for more info
+	As a direct result of the change in scripting subsystems Rubble is now MUCH faster.
+	More internal data is exported to scripts (via GenII, so be careful!).
+	Some native commands have been ported to init scripts.
+	Fixed lots of little scripting bugs that were discovered when porting.
+	Removed the builtin templates !SCRIPT, SCRIPT, and #SCRIPT.
+	Added a new base template: @SCRIPT.
+	The !SCRIPT_TEMPLATE builtin template was removed, use the rubble:template script command.
+	The syntax of the rubble:template command has changed significantly (it's simpler in some ways).
+	Removed shell mode, it was useful, but ultimately added much complexity for small gain.
+	Removed the lexer test. This was an internal debugging utility that has outlived it's usefulness.
+	Removed the "Shared Animal Mats" addon, as it is too fragile for inclusion with Rubble.
+	Added "Fix/Fish Pops", raises all fish population to the max, never fish out an area again.
+	Fixed rare case where the addon list would not update.
+	The script raw parser has moved from the "raw" module to the "df:raw" module.
+		The parser has been simplified and is joined by a slow, but more flexible cousin.
+	Added "Dev/Tileset/Export", automatically extract tile info from raws that have the Rubble tileset templates.
+	Added "Dev/Tileset/Insert", automatically inserts Rubble tileset templates into untemplated raws.
+	Removed the #WRITE_TILESET template, it is now obsolete.
+	Removed support for anonymous template parameters (eg %1) as this was never useful, and has become less so over time.
+	The "outputdir" setting has changed, it is now the path to the "raw" directory, not "raw/objects".
+	Renamed "Tilesets/MLC" to "Tilesets/MLC/Normal".
+	Added "Tilesets/MLC/Tracks", A version of the MLC tileset that has graphical tracks.
+	Added "Tilesets/MLC/DFHack/TWBT", A version of the MLC tileset for use with Text Will Be Text.
+	The addon loader no longer writes every addon and file name to the log, all this did was bloat the log for no good reason.
+	It is now possible to specify -config or -addons more than once, this applies to rubble.ini as well.
+		Each occurrence is parsed separately, but the results are added together.
+	Added the ability to pass a file name to -config, in that case the config variables will be read from the file.
+	Added the ability to pass a file name to -addons, in that case the file is treated as an addon list file.
+	Removed live profiling, it is normally really nice to have, but Rubble completes too fast for it to be usable.
+	Made sure Rubble always exits with code 1 when it does not complete properly.
+	Made sure Rubble prints "Done." as the last thing when it succeeds.
+	Finally got it so that ALL native script command documentation is automatically generated.
+		The script documents should never go out of sync now (user command docs are still done by hand though).
+	Rubble now prefixes all parsed files with a short message stating that the file was automatically generated.
+		This message also includes the source path (uses the AXIS syntax).
+	Added new addon, "Building Dimensions": Append all building names with their dimensions.
+	Lists are now always split at ';' characters instead of using the OS-specific path list separator char.
+		This change should make things more consistent across OSes.
+	rubble.ini now uses the same rules as the command line flag handler for parsing boolean values.
+	Added an "installer" mode, it simply loads files from a single zip and then runs any ".inst.rex" scripts,
+		use to install non-raw mods and addons automatically.
+	Created a new GUI with support for prepping or regenerating a region (still windows only).
+	The GUI now launches Rubble in installer mode when it is started with a command line argument.
+		(this makes it support drag and drop installing)
+	The GUI now supports a "minimal=true" option in it's INI that makes it not create the "Prep" and "Regen" tabs.
+	Made all addons deterministic, this should make region regeneration possible.
+		(in this case deterministic means that generated raw objects will always be in the same order for a given input)
+		Changed addons:
+			"Libs/Castes"
+			"Libs/Castes/DFHack/Transform"
+			"Libs/Crates"
+			"Libs/DFHack/Command"
+	Added two new templates: SHARED_OBJECT_KILL_TAG and SHARED_OBJECT_REPLACE_TAG, modify shared objects with minimum fuss.
+	Rewrote "Fix/Undead Melt" to use SHARED_OBJECT_REPLACE_TAG, it is now much less brittle.
+	All file access is now negotiated through AXIS VFS, this makes Rubble's directory structure MUCH more flexible.
+		It should no longer be possible to write to arbitrary locations on the file system, so security should be much improved.
+	The "file" and "fileio" script modules are no longer loaded, use the commands in the "axis" module instead.
+	The various script directory variables have been removed as they are not needed with AXIS VFS.
+	Added new base template: @IF_SKIP, conditionally skip a file with minimal fuss.
+	Added addon "Tileset/Vanilla/Graphics": mostly just a demo of how to make creature graphic addons.
+	Added four new tileset templates to "Base/Templates", these templates are for finer grain control of font settings.
+	Added new addons, "Libs/Macro" and "Libs/Macro/Example": Generate macros from scripts.
+	Added native script command rubble:activate_addon, force an addon active at any point.
+	Renamed "Base/Templates" to "Libs/Base".
+	"Libs/Base" is now forced active by init script during normal generation cycles.
+	Removed "Base/Clear", replaced with an init script.
+	Replaced the "Libs/Base" DFHack support with a much more flexible and less error prone system, no more extra install steps!
+	Updated "Libs/DFHack/Add Reaction" to use the new DFHack support.
+		There is no longer a need to prep between regions when using this addon.
+	Moved "Base/Files" to "Base"
+	Updated "Libs/Caste/DFHack/Transform" to use the newest DFHack stuff.
+	Updated a LOT of documentation, and still more needs to be written...

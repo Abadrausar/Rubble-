@@ -39,7 +39,7 @@ Most users will never need the configuration file.
 Tileset Addons:
 ==============================================
 
-There is a rather good (IMHO) tutorial on tileset addon in the "HowTo Rubble" file, see tutorial #4.
+There is a rather good (IMHO) tutorial on tileset addons in the "HowTo Rubble" file, see tutorial #4.
 
 ==============================================
 Porting an existing mod to Rubble with "Dev/Tileset/Insert":
@@ -81,6 +81,8 @@ Use init scripts to do setup that may be shared by multiple addons and HAS to be
 Another fine use of init scripts is "always active" templates, basically you add a template stub in an init script an the override it with a full version in a pre tweak script. This way clients of your addon can just assume that your addon's template are present allowing you to skip checking to see if it is active. 
 (please note that you really only want to do this within an addon pack so that you can be sure the other addon is installed)
 
+Init scripts also work well for automatic dependency management. If your addon requires a library addon you can add an init script that checks if your addon is active and forces your dependencies active if so. 
+
 Init scripts have a very narrow use-case and should be used with care.
 
 Init scripts are still loaded as "user data" if their containing addon contains any parseables!
@@ -91,7 +93,7 @@ The prep "addon":
 
 prep is a special "addon" that is created automatically during generation and is written to the raw folder. This "addon" contains all the scripts and files needed to make DF ready to load a world generated from that set of raws. Basically it allows you to easily run multiple, very different, worlds without too much trouble. 
 
-Running "rubble -prep=<region name>" should make sure all init setting, tilesets, DFHack scripts, ect. are installed just as they were when the raws for that world were originally generated.
+Running "rubble -prep=<region name>" should make sure all init setting, tilesets, ect. are installed just as they were when the raws for that world were originally generated.
 (It is the responsibility of each addon to provide any prep support it may need)
 
 Scripts with the extension ".prep.rex" are automatically added to the prep "addon" to be run when a region is prepped, any data files you need will have to be added manually via the "rubble:prepfile" script command.
@@ -113,7 +115,7 @@ Install scripts can do anything that any other script can do.
 To install a package:
 	rubble -install=<package>
 
-<package> should be a (non-DCFS!) path to a zip file.
+<package> should be a (non-AXIS!) path to a zip file.
 
 Windows users can simply drag and drop an installer package onto the Rubble GUI icon, this will automatically launch Rubble to install the package.
 
@@ -192,8 +194,6 @@ If any addon names are specified via the -addons option then addonlist.ini is ne
 So why do you (the modder) need to know all this? To put it simply you need to know what is permissible for structuring your addon(s) so that you can choose an optimal method that makes it easy on both you and your users. 
 
 Do you want to use multiple small addons or just one large one? Do you want all of your mod's addons in one large directory, or do you want to group related things together? These decisions are important part of deciding how you want to package your mod and how you want the addon list presented to users.
-
-For example Better Dorfs, a mod of mine, groups all of its addons into the "Better Dorfs" addon. This means that users see, for example the Saurians addon, as "Better Dorfs/Saurians". When I add a saurian specific addon I put the new addon in "Better Dorfs/Saurians/<new addon name>". This grouping helps make it obvious what goes with what, making the lives of your users a little more pleasant.
 
 ==============================================
 Other Random Information:

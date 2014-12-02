@@ -28,6 +28,7 @@ import "dctech/axis"
 func LoadAddons() []*Addon {
 	addonlist := make([]*Addon, 0, 20)
 
+	loadInit(FS, "addons:dir:")
 	for _, dir := range FS.ListDir("addons:dir:") {
 		addonlist = loadDir(FS, dir, "addons:dir:" + dir, addonlist)
 	}

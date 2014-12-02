@@ -29,6 +29,7 @@ import "dctech/axis"
 // (all the listed versions are assumed to be backwards compatible)
 // Index 0 MUST be the current version!
 var RubbleVersions = []string{
+	"4.3",
 	"4.2",
 	"4.1",
 	"4.0",
@@ -44,9 +45,9 @@ var Addons []*Addon
 // Files is mapped to the Raptor indexable rubble:raws.
 var Files *FileList
 
-// Force initialization scripts, there should never be very many.
-var ForcedInit = make(map[string][]byte, 5)
-var ForcedInitOrder = make([]string, 0, 5)
+// Force initialization scripts.
+var ForcedInit = make(map[string][]byte, 20)
+var ForcedInitOrder = make([]string, 0, 20)
 
 // Parse stage constants
 const (

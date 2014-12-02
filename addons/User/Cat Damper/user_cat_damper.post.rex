@@ -11,8 +11,9 @@ var foundcat = false
 				(if (int:eq (len [tag]) 1) {
 					(if (str:cmp [tag 0] "CAT"){
 						[foundcat = true]
+					}{
+						[foundcat = false]
 					})
-					[foundcat = false]
 				}{
 					(rubble:abort "Error: invalid param count to CREATURE raw tag in last file.")
 				})

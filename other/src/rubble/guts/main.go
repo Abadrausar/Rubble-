@@ -27,6 +27,7 @@ import "strings"
 import "os"
 import "runtime/pprof"
 import "time"
+import "sort"
 
 func Main() {
 	timeStart := time.Now()
@@ -199,6 +200,7 @@ func Main() {
 
 	LogPrintln("=============================================")
 	LogPrintln("Running Init Scripts...")
+	sort.Strings(ForcedInitOrder)
 	for _, i := range ForcedInitOrder {
 		CurrentFile = i
 		LogPrintln("  " + i)

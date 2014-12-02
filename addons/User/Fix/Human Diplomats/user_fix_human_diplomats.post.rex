@@ -30,12 +30,12 @@ var diplomats =
 
 var curEntity = ""
 
-[rubble:raws "entity_default" = (df:raw:walk [rubble:raws "entity_default"] block tag {
+[rubble:raws "entity_default.txt" = (df:raw:walk [rubble:raws "entity_default.txt"] block tag {
 	(if (str:cmp [tag id] "ENTITY") {
 		(if (int:eq (len [tag]) 1) {
-			[curEntity [tag 0]]
+			[curEntity = [tag 0]]
 		}{
-			(rubble:abort "invalid param count to ENTITY raw tag in entity_default")
+			(rubble:abort "invalid param count to ENTITY raw tag in entity_default.txt")
 		})
 	})
 	
@@ -43,9 +43,9 @@ var curEntity = ""
 		(if (str:cmp [tag id] "STONE_SHAPE") {
 			(if (int:eq (len [tag]) 1) {
 				[curEntity = ""]
-				[tag replace = (str:add [diplomats] "[STONE_SHAPE:" [tag 0] "]")]
+				[tag replace = (str:add [diplomats] "\t[STONE_SHAPE:" [tag 0] "]")]
 			}{
-				(rubble:abort "invalid param count to STONE_SHAPE raw tag in entity_default")
+				(rubble:abort "invalid param count to STONE_SHAPE raw tag in entity_default.txt")
 			})
 		})
 	})
