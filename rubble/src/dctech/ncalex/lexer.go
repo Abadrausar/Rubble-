@@ -279,6 +279,24 @@ func NewLexer(input string, startline, startcolumn int) *Lexer {
 	return lexer
 }
 
+// Current is for NCA6 CodeSource support.
+func (this *Lexer) CurrentTkn() *Token {
+	return this.Current
+}
+
+// LookAhead is for NCA6 CodeSource support.
+func (this *Lexer) LookAhead() *Token {
+	return this.Look
+}
+
+// Line is for NCA6 CodeSource support.
+func (this *Lexer) Line() int {
+	if !this.PositionValid {
+		return -1
+	}
+	return this.LastLine
+}
+
 // This advances the Lexer one token.
 // May cause a panic if the lexer encounters an error
 // For most purposes use GetToken instead.

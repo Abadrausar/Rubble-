@@ -1,31 +1,55 @@
+PACKAGE
 
-Create a new (empty) ini file.
+package ini
+    import "dctech/nca6/ini"
+
+    NCA v6 INI Commands.
+
+FUNCTIONS
+
+func CommandIni_Create(state *nca6.State, params []*nca6.Value)
+    Create a new (empty) ini file.
 
 	ini:create
 
-    Returns the ini file handle
+    Returns the ini file
 
-Format an ini file for writing to disk.
+func CommandIni_Format(state *nca6.State, params []*nca6.Value)
+    Format an ini file for writing to disk.
 
-	ini:format filehandle
+	ini:format file
 
     Returns the string representation of the ini file or an error message.
     May set the Error flag.
 
-Get a specific value from an ini file.
+func CommandIni_GetValue(state *nca6.State, params []*nca6.Value)
+    Gets a specific value from an ini file.
 
-	ini:getvalue inihandle sectionname keyname
+	ini:getvalue file sectionname keyname
 
     Returns the value or an error message. May set the Error flag.
 
-Parse an ini file.
+func CommandIni_Parse(state *nca6.State, params []*nca6.Value)
+    Parse an ini file.
 
 	ini:parse filecontents
 
-    Returns the ini file handle or an error message. May set the Error flag.
+    Returns the ini file or an error message. May set the Error flag.
 
-Set a specific value in an ini file.
+func CommandIni_SetValue(state *nca6.State, params []*nca6.Value)
+    Sets a specific value in an ini file.
 
-	ini:setvalue inihandle sectionname keyname value
+	ini:setvalue file sectionname keyname value
 
     Returns unchanged or an error message. May set the Error flag.
+
+func Setup(state *nca6.State)
+    Adds the ini commands to the state. The ini commands are:
+
+	ini:create
+	ini:parse
+	ini:format
+	ini:getvalue
+	ini:setvalue
+
+

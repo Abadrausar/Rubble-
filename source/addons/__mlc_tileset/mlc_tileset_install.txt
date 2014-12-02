@@ -51,8 +51,8 @@ This is an example tileset addon
 	(set d_init (regex:replace "\\[TRACK_RAMP_SEW:(?:[0-9]+|'.')I?\\]" [d_init] "[TRACK_RAMP_SEW:30I]"))
 	(set d_init (regex:replace "\\[TRACK_RAMP_NSEW:(?:[0-9]+|'.')I?\\]" [d_init] "[TRACK_RAMP_NSEW:30I]"))
 	
-	(fileio:write (append [rubble:dfdir] "/data/init/init.txt.new") [init])
-	(fileio:write (append [rubble:dfdir] "/data/init/d_init.txt.new") [d_init])
+	(fileio:write (append [rubble:dfdir] "/data/init/init.txt") [init])
+	(fileio:write (append [rubble:dfdir] "/data/init/d_init.txt") [d_init])
 	
 	
 	'An ugly hack, but I failed to find a copy file function in the go stdlib and this works fine.'

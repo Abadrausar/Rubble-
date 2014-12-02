@@ -68,8 +68,19 @@ User Templates in Standared Base
 	Writes <PRERAWS> to the console. Each param gets it's own line.
 
 ==============================================
+{SHARED_PLANT;<NAME>;<DEFINITION>}
+	Adds a common plant to the dictionary. <DEFINITION> should be a complete plant entry, EXCLUDING the [PLANT:<NAME>] tag. If this template call is the first to define this plant, then the given <DEFINITION> will be used in the finished raws. 
+	
+	SHARED_PLANT, like the other shared definition templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR. Use #WRITE_TILESET to write a file with all the generated (and user placed) calls.
+	
+	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws.
+	Uses SHARED_OBJECT, make sure <NAME> is unique.
+
+==============================================
 {SHARED_INORGANIC;<NAME>;<DEFINITION>}
 	Adds a common inorganic to the dictionary. <DEFINITION> should be a complete inorganic stone entry, EXCLUDING the [INORGANIC:<NAME>] tag. If this template call is the first to define this inorganic, then the given <DEFINITION> will be used in the finished raws. 
+	
+	SHARED_INORGANIC, like the other shared definition templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR. Use #WRITE_TILESET to write a file with all the generated (and user placed) calls.
 	
 	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_ORE, REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
 	Uses SHARED_OBJECT, make sure <NAME> is unique.
@@ -77,6 +88,8 @@ User Templates in Standared Base
 ==============================================
 {SHARED_MATERIAL_TEMPLATE;<NAME>;<DEFINITION>}
 	Adds a common material template to the dictionary. <DEFINITION> should be a complete template entry, EXCLUDING the [MATERIAL_TEMPLATE:<NAME>] tag. If this template call is the first to define this material template, then the given <DEFINITION> will be used in the finished raws. 
+	
+	SHARED_MATERIAL_TEMPLATE, like the other shared definition templates extracts all tile numbers and colors and wraps them in calls to #TILE or #COLOR. Use #WRITE_TILESET to write a file with all the generated (and user placed) calls.
 	
 	Note that the contents of <DEFINITION> are always parsed, whether or not the results will appear in the raws, so you can put your REGISTER_REACTION_CLASS, and REGISTER_REACTION_PRODUCT calls in there.
 	Uses SHARED_OBJECT, make sure <NAME> is unique.
@@ -102,6 +115,22 @@ User Templates in Standared Base
 {#TILE;<ID>;<DEFAULT>}
 	If a tile entry for <ID> exists return it else return <DEFAULT>.
 	Use everywhere a tile number is required.
+
+==============================================
+{SET_COLOR;<ID>;<COLOR>}
+	Sets color entry <ID> to <COLOR>.
+	Used to add support for tilesets, first entry "wins".
+
+==============================================
+{#COLOR;<ID>;<DEFAULT>}
+	If a color entry for <ID> exists return it else return <DEFAULT>.
+	Use everywhere a color is required.
+
+==============================================
+{#WRITE_TILESET;<PATH>}
+	Write calls to SET_TILE and SET_COLOR for all calls to #TILE and #COLOR to file <PATH>.
+	This should only be used once to get a template for making a tileset addon, it has no other use.
+	Note that for this to work #WRITE_TILESET MUST be called AFTER every call to #TILE or #COLOR!
 
 ==============================================
 {BUILDING_WORKSHOP;<TECH>;<CLASS>}
@@ -139,8 +168,12 @@ User Templates in Standared Base
 
 ==============================================
 {ITEM_CLASS;<CLASS>;<RARITY>=COMMON}
+{ITEM_CLASS;<TYPE>;<ITEM>;<CLASS>;<RARITY>=COMMON}
 	
-	Sets an items class and rarity. Items may have many classes and each class may have a different rarity per item. An ITEM_CLASS template always refers to the last ITEM template before it.
+	Sets an items class and rarity. Items may have many classes and each class may have a different rarity per item. 
+	
+	The first form of an ITEM_CLASS template always refers to the last ITEM template before it.
+	The second form is for use in addons or other places where the call cannot follow the item definition.
 	
 	<RARITY> can be RARE, UNCOMMON, COMMON and FORCED.
 	
@@ -151,7 +184,7 @@ User Templates in Standared Base
 	}{ITEM_CLASS;TEST_WEAPONS}
 	
 	{#USES_ITEMS;TEST_WEAPONS} -> [WEAPON:ITEM_WEAPON_TEST]
-	
+
 ==============================================
 {#USES_ITEMS;<CLASS>}
 	Usable in entity definitions. Expands to a list of item permissions of the <CLASS>. When using multiple #USES_ITEMS calls make sure every item is returned by at most one #USES_ITEMS call.

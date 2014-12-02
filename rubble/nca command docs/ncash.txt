@@ -1,0 +1,23 @@
+PACKAGE
+
+package ncash
+    import "dctech/nca6/ncash"
+
+    NCA v6 Shell Command.
+
+FUNCTIONS
+
+func CommandNCASH(state *nca6.State, params []*nca6.Value)
+    Break into the NCA SHell. VERY useful for debuging! This command will
+    provide an interactive shell until eof is reached, on windows this may
+    be simulated by pressing CTRL+Z followed by <ENTER>.
+
+	ncash
+
+    Returns the return value of the last command to be run.
+
+func Setup(state *nca6.State)
+    Adds the ncash command to the state. The ncash command gives access to a
+    shell much like NCASH6 that may be broken into at any time.
+
+

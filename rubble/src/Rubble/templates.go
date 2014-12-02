@@ -3,8 +3,7 @@ package main
 //import "fmt"
 import "strings"
 import "strconv"
-import "sort"
-import "dctech/nca5"
+import "dctech/nca6"
 
 func SetupBuiltins() {
 	NewNativeTemplate("!TEMPLATE", tempTemplate)
@@ -13,10 +12,6 @@ func SetupBuiltins() {
 	NewNativeTemplate("!SCRIPT", tempScript)
 	NewNativeTemplate("SCRIPT", tempScript)
 	NewNativeTemplate("#SCRIPT", tempScript)
-	
-	NewNativeTemplate("ITEM", tempItem)
-	NewNativeTemplate("ITEM_RARITY", tempItemRarity)
-	NewNativeTemplate("#USES_ITEMS", tempUsesItems)
 
 	NewNativeTemplate("#ADV_TIME", tempAdvTime)
 	NewNativeTemplate("#FORT_TIME", tempFortTime)
@@ -86,7 +81,7 @@ func tempScript(params []string) string {
 	}
 	
 	GlobalNCAState.Code.Add(params[0])
-	GlobalNCAState.Envs.Add(nca5.NewEnvironment())
+	GlobalNCAState.Envs.Add(nca6.NewEnvironment())
 	
 	if len(params) > 1 {
 		GlobalNCAState.AddParams(params[1:]...)
@@ -103,125 +98,6 @@ func tempScript(params []string) string {
 		return ""
 	}
 	return rtn.String()
-}
-
-var itemTypes = map[string]bool {
-	"AMMO": false,
-	"ARMOR": true,
-	"DIGGER": false,
-	"GLOVES": true,
-	"HELM": true,
-	"INSTRUMENT": false,
-	"PANTS": true,
-	"SHIELD": false,
-	"SHOES": true,
-	"SIEGEAMMO": false,
-	"TOOL": false,
-	"TOY": false,
-	"TRAPCOMP": false,
-	"WEAPON": false }
-
-var itemRarities = map[string]int {
-	"RARE": 1,
-	"UNCOMMON": 2,
-	"COMMON": 3,
-	"FORCED": 4 }
-
-type itemClassItem struct {
-	Name string
-	Type string
-	Rarity string
-}
-
-var itemClasses = make(map[string][]*itemClassItem)
-func tempItem(params []string) string {
-	if len(params) < 3 {
-		panic("Wrong number of params to ITEM.")
-	}
-	
-	rtn := new(itemClassItem)
-	rtn.Type = params[0]
-	rtn.Name = params[1]
-	if _, ok := itemTypes[rtn.Type]; !ok {
-		panic("Invalid item type: " + rtn.Type)
-	}
-	
-	classes := params[2:]
-	if itemTypes[rtn.Type] {
-		rtn.Rarity = params[2]
-		if itemRarities[rtn.Rarity] != 0 {
-			classes = params[3:]
-			rtn.Rarity = "NULL"
-		}
-	}
-	
-	for _, class := range classes {
-		if _, ok := itemClasses[class]; !ok {
-			itemClasses[class] = make([]*itemClassItem, 0, 10)
-		}
-		itemClasses[class] = append(itemClasses[class], rtn)
-	}
-	
-	return "[ITEM_" + rtn.Type + ":" + rtn.Name + "]"
-}
-
-func tempItemRarity(params []string) string {
-	if len(params) != 3 {
-		panic("Wrong number of params to ITEM_RARITY.")
-	}
-	class := params[1]
-	if _, ok := itemClasses[class]; !ok {
-		panic("Invalid class: " + class)
-	}
-	
-	for _, item := range itemClasses[params[1]] {
-		if item.Name == params[0] {
-			item.Rarity = params[2]
-			return ""
-		}
-	}
-	panic("Invalid item: " + params[0])
-}
-
-func tempUsesItems(params []string) string {
-	if len(params) < 1 {
-		panic("Wrong number of params to #USES_ITEMS.")
-	}
-	
-	permittedItems := make(map[string]*itemClassItem)
-	nameList := make([]string, 0, 20)
-	for _, class := range params {
-		for _, item := range itemClasses[class] {
-			if _, ok := permittedItems[item.Name]; ok {
-				rtn := new(itemClassItem)
-				rtn.Name = item.Name
-				rtn.Type = item.Type
-				
-				if itemRarities[permittedItems[item.Name].Rarity] >= itemRarities[item.Rarity] {
-					rtn.Rarity = permittedItems[item.Name].Rarity
-				} else {
-					rtn.Rarity = item.Rarity
-				}
-				permittedItems[item.Name] = rtn
-				nameList = append(nameList, item.Name)
-				continue
-			}
-			permittedItems[item.Name] = item
-			nameList = append(nameList, item.Name)
-		}
-	}
-	
-	sort.Strings(nameList)
-	out := ""
-	for _, name := range nameList {
-		item := permittedItems[name]
-		if item.Rarity != "NULL" {
-			out += "\n\t[" + item.Type + ":" + item.Name + ":" + item.Rarity + "]"
-		} else {
-			out += "\n\t[" + item.Type + ":" + item.Name + "]"
-		}
-	}
-	return strings.TrimSpace(out)
 }
 
 var advTime = map[string]int64 {

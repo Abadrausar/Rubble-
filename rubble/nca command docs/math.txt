@@ -1,30 +1,59 @@
+PACKAGE
 
-Add two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+package math
+    import "dctech/nca6/math"
+
+    NCA v6 Math Commands.
+
+FUNCTIONS
+
+func CommandAdd(state *nca6.State, params []*nca6.Value)
+    Adds two nca6.Values. Opperands are converted to 64 bit integers.
+    Invalid strings are given the nca6.Value "0"
 
 	add a b
 
     Returns a + b
 
-Divide two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+func CommandDiv(state *nca6.State, params []*nca6.Value)
+    Divides two nca6.Values. Opperands are converted to 64 bit integers.
+    Invalid strings are given the nca6.Value "0"
 
 	div a b
 
     Returns a / b
 
-Give the remainder of dividing two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+func CommandMod(state *nca6.State, params []*nca6.Value)
+    Gives the remainder of dividing two nca6.Values. Opperands are converted
+    to 64 bit integers. Invalid strings are given the nca6.Value "0"
 
 	mod a b
 
     Returns a % b
 
-Multiply two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+func CommandMul(state *nca6.State, params []*nca6.Value)
+    Multiplies two nca6.Values. Opperands are converted to 64 bit integers.
+    Invalid strings are given the nca6.Value "0"
 
 	mul a b
 
     Returns a * b
 
-Subtract two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+func CommandSub(state *nca6.State, params []*nca6.Value)
+    Subtracts two nca6.Values. Opperands are converted to 64 bit integers.
+    Invalid strings are given the nca6.Value "0"
 
 	sub a b
 
     Returns a - b
+
+func Setup(state *nca6.State)
+    Adds the math commands to the state. The math commands are:
+
+	add
+	sub
+	div
+	mod
+	mul
+
+

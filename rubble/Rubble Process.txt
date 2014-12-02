@@ -6,7 +6,7 @@ Detailed Order of Execution
 ==============================================
 
 	Commandline options are processed
-	NCA4 is initalized
+	NCA is initalized
 	Builtin templates are loaded
 	All the files in the Base dir are loaded
 	Any files in Addon dirs are loaded

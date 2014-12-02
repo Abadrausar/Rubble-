@@ -1,41 +1,56 @@
+PACKAGE
 
-Delete a file.
+package file
+    import "dctech/nca6/file"
+
+    NCA v6 File System Commands.
+
+FUNCTIONS
+
+func CommandFile_Del(state *nca6.State, params []*nca6.Value)
+    Delete a file.
 
 	file:del path
 
     Returns unchanged or an error message. May set the Error flag.
 
-Delete an empty directory.
+func CommandFile_DelDir(state *nca6.State, params []*nca6.Value)
+    Delete an empty directory.
 
 	file:deldir path
 
     Returns unchanged or an error message. May set the Error flag.
 
-Delete a directory and all sub dirs and files.
+func CommandFile_DelTree(state *nca6.State, params []*nca6.Value)
+    Delete a directory and all sub dirs and files.
 
 	file:deltree path
 
     Returns unchanged or an error message. May set the Error flag.
 
-Check if a directory exists.
+func CommandFile_DirExists(state *nca6.State, params []*nca6.Value)
+    Checks if a directory exists.
 
 	file:direxists path
 
     Returns 0 or -1.
 
-Check if a file exists.
+func CommandFile_Exists(state *nca6.State, params []*nca6.Value)
+    Checks if a file exists.
 
 	file:exists path
 
     Returns 0 or -1.
 
-Create a new directory.
+func CommandFile_NewDir(state *nca6.State, params []*nca6.Value)
+    Create a new directory.
 
 	file:newdir path
 
     Returns unchanged or an error message. May set the Error flag.
 
-Iterate over all the directories in a directory.
+func CommandFile_WalkDirs(state *nca6.State, params []*nca6.Value)
+    Iterate over all the directories in a directory.
 
 	file:walkdirs path code
 
@@ -45,7 +60,8 @@ Iterate over all the directories in a directory.
 
     Returns nil or an error message. May set the Error flag.
 
-Iterate over all the files in a directory.
+func CommandFile_WalkFiles(state *nca6.State, params []*nca6.Value)
+    Iterate over all the files in a directory.
 
 	file:walkfiles path code
 
@@ -54,3 +70,18 @@ Iterate over all the files in a directory.
 	code path
 
     Returns nil or an error message. May set the Error flag.
+
+func Setup(state *nca6.State)
+    Adds the file system commands to the state. The file system commands
+    are:
+
+	file:deldir
+	file:deltree
+	file:newdir
+	file:del
+	file:exists
+	file:direxists
+	file:walkfiles
+	file:walkdirs
+
+

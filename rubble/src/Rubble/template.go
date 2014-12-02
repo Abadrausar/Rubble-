@@ -3,7 +3,7 @@ package main
 import "strings"
 import "regexp"
 import "strconv"
-import "dctech/nca5"
+import "dctech/nca6"
 
 type NativeTemplate func([]string) string
 
@@ -70,7 +70,7 @@ func (this *Template) Call(params []string) string {
 	// Script template
 	if this.NCA {
 		GlobalNCAState.Code.Add(this.Text)
-		GlobalNCAState.Envs.Add(nca5.NewEnvironment())
+		GlobalNCAState.Envs.Add(nca6.NewEnvironment())
 		
 		// Handle params
 		if len(this.Params) == 1 && this.Params[0].Name == "..." {
@@ -78,9 +78,9 @@ func (this *Template) Call(params []string) string {
 		} else {
 			for i := range this.Params {
 				if len(params) <= i {
-					GlobalNCAState.NewVar(this.Params[i].Name, nca5.NewValue(this.Params[i].Default))
+					GlobalNCAState.NewVar(this.Params[i].Name, nca6.NewValueString(this.Params[i].Default))
 				} else {
-					GlobalNCAState.NewVar(this.Params[i].Name, nca5.NewValue(params[i]))
+					GlobalNCAState.NewVar(this.Params[i].Name, nca6.NewValueString(params[i]))
 				}
 			}
 		}

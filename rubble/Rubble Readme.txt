@@ -35,7 +35,7 @@ Blast has a lot of power and advanced fetures that let you do all kinds of thing
 
 Which is the best depends on exactly what you want, Rubble for simple and fast, Blast for maximum compatibility and power.
 
-Note that both Rubble and Blast are both still being worked on, so the situation may change as both Blast and Rubble mature.
+Basicly I just wanted something that allowed me to do most of the things I could do with Blast, but with less fuss.
 
 ==============================================
 Install:
@@ -76,11 +76,24 @@ All the command documents are in the "raw/rubble/nca docs" directory as well as 
 BUGS:
 ==============================================
 
-The generic animal mats addon does not appear to work 100%, some things like meat are still not generic. Sometime I'll look into it, until then it may be better not to use that setting.
+None
 
 ==============================================
 Changelog:
 ==============================================
+v1.6
+	Updated script runtime to NCA6, this brings major improvements to the way script values are handled
+	Added new NCA command len, the old pre-v6 way of fetching an Indexable's element count will no longer work
+	Removed source for NCASH, this is now replaced with the ncash NCA command
+	Re-exported all of the NCA command documents
+	Fixed all the templates to work with NCA6
+	Removed the old item templates (the native ones from 1.1), this was supposed to happen in 1.5 but I forgot.
+	Changed ITEM_CLASS to be more flexable
+	Changed SHARED_INORGANIC and SHARED_MATERIAL_TEMPLATE to automaticly support tilesets
+	Added template SHARED_PLANT, just like SHARED_INORGANIC but for plants
+	Added template #WRITE_TILESET to help modders make tileset addons
+	Fixed the generic animal mats addon
+
 v1.5
 	NCA variable dereference syntax now allows index dereferencing a value (eg. [value index])
 	NCA base commands map and array changed, they no longer create a variable, they only return the new map or array

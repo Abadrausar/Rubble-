@@ -1,36 +1,62 @@
+PACKAGE
 
-And two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+package bit
+    import "dctech/nca6/bit"
+
+    NCA v6 Bitwise Commands.
+
+FUNCTIONS
+
+func CommandAnd(state *nca6.State, params []*nca6.Value)
+    Ands two values.
 
 	and a b
 
     Returns a & b
 
-Shift the value left. Opperand is converted to a 64 bit integer. Invalid strings are given the value "0" Count is converted to an uint8 with an invalid string getting the value "1".
+func CommandLShift(state *nca6.State, params []*nca6.Value)
+    Shifts the value left. Count values of 0 or less are given the value 1.
 
 	lshift a [count]
 
     Returns the param shifted "count" places
 
-Invert a value. Opperand is converted to a 64 bit integer. Invalid strings are given the value "0"
+func CommandNot(state *nca6.State, params []*nca6.Value)
+    Inverts a value.
 
 	not a
 
     Returns a ^ -1
 
-Or two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+func CommandOr(state *nca6.State, params []*nca6.Value)
+    Ors two values.
 
 	or a b
 
     Returns a | b
 
-Shift the value right. Opperand is converted to a 64 bit integer. Invalid strings are given the value "0" Count is converted to an uint8 with an invalid string getting the value "1".
+func CommandRShift(state *nca6.State, params []*nca6.Value)
+    Shifts the value right. Count values of 0 or less are given the value 1.
 
 	rshift a [count]
 
     Returns the param shifted "count" places
 
-Xor two values. Opperands are converted to 64 bit integers. Invalid strings are given the value "0"
+func CommandXor(state *nca6.State, params []*nca6.Value)
+    Xors two values.
 
 	xor a b
 
     Returns a ^ b
+
+func Setup(state *nca6.State)
+    Adds the bitwise commands to the state. The bitwise commands are:
+
+	lshift
+	rshift
+	and
+	or
+	xor
+	not
+
+

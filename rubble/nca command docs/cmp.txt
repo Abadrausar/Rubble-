@@ -1,18 +1,39 @@
+PACKAGE
 
-Equal. Does a simple string compare. Make sure numeric values are normalized. If you try to load a hexadecimal constant and compare it to a existing number it will not work correctly. A simple (set numbervar (add [numbervar] 0)) should work.
+package cmp
+    import "dctech/nca6/cmp"
+
+    NCA v6 Integer Comparison Commands.
+
+FUNCTIONS
+
+func CommandEq(state *nca6.State, params []*nca6.Value)
+    Integer equal.
 
 	eq a b
 
-    Returns "0" or "-1"
+    Returns 0 or -1
 
-Greater than. If the value can be converted to int64 that is the value used otherwise the length is used.
+func CommandGt(state *nca6.State, params []*nca6.Value)
+    Integer greater than.
 
 	gt a b
 
-    Returns "0" or "-1"
+    Returns 0 or -1
 
-Less than. If the value can be converted to int64 that is the value used otherwise the length is used.
+func CommandLt(state *nca6.State, params []*nca6.Value)
+    Integer less than.
 
 	lt a b
 
-    Returns "0" or "-1"
+    Returns 0 or -1
+
+func Setup(state *nca6.State)
+    Adds the integer comparison commands to the state. The integer
+    comparison commands are:
+
+	gt
+	lt
+	eq
+
+
