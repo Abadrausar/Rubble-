@@ -649,7 +649,7 @@ May also be used to help control variable expansion.'
 			[rubble:item_current_id]=<map
 				rarity=[rarity]
 				type=[rubble:item_current_type]
-			>)
+			>
 		>) 
 	})
 }

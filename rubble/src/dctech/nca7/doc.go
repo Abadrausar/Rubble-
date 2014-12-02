@@ -33,9 +33,11 @@ If lexing a double-quote string (that is being used as code) that has \n escape 
 the position will not match the source.
 In any case the error reporting is light-years better than that of version 3 and before.
 
+Note that any commands or internal functions that say that they may "panic with an error" have all such panics recovered before they can reach any user code (unless State.NoRecover is true).
+
 Changelog:
 This gets a little sketchy for the older versions, I didn't keep good records before version 6
-	V7
+	v7
 		Better support for semi and fully readonly Indexables
 			Indexables may now reject some or all writes
 		Multiple level indexing syntax changed
@@ -50,7 +52,7 @@ This gets a little sketchy for the older versions, I didn't keep good records be
 		Any expression that yields a value may be used in the global scope, previously only commands were allowed.
 		Column information restored to error messages, the column will display as 0 if data is not avalible.
 	
-	V6
+	v6
 		Script Values may now hold arbitrary data, just make sure that your commands know how to handle it.
 		Script code may be "compiled" into a pre-lexed version for storage, this is used by user commands and the like.
 		Error messages no longer have the column, this was (almost) always wrong anyways.
@@ -60,26 +62,26 @@ This gets a little sketchy for the older versions, I didn't keep good records be
 		The way the element count of an Indexable is fetched has changed.
 		Exit now a flag in the state, this is far more flexable than the old way
 	
-	V5
+	v5
 		New array type
 		Maps (and arrays) are now treated like Values
 	
-	V4
+	v4
 		GDM and Parser combined into State
 		Native command handler prototype changed to fit above change
 	
-	V3
+	v3
 		return value handling changed (now stored in GDM)
 		error flag added to GDM
 
-	V2
+	v2
 		array renamed map
 		optional param names
 		simple param checking (the count is verifyed (only if param names are used))
 		command handling reworked. all commands are now added to the global data manager, user commands are no longer normal variables
 		namespace. A namespace is more-or-less just a named root environment
 
-	V1
+	v1
 		The first version
 
 */

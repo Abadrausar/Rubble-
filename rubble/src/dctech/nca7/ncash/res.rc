@@ -1,0 +1,32 @@
+#include <windows.h>
+
+IDI_ICON1               ICON    DISCARDABLE     "C:/Docs/DCRes/DoubleClick.ico"
+
+1 VERSIONINFO
+    FILEVERSION     7,0,0,0
+    PRODUCTVERSION  7,0,0,0
+    FILEOS          VOS_NT
+    FILETYPE        VFT_APP
+    FILESUBTYPE     VFT2_UNKNOWN
+    FILEFLAGSMASK   0x00000000
+    FILEFLAGS       0x00000000
+{
+    BLOCK "StringFileInfo"
+    {
+        BLOCK "04090025"
+        {
+            VALUE "CompanyName", "Double Click Technologies"
+            VALUE "FileDescription", "NCASH v7"
+            VALUE "FileVersion", "7"
+            VALUE "InternalName", "NCASH"
+            VALUE "LegalCopyright", "2013 Milo Christiansen"
+            VALUE "OriginalFilename", "NCASH.exe"
+            VALUE "ProductName", "NCASH v7"
+            VALUE "ProductVersion", "7"
+        }
+    }
+    BLOCK "VarFileInfo"
+    {
+        VALUE "Translation", 0x0409, 0x0025
+    }
+}

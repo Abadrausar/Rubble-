@@ -44,14 +44,8 @@ import "io/ioutil"
 import "flag"
 import "runtime/pprof"
 
-// cmd.exe can't display line drawing chars with the default font.
-//var header = ` ╔═══════════════════════════════════════════════════════════════════════════╗
-// ║                                  NCASH 7                                  ║
-// ║                          No Clever Acronym SHell                          ║
-// ║                           Enter Ctrl+Z to exit.                           ║
-// ╚═══════════════════════════════════════════════════════════════════════════╝
-//`
-
+// The bit about "Enter Ctrl+Z to exit." is true in windows when using the default command prompt, 
+// I have no idea how to generate an EOF in linux/mac.
 var header = ` +---------------------------------------------------------------------------+
  |                                  NCASH 7                                  |
  |                          No Clever Acronym SHell                          |
@@ -60,6 +54,7 @@ var header = ` +----------------------------------------------------------------
 `
 
 var filename = flag.String("script", "", "The file to run in batch mode. If this is omited NCASH will run in interactive mode.")
+var noexit = flag.Bool("noexit", false, "If this is true NCASH will not exit after running a script in batch mode.")
 var preload = flag.String("load", "", "Path to a file containing preload code. This file is evaluated before anything else. Does not cause a switch to batch mode")
 var loadPreDefs = flag.Bool("predef", true, "Should ncash load a few extra predefined user commands? These commands are for, while, include, ++, and --.")
 var recover = flag.Bool("recover", true, "Should nca recover errors? If not NCASH will CRASH on script errors.")
@@ -208,8 +203,11 @@ func main() {
 			fmt.Println("Error:", err)
 		}
 		fmt.Println("Ret:", rtn)
-		//fmt.Println("Exiting...")
-		//return
+		
+		if !*noexit {
+			fmt.Println("Exiting...")
+			return
+		}
 	}
 
 	escape := false

@@ -61,10 +61,10 @@ User Templates in Standared Base
 	Returns [AQUIFER] if the USE_AQUIFERS config option is YES.
 
 ==============================================
-{!PRINT;<PRERAWS>...}
-{PRINT;<PRERAWS>...}
-{#PRINT;<PRERAWS>...}
-	Writes <PRERAWS> to the console. Each param gets it's own line.
+{!PRINT;<MSG>...}
+{PRINT;<MSG>...}
+{#PRINT;<MSG>...}
+	Writes <MSG> to the console. Each param gets it's own line.
 
 ==============================================
 {SHARED_PLANT;<NAME>;<DEFINITION>}
@@ -127,7 +127,7 @@ User Templates in Standared Base
 
 ==============================================
 {#WRITE_TILESET;<PATH>}
-	Write calls to SET_TILE and SET_COLOR for all calls to #TILE and #COLOR to file <PATH>.
+	Writes calls to SET_TILE and SET_COLOR for all calls to #TILE and #COLOR to file <PATH>.
 	This should only be used once to get a template for making a tileset addon, it has no other use.
 	Note that for this to work #WRITE_TILESET MUST be called AFTER every call to #TILE or #COLOR!
 

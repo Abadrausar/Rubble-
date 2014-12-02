@@ -66,6 +66,7 @@ Example "rubble.cfg":
 
 If you want to regenerate the raws for a save just run 'rubble -dfdir="./../../../.."' in the save's raw directory.
 	Keep in mind that using rubble will increase your save size by ~10MB (removing the two extra binarys will drop that amount by about half)
+	The main reason to leave Rubble in a save is if you want to be able to switch tilesets in a game in progress.
 
 All directorys used by Rubble must exist (if they do not exist nothing bad will happen, Rubble will just quietly fail).
 
@@ -78,6 +79,13 @@ None known.
 ==============================================
 Changelog:
 ==============================================
+v1.9
+	Fixed ITEM_CLASS, this template is (AFAIK) not used in the base, but it is used in the Broken Arrow addon.
+		On line 652 of file "base_templates.txt" there was an extra ')', Oops.
+	Rubble now has an icon on windows!
+	There may be some small bug fixes to the script engine, I worked on it some and I don't remember if I fixed anything other than adding hooks for (very, very) low level debugging.
+	Made a few small fixes to the docs, nothing to worry about.
+	
 v1.8
 	Updated to NCA7, this includes many small (and a few large) script changes
 		If you wrote any script code check the command docs, 
